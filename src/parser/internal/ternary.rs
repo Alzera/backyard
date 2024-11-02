@@ -1,0 +1,55 @@
+use crate::{
+  lexer::token::{ Token, TokenType, TokenTypeArrayCombine },
+  parser::{
+    node::{ Node, TernaryNode },
+    parser::{ Internal, LoopArgument, Parser },
+    utils::{ match_pattern, Lookup },
+  },
+};
+
+#[derive(Debug, Clone)]
+pub struct TernaryParser {}
+
+impl Internal for TernaryParser {
+  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+    match_pattern(tokens, [Lookup::Equal(vec![TokenType::QuestionMark])].to_vec())
+  }
+
+  fn parse(
+    &self,
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &LoopArgument
+  ) -> Option<Node> {
+    if let [_] = matched.as_slice() {
+      if args.last_expr.is_none() {
+        return None;
+      }
+      let valid = parser.get_statement(
+        &mut LoopArgument::with_tokens("ternary_valid", &[], &[TokenType::Colon])
+      );
+      if valid.is_none() {
+        return None;
+      }
+      parser.position += 1;
+      let invalid = parser.get_statement(
+        &mut LoopArgument::with_tokens(
+          "ternary_invalid",
+          &args.separators.combine(&[TokenType::Semicolon]),
+          &args.breakers
+        )
+      );
+      if invalid.is_none() {
+        return None;
+      }
+      return Some(
+        Box::new(TernaryNode {
+          condition: args.last_expr.to_owned().unwrap(),
+          valid: valid.unwrap(),
+          invalid: invalid.unwrap(),
+        })
+      );
+    }
+    None
+  }
+}

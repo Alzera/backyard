@@ -1,0 +1,80 @@
+use crate::{
+  guard,
+  guard_ok,
+  lexer::token::{ Token, TokenType, TokenTypeArrayCombine },
+  parser::{
+    node::{ CallNode, CastNode, Node, NodeTraitCast, NodeType, ParenthesisNode },
+    parser::{ Internal, LoopArgument, Parser },
+    utils::{ match_pattern, Lookup },
+  },
+};
+
+use super::call::CallParser;
+
+#[derive(Debug, Clone)]
+pub struct ParenthesisParser {}
+
+impl Internal for ParenthesisParser {
+  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+    match_pattern(
+      tokens,
+      [
+        Lookup::Equal(vec![TokenType::LeftParenthesis]),
+        // Lookup::Optional(vec![TokenType::Function, TokenType::Fn]),
+      ].to_vec()
+    )
+  }
+
+  fn parse(
+    &self,
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &LoopArgument
+  ) -> Option<Node> {
+    if let [_] = matched.as_slice() {
+      if let Some(le) = args.last_expr.clone() {
+        if le.get_type() == NodeType::Parenthesis {
+          let le = guard_ok!(le.cast::<ParenthesisNode>());
+          if le.statement.get_type() == NodeType::AnonymousFunction {
+            return Some(
+              Box::new(CallNode {
+                name: args.last_expr.to_owned().unwrap(),
+                arguments: CallParser::get_arguments(parser),
+              })
+            );
+          }
+        }
+      }
+      let statement = guard!(
+        parser.get_statement(
+          &mut LoopArgument::with_tokens(
+            "parenthesis",
+            &args.separators,
+            &args.breakers.combine(&[TokenType::RightParenthesis])
+          )
+        )
+      );
+      parser.position += 1;
+      if statement.get_type() != NodeType::Type {
+        return Some(
+          Box::new(ParenthesisNode {
+            statement,
+          })
+        );
+      }
+      let expression = guard!(
+        parser.get_statement(
+          &mut LoopArgument::with_tokens("cast", &args.separators, &args.breakers)
+        )
+      );
+
+      return Some(
+        Box::new(CastNode {
+          target: statement,
+          expression,
+        })
+      );
+    }
+    None
+  }
+}
