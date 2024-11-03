@@ -2,7 +2,8 @@ use crate::{
   guard,
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ Node, StaticLookupNode },
+    node::Node,
+    nodes::staticlookup::StaticLookupNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -27,12 +28,7 @@ impl Internal for StaticLookupParser {
   fn parse(&self, _: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
     if let [_, prop] = matched.as_slice() {
       let on = guard!(args.last_expr.to_owned());
-      return Some(
-        Box::new(StaticLookupNode {
-          on,
-          target: IdentifierParser::from_matched(prop),
-        })
-      );
+      return Some(StaticLookupNode::new(on, IdentifierParser::from_matched(prop)));
     }
     None
   }

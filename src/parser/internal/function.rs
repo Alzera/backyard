@@ -2,13 +2,19 @@ use crate::{
   guard,
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ AnonymousFunctionNode, ArrowFunctionNode, FunctionNode, Node, Nodes, ParameterNode },
+    node::{ Node, Nodes },
+    nodes::function::{ AnonymousFunctionNode, ArrowFunctionNode, FunctionNode, ParameterNode },
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, Lookup },
   },
 };
 
-use super::{ block::BlockParser, identifier::IdentifierParser, types::TypesParser };
+use super::{
+  block::BlockParser,
+  comment::CommentParser,
+  identifier::IdentifierParser,
+  types::TypesParser,
+};
 
 #[derive(Debug, Clone)]
 pub struct FunctionParser {}
@@ -77,14 +83,7 @@ impl FunctionParser {
       let return_type = FunctionParser::get_return_type(parser);
       parser.position += 1;
       let body = guard!(parser.get_statement(&mut LoopArgument::default("function_arrow")));
-      return Some(
-        Box::new(ArrowFunctionNode {
-          is_ref: is_ref.len() > 0,
-          arguments,
-          return_type,
-          body,
-        })
-      );
+      return Some(ArrowFunctionNode::new(is_ref.len() > 0, arguments, return_type, body));
     }
     None
   }
@@ -107,15 +106,7 @@ impl FunctionParser {
       }
       let return_type = FunctionParser::get_return_type(parser);
       let body = BlockParser::new(parser);
-      return Some(
-        Box::new(AnonymousFunctionNode {
-          is_ref: is_ref.len() > 0,
-          arguments,
-          uses,
-          return_type,
-          body,
-        })
-      );
+      return Some(AnonymousFunctionNode::new(is_ref.len() > 0, arguments, uses, return_type, body));
     }
     None
   }
@@ -130,13 +121,13 @@ impl FunctionParser {
         Some(BlockParser::new(parser))
       };
       return Some(
-        Box::new(FunctionNode {
-          is_ref: is_ref.len() > 0,
-          name: IdentifierParser::from_matched(name),
+        FunctionNode::new(
+          is_ref.len() > 0,
+          IdentifierParser::from_matched(name),
           arguments,
           return_type,
-          body,
-        })
+          body
+        )
       );
     }
     None
@@ -148,7 +139,7 @@ impl FunctionParser {
         "function_parameters",
         &[TokenType::Comma],
         &[TokenType::RightParenthesis],
-        &[ParserInternal::Parameter(ParameterParser {})]
+        &[ParserInternal::Parameter(ParameterParser {}), ParserInternal::Comment(CommentParser {})]
       )
     )
   }
@@ -162,7 +153,7 @@ impl FunctionParser {
             "function_return_type",
             &[TokenType::LeftCurlyBracket, TokenType::Arrow],
             &[],
-            &[ParserInternal::Type(TypesParser {})]
+            &[ParserInternal::Type(TypesParser {}), ParserInternal::Comment(CommentParser {})]
           )
         );
       }
@@ -204,13 +195,13 @@ impl Internal for ParameterParser {
         None
       };
       return Some(
-        Box::new(ParameterNode {
+        ParameterNode::new(
           variable_type,
-          is_ref: is_ref.len() > 0,
-          is_ellipsis: is_ellipsis.len() > 0,
-          name: IdentifierParser::from_matched(name),
-          value,
-        })
+          is_ref.len() > 0,
+          is_ellipsis.len() > 0,
+          IdentifierParser::from_matched(name),
+          value
+        )
       );
     }
     None

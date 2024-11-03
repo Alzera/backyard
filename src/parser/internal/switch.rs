@@ -2,11 +2,14 @@ use crate::{
   guard,
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ BlockNode, CaseNode, Node, SwitchNode },
+    node::Node,
+    nodes::{ block::BlockNode, switch::{ CaseNode, SwitchNode } },
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, Lookup },
   },
 };
+
+use super::comment::CommentParser;
 
 #[derive(Debug, Clone)]
 pub struct SwitchParser {}
@@ -38,16 +41,10 @@ impl Internal for SwitchParser {
           "switch_body",
           &[],
           &[TokenType::RightCurlyBracket, TokenType::EndSwitch],
-          &[ParserInternal::Case(CaseParser {})]
+          &[ParserInternal::Case(CaseParser {}), ParserInternal::Comment(CommentParser {})]
         )
       );
-      return Some(
-        Box::new(SwitchNode {
-          condition,
-          body: Box::new(BlockNode { statements }),
-          is_short,
-        })
-      );
+      return Some(SwitchNode::new(condition, BlockNode::new(statements), is_short));
     }
     None
   }
@@ -80,12 +77,7 @@ impl Internal for CaseParser {
         )
       );
       parser.position -= 1;
-      return Some(
-        Box::new(CaseNode {
-          condition,
-          body: Box::new(BlockNode { statements }),
-        })
-      );
+      return Some(CaseNode::new(condition, BlockNode::new(statements)));
     }
     None
   }

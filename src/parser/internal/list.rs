@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ ListNode, Node },
+    node::Node,
+    nodes::list::ListNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -26,11 +27,7 @@ impl Internal for ListParser {
       let values = parser.get_children(
         &mut LoopArgument::with_tokens("list", &[TokenType::Comma], &[TokenType::RightParenthesis])
       );
-      return Some(
-        Box::new(ListNode {
-          values,
-        })
-      );
+      return Some(ListNode::new(values));
     }
     None
   }

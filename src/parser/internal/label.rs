@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ LabelNode, Node },
+    node::Node,
+    nodes::label::LabelNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -23,11 +24,7 @@ impl Internal for LabelParser {
 
   fn parse(&self, _: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [name, _] = matched.as_slice() {
-      return Some(
-        Box::new(LabelNode {
-          label: IdentifierParser::from_matched(name),
-        })
-      );
+      return Some(LabelNode::new(IdentifierParser::from_matched(name)));
     }
     None
   }

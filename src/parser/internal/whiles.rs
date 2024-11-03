@@ -2,7 +2,8 @@ use crate::{
   guard,
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ Node, WhileNode },
+    node::Node,
+    nodes::whiles::WhileNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -33,13 +34,7 @@ impl Internal for WhileParser {
       );
       parser.position += 1;
       let (is_short, body) = guard!(BlockParser::new_or_short(parser, &[TokenType::EndWhile]));
-      return Some(
-        Box::new(WhileNode {
-          condition,
-          body,
-          is_short,
-        })
-      );
+      return Some(WhileNode::new(condition, body, is_short));
     }
     None
   }

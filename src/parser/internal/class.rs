@@ -1,13 +1,15 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ BlockNode, ClassNode, Node },
+    node::Node,
+    nodes::{ block::BlockNode, class::ClassNode },
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, some_or_default, Lookup },
   },
 };
 
 use super::{
+  comment::CommentParser,
   consts::ConstPropertyParser,
   identifier::IdentifierParser,
   method::MethodParser,
@@ -40,7 +42,10 @@ impl Internal for ClassParser {
           "class_implements",
           &[TokenType::Comma],
           &[TokenType::LeftCurlyBracket],
-          &[ParserInternal::Identifier(IdentifierParser {})]
+          &[
+            ParserInternal::Identifier(IdentifierParser {}),
+            ParserInternal::Comment(CommentParser {}),
+          ]
         )
       );
       let body = parser.get_children(
@@ -53,6 +58,7 @@ impl Internal for ClassParser {
             ParserInternal::Property(PropertyParser {}),
             ParserInternal::Method(MethodParser {}),
             ParserInternal::ConstProperty(ConstPropertyParser {}),
+            ParserInternal::Comment(CommentParser {}),
           ]
         )
       );
@@ -61,13 +67,13 @@ impl Internal for ClassParser {
         _ => None,
       };
       return Some(
-        Box::new(ClassNode {
-          modifier: some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
-          name: IdentifierParser::from_matched(name),
+        ClassNode::new(
+          some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
+          IdentifierParser::from_matched(name),
           extends,
           implements,
-          body: Box::new(BlockNode { statements: body }),
-        })
+          BlockNode::new(body)
+        )
       );
     }
     None

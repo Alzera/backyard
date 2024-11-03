@@ -2,7 +2,8 @@ use crate::{
   guard,
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ Node, ObjectAccessNode },
+    node::Node,
+    nodes::objectaccess::ObjectAccessNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -39,10 +40,10 @@ impl Internal for ObjectAccessParser {
       2 => {
         if let [_, prop] = matched.as_slice() {
           return Some(
-            Box::new(ObjectAccessNode {
-              object: args.last_expr.to_owned().unwrap(),
-              property: IdentifierParser::from_matched(prop),
-            })
+            ObjectAccessNode::new(
+              args.last_expr.to_owned().unwrap(),
+              IdentifierParser::from_matched(prop)
+            )
           );
         }
       }
@@ -57,12 +58,7 @@ impl Internal for ObjectAccessParser {
           )
         );
         parser.position += 1;
-        return Some(
-          Box::new(ObjectAccessNode {
-            object: args.last_expr.to_owned().unwrap(),
-            property: expr,
-          })
-        );
+        return Some(ObjectAccessNode::new(args.last_expr.to_owned().unwrap(), expr));
       }
       _ => {
         return None;

@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ IncludeNode, Node },
+    node::Node,
+    nodes::include::IncludeNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -43,13 +44,7 @@ impl Internal for IncludeParser {
         return None;
       }
       parser.position += 1;
-      return Some(
-        Box::new(IncludeNode {
-          is_require,
-          is_once,
-          argument: argument.unwrap(),
-        })
-      );
+      return Some(IncludeNode::new(is_require, is_once, argument.unwrap()));
     }
     None
   }

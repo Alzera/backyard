@@ -2,13 +2,19 @@ use crate::{
   guard,
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ CatchNode, Node, TryNode },
+    node::Node,
+    nodes::tries::{ CatchNode, TryNode },
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, Lookup },
   },
 };
 
-use super::{ block::BlockParser, identifier::IdentifierParser, variable::VariableParser };
+use super::{
+  block::BlockParser,
+  comment::CommentParser,
+  identifier::IdentifierParser,
+  variable::VariableParser,
+};
 
 #[derive(Debug, Clone)]
 pub struct TryParser {}
@@ -48,7 +54,10 @@ impl Internal for TryParser {
             "catch_types",
             &[TokenType::BitwiseOr],
             &[TokenType::Variable, TokenType::VariableBracketOpen],
-            &[ParserInternal::Identifier(IdentifierParser {})]
+            &[
+              ParserInternal::Identifier(IdentifierParser {}),
+              ParserInternal::Comment(CommentParser {}),
+            ]
           )
         );
         parser.position -= 1;
@@ -58,20 +67,17 @@ impl Internal for TryParser {
               "catch_variable",
               &[],
               &[TokenType::RightParenthesis],
-              &[ParserInternal::Variable(VariableParser {})]
+              &[
+                ParserInternal::Variable(VariableParser {}),
+                ParserInternal::Comment(CommentParser {}),
+              ]
             )
           )
         );
         parser.position += 1;
-        catches.push(Box::new(CatchNode { types, variable, body: BlockParser::new(parser) }));
+        catches.push(CatchNode::new(types, variable, BlockParser::new(parser)));
       }
-      return Some(
-        Box::new(TryNode {
-          body,
-          catches,
-          finally,
-        })
-      );
+      return Some(TryNode::new(body, catches, finally));
     }
     None
   }

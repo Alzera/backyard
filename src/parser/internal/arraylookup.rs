@@ -2,7 +2,8 @@ use crate::{
   guard,
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ ArrayLookupNode, Node, NodeType },
+    node::{ Node, NodeType },
+    nodes::arraylookup::ArrayLookupNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -45,12 +46,7 @@ impl Internal for ArrayLookupParser {
         )
       );
       parser.position += 1;
-      return Some(
-        Box::new(ArrayLookupNode {
-          on,
-          target,
-        })
-      );
+      return Some(ArrayLookupNode::new(on, target));
     }
     None
   }

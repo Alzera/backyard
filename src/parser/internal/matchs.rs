@@ -2,11 +2,14 @@ use crate::{
   guard,
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ MatchArmNode, MatchNode, Node },
+    node::Node,
+    nodes::matchs::{ MatchArmNode, MatchNode },
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, Lookup },
   },
 };
+
+use super::comment::CommentParser;
 
 #[derive(Debug, Clone)]
 pub struct MatchParser {}
@@ -35,15 +38,10 @@ impl Internal for MatchParser {
           "match_arm",
           &[TokenType::Comma],
           &[TokenType::RightCurlyBracket],
-          &[ParserInternal::MatchArm(MatchArmParser {})]
+          &[ParserInternal::MatchArm(MatchArmParser {}), ParserInternal::Comment(CommentParser {})]
         )
       );
-      return Some(
-        Box::new(MatchNode {
-          condition: condition,
-          arms: arms,
-        })
-      );
+      return Some(MatchNode::new(condition, arms));
     }
     None
   }
@@ -78,11 +76,6 @@ impl Internal for MatchArmParser {
       )
     );
     parser.position += 1;
-    Some(
-      Box::new(MatchArmNode {
-        conditions,
-        body,
-      })
-    )
+    Some(MatchArmNode::new(conditions, body))
   }
 }

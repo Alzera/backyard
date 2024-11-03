@@ -1,13 +1,14 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ NamespaceNode, Node },
+    node::Node,
+    nodes::namespace::NamespaceNode,
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, Lookup },
   },
 };
 
-use super::{ block::BlockParser, identifier::IdentifierParser };
+use super::{ block::BlockParser, comment::CommentParser, identifier::IdentifierParser };
 
 #[derive(Debug, Clone)]
 pub struct NamespaceParser {}
@@ -24,7 +25,10 @@ impl Internal for NamespaceParser {
           "namespace",
           &[TokenType::BackSlash],
           &[TokenType::Semicolon, TokenType::LeftCurlyBracket],
-          &[ParserInternal::Identifier(IdentifierParser {})]
+          &[
+            ParserInternal::Identifier(IdentifierParser {}),
+            ParserInternal::Comment(CommentParser {}),
+          ]
         )
       );
       let is_bracket = if let Some(t) = parser.tokens.get(parser.position - 1) {
@@ -35,13 +39,7 @@ impl Internal for NamespaceParser {
         false
       };
       let body = BlockParser::new(parser);
-      return Some(
-        Box::new(NamespaceNode {
-          name,
-          body,
-          is_bracket,
-        })
-      );
+      return Some(NamespaceNode::new(name, body, is_bracket));
     }
     None
   }

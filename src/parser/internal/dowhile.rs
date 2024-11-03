@@ -2,7 +2,8 @@ use crate::{
   guard,
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ DoWhileNode, Node },
+    node::Node,
+    nodes::dowhile::DoWhileNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -28,12 +29,7 @@ impl Internal for DoWhileParser {
         )
       );
       parser.position += 1;
-      return Some(
-        Box::new(DoWhileNode {
-          condition,
-          body,
-        })
-      );
+      return Some(DoWhileNode::new(condition, body));
     }
     None
   }

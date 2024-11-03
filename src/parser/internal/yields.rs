@@ -2,7 +2,8 @@ use crate::{
   guard,
   lexer::token::{ Token, TokenType, TokenTypeArrayCombine },
   parser::{
-    node::{ Node, YieldFromNode, YieldNode },
+    node::Node,
+    nodes::yields::{ YieldFromNode, YieldNode },
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -36,11 +37,7 @@ impl Internal for YieldParser {
         )
       );
       if has_from.len() > 0 {
-        return Some(
-          Box::new(YieldFromNode {
-            value,
-          })
-        );
+        return Some(YieldFromNode::new(value));
       }
       let mut key = None;
       if guard!(parser.tokens.get(parser.position)).token_type == TokenType::Arrow {
@@ -56,12 +53,7 @@ impl Internal for YieldParser {
           )
         );
       }
-      return Some(
-        Box::new(YieldNode {
-          key,
-          value,
-        })
-      );
+      return Some(YieldNode::new(key, value));
     }
     None
   }

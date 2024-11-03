@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ EncapsedNode, EncapsedPartNode, Node, Nodes, StringNode },
+    node::{ Node, Nodes },
+    nodes::string::{ EncapsedNode, EncapsedPartNode, StringNode },
     parser::{ Internal, LoopArgument, Parser },
   },
 };
@@ -27,11 +28,7 @@ impl Internal for StringParser {
         if string_type.token_type == TokenType::EncapsedStringOpen {
           return StringParser::parse_encapsed(parser);
         } else if string_type.token_type == TokenType::String {
-          return Some(
-            Box::new(StringNode {
-              value: string_type.value.to_owned(),
-            })
-          );
+          return Some(StringNode::new(string_type.value.to_owned()));
         }
       }
     }
@@ -49,19 +46,9 @@ impl StringParser {
           break;
         }
         TokenType::EncapsedString =>
-          values.push(
-            Box::new(EncapsedPartNode {
-              is_advanced: false,
-              value: Box::new(StringNode { value: i.value.to_owned() }),
-            })
-          ),
+          values.push(EncapsedPartNode::new(false, StringNode::new(i.value.to_owned()))),
         TokenType::Variable =>
-          values.push(
-            Box::new(EncapsedPartNode {
-              is_advanced: false,
-              value: VariableParser::new(i.value.to_owned(), false),
-            })
-          ),
+          values.push(EncapsedPartNode::new(false, VariableParser::new(i.value.to_owned(), false))),
         TokenType::AdvanceInterpolationOpen => {
           let value = parser.get_statement(
             &mut LoopArgument::with_tokens("string", &[TokenType::AdvanceInterpolationClose], &[])
@@ -70,22 +57,13 @@ impl StringParser {
           if value.is_none() {
             continue;
           }
-          values.push(
-            Box::new(EncapsedPartNode {
-              is_advanced: true,
-              value: value.unwrap(),
-            })
-          );
+          values.push(EncapsedPartNode::new(true, value.unwrap()));
         }
         _ => {
           continue;
         }
       }
     }
-    return Some(
-      Box::new(EncapsedNode {
-        values,
-      })
-    );
+    return Some(EncapsedNode::new(values));
   }
 }

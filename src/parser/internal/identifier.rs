@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ IdentifierNode, Node },
+    node::Node,
+    nodes::identifier::IdentifierNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::some_or_default,
   },
@@ -12,7 +13,7 @@ pub struct IdentifierParser {}
 
 impl IdentifierParser {
   pub fn new(name: String) -> Node {
-    Box::new(IdentifierNode { name })
+    IdentifierNode::new(name)
   }
 
   pub fn from_matched(name: &Vec<Token>) -> Node {

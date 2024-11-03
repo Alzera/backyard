@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType, TokenTypeArrayCombine },
   parser::{
-    node::{ BinNode, Node },
+    node::Node,
+    nodes::bin::BinNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -63,11 +64,7 @@ impl Internal for BinParser {
           )
         {
           return Some(
-            Box::new(BinNode {
-              left: args.last_expr.to_owned().unwrap(),
-              operator: operator.value.to_owned(),
-              right: right,
-            })
+            BinNode::new(args.last_expr.to_owned().unwrap(), operator.value.to_owned(), right)
           );
         }
       }

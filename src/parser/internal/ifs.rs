@@ -2,7 +2,8 @@ use crate::{
   guard,
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ IfNode, Node },
+    node::Node,
+    nodes::ifs::IfNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -94,14 +95,7 @@ impl Internal for IfParser {
           _ => {}
         }
       }
-      return Some(
-        Box::new(IfNode {
-          condition,
-          valid,
-          invalid,
-          is_short,
-        })
-      );
+      return Some(IfNode::new(condition, valid, invalid, is_short));
     }
     None
   }

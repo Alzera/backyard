@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ EvalNode, Node },
+    node::Node,
+    nodes::eval::EvalNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -29,11 +30,7 @@ impl Internal for EvalParser {
       if argument.is_none() {
         return None;
       }
-      return Some(
-        Box::new(EvalNode {
-          argument: argument.unwrap(),
-        })
-      );
+      return Some(EvalNode::new(argument.unwrap()));
     }
     None
   }

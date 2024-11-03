@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ MagicNode, Node },
+    node::Node,
+    nodes::magic::MagicNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, some_or_default, Lookup },
   },
@@ -18,9 +19,7 @@ impl Internal for MagicParser {
   fn parse(&self, _: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [number] = matched.as_slice() {
       return Some(
-        Box::new(MagicNode {
-          name: some_or_default(number.get(0), String::from("0"), |i| i.value.to_owned()),
-        })
+        MagicNode::new(some_or_default(number.get(0), String::from("0"), |i| i.value.to_owned()))
       );
     }
     None

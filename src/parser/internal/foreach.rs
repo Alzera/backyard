@@ -2,7 +2,8 @@ use crate::{
   guard,
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ ForeachNode, Node },
+    node::Node,
+    nodes::foreach::ForeachNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -62,15 +63,7 @@ impl Internal for ForeachParser {
       parser.position += 1;
       if let Some((key, value)) = ForeachParser::get_key_value(parser) {
         let (is_short, body) = guard!(BlockParser::new_or_short(parser, &[TokenType::EndForeach]));
-        return Some(
-          Box::new(ForeachNode {
-            source,
-            key,
-            value,
-            body,
-            is_short,
-          })
-        );
+        return Some(ForeachNode::new(source, key, value, body, is_short));
       }
     }
     None

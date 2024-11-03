@@ -1,13 +1,14 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ GlobalNode, Node },
+    node::Node,
+    nodes::global::GlobalNode,
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, Lookup },
   },
 };
 
-use super::variable::VariableParser;
+use super::{ comment::CommentParser, variable::VariableParser };
 
 #[derive(Debug, Clone)]
 pub struct GlobalParser {}
@@ -32,11 +33,14 @@ impl Internal for GlobalParser {
             "global",
             &[],
             &[TokenType::Semicolon],
-            &[ParserInternal::Variable(VariableParser {})]
+            &[
+              ParserInternal::Variable(VariableParser {}),
+              ParserInternal::Comment(CommentParser {}),
+            ]
           )
         )
       {
-        return Some(Box::new(GlobalNode { variable }));
+        return Some(GlobalNode::new(variable));
       }
     }
     None

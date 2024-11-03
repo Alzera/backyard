@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType, TokenTypeArrayCombine },
   parser::{
-    node::{ Node, TernaryNode },
+    node::Node,
+    nodes::ternary::TernaryNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -43,11 +44,7 @@ impl Internal for TernaryParser {
         return None;
       }
       return Some(
-        Box::new(TernaryNode {
-          condition: args.last_expr.to_owned().unwrap(),
-          valid: valid.unwrap(),
-          invalid: invalid.unwrap(),
-        })
+        TernaryNode::new(args.last_expr.to_owned().unwrap(), valid.unwrap(), invalid.unwrap())
       );
     }
     None

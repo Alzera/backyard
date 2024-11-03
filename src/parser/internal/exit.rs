@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ ExitNode, Node },
+    node::Node,
+    nodes::exit::ExitNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -29,11 +30,7 @@ impl Internal for ExitParser {
       if argument.is_none() {
         return None;
       }
-      return Some(
-        Box::new(ExitNode {
-          argument: argument.unwrap(),
-        })
-      );
+      return Some(ExitNode::new(argument.unwrap()));
     }
     None
   }

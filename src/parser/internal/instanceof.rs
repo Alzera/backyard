@@ -2,7 +2,8 @@ use crate::{
   guard,
   lexer::token::{ Token, TokenType, TokenTypeArrayCombine },
   parser::{
-    node::{ InstanceOfNode, Node },
+    node::Node,
+    nodes::instanceof::InstanceOfNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -32,12 +33,7 @@ impl Internal for InstanceOfParser {
           )
         )
       );
-      return Some(
-        Box::new(InstanceOfNode {
-          left: args.last_expr.to_owned().unwrap(),
-          right,
-        })
-      );
+      return Some(InstanceOfNode::new(args.last_expr.to_owned().unwrap(), right));
     }
     None
   }

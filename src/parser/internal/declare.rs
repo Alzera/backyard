@@ -1,13 +1,14 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ BodyType, DeclareArgumentNode, DeclareNode, Node },
+    node::{ BodyType, Node },
+    nodes::declare::{ DeclareArgumentNode, DeclareNode },
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, Lookup },
   },
 };
 
-use super::{ block::BlockParser, identifier::IdentifierParser };
+use super::{ block::BlockParser, comment::CommentParser, identifier::IdentifierParser };
 
 #[derive(Debug, Clone)]
 pub struct DeclareParser {}
@@ -30,7 +31,10 @@ impl Internal for DeclareParser {
           "declare",
           &[TokenType::Comma],
           &[TokenType::RightParenthesis],
-          &[ParserInternal::DeclareArgument(DeclareArgumentParser {})]
+          &[
+            ParserInternal::DeclareArgument(DeclareArgumentParser {}),
+            ParserInternal::Comment(CommentParser {}),
+          ]
         )
       );
       let body_type: BodyType = {
@@ -49,13 +53,7 @@ impl Internal for DeclareParser {
         BodyType::Basic => Some(BlockParser::new(parser)),
         BodyType::Short => Some(BlockParser::new_short(parser, &[TokenType::EndDeclare])),
       };
-      return Some(
-        Box::new(DeclareNode {
-          arguments,
-          body,
-          body_type,
-        })
-      );
+      return Some(DeclareNode::new(arguments, body, body_type));
     }
     None
   }
@@ -86,12 +84,7 @@ impl Internal for DeclareArgumentParser {
           )
         )
       {
-        return Some(
-          Box::new(DeclareArgumentNode {
-            name: IdentifierParser::from_matched(name),
-            value,
-          })
-        );
+        return Some(DeclareArgumentNode::new(IdentifierParser::from_matched(name), value));
       }
     }
     None

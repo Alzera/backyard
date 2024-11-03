@@ -1,7 +1,16 @@
 use crate::{
   lexer::token::{ Token, TokenType, TokenTypeArrayCombine },
   parser::{
-    node::{ BreakNode, ContinueNode, EchoNode, NewNode, Node, PrintNode, ReturnNode, ThrowNode },
+    node::Node,
+    nodes::singles::{
+      BreakNode,
+      ContinueNode,
+      EchoNode,
+      NewNode,
+      PrintNode,
+      ReturnNode,
+      ThrowNode,
+    },
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -47,9 +56,9 @@ impl Internal for SinglesParser {
           )
         );
         let node: Option<Node> = match key.token_type {
-          TokenType::Break => Some(Box::new(BreakNode { argument: argument.to_owned() })),
-          TokenType::Continue => Some(Box::new(ContinueNode { argument: argument.to_owned() })),
-          TokenType::Return => Some(Box::new(ReturnNode { argument: argument.to_owned() })),
+          TokenType::Break => Some(BreakNode::new(argument.to_owned())),
+          TokenType::Continue => Some(ContinueNode::new(argument.to_owned())),
+          TokenType::Return => Some(ReturnNode::new(argument.to_owned())),
           _ => None,
         };
         if node.is_some() {
@@ -60,10 +69,10 @@ impl Internal for SinglesParser {
         }
         let argument = argument.unwrap();
         return match key.token_type {
-          TokenType::Echo => Some(Box::new(EchoNode { argument })),
-          TokenType::New => Some(Box::new(NewNode { argument })),
-          TokenType::Print => Some(Box::new(PrintNode { argument })),
-          TokenType::Throw => Some(Box::new(ThrowNode { argument })),
+          TokenType::Echo => Some(EchoNode::new(argument)),
+          TokenType::New => Some(NewNode::new(argument)),
+          TokenType::Print => Some(PrintNode::new(argument)),
+          TokenType::Throw => Some(ThrowNode::new(argument)),
           _ => None,
         };
       }

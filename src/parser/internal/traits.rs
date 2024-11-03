@@ -1,13 +1,15 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ BlockNode, Node, TraitNode },
+    node::Node,
+    nodes::{ block::BlockNode, traits::TraitNode },
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, Lookup },
   },
 };
 
 use super::{
+  comment::CommentParser,
   consts::ConstPropertyParser,
   identifier::IdentifierParser,
   method::MethodParser,
@@ -39,15 +41,11 @@ impl Internal for TraitParser {
             ParserInternal::Property(PropertyParser {}),
             ParserInternal::Method(MethodParser {}),
             ParserInternal::ConstProperty(ConstPropertyParser {}),
+            ParserInternal::Comment(CommentParser {}),
           ]
         )
       );
-      return Some(
-        Box::new(TraitNode {
-          name: IdentifierParser::from_matched(name),
-          body: Box::new(BlockNode { statements: body }),
-        })
-      );
+      return Some(TraitNode::new(IdentifierParser::from_matched(name), BlockNode::new(body)));
     }
     None
   }

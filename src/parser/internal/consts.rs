@@ -1,13 +1,14 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ ConstNode, ConstPropertyNode, Node, Nodes },
+    node::{ Node, Nodes },
+    nodes::consts::{ ConstNode, ConstPropertyNode },
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, some_or_default, Lookup },
   },
 };
 
-use super::{ assignment::AssignmentParser, identifier::IdentifierParser };
+use super::{ assignment::AssignmentParser, comment::CommentParser, identifier::IdentifierParser };
 
 #[derive(Debug, Clone)]
 pub struct ConstParser {}
@@ -22,6 +23,7 @@ impl ConstParser {
         &[
           ParserInternal::Identifier(IdentifierParser {}),
           ParserInternal::Assignment(AssignmentParser {}),
+          ParserInternal::Comment(CommentParser {}),
         ]
       )
     );
@@ -37,11 +39,7 @@ impl Internal for ConstParser {
 
   fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [_] = matched.as_slice() {
-      return Some(
-        Box::new(ConstNode {
-          consts: ConstParser::get_consts(parser),
-        })
-      );
+      return Some(ConstNode::new(ConstParser::get_consts(parser)));
     }
     None
   }
@@ -64,10 +62,10 @@ impl Internal for ConstPropertyParser {
   fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [visibility, _] = matched.as_slice() {
       return Some(
-        Box::new(ConstPropertyNode {
-          visibility: some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
-          consts: ConstParser::get_consts(parser),
-        })
+        ConstPropertyNode::new(
+          some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
+          ConstParser::get_consts(parser)
+        )
       );
     }
     None

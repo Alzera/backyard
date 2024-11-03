@@ -1,13 +1,14 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ ArgumentNode, CallNode, Node, Nodes },
+    node::{ Node, Nodes },
+    nodes::call::{ ArgumentNode, CallNode },
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, Lookup },
   },
 };
 
-use super::identifier::IdentifierParser;
+use super::{ comment::CommentParser, identifier::IdentifierParser };
 
 #[derive(Debug, Clone)]
 pub struct CallParser {}
@@ -19,7 +20,7 @@ impl CallParser {
         "call",
         &[TokenType::Comma],
         &[TokenType::RightParenthesis],
-        &[ParserInternal::Argument(ArgumentParser {})]
+        &[ParserInternal::Argument(ArgumentParser {}), ParserInternal::Comment(CommentParser {})]
       )
     )
   }
@@ -40,10 +41,10 @@ impl Internal for CallParser {
     if let [name, _] = matched.as_slice() {
       if let Some(name) = name.get(0) {
         return Some(
-          Box::new(CallNode {
-            name: IdentifierParser::new(name.value.to_owned()),
-            arguments: CallParser::get_arguments(parser),
-          })
+          CallNode::new(
+            IdentifierParser::new(name.value.to_owned()),
+            CallParser::get_arguments(parser)
+          )
         );
       }
     }
@@ -82,12 +83,7 @@ impl Internal for ArgumentParser {
         1 => Some(IdentifierParser::from_matched(name)),
         _ => None,
       };
-      return Some(
-        Box::new(ArgumentNode {
-          name,
-          value: value.unwrap(),
-        })
-      );
+      return Some(ArgumentNode::new(name, value.unwrap()));
     }
     None
   }

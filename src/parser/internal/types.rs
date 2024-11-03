@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ Node, TypeNode },
+    node::Node,
+    nodes::types::TypeNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -17,12 +18,7 @@ impl TypesParser {
         let is_nullable =
           is_nullable.len() > 0 &&
           is_nullable.get(0).unwrap().token_type == TokenType::QuestionMark;
-        return Some(
-          Box::new(TypeNode {
-            is_nullable,
-            name: type_name.value.to_owned(),
-          })
-        );
+        return Some(TypeNode::new(is_nullable, type_name.value.to_owned()));
       }
     }
     None

@@ -8,6 +8,12 @@ macro_rules! guard {
           }
       }
   };
+  ($option:expr, $default:expr) => {
+      match $option {
+          Some(value) => value,
+          None => $default,
+      }
+  };
   ($option:expr, $failure:block) => {
       match $option {
           Some(value) => value,

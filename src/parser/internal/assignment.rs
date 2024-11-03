@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType, TokenTypeArrayCombine },
   parser::{
-    node::{ AssignmentNode, Node },
+    node::Node,
+    nodes::assignment::AssignmentNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -55,11 +56,11 @@ impl Internal for AssignmentParser {
           )
         {
           return Some(
-            Box::new(AssignmentNode {
-              left: args.last_expr.to_owned().unwrap(),
-              operator: operator.value.to_owned(),
-              right: right,
-            })
+            AssignmentNode::new(
+              args.last_expr.to_owned().unwrap(),
+              operator.value.to_owned(),
+              right
+            )
           );
         }
       }

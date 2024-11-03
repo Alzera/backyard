@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ Node, NumberNode },
+    node::Node,
+    nodes::number::NumberNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::some_or_default,
   },
@@ -22,9 +23,7 @@ impl Internal for NumberParser {
   fn parse(&self, _: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [number] = matched.as_slice() {
       return Some(
-        Box::new(NumberNode {
-          value: some_or_default(number.get(0), String::from("0"), |i| i.value.to_owned()),
-        })
+        NumberNode::new(some_or_default(number.get(0), String::from("0"), |i| i.value.to_owned()))
       );
     }
     None

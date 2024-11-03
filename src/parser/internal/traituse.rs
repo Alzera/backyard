@@ -2,13 +2,17 @@ use crate::{
   guard,
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ BlockNode, Node, TraitUseAliasNode, TraitUseNode, TraitUsePrecedenceNode },
+    node::Node,
+    nodes::{
+      block::BlockNode,
+      traituse::{ TraitUseAliasNode, TraitUseNode, TraitUsePrecedenceNode },
+    },
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, some_or_default, Lookup },
   },
 };
 
-use super::identifier::IdentifierParser;
+use super::{ comment::CommentParser, identifier::IdentifierParser };
 
 #[derive(Debug, Clone)]
 pub struct TraitUseParser {}
@@ -25,7 +29,10 @@ impl Internal for TraitUseParser {
           "traituse",
           &[TokenType::Comma],
           &[TokenType::Semicolon, TokenType::LeftCurlyBracket],
-          &[ParserInternal::Identifier(IdentifierParser {})]
+          &[
+            ParserInternal::Identifier(IdentifierParser {}),
+            ParserInternal::Comment(CommentParser {}),
+          ]
         )
       );
       let mut adaptations: Option<Node> = None;
@@ -40,17 +47,13 @@ impl Internal for TraitUseParser {
             &[
               ParserInternal::TraitUseAlias(TraitUseAliasParser {}),
               ParserInternal::TraitUsePrecedence(TraitUsePrecedenceParser {}),
+              ParserInternal::Comment(CommentParser {}),
             ]
           )
         );
-        adaptations = Some(Box::new(BlockNode { statements: adaptations_body }));
+        adaptations = Some(BlockNode::new(adaptations_body));
       }
-      return Some(
-        Box::new(TraitUseNode {
-          traits,
-          adaptations,
-        })
-      );
+      return Some(TraitUseNode::new(traits, adaptations));
     }
     None
   }
@@ -84,12 +87,12 @@ impl Internal for TraitUseAliasParser {
         _ => None,
       };
       return Some(
-        Box::new(TraitUseAliasNode {
-          trait_name: trait_name_parsed,
-          method: IdentifierParser::from_matched(name_to_parsed),
-          alias: IdentifierParser::from_matched(alias),
-          visibility: some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
-        })
+        TraitUseAliasNode::new(
+          trait_name_parsed,
+          IdentifierParser::from_matched(name_to_parsed),
+          IdentifierParser::from_matched(alias),
+          some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned())
+        )
       );
     }
     None
@@ -123,11 +126,11 @@ impl Internal for TraitUsePrecedenceParser {
         _ => None,
       };
       return Some(
-        Box::new(TraitUsePrecedenceNode {
-          trait_name: trait_name_parsed,
-          method: IdentifierParser::from_matched(name_to_parsed),
-          instead: IdentifierParser::from_matched(instead),
-        })
+        TraitUsePrecedenceNode::new(
+          trait_name_parsed,
+          IdentifierParser::from_matched(name_to_parsed),
+          IdentifierParser::from_matched(instead)
+        )
       );
     }
     None

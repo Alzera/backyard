@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ BodyType, ForNode, Node },
+    node::{ BodyType, Node },
+    nodes::fors::ForNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -49,15 +50,7 @@ impl Internal for ForParser {
         };
         body = Some(parsed_block);
       }
-      return Some(
-        Box::new(ForNode {
-          inits,
-          tests,
-          increments,
-          body,
-          body_type,
-        })
-      );
+      return Some(ForNode::new(inits, tests, increments, body, body_type));
     }
     None
   }

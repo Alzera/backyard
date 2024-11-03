@@ -1,13 +1,14 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ MethodNode, Node },
+    node::Node,
+    nodes::method::MethodNode,
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, some_or_default, Lookup },
   },
 };
 
-use super::function::FunctionParser;
+use super::{ comment::CommentParser, function::FunctionParser };
 
 #[derive(Debug, Clone)]
 pub struct MethodParser {}
@@ -31,19 +32,19 @@ impl Internal for MethodParser {
           "method",
           &[TokenType::RightCurlyBracket],
           &[],
-          &[ParserInternal::Function(FunctionParser {})]
+          &[ParserInternal::Function(FunctionParser {}), ParserInternal::Comment(CommentParser {})]
         )
       );
       if function.is_none() {
         return None;
       }
       return Some(
-        Box::new(MethodNode {
-          visibility: some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
-          modifier: some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
-          is_static: is_static.len() > 0,
-          function: function.unwrap(),
-        })
+        MethodNode::new(
+          some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
+          some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
+          is_static.len() > 0,
+          function.unwrap()
+        )
       );
     }
     None

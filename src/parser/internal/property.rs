@@ -1,13 +1,14 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ Node, PropertyItemNode, PropertyNode },
+    node::Node,
+    nodes::property::{ PropertyItemNode, PropertyNode },
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, some_or_default, Lookup },
   },
 };
 
-use super::{ identifier::IdentifierParser, types::TypesParser };
+use super::{ comment::CommentParser, identifier::IdentifierParser, types::TypesParser };
 
 #[derive(Debug, Clone)]
 pub struct PropertyParser {}
@@ -40,15 +41,18 @@ impl Internal for PropertyParser {
           "property",
           &[TokenType::Comma],
           &[TokenType::Semicolon],
-          &[ParserInternal::PropertyItem(PropertyItemParser {})]
+          &[
+            ParserInternal::PropertyItem(PropertyItemParser {}),
+            ParserInternal::Comment(CommentParser {}),
+          ]
         )
       );
       return Some(
-        Box::new(PropertyNode {
-          visibility: some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
-          is_static: is_static.len() > 0,
-          items,
-        })
+        PropertyNode::new(
+          some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
+          is_static.len() > 0,
+          items
+        )
       );
     }
     None
@@ -86,11 +90,7 @@ impl Internal for PropertyItemParser {
         None
       };
       return Some(
-        Box::new(PropertyItemNode {
-          name: IdentifierParser::from_matched(name),
-          variable_type,
-          value,
-        })
+        PropertyItemNode::new(IdentifierParser::from_matched(name), variable_type, value)
       );
     }
     None

@@ -1,13 +1,14 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ BlockNode, InterfaceNode, Node },
+    node::Node,
+    nodes::{ block::BlockNode, interface::InterfaceNode },
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, Lookup },
   },
 };
 
-use super::{ identifier::IdentifierParser, method::MethodParser };
+use super::{ comment::CommentParser, identifier::IdentifierParser, method::MethodParser };
 
 #[derive(Debug, Clone)]
 pub struct InterfaceParser {}
@@ -31,7 +32,10 @@ impl Internal for InterfaceParser {
           "interface_implements",
           &[TokenType::Comma],
           &[TokenType::LeftCurlyBracket],
-          &[ParserInternal::Identifier(IdentifierParser {})]
+          &[
+            ParserInternal::Identifier(IdentifierParser {}),
+            ParserInternal::Comment(CommentParser {}),
+          ]
         )
       );
       let body = parser.get_children(
@@ -39,15 +43,11 @@ impl Internal for InterfaceParser {
           "interface_body",
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
-          &[ParserInternal::Method(MethodParser {})]
+          &[ParserInternal::Method(MethodParser {}), ParserInternal::Comment(CommentParser {})]
         )
       );
       return Some(
-        Box::new(InterfaceNode {
-          name: IdentifierParser::from_matched(name),
-          implements,
-          body: Box::new(BlockNode { statements: body }),
-        })
+        InterfaceNode::new(IdentifierParser::from_matched(name), implements, BlockNode::new(body))
       );
     }
     None

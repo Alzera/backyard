@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ Node, PreNode },
+    node::Node,
+    nodes::pre::PreNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -34,12 +35,7 @@ impl Internal for PreParser {
       if argument.is_none() {
         return None;
       }
-      return Some(
-        Box::new(PreNode {
-          variable: argument.unwrap(),
-          operator: operator.unwrap().value.to_owned(),
-        })
-      );
+      return Some(PreNode::new(argument.unwrap(), operator.unwrap().value.to_owned()));
     }
     None
   }

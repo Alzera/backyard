@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ GotoNode, Node },
+    node::Node,
+    nodes::goto::GotoNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -23,11 +24,7 @@ impl Internal for GotoParser {
 
   fn parse(&self, _: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [_, identifier] = matched.as_slice() {
-      return Some(
-        Box::new(GotoNode {
-          label: IdentifierParser::from_matched(identifier),
-        })
-      );
+      return Some(GotoNode::new(IdentifierParser::from_matched(identifier)));
     }
     None
   }

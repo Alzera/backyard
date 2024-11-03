@@ -3,7 +3,8 @@ use crate::{
   guard_ok,
   lexer::token::{ Token, TokenType, TokenTypeArrayCombine },
   parser::{
-    node::{ CallNode, CastNode, Node, NodeTraitCast, NodeType, ParenthesisNode },
+    node::{ Node, NodeTraitCast, NodeType },
+    nodes::{ call::CallNode, parenthesis::{ CastNode, ParenthesisNode } },
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -37,10 +38,7 @@ impl Internal for ParenthesisParser {
           let le = guard_ok!(le.cast::<ParenthesisNode>());
           if le.statement.get_type() == NodeType::AnonymousFunction {
             return Some(
-              Box::new(CallNode {
-                name: args.last_expr.to_owned().unwrap(),
-                arguments: CallParser::get_arguments(parser),
-              })
+              CallNode::new(args.last_expr.to_owned().unwrap(), CallParser::get_arguments(parser))
             );
           }
         }
@@ -56,11 +54,7 @@ impl Internal for ParenthesisParser {
       );
       parser.position += 1;
       if statement.get_type() != NodeType::Type {
-        return Some(
-          Box::new(ParenthesisNode {
-            statement,
-          })
-        );
+        return Some(ParenthesisNode::new(statement));
       }
       let expression = guard!(
         parser.get_statement(
@@ -68,12 +62,7 @@ impl Internal for ParenthesisParser {
         )
       );
 
-      return Some(
-        Box::new(CastNode {
-          target: statement,
-          expression,
-        })
-      );
+      return Some(CastNode::new(statement, expression));
     }
     None
   }

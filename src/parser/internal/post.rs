@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ Node, PostNode },
+    node::Node,
+    nodes::post::PostNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -28,10 +29,7 @@ impl Internal for PostParser {
         return None;
       }
       return Some(
-        Box::new(PostNode {
-          variable: args.last_expr.to_owned().unwrap(),
-          operator: operator.unwrap().value.to_owned(),
-        })
+        PostNode::new(args.last_expr.to_owned().unwrap(), operator.unwrap().value.to_owned())
       );
     }
     None

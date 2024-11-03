@@ -3,12 +3,13 @@ use std::fmt::Debug;
 use crate::lexer::token::{ Token, TokenType };
 use super::{
   internal::{
-    array::ArrayParser,
+    array::{ ArrayItemParser, ArrayParser },
     arraylookup::ArrayLookupParser,
     assignment::AssignmentParser,
     bin::BinParser,
     call::{ ArgumentParser, CallParser },
     class::ClassParser,
+    comment::CommentParser,
     consts::{ ConstParser, ConstPropertyParser },
     declare::{ DeclareArgumentParser, DeclareParser },
     dowhile::DoWhileParser,
@@ -35,6 +36,7 @@ use super::{
     parenthesis::ParenthesisParser,
     post::PostParser,
     pre::PreParser,
+    program::ProgramParser,
     property::{ PropertyItemParser, PropertyParser },
     singles::SinglesParser,
     staticlookup::StaticLookupParser,
@@ -66,6 +68,7 @@ pub trait Internal: Debug {
 #[derive(Clone, Debug)]
 pub enum ParserInternal {
   Array(ArrayParser),
+  ArrayItem(ArrayItemParser),
   ArrayLookup(ArrayLookupParser),
   Argument(ArgumentParser),
   Assignment(AssignmentParser),
@@ -73,6 +76,7 @@ pub enum ParserInternal {
   Call(CallParser),
   Case(CaseParser),
   Class(ClassParser),
+  Comment(CommentParser),
   Const(ConstParser),
   ConstProperty(ConstPropertyParser),
   Declare(DeclareParser),
@@ -103,6 +107,7 @@ pub enum ParserInternal {
   Parenthesis(ParenthesisParser),
   Post(PostParser),
   Pre(PreParser),
+  Program(ProgramParser),
   Property(PropertyParser),
   PropertyItem(PropertyItemParser),
   Singles(SinglesParser),
@@ -126,6 +131,7 @@ impl ParserInternal {
   fn as_internal(&self) -> Box<&dyn Internal> {
     match self {
       ParserInternal::Array(x) => Box::new(x),
+      ParserInternal::ArrayItem(x) => Box::new(x),
       ParserInternal::ArrayLookup(x) => Box::new(x),
       ParserInternal::Argument(x) => Box::new(x),
       ParserInternal::Assignment(x) => Box::new(x),
@@ -133,6 +139,7 @@ impl ParserInternal {
       ParserInternal::Call(x) => Box::new(x),
       ParserInternal::Case(x) => Box::new(x),
       ParserInternal::Class(x) => Box::new(x),
+      ParserInternal::Comment(x) => Box::new(x),
       ParserInternal::Const(x) => Box::new(x),
       ParserInternal::ConstProperty(x) => Box::new(x),
       ParserInternal::Declare(x) => Box::new(x),
@@ -163,6 +170,7 @@ impl ParserInternal {
       ParserInternal::Parenthesis(x) => Box::new(x),
       ParserInternal::Post(x) => Box::new(x),
       ParserInternal::Pre(x) => Box::new(x),
+      ParserInternal::Program(x) => Box::new(x),
       ParserInternal::Property(x) => Box::new(x),
       ParserInternal::PropertyItem(x) => Box::new(x),
       ParserInternal::Singles(x) => Box::new(x),
@@ -184,7 +192,8 @@ impl ParserInternal {
   }
 }
 
-pub static DEFAULT_PARSERS: [ParserInternal; 43] = [
+pub static DEFAULT_PARSERS: [ParserInternal; 45] = [
+  ParserInternal::Comment(CommentParser {}),
   ParserInternal::Goto(GotoParser {}),
   ParserInternal::Label(LabelParser {}),
   ParserInternal::List(ListParser {}),
@@ -219,6 +228,7 @@ pub static DEFAULT_PARSERS: [ParserInternal; 43] = [
   ParserInternal::Number(NumberParser {}),
   ParserInternal::Post(PostParser {}),
   ParserInternal::Pre(PreParser {}),
+  ParserInternal::Program(ProgramParser {}),
   ParserInternal::Singles(SinglesParser {}),
   ParserInternal::StaticLookup(StaticLookupParser {}),
   ParserInternal::Yield(YieldParser {}),
@@ -353,6 +363,8 @@ impl Parser {
           NodeType::Case,
           NodeType::Label,
           NodeType::Try,
+          NodeType::CommentLine,
+          NodeType::CommentBlock,
         ].contains(&n.get_type());
         // println!(
         //   "get_statement force_end_statement: {:?}, {:?}",

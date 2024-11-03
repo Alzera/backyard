@@ -1,13 +1,14 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ Node, UseNode },
+    node::Node,
+    nodes::uses::UseNode,
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, some_or_default, Lookup },
   },
 };
 
-use super::identifier::IdentifierParser;
+use super::{ comment::CommentParser, identifier::IdentifierParser };
 
 #[derive(Debug, Clone)]
 pub struct UsesParser {}
@@ -31,7 +32,10 @@ impl Internal for UsesParser {
           "uses_name",
           &[TokenType::BackSlash],
           &[TokenType::Semicolon, TokenType::LeftCurlyBracket],
-          &[ParserInternal::Identifier(IdentifierParser {})]
+          &[
+            ParserInternal::Identifier(IdentifierParser {}),
+            ParserInternal::Comment(CommentParser {}),
+          ]
         )
       );
       let items = {
@@ -43,14 +47,17 @@ impl Internal for UsesParser {
                 "uses_items",
                 &[TokenType::Comma],
                 &[TokenType::RightCurlyBracket],
-                &[ParserInternal::Identifier(IdentifierParser {})]
+                &[
+                  ParserInternal::Identifier(IdentifierParser {}),
+                  ParserInternal::Comment(CommentParser {}),
+                ]
               )
             );
           }
         }
         items
       };
-      return Some(Box::new(UseNode { modifier, name, items }));
+      return Some(UseNode::new(modifier, name, items));
     }
     None
   }

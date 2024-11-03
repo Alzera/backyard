@@ -1,7 +1,8 @@
 use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
-    node::{ Node, VariableNode },
+    node::Node,
+    nodes::variable::VariableNode,
     parser::{ Internal, LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -18,7 +19,7 @@ impl VariableParser {
   }
 
   pub fn new_bracked(name: Node, is_ref: bool) -> Node {
-    Box::new(VariableNode { is_ref, name })
+    VariableNode::new(is_ref, name)
   }
 }
 
