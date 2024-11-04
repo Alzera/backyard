@@ -16,7 +16,7 @@ impl Internal for ExitParser {
     match_pattern(
       tokens,
       [
-        Lookup::Equal(vec![TokenType::Exit]),
+        Lookup::Equal(vec![TokenType::Exit, TokenType::Die]),
         Lookup::Equal(vec![TokenType::LeftParenthesis]),
       ].to_vec()
     )

@@ -41,7 +41,10 @@ impl Internal for BinParser {
             TokenType::Concatenation,
             TokenType::Coalesce,
             TokenType::BooleanAnd,
-            TokenType::BooleanOr
+            TokenType::BooleanOr,
+            TokenType::And,
+            TokenType::Or,
+            TokenType::Xor
           ]
         ),
       ].to_vec()
