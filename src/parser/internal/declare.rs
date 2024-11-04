@@ -41,7 +41,7 @@ impl Internal for DeclareParser {
         let mut body_type = BodyType::Empty;
         if let Some(close) = parser.tokens.get(parser.position) {
           body_type = match close.token_type {
-            TokenType::ShortFormStart => BodyType::Short,
+            TokenType::Colon => BodyType::Short,
             TokenType::LeftCurlyBracket => BodyType::Basic,
             _ => BodyType::Empty,
           };

@@ -131,8 +131,8 @@ pub enum TokenType {
   BackSlash,
   Comma,
   Semicolon,
-  ShortForm,
-  ShortFormStart,
+  // ShortForm,
+  // ShortFormStart,
   // LineBreak,
 
   Abstract,

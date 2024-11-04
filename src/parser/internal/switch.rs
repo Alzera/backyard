@@ -33,8 +33,7 @@ impl Internal for SwitchParser {
         )
       );
       parser.position += 1;
-      let is_short =
-        guard!(parser.tokens.get(parser.position)).token_type == TokenType::ShortFormStart;
+      let is_short = guard!(parser.tokens.get(parser.position)).token_type == TokenType::Colon;
       parser.position += 1;
       let statements = parser.get_children(
         &mut LoopArgument::new(
@@ -64,7 +63,7 @@ impl Internal for CaseParser {
         TokenType::Default => None,
         _ => {
           parser.get_statement(
-            &mut LoopArgument::with_tokens("switch_case_condition", &[], &[TokenType::ShortForm])
+            &mut LoopArgument::with_tokens("switch_case_condition", &[], &[TokenType::Colon])
           )
         }
       };

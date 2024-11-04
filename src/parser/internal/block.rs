@@ -24,7 +24,7 @@ impl BlockParser {
   pub fn new_or_short(parser: &mut Parser, breakers: &[TokenType]) -> Option<(bool, Node)> {
     if let Some(start) = parser.tokens.get(parser.position) {
       return match start.token_type {
-        TokenType::ShortFormStart => Some((true, BlockParser::new_short(parser, breakers))),
+        TokenType::Colon => Some((true, BlockParser::new_short(parser, breakers))),
         TokenType::LeftCurlyBracket => Some((false, BlockParser::new(parser))),
         _ => None,
       };

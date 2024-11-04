@@ -1,4 +1,4 @@
-use crate::lexer::{ lexer::Lexer, token::{ Token, TokenType }, utils::get_tokens_level };
+use crate::lexer::{ lexer::Lexer, token::{ Token, TokenType } };
 
 pub struct KeywordToken {}
 
@@ -80,25 +80,25 @@ impl KeywordToken {
     Self::KEYS.contains(&input.as_str())
   }
 
-  pub fn lex(input: &String, lexer: &mut Lexer) -> Option<Vec<Token>> {
+  pub fn lex(input: &String, _: &mut Lexer) -> Option<Vec<Token>> {
     match input.as_str() {
       "abstract" => Some(vec![Token::new(TokenType::Abstract, input)]),
       "array" => Some(vec![Token::new(TokenType::Array, input)]),
       "as" => Some(vec![Token::new(TokenType::As, input)]),
       "break" => Some(vec![Token::new(TokenType::Break, input)]),
       "callable" => Some(vec![Token::new(TokenType::Callable, input)]),
-      "case" => KeywordToken::short_form(TokenType::Case, input, lexer),
+      "case" => Some(vec![Token::new(TokenType::Case, input)]),
       "catch" => Some(vec![Token::new(TokenType::Catch, input)]),
       "class" => Some(vec![Token::new(TokenType::Class, input)]),
       "clone" => Some(vec![Token::new(TokenType::Clone, input)]),
       "const" => Some(vec![Token::new(TokenType::Const, input)]),
       "continue" => Some(vec![Token::new(TokenType::Continue, input)]),
-      "declare" => KeywordToken::detect_short_form_complex(TokenType::Declare, input, lexer),
-      "default" => KeywordToken::detect_short_form_simple(TokenType::Default, input, lexer),
+      "declare" => Some(vec![Token::new(TokenType::Declare, input)]),
+      "default" => Some(vec![Token::new(TokenType::Default, input)]),
       "do" => Some(vec![Token::new(TokenType::Do, input)]),
       "echo" => Some(vec![Token::new(TokenType::Echo, input)]),
-      "else" => KeywordToken::detect_short_form_simple(TokenType::Else, input, lexer),
-      "elseif" => KeywordToken::detect_short_form_complex(TokenType::ElseIf, input, lexer),
+      "else" => Some(vec![Token::new(TokenType::Else, input)]),
+      "elseif" => Some(vec![Token::new(TokenType::ElseIf, input)]),
       "enddeclare" => Some(vec![Token::new(TokenType::EndDeclare, input)]),
       "endfor" => Some(vec![Token::new(TokenType::EndFor, input)]),
       "endforeach" => Some(vec![Token::new(TokenType::EndForeach, input)]),
@@ -113,13 +113,13 @@ impl KeywordToken {
       "final" => Some(vec![Token::new(TokenType::Final, input)]),
       "finally" => Some(vec![Token::new(TokenType::Finally, input)]),
       "fn" => Some(vec![Token::new(TokenType::Fn, input)]),
-      "for" => KeywordToken::detect_short_form_complex(TokenType::For, input, lexer),
-      "foreach" => KeywordToken::detect_short_form_complex(TokenType::Foreach, input, lexer),
+      "for" => Some(vec![Token::new(TokenType::For, input)]),
+      "foreach" => Some(vec![Token::new(TokenType::Foreach, input)]),
       "from" => Some(vec![Token::new(TokenType::From, input)]),
       "function" => Some(vec![Token::new(TokenType::Function, input)]),
       "global" => Some(vec![Token::new(TokenType::Global, input)]),
       "goto" => Some(vec![Token::new(TokenType::Goto, input)]),
-      "if" => KeywordToken::detect_short_form_complex(TokenType::If, input, lexer),
+      "if" => Some(vec![Token::new(TokenType::If, input)]),
       "implements" => Some(vec![Token::new(TokenType::Implements, input)]),
       "include" => Some(vec![Token::new(TokenType::Include, input)]),
       "include_once" => Some(vec![Token::new(TokenType::IncludeOnce, input)]),
@@ -143,65 +143,65 @@ impl KeywordToken {
       "static" => Some(vec![Token::new(TokenType::Static, input)]),
       "parent" => Some(vec![Token::new(TokenType::Parent, input)]),
       "self" => Some(vec![Token::new(TokenType::SelfKeyword, input)]),
-      "switch" => KeywordToken::detect_short_form_complex(TokenType::Switch, input, lexer),
+      "switch" => Some(vec![Token::new(TokenType::Switch, input)]),
       "throw" => Some(vec![Token::new(TokenType::Throw, input)]),
       "trait" => Some(vec![Token::new(TokenType::Trait, input)]),
       "try" => Some(vec![Token::new(TokenType::Try, input)]),
       "use" => Some(vec![Token::new(TokenType::Use, input)]),
       "var" => Some(vec![Token::new(TokenType::Var, input)]),
-      "while" => KeywordToken::detect_short_form_complex(TokenType::While, input, lexer),
+      "while" => Some(vec![Token::new(TokenType::While, input)]),
       "yield" => Some(vec![Token::new(TokenType::Yield, input)]),
       "xor" => Some(vec![Token::new(TokenType::Xor, input)]),
       _ => None,
     }
   }
 
-  fn short_form(token_type: TokenType, input: &String, lexer: &mut Lexer) -> Option<Vec<Token>> {
-    let mut tokens = get_tokens_level(lexer, 1, [].to_vec(), [TokenType::Colon].to_vec());
-    tokens.insert(0, Token::new(token_type, input));
-    tokens.push(Token::new(TokenType::ShortForm, ":"));
-    Some(tokens)
-  }
+  // fn short_form(token_type: TokenType, input: &String, lexer: &mut Lexer) -> Option<Vec<Token>> {
+  //   let mut tokens = get_tokens_level(lexer, 1, [].to_vec(), [TokenType::Colon].to_vec());
+  //   tokens.insert(0, Token::new(token_type, input));
+  //   tokens.push(Token::new(TokenType::ShortForm, ":"));
+  //   Some(tokens)
+  // }
 
-  fn detect_short_form_complex(
-    token_type: TokenType,
-    input: &String,
-    lexer: &mut Lexer
-  ) -> Option<Vec<Token>> {
-    let mut tokens: Vec<Token> = get_tokens_level(
-      lexer,
-      0,
-      [TokenType::LeftParenthesis].to_vec(),
-      [TokenType::RightParenthesis].to_vec()
-    );
-    tokens.insert(0, Token::new(token_type, input));
-    tokens.push(Token::new(TokenType::RightParenthesis, ")"));
+  // fn detect_short_form_complex(
+  //   token_type: TokenType,
+  //   input: &String,
+  //   lexer: &mut Lexer
+  // ) -> Option<Vec<Token>> {
+  //   let mut tokens: Vec<Token> = get_tokens_level(
+  //     lexer,
+  //     0,
+  //     [TokenType::LeftParenthesis].to_vec(),
+  //     [TokenType::RightParenthesis].to_vec()
+  //   );
+  //   tokens.insert(0, Token::new(token_type, input));
+  //   tokens.push(Token::new(TokenType::RightParenthesis, ")"));
 
-    if KeywordToken::detect_short_form(lexer) {
-      tokens.push(Token::new(TokenType::ShortFormStart, ":"));
-    }
-    Some(tokens)
-  }
+  //   if KeywordToken::detect_short_form(lexer) {
+  //     tokens.push(Token::new(TokenType::ShortFormStart, ":"));
+  //   }
+  //   Some(tokens)
+  // }
 
-  fn detect_short_form_simple(
-    token_type: TokenType,
-    input: &String,
-    lexer: &mut Lexer
-  ) -> Option<Vec<Token>> {
-    let mut tokens = vec![Token::new(token_type, input)];
-    if KeywordToken::detect_short_form(lexer) {
-      tokens.push(Token::new(TokenType::ShortForm, ":"));
-    }
-    Some(tokens)
-  }
+  // fn detect_short_form_simple(
+  //   token_type: TokenType,
+  //   input: &String,
+  //   lexer: &mut Lexer
+  // ) -> Option<Vec<Token>> {
+  //   let mut tokens = vec![Token::new(token_type, input)];
+  //   if KeywordToken::detect_short_form(lexer) {
+  //     tokens.push(Token::new(TokenType::ShortForm, ":"));
+  //   }
+  //   Some(tokens)
+  // }
 
-  fn detect_short_form(lexer: &mut Lexer) -> bool {
-    if let Some(current_char) = lexer.chars.get(lexer.position) {
-      if *current_char == ':' {
-        lexer.position += 1;
-        return true;
-      }
-    }
-    false
-  }
+  // fn detect_short_form(lexer: &mut Lexer) -> bool {
+  //   if let Some(current_char) = lexer.chars.get(lexer.position) {
+  //     if *current_char == ':' {
+  //       lexer.position += 1;
+  //       return true;
+  //     }
+  //   }
+  //   false
+  // }
 }

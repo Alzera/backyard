@@ -39,7 +39,7 @@ impl Internal for IfParser {
       let next_token = guard!(parser.tokens.get(parser.position));
       let mut is_short = false;
       let valid = match next_token.token_type {
-        TokenType::ShortFormStart => {
+        TokenType::Colon => {
           is_short = true;
           let parsed = BlockParser::new_short(
             parser,
@@ -66,7 +66,7 @@ impl Internal for IfParser {
             parser.position += 1;
             if let Some(next_token) = parser.tokens.get(parser.position) {
               match next_token.token_type {
-                TokenType::LeftCurlyBracket | TokenType::ShortFormStart | TokenType::ShortForm => {
+                TokenType::LeftCurlyBracket | TokenType::Colon => {
                   if is_short {
                     invalid = Some(BlockParser::new_short(parser, &[TokenType::EndIf]));
                   } else {
