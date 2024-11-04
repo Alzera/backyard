@@ -9,6 +9,7 @@ pub mod comment;
 pub mod consts;
 pub mod declare;
 pub mod dowhile;
+pub mod enums;
 pub mod eval;
 pub mod exit;
 pub mod foreach;

@@ -92,8 +92,6 @@ export const enum TokenType {
   BackSlash = 'BackSlash',
   Comma = 'Comma',
   Semicolon = 'Semicolon',
-  ShortForm = 'ShortForm',
-  ShortFormStart = 'ShortFormStart',
   Abstract = 'Abstract',
   Array = 'Array',
   As = 'As',

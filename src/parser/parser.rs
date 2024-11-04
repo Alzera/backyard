@@ -13,6 +13,7 @@ use super::{
     consts::{ ConstParser, ConstPropertyParser },
     declare::{ DeclareArgumentParser, DeclareParser },
     dowhile::DoWhileParser,
+    enums::{ EnumItemParser, EnumParser },
     eval::EvalParser,
     exit::ExitParser,
     foreach::ForeachParser,
@@ -82,6 +83,8 @@ pub enum ParserInternal {
   Declare(DeclareParser),
   DeclareArgument(DeclareArgumentParser),
   DoWhile(DoWhileParser),
+  Enum(EnumParser),
+  EnumItem(EnumItemParser),
   Eval(EvalParser),
   Exit(ExitParser),
   For(ForParser),
@@ -145,6 +148,8 @@ impl ParserInternal {
       ParserInternal::Declare(x) => Box::new(x),
       ParserInternal::DeclareArgument(x) => Box::new(x),
       ParserInternal::DoWhile(x) => Box::new(x),
+      ParserInternal::Enum(x) => Box::new(x),
+      ParserInternal::EnumItem(x) => Box::new(x),
       ParserInternal::Eval(x) => Box::new(x),
       ParserInternal::Exit(x) => Box::new(x),
       ParserInternal::For(x) => Box::new(x),
@@ -192,7 +197,7 @@ impl ParserInternal {
   }
 }
 
-pub static DEFAULT_PARSERS: [ParserInternal; 45] = [
+pub static DEFAULT_PARSERS: [ParserInternal; 46] = [
   ParserInternal::Comment(CommentParser {}),
   ParserInternal::Goto(GotoParser {}),
   ParserInternal::Label(LabelParser {}),
@@ -220,6 +225,7 @@ pub static DEFAULT_PARSERS: [ParserInternal; 45] = [
   ParserInternal::Class(ClassParser {}),
   ParserInternal::Interface(InterfaceParser {}),
   ParserInternal::Trait(TraitParser {}),
+  ParserInternal::Enum(EnumParser {}),
   ParserInternal::Const(ConstParser {}),
   ParserInternal::Eval(EvalParser {}),
   ParserInternal::Exit(ExitParser {}),
@@ -350,6 +356,7 @@ impl Parser {
           NodeType::Class,
           NodeType::Interface,
           NodeType::Trait,
+          NodeType::Enum,
           NodeType::Property,
           NodeType::Method,
           NodeType::TraitUse,
