@@ -20,7 +20,7 @@ impl Internal for StaticLookupParser {
       tokens,
       [
         Lookup::Equal(vec![TokenType::DoubleColon]),
-        Lookup::Equal(vec![TokenType::Identifier]),
+        Lookup::Equal(vec![TokenType::Identifier, TokenType::Class]),
       ].to_vec()
     )
   }

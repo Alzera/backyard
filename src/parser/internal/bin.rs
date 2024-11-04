@@ -39,7 +39,9 @@ impl Internal for BinParser {
             TokenType::IsGreaterOrEqual,
             TokenType::Spaceship,
             TokenType::Concatenation,
-            TokenType::Coalesce
+            TokenType::Coalesce,
+            TokenType::BooleanAnd,
+            TokenType::BooleanOr
           ]
         ),
       ].to_vec()

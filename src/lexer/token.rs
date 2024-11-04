@@ -35,6 +35,7 @@ pub enum TokenType {
   // ?
   CloseTag,
   NullsafeObjectAccess,
+  NullsafeObjectAccessBracketOpen,
   CoalesceAssignment,
   Coalesce,
   QuestionMark,

@@ -20,14 +20,21 @@ impl Internal for ObjectAccessParser {
       let Some(m) = match_pattern(
         tokens,
         [
-          Lookup::Equal(vec![TokenType::ObjectAccess]),
+          Lookup::Equal(vec![TokenType::ObjectAccess, TokenType::NullsafeObjectAccess]),
           Lookup::Equal(vec![TokenType::Identifier]),
         ].to_vec()
       )
     {
       return Some(m);
     }
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::ObjectAccessBracketOpen])].to_vec())
+    match_pattern(
+      tokens,
+      [
+        Lookup::Equal(
+          vec![TokenType::ObjectAccessBracketOpen, TokenType::NullsafeObjectAccessBracketOpen]
+        ),
+      ].to_vec()
+    )
   }
 
   fn parse(

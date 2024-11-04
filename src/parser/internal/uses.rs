@@ -38,10 +38,12 @@ impl Internal for UsesParser {
           ]
         )
       );
+      parser.position -= 1;
       let items = {
         let mut items = vec![];
-        if let Some(t) = parser.tokens.get(parser.position - 1) {
+        if let Some(t) = parser.tokens.get(parser.position) {
           if t.token_type == TokenType::LeftCurlyBracket {
+            parser.position += 1;
             items = parser.get_children(
               &mut LoopArgument::new(
                 "uses_items",

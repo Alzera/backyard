@@ -38,9 +38,9 @@ pub fn implement_node_trait(input: TokenStream) -> TokenStream {
   let func_args = field_filtered.iter().map(|f| {
     let name = &f.ident;
     let ty = &f.ty;
-    quote! { #name: #ty }
+    quote! { #name: #ty, }
   });
-  let field_setters = fields.iter().map(|f| {
+  let field_setters = field_filtered.iter().map(|f| {
     let name = f.ident.as_ref().unwrap();
     let name_str = name.to_string();
     let ty = &f.ty;
@@ -53,6 +53,20 @@ pub fn implement_node_trait(input: TokenStream) -> TokenStream {
           "Option" =>
             quote! { let _ = obj.set(#name_str, match &self.#name { Some(x) => Some(x.to_object(env)), _ => None }); },
           "Node" => quote! { let _ = obj.set(#name_str, self.#name.to_object(env)); },
+          "Vec" => {
+            if let syn::PathArguments::AngleBracketed(args) = &ident.arguments {
+              if let syn::GenericArgument::Type(ty) = &args.args[0] {
+                if let syn::Type::Path(type_path) = ty {
+                  if let Some(ident) = type_path.path.segments.last() {
+                    if ident.ident.to_string().as_str() == "String" {
+                      return quote! { let _ = obj.set(#name_str, self.#name.to_owned()); };
+                    }
+                  }
+                }
+              }
+            }
+            quote! {}
+          }
           "BodyType" => quote! { let _ = obj.set(#name_str, self.#name.to_object()); },
           "Nodes" =>
             quote! { let _ = obj.set(#name_str, self.#name.iter().map(|x| x.to_object(env)).collect::<Vec<JsObject>>()); },
@@ -70,7 +84,7 @@ pub fn implement_node_trait(input: TokenStream) -> TokenStream {
   let expanded =
     quote! {
         impl #struct_name {
-            pub fn new(#(#func_args),*) -> Box<Self> {
+            pub fn new(#(#func_args)*) -> Box<Self> {
                 Box::new(Self {
                     #(#field_inits),*,
                     leading_comments: vec![],
@@ -101,6 +115,13 @@ pub fn implement_node_trait(input: TokenStream) -> TokenStream {
                 let _ = obj.set("type", #node_type.to_string());
                 
                 #(#field_setters)*
+
+                if self.leading_comments.len() > 0 {
+                  let _ = obj.set("leading_comments", self.leading_comments.iter().map(|x| x.to_object(env)).collect::<Vec<JsObject>>());
+                }
+                if self.trailing_comments.len() > 0 {
+                  let _ = obj.set("trailing_comments", self.trailing_comments.iter().map(|x| x.to_object(env)).collect::<Vec<JsObject>>());
+                }
 
                 obj
             }

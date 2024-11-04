@@ -4,11 +4,14 @@ use crate::{
     node::Node,
     nodes::singles::{
       BreakNode,
+      CloneNode,
       ContinueNode,
       EchoNode,
       NewNode,
+      ParentNode,
       PrintNode,
       ReturnNode,
+      StaticNode,
       ThrowNode,
     },
     parser::{ Internal, LoopArgument, Parser },
@@ -33,7 +36,10 @@ impl Internal for SinglesParser {
             TokenType::New,
             TokenType::Print,
             TokenType::Return,
-            TokenType::Throw
+            TokenType::Throw,
+            TokenType::Parent,
+            TokenType::Static,
+            TokenType::Clone
           ]
         ),
       ].to_vec()
@@ -48,6 +54,13 @@ impl Internal for SinglesParser {
   ) -> Option<Node> {
     if let [key] = matched.as_slice() {
       if let Some(key) = key.first() {
+        if [TokenType::Parent, TokenType::Static].contains(&key.token_type) {
+          return match key.token_type {
+            TokenType::Parent => Some(ParentNode::new(key.value.to_owned())),
+            TokenType::Static => Some(StaticNode::new(key.value.to_owned())),
+            _ => None,
+          };
+        }
         let argument = parser.get_statement(
           &mut LoopArgument::with_tokens(
             "singles",
@@ -73,6 +86,7 @@ impl Internal for SinglesParser {
           TokenType::New => Some(NewNode::new(argument)),
           TokenType::Print => Some(PrintNode::new(argument)),
           TokenType::Throw => Some(ThrowNode::new(argument)),
+          TokenType::Clone => Some(CloneNode::new(argument)),
           _ => None,
         };
       }

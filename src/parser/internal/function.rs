@@ -3,7 +3,10 @@ use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
     node::{ Node, Nodes },
-    nodes::function::{ AnonymousFunctionNode, ArrowFunctionNode, FunctionNode, ParameterNode },
+    nodes::{
+      function::{ AnonymousFunctionNode, ArrowFunctionNode, FunctionNode, ParameterNode },
+      singles::StaticNode,
+    },
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
     utils::{ match_pattern, Lookup },
   },
@@ -27,7 +30,7 @@ impl Internal for FunctionParser {
         [
           Lookup::Equal(vec![TokenType::Function]),
           Lookup::Optional(vec![TokenType::BitwiseAnd]),
-          Lookup::Equal(vec![TokenType::Identifier]),
+          Lookup::Equal(vec![TokenType::Identifier, TokenType::Clone]),
           Lookup::Equal(vec![TokenType::LeftParenthesis]),
         ].to_vec()
       )
@@ -56,14 +59,19 @@ impl Internal for FunctionParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  fn parse(
+    &self,
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &LoopArgument
+  ) -> Option<Node> {
     match matched.len() {
       4 => FunctionParser::parse_basic(matched, parser),
       3 => {
         if let Some(f) = matched.get(0) {
           if let Some(f) = f.get(0) {
             if f.token_type == TokenType::Fn {
-              return FunctionParser::parse_arrow(matched, parser);
+              return FunctionParser::parse_arrow(matched, parser, args);
             } else if f.token_type == TokenType::Function {
               return FunctionParser::parse_anonymous(matched, parser);
             }
@@ -77,12 +85,18 @@ impl Internal for FunctionParser {
 }
 
 impl FunctionParser {
-  pub fn parse_arrow(matched: Vec<Vec<Token>>, parser: &mut Parser) -> Option<Node> {
+  pub fn parse_arrow(
+    matched: Vec<Vec<Token>>,
+    parser: &mut Parser,
+    args: &LoopArgument
+  ) -> Option<Node> {
     if let [_, is_ref, _] = matched.as_slice() {
       let arguments = FunctionParser::get_parameters(parser);
       let return_type = FunctionParser::get_return_type(parser);
       parser.position += 1;
-      let body = guard!(parser.get_statement(&mut LoopArgument::default("function_arrow")));
+      let body = guard!(
+        parser.get_statement(&mut LoopArgument::with_tokens("function_arrow", &[], args.breakers))
+      );
       return Some(ArrowFunctionNode::new(is_ref.len() > 0, arguments, return_type, body));
     }
     None
@@ -139,7 +153,11 @@ impl FunctionParser {
         "function_parameters",
         &[TokenType::Comma],
         &[TokenType::RightParenthesis],
-        &[ParserInternal::Parameter(ParameterParser {}), ParserInternal::Comment(CommentParser {})]
+        &[
+          ParserInternal::Type(TypesParser {}),
+          ParserInternal::Parameter(ParameterParser {}),
+          ParserInternal::Comment(CommentParser {}),
+        ]
       )
     )
   }
@@ -148,6 +166,12 @@ impl FunctionParser {
     if let Some(next_token) = parser.tokens.get(parser.position) {
       if next_token.token_type == TokenType::Colon {
         parser.position += 1;
+        if let Some(next_token) = parser.tokens.get(parser.position) {
+          if next_token.token_type == TokenType::Static {
+            parser.position += 1;
+            return Some(StaticNode::new(String::from("static")));
+          }
+        }
         return parser.get_statement(
           &mut LoopArgument::new(
             "function_return_type",
@@ -170,8 +194,6 @@ impl Internal for ParameterParser {
     match_pattern(
       tokens,
       [
-        Lookup::Optional(vec![TokenType::QuestionMark]),
-        Lookup::Optional(vec![TokenType::Type, TokenType::Identifier]),
         Lookup::Optional(vec![TokenType::Reference]),
         Lookup::Optional(vec![TokenType::Ellipsis]),
         Lookup::Equal(vec![TokenType::Variable]),
@@ -180,9 +202,13 @@ impl Internal for ParameterParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
-    if let [is_nullable, type_name, is_ref, is_ellipsis, name, has_value] = matched.as_slice() {
-      let variable_type = TypesParser::new(is_nullable, type_name);
+  fn parse(
+    &self,
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &LoopArgument
+  ) -> Option<Node> {
+    if let [is_ref, is_ellipsis, name, has_value] = matched.as_slice() {
       let value = if has_value.len() > 0 {
         parser.get_statement(
           &mut LoopArgument::with_tokens(
@@ -196,7 +222,7 @@ impl Internal for ParameterParser {
       };
       return Some(
         ParameterNode::new(
-          variable_type,
+          args.last_expr.to_owned(),
           is_ref.len() > 0,
           is_ellipsis.len() > 0,
           IdentifierParser::from_matched(name),

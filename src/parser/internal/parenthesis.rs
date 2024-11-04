@@ -41,6 +41,10 @@ impl Internal for ParenthesisParser {
               CallNode::new(args.last_expr.to_owned().unwrap(), CallParser::get_arguments(parser))
             );
           }
+        } else if [NodeType::StaticLookup, NodeType::ObjectAccess].contains(&le.get_type()) {
+          return Some(
+            CallNode::new(args.last_expr.to_owned().unwrap(), CallParser::get_arguments(parser))
+          );
         }
       }
       let statement = guard!(

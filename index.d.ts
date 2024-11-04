@@ -25,6 +25,7 @@ export const enum TokenType {
   CommentLine = 'CommentLine',
   CloseTag = 'CloseTag',
   NullsafeObjectAccess = 'NullsafeObjectAccess',
+  NullsafeObjectAccessBracketOpen = 'NullsafeObjectAccessBracketOpen',
   CoalesceAssignment = 'CoalesceAssignment',
   Coalesce = 'Coalesce',
   QuestionMark = 'QuestionMark',

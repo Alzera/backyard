@@ -350,6 +350,7 @@ impl Parser {
           NodeType::Class,
           NodeType::Interface,
           NodeType::Trait,
+          NodeType::Property,
           NodeType::Method,
           NodeType::TraitUse,
           NodeType::Foreach,

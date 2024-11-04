@@ -278,3 +278,30 @@ pub struct PrintNode {
 //     obj
 //   }
 // }
+
+#[derive(Debug, Clone, macros::ImplementNodeTrait)]
+#[implement_node_trait(NodeType::Parent)]
+pub struct ParentNode {
+  pub raw: String,
+
+  pub leading_comments: Nodes,
+  pub trailing_comments: Nodes,
+}
+
+#[derive(Debug, Clone, macros::ImplementNodeTrait)]
+#[implement_node_trait(NodeType::Static)]
+pub struct StaticNode {
+  pub raw: String,
+
+  pub leading_comments: Nodes,
+  pub trailing_comments: Nodes,
+}
+
+#[derive(Debug, Clone, macros::ImplementNodeTrait)]
+#[implement_node_trait(NodeType::Clone)]
+pub struct CloneNode {
+  pub target: Node,
+
+  pub leading_comments: Nodes,
+  pub trailing_comments: Nodes,
+}

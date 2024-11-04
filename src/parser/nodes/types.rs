@@ -8,7 +8,7 @@ use crate::parser::node::{ NodeTrait, NodeType, Nodes };
 #[implement_node_trait(NodeType::Type)]
 pub struct TypeNode {
   pub is_nullable: bool,
-  pub name: String,
+  pub name: Vec<String>,
 
   pub leading_comments: Nodes,
   pub trailing_comments: Nodes,
