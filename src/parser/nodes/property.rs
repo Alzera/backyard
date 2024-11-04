@@ -56,7 +56,7 @@ pub struct PropertyItemNode {
 #[implement_node_trait(NodeType::Property)]
 pub struct PropertyNode {
   pub visibility: String,
-  pub is_static: bool,
+  pub modifier: String,
   pub items: Nodes,
 
   pub leading_comments: Nodes,

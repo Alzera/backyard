@@ -5,10 +5,11 @@ use crate::{
     node::{ Node, Nodes },
     nodes::{
       function::{ AnonymousFunctionNode, ArrowFunctionNode, FunctionNode, ParameterNode },
+      property::PropertyNode,
       singles::StaticNode,
     },
     parser::{ Internal, LoopArgument, Parser, ParserInternal },
-    utils::{ match_pattern, Lookup },
+    utils::{ match_pattern, some_or_default, Lookup },
   },
 };
 
@@ -16,6 +17,7 @@ use super::{
   block::BlockParser,
   comment::CommentParser,
   identifier::IdentifierParser,
+  property::{ PropertyItemParser, PropertyParser },
   types::TypesParser,
 };
 
@@ -127,7 +129,23 @@ impl FunctionParser {
 
   pub fn parse_basic(matched: Vec<Vec<Token>>, parser: &mut Parser) -> Option<Node> {
     if let [_, is_ref, name, _] = matched.as_slice() {
-      let arguments = FunctionParser::get_parameters(parser);
+      let name = some_or_default(name.get(0), String::from(""), |i| i.value.to_owned());
+      let arguments = if name == "__construct" {
+        parser.get_children(
+          &mut LoopArgument::new(
+            "function_construct_parameters",
+            &[TokenType::Comma],
+            &[TokenType::RightParenthesis],
+            &[
+              ParserInternal::Type(TypesParser {}),
+              ParserInternal::ConstructorParameter(ConstructorParameterParser {}),
+              ParserInternal::Comment(CommentParser {}),
+            ]
+          )
+        )
+      } else {
+        FunctionParser::get_parameters(parser)
+      };
       let return_type = FunctionParser::get_return_type(parser);
       let body = if guard!(parser.tokens.get(parser.position)).token_type == TokenType::Semicolon {
         None
@@ -137,7 +155,7 @@ impl FunctionParser {
       return Some(
         FunctionNode::new(
           is_ref.len() > 0,
-          IdentifierParser::from_matched(name),
+          IdentifierParser::new(name),
           arguments,
           return_type,
           body
@@ -181,6 +199,42 @@ impl FunctionParser {
           )
         );
       }
+    }
+    None
+  }
+}
+
+#[derive(Debug, Clone)]
+pub struct ConstructorParameterParser {}
+
+impl Internal for ConstructorParameterParser {
+  fn test(&self, tokens: &Vec<Token>, args: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+    (PropertyParser {}).test(tokens, args)
+  }
+
+  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+    if let [visibility, modifier] = matched.as_slice() {
+      let item = guard!(
+        parser.get_statement(
+          &mut LoopArgument::new(
+            "constructor_parameter",
+            &[],
+            &[TokenType::Comma, TokenType::RightParenthesis],
+            &[
+              ParserInternal::Comment(CommentParser {}),
+              ParserInternal::Type(TypesParser {}),
+              ParserInternal::PropertyItem(PropertyItemParser {}),
+            ]
+          )
+        )
+      );
+      return Some(
+        PropertyNode::new(
+          some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
+          some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
+          vec![item]
+        )
+      );
     }
     None
   }

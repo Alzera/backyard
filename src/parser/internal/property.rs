@@ -23,7 +23,7 @@ impl Internal for PropertyParser {
         tokens,
         [
           Lookup::Optional(vec![TokenType::Public, TokenType::Private, TokenType::Protected]),
-          Lookup::Optional(vec![TokenType::Static]),
+          Lookup::Optional(vec![TokenType::Static, TokenType::Readonly]),
         ].to_vec()
       )
     {
@@ -50,7 +50,7 @@ impl Internal for PropertyParser {
   }
 
   fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
-    if let [visibility, is_static] = matched.as_slice() {
+    if let [visibility, modifier] = matched.as_slice() {
       let items = parser.get_children(
         &mut LoopArgument::new(
           "property",
@@ -66,7 +66,7 @@ impl Internal for PropertyParser {
       return Some(
         PropertyNode::new(
           some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
-          is_static.len() > 0,
+          some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
           items
         )
       );
