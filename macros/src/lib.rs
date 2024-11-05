@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{ parse_macro_input, Data, DeriveInput, Path, Type };
+use syn::{ parse_macro_input, Data, DeriveInput, Path };
 
 #[proc_macro_derive(ImplementNodeTrait, attributes(implement_node_trait))]
 pub fn implement_node_trait(input: TokenStream) -> TokenStream {
@@ -43,89 +43,80 @@ pub fn implement_node_trait(input: TokenStream) -> TokenStream {
   let field_setters = field_filtered.iter().map(|f| {
     let name = f.ident.as_ref().unwrap();
     let name_str = name.to_string();
+
+    return quote! { let _ = obj.set(#name_str, val.#name); };
+  });
+  let field_getter = field_filtered.iter().map(|f| {
+    let name = f.ident.as_ref().unwrap();
+    let name_str = name.to_string();
     let ty = &f.ty;
 
-    if let Type::Path(type_path) = ty {
-      if let Some(ident) = type_path.path.segments.last() {
-        return match ident.ident.to_string().as_str() {
-          "String" => quote! { let _ = obj.set(#name_str, &self.#name); },
-          "bool" => quote! { let _ = obj.set(#name_str, self.#name); },
-          "Option" =>
-            quote! { let _ = obj.set(#name_str, match &self.#name { Some(x) => Some(x.to_object(env)), _ => None }); },
-          "Node" => quote! { let _ = obj.set(#name_str, self.#name.to_object(env)); },
-          "Vec" => {
-            if let syn::PathArguments::AngleBracketed(args) = &ident.arguments {
-              if let syn::GenericArgument::Type(ty) = &args.args[0] {
-                if let syn::Type::Path(type_path) = ty {
-                  if let Some(ident) = type_path.path.segments.last() {
-                    if ident.ident.to_string().as_str() == "String" {
-                      return quote! { let _ = obj.set(#name_str, self.#name.to_owned()); };
-                    }
-                  }
-                }
-              }
-            }
-            quote! {}
-          }
-          "BodyType" => quote! { let _ = obj.set(#name_str, self.#name.to_object()); },
-          "Nodes" =>
-            quote! { let _ = obj.set(#name_str, self.#name.iter().map(|x| x.to_object(env)).collect::<Vec<JsObject>>()); },
-          _ => {
-            println!("Ident: {:?}", ident);
-            quote! {}
-          }
-        };
-      }
-    }
-
-    return quote! {};
+    quote! { #name: val.get::<&str, #ty>(#name_str).unwrap().unwrap() }
   });
 
   let expanded =
     quote! {
-        impl #struct_name {
-            pub fn new(#(#func_args)*) -> Box<Self> {
-                Box::new(Self {
-                    #(#field_inits),*,
-                    leading_comments: vec![],
-                    trailing_comments: vec![],
-                })
-            }
+      impl #struct_name {
+        pub fn new(#(#func_args)*) -> Box<Self> {
+          Box::new(Self {
+            #(#field_inits),*,
+            leading_comments: vec![],
+            trailing_comments: vec![],
+          })
+        }
+      }
+
+      impl napi::bindgen_prelude::ToNapiValue for #struct_name {
+        unsafe fn to_napi_value(
+          env: napi::sys::napi_env,
+          val: Self
+        ) -> napi::Result<napi::sys::napi_value> {
+          let unraw_env = napi::Env::from_raw(env);
+          let mut obj = unraw_env.create_object()?;
+          let _ = obj.set("type", #node_type.to_string());
+          
+          #(#field_setters)*
+
+          if val.leading_comments.len() > 0 {
+            let _ = obj.set("leading_comments", val.leading_comments);
+          }
+          if val.trailing_comments.len() > 0 {
+            let _ = obj.set("trailing_comments", val.trailing_comments);
+          }
+
+          napi::bindgen_prelude::Object::to_napi_value(env, obj)
+        }
+      }
+
+      impl crate::parser::node::NodeTrait for #struct_name {
+        fn add_leading_comments(&mut self, comments: crate::parser::node::Node) {
+          self.leading_comments.push(comments);
         }
 
-        impl NodeTrait for #struct_name {
-            fn add_leading_comments(&mut self, comments: crate::parser::node::Node) {
-                self.leading_comments.push(comments);
-            }
-
-            fn add_trailing_comments(&mut self, comments: crate::parser::node::Node) {
-                self.trailing_comments.push(comments);
-            }
-
-            fn get_type(&self) -> NodeType {
-               #node_type
-            }
-            
-            fn as_any(self: Box<Self>) -> Box<dyn Any> {
-                self
-            }
-
-            fn to_object(&self, env: Env) -> JsObject {
-                let mut obj = env.create_object().unwrap();
-                let _ = obj.set("type", #node_type.to_string());
-                
-                #(#field_setters)*
-
-                if self.leading_comments.len() > 0 {
-                  let _ = obj.set("leading_comments", self.leading_comments.iter().map(|x| x.to_object(env)).collect::<Vec<JsObject>>());
-                }
-                if self.trailing_comments.len() > 0 {
-                  let _ = obj.set("trailing_comments", self.trailing_comments.iter().map(|x| x.to_object(env)).collect::<Vec<JsObject>>());
-                }
-
-                obj
-            }
+        fn add_trailing_comments(&mut self, comments: crate::parser::node::Node) {
+          self.trailing_comments.push(comments);
         }
+
+        fn get_type(&self) -> crate::parser::node::NodeType {
+          #node_type
+        }
+          
+        fn as_any(self: Box<Self>) -> Box<dyn Any> {
+          self
+        }
+          
+        unsafe fn to_napi(&self, env: napi::sys::napi_env) -> napi::Result<napi::sys::napi_value> {
+          #struct_name::to_napi_value(env, self.clone())
+        }
+
+        fn from_napi(env: napi::sys::napi_env, val: napi::JsObject) -> Box<Self> where Self: Sized {
+          Box::new(Self {
+            #(#field_getter),*,
+            leading_comments: crate::guard!(val.get::<&str, Nodes>("leading_comments").unwrap(), vec![]), 
+            trailing_comments: crate::guard!(val.get::<&str, Nodes>("trailing_comments").unwrap(), vec![]),
+          })
+        }
+      }
     };
 
   TokenStream::from(expanded)

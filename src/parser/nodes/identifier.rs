@@ -1,8 +1,8 @@
 use std::any::Any;
 
-use napi::{ Env, JsObject };
+use napi::bindgen_prelude::ToNapiValue;
 
-use crate::parser::node::{ NodeTrait, NodeType, Nodes };
+use crate::parser::node::{ NodeType, Nodes };
 
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Identifier)]

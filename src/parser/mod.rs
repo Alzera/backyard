@@ -2,7 +2,7 @@ pub mod node;
 mod internal;
 mod parser;
 mod utils;
-mod nodes;
+pub mod nodes;
 
 use node::Nodes;
 use parser::LoopArgument;
