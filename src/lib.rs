@@ -8,7 +8,7 @@ mod lexer;
 mod parser;
 
 use napi::Env;
-use napi::JsObject;
+use parser::node::Nodes;
 
 use crate::lexer::{ lex as process_lex, token::Token };
 use crate::parser::parse as process_parse;
@@ -19,9 +19,6 @@ pub fn lex(input: String) -> Vec<Token> {
 }
 
 #[napi]
-pub fn parse(input: String, env: Env) -> Vec<JsObject> {
+pub fn parse(input: String, _: Env) -> Nodes {
   process_parse(input)
-    .iter()
-    .map(|x| x.to_object(env))
-    .collect()
 }
