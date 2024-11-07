@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::{ block::BlockNode, class::ClassNode },
-    parser::{ Internal, LoopArgument, Parser, ParserInternal },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, some_or_default, Lookup },
   },
 };
@@ -20,8 +20,8 @@ use super::{
 #[derive(Debug, Clone)]
 pub struct ClassParser {}
 
-impl Internal for ClassParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl ClassParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -35,7 +35,7 @@ impl Internal for ClassParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [modifier, _, name, _, extends, _] = matched.as_slice() {
       let implements = parser.get_children(
         &mut LoopArgument::new(
@@ -43,8 +43,8 @@ impl Internal for ClassParser {
           &[TokenType::Comma],
           &[TokenType::LeftCurlyBracket],
           &[
-            ParserInternal::Identifier(IdentifierParser {}),
-            ParserInternal::Comment(CommentParser {}),
+            (IdentifierParser::test, IdentifierParser::parse),
+            (CommentParser::test, CommentParser::parse),
           ]
         )
       );
@@ -54,11 +54,11 @@ impl Internal for ClassParser {
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
           &[
-            ParserInternal::TraitUse(TraitUseParser {}),
-            ParserInternal::Property(PropertyParser {}),
-            ParserInternal::Method(MethodParser {}),
-            ParserInternal::ConstProperty(ConstPropertyParser {}),
-            ParserInternal::Comment(CommentParser {}),
+            (TraitUseParser::test, TraitUseParser::parse),
+            (PropertyParser::test, PropertyParser::parse),
+            (MethodParser::test, MethodParser::parse),
+            (ConstPropertyParser::test, ConstPropertyParser::parse),
+            (CommentParser::test, CommentParser::parse),
           ]
         )
       );

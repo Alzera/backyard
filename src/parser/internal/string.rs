@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::{ Node, Nodes },
     nodes::string::{ EncapsedNode, EncapsedPartNode, StringNode },
-    parser::{ Internal, LoopArgument, Parser },
+    parser::{ LoopArgument, Parser },
   },
 };
 
@@ -12,8 +12,8 @@ use super::variable::VariableParser;
 #[derive(Debug, Clone)]
 pub struct StringParser {}
 
-impl Internal for StringParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl StringParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     if let Some(token) = tokens.get(0) {
       if [TokenType::EncapsedStringOpen, TokenType::String].contains(&token.token_type) {
         return Some(vec![vec![token.to_owned()]]);
@@ -22,7 +22,7 @@ impl Internal for StringParser {
     None
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [string_type] = matched.as_slice() {
       if let Some(string_type) = string_type.get(0) {
         if string_type.token_type == TokenType::EncapsedStringOpen {

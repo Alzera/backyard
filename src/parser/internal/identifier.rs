@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::identifier::IdentifierNode,
-    parser::{ Internal, LoopArgument, Parser },
+    parser::{ LoopArgument, Parser },
     utils::some_or_default,
   },
 };
@@ -21,8 +21,8 @@ impl IdentifierParser {
   }
 }
 
-impl Internal for IdentifierParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl IdentifierParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     let token = tokens.get(0).unwrap();
     if [TokenType::Identifier].contains(&token.token_type) {
       return Some(vec![vec![token.to_owned()]]);
@@ -30,7 +30,7 @@ impl Internal for IdentifierParser {
     None
   }
 
-  fn parse(&self, _: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [identifier] = matched.as_slice() {
       return Some(IdentifierParser::from_matched(identifier));
     }

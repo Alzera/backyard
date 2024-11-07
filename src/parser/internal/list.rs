@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::list::ListNode,
-    parser::{ Internal, LoopArgument, Parser },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -11,8 +11,8 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct ListParser {}
 
-impl Internal for ListParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl ListParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -22,7 +22,7 @@ impl Internal for ListParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [_, _] = matched.as_slice() {
       let values = parser.get_children(
         &mut LoopArgument::with_tokens("list", &[TokenType::Comma], &[TokenType::RightParenthesis])

@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::ternary::TernaryNode,
-    parser::{ Internal, LoopArgument, Parser },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -11,17 +11,12 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct TernaryParser {}
 
-impl Internal for TernaryParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl TernaryParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::QuestionMark])].to_vec())
   }
 
-  fn parse(
-    &self,
-    parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
-    args: &LoopArgument
-  ) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
     if let [_] = matched.as_slice() {
       if args.last_expr.is_none() {
         return None;

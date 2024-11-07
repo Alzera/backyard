@@ -4,7 +4,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::types::TypeNode,
-    parser::{ Internal, LoopArgument, Parser },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -25,9 +25,9 @@ pub struct TypesParser {}
 //     None
 //   }
 // }
-impl Internal for TypesParser {
+impl TypesParser {
   #[allow(unused_assignments)]
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     if
       let Some(m) = match_pattern(
         tokens,
@@ -68,7 +68,7 @@ impl Internal for TypesParser {
     Some(vec![matched])
   }
 
-  fn parse(&self, _: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if matched.len() == 2 {
       if let [is_nullable, type_name] = matched.as_slice() {
         if let Some(type_name) = type_name.get(0) {

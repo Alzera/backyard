@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::{ Node, Nodes },
     nodes::call::{ ArgumentNode, CallNode },
-    parser::{ Internal, LoopArgument, Parser, ParserInternal },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -20,14 +20,17 @@ impl CallParser {
         "call",
         &[TokenType::Comma],
         &[TokenType::RightParenthesis],
-        &[ParserInternal::Argument(ArgumentParser {}), ParserInternal::Comment(CommentParser {})]
+        &[
+          (ArgumentParser::test, ArgumentParser::parse),
+          (CommentParser::test, CommentParser::parse),
+        ]
       )
     )
   }
 }
 
-impl Internal for CallParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl CallParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -37,7 +40,7 @@ impl Internal for CallParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [name, _] = matched.as_slice() {
       if let Some(name) = name.get(0) {
         return Some(
@@ -55,8 +58,8 @@ impl Internal for CallParser {
 #[derive(Debug, Clone)]
 pub struct ArgumentParser {}
 
-impl Internal for ArgumentParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl ArgumentParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -66,7 +69,7 @@ impl Internal for ArgumentParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     // println!("ArgumentNode::parse: {:?}", matched);
     if let [name, _] = matched.as_slice() {
       let value = parser.get_statement(

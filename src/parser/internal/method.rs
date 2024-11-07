@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::method::MethodNode,
-    parser::{ Internal, LoopArgument, Parser, ParserInternal },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, some_or_default, Lookup },
   },
 };
@@ -13,8 +13,8 @@ use super::{ comment::CommentParser, function::FunctionParser };
 #[derive(Debug, Clone)]
 pub struct MethodParser {}
 
-impl Internal for MethodParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl MethodParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     let basic_grammar = [
       Lookup::Optional(vec![TokenType::Public, TokenType::Private, TokenType::Protected]),
       Lookup::Optional(vec![TokenType::Abstract, TokenType::Final]),
@@ -24,7 +24,7 @@ impl Internal for MethodParser {
     match_pattern(tokens, basic_grammar)
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [visibility, modifier, is_static, _] = matched.as_slice() {
       parser.position -= 1;
       let function = parser.get_statement(
@@ -32,7 +32,10 @@ impl Internal for MethodParser {
           "method",
           &[TokenType::RightCurlyBracket],
           &[],
-          &[ParserInternal::Function(FunctionParser {}), ParserInternal::Comment(CommentParser {})]
+          &[
+            (FunctionParser::test, FunctionParser::parse),
+            (CommentParser::test, CommentParser::parse),
+          ]
         )
       );
       if function.is_none() {

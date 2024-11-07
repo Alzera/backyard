@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::{ BodyType, Node },
     nodes::declare::{ DeclareArgumentNode, DeclareNode },
-    parser::{ Internal, LoopArgument, Parser, ParserInternal },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -13,8 +13,8 @@ use super::{ block::BlockParser, comment::CommentParser, identifier::IdentifierP
 #[derive(Debug, Clone)]
 pub struct DeclareParser {}
 
-impl Internal for DeclareParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl DeclareParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -24,7 +24,7 @@ impl Internal for DeclareParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [_, _] = matched.as_slice() {
       let arguments = parser.get_children(
         &mut LoopArgument::new(
@@ -32,8 +32,8 @@ impl Internal for DeclareParser {
           &[TokenType::Comma],
           &[TokenType::RightParenthesis],
           &[
-            ParserInternal::DeclareArgument(DeclareArgumentParser {}),
-            ParserInternal::Comment(CommentParser {}),
+            (DeclareArgumentParser::test, DeclareArgumentParser::parse),
+            (CommentParser::test, CommentParser::parse),
           ]
         )
       );
@@ -62,8 +62,8 @@ impl Internal for DeclareParser {
 #[derive(Debug, Clone)]
 pub struct DeclareArgumentParser {}
 
-impl Internal for DeclareArgumentParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl DeclareArgumentParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -73,7 +73,7 @@ impl Internal for DeclareArgumentParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [name, _] = matched.as_slice() {
       if
         let Some(value) = parser.get_statement(

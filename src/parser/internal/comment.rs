@@ -4,7 +4,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::comment::{ CommentBlockNode, CommentLineNode },
-    parser::{ Internal, LoopArgument, Parser },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -12,8 +12,8 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct CommentParser {}
 
-impl Internal for CommentParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl CommentParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -22,12 +22,7 @@ impl Internal for CommentParser {
     )
   }
 
-  fn parse(
-    &self,
-    parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
-    args: &LoopArgument
-  ) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
     if let [comment] = matched.as_slice() {
       let comment = guard!(comment.get(0));
       let comment: Node = if comment.token_type == TokenType::CommentLine {

@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::{ Node, Nodes },
     nodes::consts::{ ConstNode, ConstPropertyNode },
-    parser::{ Internal, LoopArgument, Parser, ParserInternal },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, some_or_default, Lookup },
   },
 };
@@ -21,9 +21,9 @@ impl ConstParser {
         &[TokenType::Comma],
         &[TokenType::Semicolon],
         &[
-          ParserInternal::Identifier(IdentifierParser {}),
-          ParserInternal::Assignment(AssignmentParser {}),
-          ParserInternal::Comment(CommentParser {}),
+          (IdentifierParser::test, IdentifierParser::parse),
+          (AssignmentParser::test, AssignmentParser::parse),
+          (CommentParser::test, CommentParser::parse),
         ]
       )
     );
@@ -32,12 +32,12 @@ impl ConstParser {
   }
 }
 
-impl Internal for ConstParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl ConstParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Const])].to_vec())
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [_] = matched.as_slice() {
       return Some(ConstNode::new(ConstParser::get_consts(parser)));
     }
@@ -48,8 +48,8 @@ impl Internal for ConstParser {
 #[derive(Debug, Clone)]
 pub struct ConstPropertyParser {}
 
-impl Internal for ConstPropertyParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl ConstPropertyParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -59,7 +59,7 @@ impl Internal for ConstPropertyParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [visibility, _] = matched.as_slice() {
       return Some(
         ConstPropertyNode::new(

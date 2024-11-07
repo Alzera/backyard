@@ -4,7 +4,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::tries::{ CatchNode, TryNode },
-    parser::{ Internal, LoopArgument, Parser, ParserInternal },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -19,8 +19,8 @@ use super::{
 #[derive(Debug, Clone)]
 pub struct TryParser {}
 
-impl Internal for TryParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl TryParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -30,7 +30,7 @@ impl Internal for TryParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [_, _] = matched.as_slice() {
       let body = BlockParser::new(parser);
       let mut catches: Vec<Node> = vec![];
@@ -55,8 +55,8 @@ impl Internal for TryParser {
             &[TokenType::BitwiseOr],
             &[TokenType::Variable, TokenType::VariableBracketOpen],
             &[
-              ParserInternal::Identifier(IdentifierParser {}),
-              ParserInternal::Comment(CommentParser {}),
+              (IdentifierParser::test, IdentifierParser::parse),
+              (CommentParser::test, CommentParser::parse),
             ]
           )
         );
@@ -68,8 +68,8 @@ impl Internal for TryParser {
               &[],
               &[TokenType::RightParenthesis],
               &[
-                ParserInternal::Variable(VariableParser {}),
-                ParserInternal::Comment(CommentParser {}),
+                (VariableParser::test, VariableParser::parse),
+                (CommentParser::test, CommentParser::parse),
               ]
             )
           )

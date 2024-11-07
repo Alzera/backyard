@@ -4,7 +4,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::{ block::BlockNode, switch::{ CaseNode, SwitchNode } },
-    parser::{ Internal, LoopArgument, Parser, ParserInternal },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -14,8 +14,8 @@ use super::comment::CommentParser;
 #[derive(Debug, Clone)]
 pub struct SwitchParser {}
 
-impl Internal for SwitchParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl SwitchParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -25,7 +25,7 @@ impl Internal for SwitchParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [_, _] = matched.as_slice() {
       let condition = guard!(
         parser.get_statement(
@@ -40,7 +40,10 @@ impl Internal for SwitchParser {
           "switch_body",
           &[],
           &[TokenType::RightCurlyBracket, TokenType::EndSwitch],
-          &[ParserInternal::Case(CaseParser {}), ParserInternal::Comment(CommentParser {})]
+          &[
+            (CaseParser::test, CaseParser::parse),
+            (CommentParser::test, CommentParser::parse),
+          ]
         )
       );
       return Some(SwitchNode::new(condition, BlockNode::new(statements), is_short));
@@ -52,12 +55,12 @@ impl Internal for SwitchParser {
 #[derive(Debug, Clone)]
 pub struct CaseParser {}
 
-impl Internal for CaseParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl CaseParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Case, TokenType::Default])].to_vec())
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [is_default] = matched.as_slice() {
       let condition = match guard!(is_default.get(0)).token_type {
         TokenType::Default => None,

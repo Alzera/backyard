@@ -6,7 +6,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::property::{ PropertyItemNode, PropertyNode },
-    parser::{ Internal, LoopArgument, Parser, ParserInternal },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, some_or_default, Lookup },
   },
 };
@@ -16,8 +16,8 @@ use super::{ comment::CommentParser, identifier::IdentifierParser, types::TypesP
 #[derive(Debug, Clone)]
 pub struct PropertyParser {}
 
-impl Internal for PropertyParser {
-  fn test(&self, tokens: &Vec<Token>, args: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl PropertyParser {
+  pub fn test(tokens: &Vec<Token>, args: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     if
       let Some(first_test) = match_pattern(
         tokens,
@@ -32,7 +32,7 @@ impl Internal for PropertyParser {
         .map(|i| i.len())
         .sum();
       let tmp_tokens = guard!(tokens.get(first_test_count..)).to_vec();
-      let type_test = (TypesParser {}).test(&tmp_tokens, args);
+      let type_test = TypesParser::test(&tmp_tokens, args);
       let type_test_count: usize = if type_test.is_none() {
         0
       } else {
@@ -49,7 +49,7 @@ impl Internal for PropertyParser {
     None
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [visibility, modifier] = matched.as_slice() {
       let items = parser.get_children(
         &mut LoopArgument::new(
@@ -57,9 +57,9 @@ impl Internal for PropertyParser {
           &[TokenType::Comma],
           &[TokenType::Semicolon],
           &[
-            ParserInternal::Comment(CommentParser {}),
-            ParserInternal::Type(TypesParser {}),
-            ParserInternal::PropertyItem(PropertyItemParser {}),
+            (CommentParser::test, CommentParser::parse),
+            (TypesParser::test, TypesParser::parse),
+            (PropertyItemParser::test, PropertyItemParser::parse),
           ]
         )
       );
@@ -78,8 +78,8 @@ impl Internal for PropertyParser {
 #[derive(Debug, Clone)]
 pub struct PropertyItemParser {}
 
-impl Internal for PropertyItemParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl PropertyItemParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -89,12 +89,7 @@ impl Internal for PropertyItemParser {
     )
   }
 
-  fn parse(
-    &self,
-    parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
-    args: &LoopArgument
-  ) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
     if let [name, has_value] = matched.as_slice() {
       let value = if has_value.len() > 0 {
         parser.get_statement(

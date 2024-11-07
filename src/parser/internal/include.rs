@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::include::IncludeNode,
-    parser::{ Internal, LoopArgument, Parser },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -11,8 +11,8 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct IncludeParser {}
 
-impl Internal for IncludeParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl IncludeParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -29,7 +29,7 @@ impl Internal for IncludeParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [keyword, _] = matched.as_slice() {
       let mut is_require = false;
       let mut is_once = false;

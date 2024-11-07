@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::global::GlobalNode,
-    parser::{ Internal, LoopArgument, Parser, ParserInternal },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -13,8 +13,8 @@ use super::{ comment::CommentParser, variable::VariableParser };
 #[derive(Debug, Clone)]
 pub struct GlobalParser {}
 
-impl Internal for GlobalParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl GlobalParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -24,7 +24,7 @@ impl Internal for GlobalParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [_, _] = matched.as_slice() {
       parser.position -= 1;
       if
@@ -34,8 +34,8 @@ impl Internal for GlobalParser {
             &[],
             &[TokenType::Semicolon],
             &[
-              ParserInternal::Variable(VariableParser {}),
-              ParserInternal::Comment(CommentParser {}),
+              (VariableParser::test, VariableParser::parse),
+              (CommentParser::test, CommentParser::parse),
             ]
           )
         )

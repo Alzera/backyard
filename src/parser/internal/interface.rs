@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::{ block::BlockNode, interface::InterfaceNode },
-    parser::{ Internal, LoopArgument, Parser, ParserInternal },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -13,8 +13,8 @@ use super::{ comment::CommentParser, identifier::IdentifierParser, method::Metho
 #[derive(Debug, Clone)]
 pub struct InterfaceParser {}
 
-impl Internal for InterfaceParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl InterfaceParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -25,7 +25,7 @@ impl Internal for InterfaceParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [_, name, _] = matched.as_slice() {
       let implements = parser.get_children(
         &mut LoopArgument::new(
@@ -33,8 +33,8 @@ impl Internal for InterfaceParser {
           &[TokenType::Comma],
           &[TokenType::LeftCurlyBracket],
           &[
-            ParserInternal::Identifier(IdentifierParser {}),
-            ParserInternal::Comment(CommentParser {}),
+            (IdentifierParser::test, IdentifierParser::parse),
+            (CommentParser::test, CommentParser::parse),
           ]
         )
       );
@@ -43,7 +43,10 @@ impl Internal for InterfaceParser {
           "interface_body",
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
-          &[ParserInternal::Method(MethodParser {}), ParserInternal::Comment(CommentParser {})]
+          &[
+            (MethodParser::test, MethodParser::parse),
+            (CommentParser::test, CommentParser::parse),
+          ]
         )
       );
       return Some(

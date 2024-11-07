@@ -4,7 +4,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::objectaccess::ObjectAccessNode,
-    parser::{ Internal, LoopArgument, Parser },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -14,8 +14,8 @@ use super::identifier::IdentifierParser;
 #[derive(Debug, Clone)]
 pub struct ObjectAccessParser {}
 
-impl Internal for ObjectAccessParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl ObjectAccessParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     if
       let Some(m) = match_pattern(
         tokens,
@@ -37,12 +37,7 @@ impl Internal for ObjectAccessParser {
     )
   }
 
-  fn parse(
-    &self,
-    parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
-    args: &LoopArgument
-  ) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
     match matched.len() {
       2 => {
         if let [_, prop] = matched.as_slice() {

@@ -7,7 +7,7 @@ use crate::{
       block::BlockNode,
       traituse::{ TraitUseAliasNode, TraitUseNode, TraitUsePrecedenceNode },
     },
-    parser::{ Internal, LoopArgument, Parser, ParserInternal },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, some_or_default, Lookup },
   },
 };
@@ -17,12 +17,12 @@ use super::{ comment::CommentParser, identifier::IdentifierParser };
 #[derive(Debug, Clone)]
 pub struct TraitUseParser {}
 
-impl Internal for TraitUseParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl TraitUseParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Use])].to_vec())
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [_] = matched.as_slice() {
       let traits = parser.get_children(
         &mut LoopArgument::new(
@@ -30,8 +30,8 @@ impl Internal for TraitUseParser {
           &[TokenType::Comma],
           &[TokenType::Semicolon, TokenType::LeftCurlyBracket],
           &[
-            ParserInternal::Identifier(IdentifierParser {}),
-            ParserInternal::Comment(CommentParser {}),
+            (IdentifierParser::test, IdentifierParser::parse),
+            (CommentParser::test, CommentParser::parse),
           ]
         )
       );
@@ -45,9 +45,9 @@ impl Internal for TraitUseParser {
             &[TokenType::Semicolon],
             &[TokenType::RightCurlyBracket],
             &[
-              ParserInternal::TraitUseAlias(TraitUseAliasParser {}),
-              ParserInternal::TraitUsePrecedence(TraitUsePrecedenceParser {}),
-              ParserInternal::Comment(CommentParser {}),
+              (TraitUseAliasParser::test, TraitUseAliasParser::parse),
+              (TraitUsePrecedenceParser::test, TraitUsePrecedenceParser::parse),
+              (CommentParser::test, CommentParser::parse),
             ]
           )
         );
@@ -62,8 +62,8 @@ impl Internal for TraitUseParser {
 #[derive(Debug, Clone)]
 pub struct TraitUseAliasParser {}
 
-impl Internal for TraitUseAliasParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl TraitUseAliasParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -77,7 +77,7 @@ impl Internal for TraitUseAliasParser {
     )
   }
 
-  fn parse(&self, _: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [trait_name, double_colon, name, _, visibility, alias] = matched.as_slice() {
       let has_trait = double_colon.len() > 0;
       let trait_to_parsed = if has_trait { trait_name } else { name };
@@ -102,8 +102,8 @@ impl Internal for TraitUseAliasParser {
 #[derive(Debug, Clone)]
 pub struct TraitUsePrecedenceParser {}
 
-impl Internal for TraitUsePrecedenceParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl TraitUsePrecedenceParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -116,7 +116,7 @@ impl Internal for TraitUsePrecedenceParser {
     )
   }
 
-  fn parse(&self, _: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [trait_name, double_colon, name, _, instead] = matched.as_slice() {
       let has_trait = double_colon.len() > 0;
       let trait_to_parsed = if has_trait { trait_name } else { name };

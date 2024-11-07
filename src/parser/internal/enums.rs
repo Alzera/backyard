@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::enums::{ EnumItemNode, EnumNode },
-    parser::{ Internal, LoopArgument, Parser, ParserInternal },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -13,8 +13,8 @@ use super::{ comment::CommentParser, identifier::IdentifierParser };
 #[derive(Debug, Clone)]
 pub struct EnumParser {}
 
-impl Internal for EnumParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl EnumParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -25,14 +25,17 @@ impl Internal for EnumParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [_, name, _] = matched.as_slice() {
       let items = parser.get_children(
         &mut LoopArgument::new(
           "enum",
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
-          &[ParserInternal::EnumItem(EnumItemParser {}), ParserInternal::Comment(CommentParser {})]
+          &[
+            (EnumItemParser::test, EnumItemParser::parse),
+            (CommentParser::test, CommentParser::parse),
+          ]
         )
       );
       return Some(EnumNode::new(IdentifierParser::from_matched(name), items));
@@ -44,12 +47,12 @@ impl Internal for EnumParser {
 #[derive(Debug, Clone)]
 pub struct EnumItemParser {}
 
-impl Internal for EnumItemParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl EnumItemParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Case])].to_vec())
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [_] = matched.as_slice() {
       if
         let Some(value) = parser.get_statement(

@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::{ BodyType, Node },
     nodes::fors::ForNode,
-    parser::{ Internal, LoopArgument, Parser },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -13,8 +13,8 @@ use super::block::BlockParser;
 #[derive(Debug, Clone)]
 pub struct ForParser {}
 
-impl Internal for ForParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl ForParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -24,7 +24,7 @@ impl Internal for ForParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [_, _] = matched.as_slice() {
       let inits = parser.get_children(
         &mut LoopArgument::with_tokens("for_inits", &[TokenType::Comma], &[TokenType::Semicolon])

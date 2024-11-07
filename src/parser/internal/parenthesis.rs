@@ -5,7 +5,7 @@ use crate::{
   parser::{
     node::{ Node, NodeTraitCast, NodeType },
     nodes::{ call::CallNode, parenthesis::{ CastNode, ParenthesisNode } },
-    parser::{ Internal, LoopArgument, Parser },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -15,8 +15,8 @@ use super::call::CallParser;
 #[derive(Debug, Clone)]
 pub struct ParenthesisParser {}
 
-impl Internal for ParenthesisParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl ParenthesisParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -26,12 +26,7 @@ impl Internal for ParenthesisParser {
     )
   }
 
-  fn parse(
-    &self,
-    parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
-    args: &LoopArgument
-  ) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
     if let [_] = matched.as_slice() {
       if let Some(le) = args.last_expr.clone() {
         if le.get_type() == NodeType::Parenthesis {

@@ -8,7 +8,7 @@ use crate::{
       property::PropertyNode,
       singles::StaticNode,
     },
-    parser::{ Internal, LoopArgument, Parser, ParserInternal },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, some_or_default, Lookup },
   },
 };
@@ -24,8 +24,8 @@ use super::{
 #[derive(Debug, Clone)]
 pub struct FunctionParser {}
 
-impl Internal for FunctionParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl FunctionParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     if
       let Some(m) = match_pattern(
         tokens,
@@ -61,12 +61,7 @@ impl Internal for FunctionParser {
     )
   }
 
-  fn parse(
-    &self,
-    parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
-    args: &LoopArgument
-  ) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
     match matched.len() {
       4 => FunctionParser::parse_basic(matched, parser),
       3 => {
@@ -137,9 +132,9 @@ impl FunctionParser {
             &[TokenType::Comma],
             &[TokenType::RightParenthesis],
             &[
-              ParserInternal::Type(TypesParser {}),
-              ParserInternal::ConstructorParameter(ConstructorParameterParser {}),
-              ParserInternal::Comment(CommentParser {}),
+              (TypesParser::test, TypesParser::parse),
+              (ConstructorParameterParser::test, ConstructorParameterParser::parse),
+              (CommentParser::test, CommentParser::parse),
             ]
           )
         )
@@ -172,9 +167,9 @@ impl FunctionParser {
         &[TokenType::Comma],
         &[TokenType::RightParenthesis],
         &[
-          ParserInternal::Type(TypesParser {}),
-          ParserInternal::Parameter(ParameterParser {}),
-          ParserInternal::Comment(CommentParser {}),
+          (TypesParser::test, TypesParser::parse),
+          (ParameterParser::test, ParameterParser::parse),
+          (CommentParser::test, CommentParser::parse),
         ]
       )
     )
@@ -195,7 +190,10 @@ impl FunctionParser {
             "function_return_type",
             &[TokenType::LeftCurlyBracket, TokenType::Arrow],
             &[],
-            &[ParserInternal::Type(TypesParser {}), ParserInternal::Comment(CommentParser {})]
+            &[
+              (TypesParser::test, TypesParser::parse),
+              (CommentParser::test, CommentParser::parse),
+            ]
           )
         );
       }
@@ -207,12 +205,12 @@ impl FunctionParser {
 #[derive(Debug, Clone)]
 pub struct ConstructorParameterParser {}
 
-impl Internal for ConstructorParameterParser {
-  fn test(&self, tokens: &Vec<Token>, args: &LoopArgument) -> Option<Vec<Vec<Token>>> {
-    (PropertyParser {}).test(tokens, args)
+impl ConstructorParameterParser {
+  pub fn test(tokens: &Vec<Token>, args: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+    PropertyParser::test(tokens, args)
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [visibility, modifier] = matched.as_slice() {
       let item = guard!(
         parser.get_statement(
@@ -221,9 +219,9 @@ impl Internal for ConstructorParameterParser {
             &[],
             &[TokenType::Comma, TokenType::RightParenthesis],
             &[
-              ParserInternal::Comment(CommentParser {}),
-              ParserInternal::Type(TypesParser {}),
-              ParserInternal::PropertyItem(PropertyItemParser {}),
+              (CommentParser::test, CommentParser::parse),
+              (TypesParser::test, TypesParser::parse),
+              (PropertyItemParser::test, PropertyItemParser::parse),
             ]
           )
         )
@@ -243,8 +241,8 @@ impl Internal for ConstructorParameterParser {
 #[derive(Debug, Clone)]
 pub struct ParameterParser {}
 
-impl Internal for ParameterParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl ParameterParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -256,12 +254,7 @@ impl Internal for ParameterParser {
     )
   }
 
-  fn parse(
-    &self,
-    parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
-    args: &LoopArgument
-  ) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
     if let [is_ref, is_ellipsis, name, has_value] = matched.as_slice() {
       let value = if has_value.len() > 0 {
         parser.get_statement(

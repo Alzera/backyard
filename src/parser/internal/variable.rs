@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::variable::VariableNode,
-    parser::{ Internal, LoopArgument, Parser },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -23,8 +23,8 @@ impl VariableParser {
   }
 }
 
-impl Internal for VariableParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl VariableParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -34,7 +34,7 @@ impl Internal for VariableParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if matched.len() == 2 {
       if let [is_ref, name] = matched.as_slice() {
         if let Some(name) = name.get(0) {

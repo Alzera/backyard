@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::Node,
     nodes::uses::UseNode,
-    parser::{ Internal, LoopArgument, Parser, ParserInternal },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, some_or_default, Lookup },
   },
 };
@@ -13,8 +13,8 @@ use super::{ comment::CommentParser, identifier::IdentifierParser };
 #[derive(Debug, Clone)]
 pub struct UsesParser {}
 
-impl Internal for UsesParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl UsesParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -24,7 +24,7 @@ impl Internal for UsesParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [_, modifier] = matched.as_slice() {
       let modifier = some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned());
       let name = parser.get_children(
@@ -33,8 +33,8 @@ impl Internal for UsesParser {
           &[TokenType::BackSlash],
           &[TokenType::Semicolon, TokenType::LeftCurlyBracket],
           &[
-            ParserInternal::Identifier(IdentifierParser {}),
-            ParserInternal::Comment(CommentParser {}),
+            (IdentifierParser::test, IdentifierParser::parse),
+            (CommentParser::test, CommentParser::parse),
           ]
         )
       );
@@ -50,8 +50,8 @@ impl Internal for UsesParser {
                 &[TokenType::Comma],
                 &[TokenType::RightCurlyBracket],
                 &[
-                  ParserInternal::Identifier(IdentifierParser {}),
-                  ParserInternal::Comment(CommentParser {}),
+                  (IdentifierParser::test, IdentifierParser::parse),
+                  (CommentParser::test, CommentParser::parse),
                 ]
               )
             );

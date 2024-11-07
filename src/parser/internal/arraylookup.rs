@@ -4,7 +4,7 @@ use crate::{
   parser::{
     node::{ Node, NodeType },
     nodes::arraylookup::ArrayLookupNode,
-    parser::{ Internal, LoopArgument, Parser },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -12,8 +12,8 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct ArrayLookupParser {}
 
-impl Internal for ArrayLookupParser {
-  fn test(&self, tokens: &Vec<Token>, args: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl ArrayLookupParser {
+  pub fn test(tokens: &Vec<Token>, args: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     let last_expr = guard!(&args.last_expr);
     if
       ![
@@ -32,12 +32,7 @@ impl Internal for ArrayLookupParser {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::LeftSquareBracket])].to_vec())
   }
 
-  fn parse(
-    &self,
-    parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
-    args: &LoopArgument
-  ) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
     if let [_] = matched.as_slice() {
       let on = guard!(args.last_expr.to_owned());
       let target = guard!(

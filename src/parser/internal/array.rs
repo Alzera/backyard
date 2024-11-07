@@ -3,7 +3,7 @@ use crate::{
   parser::{
     node::{ Node, NodeType, Nodes },
     nodes::array::{ ArrayItemNode, ArrayNode },
-    parser::{ Internal, LoopArgument, Parser, ParserInternal, DEFAULT_PARSERS },
+    parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -11,8 +11,8 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct ArrayParser {}
 
-impl Internal for ArrayParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl ArrayParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -22,10 +22,10 @@ impl Internal for ArrayParser {
     )
   }
 
-  fn parse(&self, parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
     if let [is_ellipsis, _] = matched.as_slice() {
       let mut loop_parsers = DEFAULT_PARSERS.to_vec();
-      loop_parsers.insert(0, ParserInternal::ArrayItem(ArrayItemParser {}));
+      loop_parsers.insert(0, (ArrayItemParser::test, ArrayItemParser::parse));
       let values = parser
         .get_children(
           &mut LoopArgument::new(
@@ -53,17 +53,12 @@ impl Internal for ArrayParser {
 #[derive(Debug, Clone)]
 pub struct ArrayItemParser {}
 
-impl Internal for ArrayItemParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl ArrayItemParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Arrow])].to_vec())
   }
 
-  fn parse(
-    &self,
-    parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
-    args: &LoopArgument
-  ) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
     if let [_] = matched.as_slice() {
       let value = parser.get_statement(
         &mut LoopArgument::with_tokens(

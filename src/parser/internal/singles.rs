@@ -14,7 +14,7 @@ use crate::{
       StaticNode,
       ThrowNode,
     },
-    parser::{ Internal, LoopArgument, Parser },
+    parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
 };
@@ -22,8 +22,8 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct SinglesParser {}
 
-impl Internal for SinglesParser {
-  fn test(&self, tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+impl SinglesParser {
+  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -46,12 +46,7 @@ impl Internal for SinglesParser {
     )
   }
 
-  fn parse(
-    &self,
-    parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
-    args: &LoopArgument
-  ) -> Option<Node> {
+  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
     if let [key] = matched.as_slice() {
       if let Some(key) = key.first() {
         if [TokenType::Parent, TokenType::Static].contains(&key.token_type) {
