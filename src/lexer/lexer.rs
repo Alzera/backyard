@@ -83,7 +83,7 @@ impl Lexer {
         }
       }
       '&' => {
-        let t = self.until(|ch| !['=', '&'].contains(ch));
+        let t = self.until(|ch| !['&', '='].contains(ch));
         match t.as_str() {
           "&=" => Some(vec![Token::new(TokenType::BitwiseAndAssignment, "&=")]),
           "&&" => Some(vec![Token::new(TokenType::BooleanAnd, "&&")]),
@@ -117,7 +117,7 @@ impl Lexer {
         }
       }
       '#' => {
-        let t = self.until(|ch| !['['].contains(ch));
+        let t = self.until(|ch| !['#', '['].contains(ch));
         match t.as_str() {
           "#[" => Some(vec![Token::new(TokenType::Attribute, "#[")]),
           "#" => CommentLineToken::lex(&self.chars, &mut self.position),
@@ -137,7 +137,7 @@ impl Lexer {
         }
       }
       '%' => {
-        let t = self.until(|ch| !['=', '>'].contains(ch));
+        let t = self.until(|ch| !['%', '=', '>'].contains(ch));
         match t.as_str() {
           "%>" => Some(vec![Token::new(TokenType::CloseTagShort, "%>")]),
           "%=" => Some(vec![Token::new(TokenType::ModulusAssignment, "%=")]),
@@ -146,7 +146,7 @@ impl Lexer {
         }
       }
       '^' => {
-        let t = self.until(|ch| !['='].contains(ch));
+        let t = self.until(|ch| !['^', '='].contains(ch));
         match t.as_str() {
           "^=" => Some(vec![Token::new(TokenType::BitwiseXorAssignment, "^=")]),
           "^" => Some(vec![Token::new(TokenType::BitwiseXor, "^")]),
@@ -232,7 +232,7 @@ impl Lexer {
         }
       }
       '<' => {
-        let t = self.until(|ch| !['?', '=', '>', '<', 'p', 'h', '%'].contains(ch));
+        let t = self.until(|ch| !['<', '?', '=', '>', 'p', 'h', '%'].contains(ch));
         match t.as_str() {
           "<%" => Some(vec![Token::new(TokenType::OpenTagShort, "<%")]),
           "<?php" => Some(vec![Token::new(TokenType::OpenTag, "<?php")]),

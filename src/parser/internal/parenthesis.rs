@@ -36,7 +36,11 @@ impl Internal for ParenthesisParser {
       if let Some(le) = args.last_expr.clone() {
         if le.get_type() == NodeType::Parenthesis {
           let le = guard_ok!(le.cast::<ParenthesisNode>());
-          if le.statement.get_type() == NodeType::AnonymousFunction {
+          if
+            [NodeType::AnonymousFunction, NodeType::ArrowFunction].contains(
+              &le.statement.get_type()
+            )
+          {
             return Some(
               CallNode::new(args.last_expr.to_owned().unwrap(), CallParser::get_arguments(parser))
             );

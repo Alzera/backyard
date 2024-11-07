@@ -1,8 +1,7 @@
 use crate::{
-  guard,
   lexer::token::{ Token, TokenType },
   parser::{
-    node::Node,
+    node::{ Node, NodeType, Nodes },
     nodes::array::{ ArrayItemNode, ArrayNode },
     parser::{ Internal, LoopArgument, Parser, ParserInternal, DEFAULT_PARSERS },
     utils::{ match_pattern, Lookup },
@@ -27,14 +26,24 @@ impl Internal for ArrayParser {
     if let [is_ellipsis, _] = matched.as_slice() {
       let mut loop_parsers = DEFAULT_PARSERS.to_vec();
       loop_parsers.insert(0, ParserInternal::ArrayItem(ArrayItemParser {}));
-      let values = parser.get_children(
-        &mut LoopArgument::new(
-          "array",
-          &[TokenType::Comma],
-          &[TokenType::RightSquareBracket],
-          &loop_parsers
+      let values = parser
+        .get_children(
+          &mut LoopArgument::new(
+            "array",
+            &[TokenType::Comma],
+            &[TokenType::RightSquareBracket],
+            &loop_parsers
+          )
         )
-      );
+        .iter()
+        .map(|i| (
+          if i.get_type() == NodeType::ArrayItem {
+            i.to_owned()
+          } else {
+            ArrayItemNode::new(None, i.to_owned())
+          }
+        ))
+        .collect::<Nodes>();
       return Some(ArrayNode::new(is_ellipsis.len() > 0, values));
     }
     None
@@ -66,7 +75,7 @@ impl Internal for ArrayItemParser {
       if value.is_none() {
         return None;
       }
-      let key = guard!(args.last_expr.to_owned());
+      let key = args.last_expr.to_owned();
       return Some(ArrayItemNode::new(key, value.unwrap()));
     }
     None

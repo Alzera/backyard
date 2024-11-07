@@ -17,7 +17,7 @@ pub struct ArrayNode {
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::ArrayItem)]
 pub struct ArrayItemNode {
-  pub key: Node,
+  pub key: Option<Node>,
   pub value: Node,
 
   pub leading_comments: Nodes,

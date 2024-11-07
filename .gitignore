@@ -197,3 +197,4 @@ Cargo.lock
 *.node
 
 test-run/
+tarpaulin-report.html

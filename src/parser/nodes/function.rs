@@ -9,7 +9,7 @@ use crate::parser::node::{ NodeType, Node, Nodes };
 pub struct FunctionNode {
   pub is_ref: bool,
   pub name: Node,
-  pub arguments: Nodes,
+  pub parameters: Nodes,
   pub return_type: Option<Node>,
   pub body: Option<Node>,
 
@@ -66,7 +66,7 @@ pub struct FunctionNode {
 #[implement_node_trait(NodeType::ArrowFunction)]
 pub struct ArrowFunctionNode {
   pub is_ref: bool,
-  pub arguments: Nodes,
+  pub parameters: Nodes,
   pub return_type: Option<Node>,
   pub body: Node,
 
@@ -119,7 +119,7 @@ pub struct ArrowFunctionNode {
 #[implement_node_trait(NodeType::AnonymousFunction)]
 pub struct AnonymousFunctionNode {
   pub is_ref: bool,
-  pub arguments: Nodes,
+  pub parameters: Nodes,
   pub uses: Nodes,
   pub return_type: Option<Node>,
   pub body: Node,

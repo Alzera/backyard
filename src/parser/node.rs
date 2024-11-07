@@ -325,11 +325,11 @@ pub type Node = Box<dyn NodeTrait>;
 pub type Nodes = Vec<Node>;
 
 pub trait NodeTraitCast {
-  fn cast<T: 'static>(self) -> Result<Box<T>, Box<dyn Any>>;
+  fn cast<T: 'static>(self) -> Result<Box<T>, Box<dyn Any>> where T: NodeTrait;
 }
 
 impl NodeTraitCast for Node {
-  fn cast<T: 'static>(self) -> Result<Box<T>, Box<dyn Any>> {
+  fn cast<T: 'static>(self) -> Result<Box<T>, Box<dyn Any>> where T: NodeTrait {
     self.as_any().downcast::<T>()
   }
 }
