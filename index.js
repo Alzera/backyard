@@ -310,8 +310,10 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { TokenType, lex, parse } = nativeBinding
+const { TokenType, BodyType, lex, parse, generate } = nativeBinding
 
 module.exports.TokenType = TokenType
+module.exports.BodyType = BodyType
 module.exports.lex = lex
 module.exports.parse = parse
+module.exports.generate = generate

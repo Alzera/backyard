@@ -167,5 +167,11 @@ export interface Token {
   tokenType: TokenType
   value: string
 }
+export const enum BodyType {
+  Basic = 0,
+  Short = 1,
+  Empty = 2
+}
 export declare function lex(input: string): Array<Token>
-export declare function parse(input: string): Array<object>
+export declare function parse(input: string): Nodes
+export declare function generate(input: Nodes): string

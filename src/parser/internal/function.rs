@@ -142,11 +142,7 @@ impl FunctionParser {
         FunctionParser::get_parameters(parser)
       };
       let return_type = FunctionParser::get_return_type(parser);
-      let body = if guard!(parser.tokens.get(parser.position)).token_type == TokenType::Semicolon {
-        None
-      } else {
-        Some(BlockParser::new(parser))
-      };
+      let body = BlockParser::new(parser);
       return Some(
         FunctionNode::new(
           is_ref.len() > 0,
