@@ -56,7 +56,7 @@ use crate::{ guard, parser::node::{ Node, NodeType, Nodes } };
 // pub type GenLines = Vec<GenLine>;
 type InternalGenerator = fn(&mut Generator, &mut Builder, &Node, &mut GeneratorArgument);
 
-const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 10] = [
+const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 13] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
   // (NodeType::Array, super::internal::array::ArrayGenerator::generate),
@@ -82,7 +82,7 @@ const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 10] = [
   // (NodeType::DeclareArgument, DeclareArgumentGenerator::generate),
   // (NodeType::DoWhile, DoWhileGenerator::generate),
   // (NodeType::Echo, EchoGenerator::generate),
-  // (NodeType::Encapsed, StringGenerator::generate_encapsed),
+  (NodeType::Encapsed, super::internal::string::StringGenerator::generate_encapsed),
   // (NodeType::EncapsedPart, StringGenerator::generate_encapsed_part),
   // (NodeType::Enum, EnumGenerator::generate),
   // (NodeType::EnumItem, EnumItemGenerator::generate),
@@ -114,13 +114,13 @@ const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 10] = [
   // (NodeType::Post, PostGenerator::generate),
   // (NodeType::Pre, PreGenerator::generate),
   // (NodeType::Print, PrintGenerator::generate),
-  // (NodeType::Program, ProgramGenerator::generate),
+  (NodeType::Program, super::internal::program::ProgramGenerator::generate),
   // (NodeType::Property, PropertyGenerator::generate),
   // (NodeType::PropertyItem, PropertyItemGenerator::generate),
   // (NodeType::Return, ReturnGenerator::generate),
   // (NodeType::Static, StaticGenerator::generate),
   // (NodeType::StaticLookup, StaticLookupGenerator::generate),
-  // (NodeType::String, StringGenerator::generate),
+  (NodeType::String, super::internal::string::StringGenerator::generate),
   // (NodeType::Switch, SwitchGenerator::generate),
   // (NodeType::Ternary, TernaryGenerator::generate),
   // (NodeType::Trait, TraitGenerator::generate),
