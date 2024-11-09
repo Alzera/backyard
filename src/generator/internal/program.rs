@@ -7,16 +7,11 @@ use crate::{
 pub struct ProgramGenerator {}
 
 impl ProgramGenerator {
-  pub fn generate(
-    generator: &mut Generator,
-    builder: &mut Builder,
-    node: &Node,
-    args: &mut GeneratorArgument
-  ) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = guard_ok!(node.to_owned().cast::<ProgramNode>(), {
       return;
     });
     builder.push("<?php");
-    generator.generate_nodes(builder, &node.children, Builder::block_end_callback, args);
+    generator.generate_nodes(builder, &node.children, &mut GeneratorArgument::for_block());
   }
 }

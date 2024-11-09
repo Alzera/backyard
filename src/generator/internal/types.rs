@@ -1,5 +1,5 @@
 use crate::{
-  generator::generator::{ Builder, Generator, GeneratorArgument },
+  generator::generator::{ Builder, Generator },
   guard_ok,
   parser::{ node::{ Node, NodeTraitCast }, nodes::types::TypeNode },
 };
@@ -7,12 +7,7 @@ use crate::{
 pub struct TypeGenerator {}
 
 impl TypeGenerator {
-  pub fn generate(
-    _: &mut Generator,
-    builder: &mut Builder,
-    node: &Node,
-    _: &mut GeneratorArgument
-  ) {
+  pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = guard_ok!(node.to_owned().cast::<TypeNode>(), {
       return;
     });

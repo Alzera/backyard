@@ -1,5 +1,5 @@
 use crate::{
-  generator::generator::{ Builder, Generator, GeneratorArgument },
+  generator::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATORS },
   guard_ok,
   parser::{
     node::{ Node, NodeTraitCast, NodeType, Nodes },
@@ -12,30 +12,18 @@ use super::{ block::BlockGenerator, identifier::IdentifierGenerator };
 pub struct FunctionGenerator {}
 
 impl FunctionGenerator {
-  pub fn get_parameters(
-    generator: &mut Generator,
-    parameters: &Nodes,
-    _: &mut GeneratorArgument
-  ) -> Builder {
-    let mut builder = generator.generate_nodes_new(
+  pub fn get_parameters(generator: &mut Generator, parameters: &Nodes) -> Builder {
+    generator.generate_nodes_new(
       parameters,
-      |_| Some(","),
-      &mut GeneratorArgument::generator(&[(NodeType::Parameter, Self::generate_parameter)])
-    );
-    builder.pop();
-    builder
+      &mut GeneratorArgument::for_parameter(&[(NodeType::Parameter, Self::generate_parameter)])
+    )
   }
 
   pub fn get_return_type(
     generator: &mut Generator,
-    node: &Option<Node>,
-    args: &mut GeneratorArgument
+    node: &Option<Node>
   ) -> (Option<Builder>, usize) {
-    let return_type = if let Some(n) = &node {
-      Some(generator.generate_node_new(n, |_| None, args))
-    } else {
-      None
-    };
+    let return_type = if let Some(n) = &node { Some(generator.generate_node_new(n)) } else { None };
     let return_type_len = if let Some(n) = &return_type {
       n.total_len_with_separator(" ")
     } else {
@@ -44,27 +32,17 @@ impl FunctionGenerator {
     (return_type, return_type_len)
   }
 
-  pub fn fill_body(
-    generator: &mut Generator,
-    builder: &mut Builder,
-    node: &Node,
-    args: &mut GeneratorArgument
-  ) {
+  pub fn fill_body(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     builder.push(" {");
     let mut block = Builder::new();
-    BlockGenerator::generate(generator, &mut block, &node, args);
+    BlockGenerator::generate(generator, &mut block, &node);
     block.indent();
     builder.extend(&block);
     builder.new_line();
     builder.push("}");
   }
 
-  pub fn generate(
-    generator: &mut Generator,
-    builder: &mut Builder,
-    node: &Node,
-    args: &mut GeneratorArgument
-  ) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = guard_ok!(node.to_owned().cast::<FunctionNode>(), {
       return;
     });
@@ -72,12 +50,16 @@ impl FunctionGenerator {
     if node.is_ref {
       builder.push("&");
     }
-    IdentifierGenerator::generate(generator, builder, &node.name, args);
-    let mut parameters = Self::get_parameters(generator, &node.parameters, args);
-    let (return_type, return_type_len) = Self::get_return_type(generator, &node.return_type, args);
+    IdentifierGenerator::generate(generator, builder, &node.name);
+    let mut parameters = Self::get_parameters(generator, &node.parameters);
+    let (return_type, return_type_len) = Self::get_return_type(generator, &node.return_type);
 
     builder.push("(");
-    if 3 + builder.last_len() + parameters.first_len() + return_type_len > args.max_length {
+    if
+      Generator::check_nodes_has_comments(&node.parameters) ||
+      3 + builder.last_len() + parameters.total_len_with_separator(", ") + return_type_len >
+        generator.max_length
+    {
       parameters.indent();
       builder.extend(&parameters);
       builder.new_line();
@@ -90,15 +72,10 @@ impl FunctionGenerator {
       builder.push(": ");
       builder.extend_first_line(n);
     }
-    Self::fill_body(generator, builder, &node.body, args);
+    Self::fill_body(generator, builder, &node.body);
   }
 
-  pub fn generate_anonymous(
-    generator: &mut Generator,
-    builder: &mut Builder,
-    node: &Node,
-    args: &mut GeneratorArgument
-  ) {
+  pub fn generate_anonymous(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = guard_ok!(node.to_owned().cast::<AnonymousFunctionNode>(), {
       return;
     });
@@ -106,15 +83,22 @@ impl FunctionGenerator {
     if node.is_ref {
       builder.push("&");
     }
-    let mut parameters = Self::get_parameters(generator, &node.parameters, args);
-    let mut uses = generator.generate_nodes_new(&node.uses, |_| Some(","), args);
-    uses.pop();
+    let mut parameters = Self::get_parameters(generator, &node.parameters);
+    let mut uses = generator.generate_nodes_new(
+      &node.uses,
+      &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
+    );
     let uses_len = if node.uses.is_empty() { 0 } else { uses.total_len_with_separator(", ") + 7 };
-    let (return_type, return_type_len) = Self::get_return_type(generator, &node.return_type, args);
+    let (return_type, return_type_len) = Self::get_return_type(generator, &node.return_type);
 
     builder.push("(");
     if
-      3 + builder.last_len() + parameters.first_len() + uses_len + return_type_len > args.max_length
+      Generator::check_nodes_has_comments(&node.parameters) ||
+      3 +
+        builder.last_len() +
+        parameters.total_len_with_separator(", ") +
+        uses_len +
+        return_type_len > generator.max_length
     {
       parameters.indent();
       builder.extend(&parameters);
@@ -126,7 +110,10 @@ impl FunctionGenerator {
 
     if !node.uses.is_empty() {
       builder.push(" use (");
-      if builder.last_len() + uses_len + return_type_len > args.max_length {
+      if
+        Generator::check_nodes_has_comments(&node.uses) ||
+        builder.last_len() + uses_len + return_type_len > generator.max_length
+      {
         uses.indent();
         builder.extend(&uses);
         builder.new_line();
@@ -140,15 +127,10 @@ impl FunctionGenerator {
       builder.push(": ");
       builder.extend_first_line(n);
     }
-    Self::fill_body(generator, builder, &node.body, args);
+    Self::fill_body(generator, builder, &node.body);
   }
 
-  pub fn generate_arrow(
-    generator: &mut Generator,
-    builder: &mut Builder,
-    node: &Node,
-    args: &mut GeneratorArgument
-  ) {
+  pub fn generate_arrow(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = guard_ok!(node.to_owned().cast::<ArrowFunctionNode>(), {
       return;
     });
@@ -156,11 +138,15 @@ impl FunctionGenerator {
     if node.is_ref {
       builder.push("&");
     }
-    let mut parameters = Self::get_parameters(generator, &node.parameters, args);
-    let (return_type, return_type_len) = Self::get_return_type(generator, &node.return_type, args);
+    let mut parameters = Self::get_parameters(generator, &node.parameters);
+    let (return_type, return_type_len) = Self::get_return_type(generator, &node.return_type);
 
     builder.push("(");
-    if 3 + builder.last_len() + parameters.first_len() + return_type_len > args.max_length {
+    if
+      Generator::check_nodes_has_comments(&node.parameters) ||
+      3 + builder.last_len() + parameters.total_len_with_separator(", ") + return_type_len >
+        generator.max_length
+    {
       parameters.indent();
       builder.extend(&parameters);
       builder.new_line();
@@ -175,20 +161,15 @@ impl FunctionGenerator {
     }
 
     builder.push(" => ");
-    generator.generate_node(builder, &node.body, |_| None, args);
+    generator.generate_node(builder, &node.body, &mut GeneratorArgument::default());
   }
 
-  pub fn generate_parameter(
-    generator: &mut Generator,
-    builder: &mut Builder,
-    node: &Node,
-    args: &mut GeneratorArgument
-  ) {
+  pub fn generate_parameter(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = guard_ok!(node.to_owned().cast::<ParameterNode>(), {
       return;
     });
     if let Some(n) = &node.variable_type {
-      generator.generate_node(builder, n, |_| None, &mut GeneratorArgument::default());
+      generator.generate_node(builder, n, &mut GeneratorArgument::default());
     }
     if node.is_ref {
       builder.push("&");
@@ -197,9 +178,9 @@ impl FunctionGenerator {
       builder.push("...");
     }
     builder.push("$");
-    IdentifierGenerator::generate(generator, builder, &node.name, args);
+    IdentifierGenerator::generate(generator, builder, &node.name);
     if let Some(n) = &node.value {
-      generator.generate_node(builder, n, |_| None, &mut GeneratorArgument::default());
+      generator.generate_node(builder, n, &mut GeneratorArgument::default());
     };
   }
 }

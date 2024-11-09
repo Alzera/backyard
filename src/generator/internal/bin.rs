@@ -7,18 +7,13 @@ use crate::{
 pub struct BinGenerator {}
 
 impl BinGenerator {
-  pub fn generate(
-    generator: &mut Generator,
-    builder: &mut Builder,
-    node: &Node,
-    args: &mut GeneratorArgument
-  ) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = guard_ok!(node.to_owned().cast::<BinNode>(), {
       return;
     });
-    generator.generate_node(builder, &node.left, |_| None, args);
-    let mut expr = generator.generate_node_new(&node.right, |_| None, args);
-    if builder.last_len() + expr.first_len() + node.operator.len() > args.max_length {
+    generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
+    let mut expr = generator.generate_node_new(&node.right);
+    if builder.last_len() + expr.first_len() + node.operator.len() > generator.max_length {
       expr.indent();
       builder.new_line();
       builder.push(format!("{} ", node.operator).as_str());

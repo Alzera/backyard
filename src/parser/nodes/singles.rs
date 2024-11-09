@@ -300,7 +300,7 @@ pub struct StaticNode {
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Clone)]
 pub struct CloneNode {
-  pub target: Node,
+  pub argument: Node,
 
   pub leading_comments: Nodes,
   pub trailing_comments: Nodes,

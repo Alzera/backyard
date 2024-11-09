@@ -58,8 +58,6 @@ type InternalParserParse = fn(&mut Parser, Vec<Vec<Token>>, &mut LoopArgument) -
 type InternalParser = (InternalParserTest, InternalParserParse);
 pub static DEFAULT_PARSERS: [InternalParser; 46] = [
   (CommentParser::test, CommentParser::parse),
-  (GotoParser::test, GotoParser::parse),
-  (LabelParser::test, LabelParser::parse),
   (ListParser::test, ListParser::parse),
   (ParenthesisParser::test, ParenthesisParser::parse),
   (ArrayLookupParser::test, ArrayLookupParser::parse),
@@ -103,6 +101,8 @@ pub static DEFAULT_PARSERS: [InternalParser; 46] = [
   (TernaryParser::test, TernaryParser::parse),
   (TypesParser::test, TypesParser::parse),
   (WhileParser::test, WhileParser::parse),
+  (GotoParser::test, GotoParser::parse),
+  (LabelParser::test, LabelParser::parse),
 ];
 
 #[derive(Debug)]

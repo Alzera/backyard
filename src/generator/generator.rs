@@ -60,34 +60,34 @@ use crate::{
 // }
 
 // pub type GenLines = Vec<GenLine>;
-type InternalGenerator = fn(&mut Generator, &mut Builder, &Node, &mut GeneratorArgument);
+type InternalGenerator = fn(&mut Generator, &mut Builder, &Node);
 
-const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 13] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 25] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
-  // (NodeType::Array, super::internal::array::ArrayGenerator::generate),
+  (NodeType::Array, super::internal::array::ArrayGenerator::generate),
   // (NodeType::ArrayItem, super::internal::array::ArrayGenerator::generate_item),
-  // (NodeType::ArrayLookup, super::internal::arraylookup::ArrayLookupGenerator::generate),
+  (NodeType::ArrayLookup, super::internal::arraylookup::ArrayLookupGenerator::generate),
   (NodeType::ArrowFunction, super::internal::function::FunctionGenerator::generate_arrow),
   (NodeType::Assignment, super::internal::assignment::AssignmentGenerator::generate),
   (NodeType::Bin, super::internal::bin::BinGenerator::generate),
   (NodeType::Block, super::internal::block::BlockGenerator::generate),
-  // (NodeType::Break, BreakGenerator::generate),
-  // (NodeType::Call, super::internal::call::CallGenerator::generate),
+  (NodeType::Break, super::internal::singles::SinglesGenerator::generate),
+  (NodeType::Call, super::internal::call::CallGenerator::generate),
   // (NodeType::Case, CaseGenerator::generate),
   // (NodeType::Cast, super::internal::parenthesis::ParenthesisGenerator::generate_cast),
   // (NodeType::Catch, CatchGenerator::generate),
   // (NodeType::Class, ClassGenerator::generate),
-  // (NodeType::Clone, CloneGenerator::generate),
+  (NodeType::Clone, super::internal::singles::SinglesGenerator::generate),
   // (NodeType::CommentBlock, CommentBlockGenerator::generate),
   // (NodeType::CommentLine, CommentLineGenerator::generate),
   // (NodeType::Const, ConstGenerator::generate),
   // (NodeType::ConstProperty, ConstPropertyGenerator::generate),
-  // (NodeType::Continue, ContinueGenerator::generate),
+  (NodeType::Continue, super::internal::singles::SinglesGenerator::generate),
   // (NodeType::Declare, DeclareGenerator::generate),
   // (NodeType::DeclareArgument, DeclareArgumentGenerator::generate),
   // (NodeType::DoWhile, DoWhileGenerator::generate),
-  // (NodeType::Echo, EchoGenerator::generate),
+  (NodeType::Echo, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Encapsed, super::internal::string::StringGenerator::generate_encapsed),
   // (NodeType::EncapsedPart, StringGenerator::generate_encapsed_part),
   // (NodeType::Enum, EnumGenerator::generate),
@@ -111,7 +111,7 @@ const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 13] = [
   // (NodeType::MatchArm, MatchArmGenerator::generate),
   // (NodeType::Method, MethodGenerator::generate),
   // (NodeType::Namespace, NamespaceGenerator::generate),
-  // (NodeType::New, NewGenerator::generate),
+  (NodeType::New, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Number, super::internal::number::NumberGenerator::generate),
   // (NodeType::ObjectAccess, ObjectAccessGenerator::generate),
   // (NodeType::Parameter, ParameterGenerator::generate),
@@ -119,13 +119,13 @@ const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 13] = [
   // (NodeType::Parenthesis, super::internal::parenthesis::ParenthesisGenerator::generate),
   // (NodeType::Post, PostGenerator::generate),
   // (NodeType::Pre, PreGenerator::generate),
-  // (NodeType::Print, PrintGenerator::generate),
+  (NodeType::Print, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Program, super::internal::program::ProgramGenerator::generate),
   // (NodeType::Property, PropertyGenerator::generate),
   // (NodeType::PropertyItem, PropertyItemGenerator::generate),
-  // (NodeType::Return, ReturnGenerator::generate),
+  (NodeType::Return, super::internal::singles::SinglesGenerator::generate),
   // (NodeType::Static, StaticGenerator::generate),
-  // (NodeType::StaticLookup, StaticLookupGenerator::generate),
+  (NodeType::StaticLookup, super::internal::staticlookup::StaticLookupGenerator::generate),
   (NodeType::String, super::internal::string::StringGenerator::generate),
   // (NodeType::Switch, SwitchGenerator::generate),
   // (NodeType::Ternary, TernaryGenerator::generate),
@@ -133,7 +133,7 @@ const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 13] = [
   // (NodeType::TraitUse, TraitUseGenerator::generate),
   // (NodeType::TraitUseAlias, TraitUseAliasGenerator::generate),
   // (NodeType::TraitUsePrecedence, TraitUsePrecedenceGenerator::generate),
-  // (NodeType::Throw, ThrowGenerator::generate),
+  (NodeType::Throw, super::internal::singles::SinglesGenerator::generate),
   // (NodeType::Try, TryGenerator::generate),
   (NodeType::Type, super::internal::types::TypeGenerator::generate),
   // (NodeType::Use, UseGenerator::generate),
@@ -202,9 +202,9 @@ impl Builder {
     }).push(line);
   }
 
-  pub fn pop(&mut self) -> Option<char> {
-    guard!(self.lines.last_mut()).line.pop()
-  }
+  // pub fn pop(&mut self) -> Option<char> {
+  //   guard!(self.lines.last_mut()).line.pop()
+  // }
 
   // pub fn push_all_lines(&mut self, line: &str) {
   //   self.lines.iter_mut().for_each(|i| {
@@ -281,98 +281,105 @@ impl Builder {
       .collect::<Vec<String>>()
       .join(separator)
   }
-
-  pub fn block_end_callback(node: &Node) -> Option<&str> {
-    if [NodeType::Function].contains(&node.get_type()) { None } else { Some(";") }
-  }
 }
 
-pub struct Generator {
-  nodes: Nodes,
+#[derive(Debug, Clone, PartialEq)]
+enum EndMode {
+  CommaWithoutEnd,
+  SemicolonDynamic,
+  None,
 }
 
 #[derive(Debug, Clone)]
 pub struct GeneratorArgument<'a> {
   generators: &'a [(NodeType, InternalGenerator)],
-  pub max_length: usize,
+  is_last: bool,
+  end: EndMode,
 }
 
 impl<'a> GeneratorArgument<'a> {
   pub fn default() -> Self {
-    Self { generators: &DEFAULT_GENERATORS, max_length: 60 }
+    Self { generators: &DEFAULT_GENERATORS, is_last: false, end: EndMode::None }
   }
 
   pub fn generator(generators: &'a [(NodeType, InternalGenerator)]) -> Self {
-    Self { generators, max_length: 60 }
+    Self { generators, is_last: false, end: EndMode::None }
   }
+
+  pub fn for_parameter(generators: &'a [(NodeType, InternalGenerator)]) -> Self {
+    Self { generators, is_last: false, end: EndMode::CommaWithoutEnd }
+  }
+
+  pub fn for_block() -> Self {
+    Self {
+      generators: &DEFAULT_GENERATORS,
+      is_last: false,
+      end: EndMode::SemicolonDynamic,
+    }
+  }
+
+  fn get_end_statement(&mut self, node_type: &NodeType) -> Option<&str> {
+    if self.end == EndMode::SemicolonDynamic {
+      if ![NodeType::Function, NodeType::Program].contains(node_type) {
+        return Some(";");
+      }
+    } else if self.end == EndMode::CommaWithoutEnd {
+      if !self.is_last {
+        return Some(",");
+      }
+    }
+    return None;
+  }
+}
+
+pub struct Generator {
+  pub max_length: usize,
+  nodes: Nodes,
 }
 
 impl Generator {
   pub fn new(nodes: Nodes) -> Self {
-    Self { nodes }
+    Self { nodes, max_length: 60 }
   }
 
   pub fn start(&mut self) -> String {
     self
-      .generate_nodes_new(
-        &self.nodes.clone(),
-        Builder::block_end_callback,
-        &mut GeneratorArgument::default()
-      )
+      .generate_nodes_new(&self.nodes.clone(), &mut GeneratorArgument::for_block())
       .to_string("\n")
   }
 
-  pub fn generate_nodes_new<T>(
-    &mut self,
-    nodes: &Nodes,
-    end_callback: T,
-    args: &mut GeneratorArgument
-  ) -> Builder
-    where T: Fn(&Node) -> Option<&str>
-  {
+  pub fn generate_nodes_new(&mut self, nodes: &Nodes, args: &mut GeneratorArgument) -> Builder {
     let mut builder = Builder::new();
-    self.generate_nodes(&mut builder, nodes, end_callback, args);
+    self.generate_nodes(&mut builder, nodes, args);
     builder
   }
 
-  pub fn generate_nodes<T>(
+  pub fn generate_nodes(
     &mut self,
     builder: &mut Builder,
     nodes: &Nodes,
-    end_callback: T,
     args: &mut GeneratorArgument
-  )
-    where T: Fn(&Node) -> Option<&str>
-  {
-    for node in nodes.iter() {
+  ) {
+    for (i, node) in nodes.iter().enumerate() {
+      args.is_last = i == nodes.len() - 1;
       builder.new_line();
-      self.generate_node(builder, node, &end_callback, args);
+      self.generate_node(builder, node, args);
     }
   }
 
-  pub fn generate_node_new<T>(
-    &mut self,
-    node: &Node,
-    end_callback: T,
-    args: &mut GeneratorArgument
-  ) -> Builder
-    where T: Fn(&Node) -> Option<&str>
-  {
+  pub fn generate_node_new(&mut self, node: &Node) -> Builder {
     let mut builder = Builder::new();
     builder.new_line();
-    self.generate_node(&mut builder, node, end_callback, args);
+    self.generate_node(&mut builder, node, &mut GeneratorArgument::default());
     builder
   }
 
-  pub fn generate_node<T>(
+  pub fn generate_node(
     &mut self,
     builder: &mut Builder,
     node: &Node,
-    end_callback: T,
     args: &mut GeneratorArgument
-  )
-    where T: Fn(&Node) -> Option<&str>
-  {
+  ) {
     for (node_type, generator) in args.generators.iter() {
       if *node_type == node.get_type() {
         println!("Generating node: {:?}", node_type);
@@ -384,9 +391,9 @@ impl Generator {
           if scoped_builder.total_len() == 0 {
             scoped_builder.new_line();
           }
-          generator(self, &mut scoped_builder, node, args);
-          if let Some(end) = end_callback(node) {
-            scoped_builder.push(&end);
+          generator(self, &mut scoped_builder, node);
+          if let Some(end) = args.get_end_statement(&node.get_type()) {
+            scoped_builder.push(end);
           }
           Self::handle_comments(&mut scoped_builder, trailing_comments);
           if builder.last_len() == 0 {
@@ -396,9 +403,9 @@ impl Generator {
             builder.extend(&scoped_builder);
           }
         } else {
-          generator(self, builder, node, args);
-          if let Some(end) = end_callback(node) {
-            builder.push(&end);
+          generator(self, builder, node);
+          if let Some(end) = args.get_end_statement(&node.get_type()) {
+            builder.push(end);
           }
         }
         return;
@@ -434,6 +441,15 @@ impl Generator {
       );
       builder.new_line();
     }
+  }
+
+  pub fn check_nodes_has_comments(nodes: &Nodes) -> bool {
+    nodes
+      .iter()
+      .fold(
+        false,
+        |acc, i| (acc || i.get_leading_comments().len() > 0 || i.get_trailing_comments().len() > 0)
+      )
   }
 }
 

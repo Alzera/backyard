@@ -10,41 +10,25 @@ use crate::{
 pub struct StringGenerator {}
 
 impl StringGenerator {
-  pub fn generate(
-    _: &mut Generator,
-    builder: &mut Builder,
-    node: &Node,
-    _: &mut GeneratorArgument
-  ) {
+  pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = guard_ok!(node.to_owned().cast::<StringNode>(), {
       return;
     });
     builder.push(format!("\"{}\"", node.value).as_str());
   }
 
-  pub fn generate_encapsed(
-    generator: &mut Generator,
-    builder: &mut Builder,
-    node: &Node,
-    _: &mut GeneratorArgument
-  ) {
+  pub fn generate_encapsed(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = guard_ok!(node.to_owned().cast::<EncapsedNode>(), {
       return;
     });
     let parts = generator.generate_nodes_new(
       &node.values,
-      |_| None,
       &mut GeneratorArgument::generator(&[(NodeType::EncapsedPart, Self::generate_encapsed_part)])
     );
     builder.push(format!("\"{}\"", parts.to_string("")).as_str());
   }
 
-  pub fn generate_encapsed_part(
-    generator: &mut Generator,
-    builder: &mut Builder,
-    node: &Node,
-    _: &mut GeneratorArgument
-  ) {
+  pub fn generate_encapsed_part(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = guard_ok!(node.to_owned().cast::<EncapsedPartNode>(), {
       return;
     });
@@ -55,9 +39,7 @@ impl StringGenerator {
       builder.push(&value.value);
       return;
     }
-    let expr = generator
-      .generate_node_new(&node.value, |_| None, &mut GeneratorArgument::default())
-      .to_string("");
+    let expr = generator.generate_node_new(&node.value).to_string("");
     if node.is_advanced {
       builder.push(format!("{{{}}}", expr).as_str());
     } else {
