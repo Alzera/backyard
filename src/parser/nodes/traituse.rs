@@ -103,7 +103,7 @@ pub struct TraitUseAliasNode {
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::TraitUsePrecedence)]
 pub struct TraitUsePrecedenceNode {
-  pub trait_name: Option<Node>,
+  pub trait_name: Node,
   pub method: Node,
   pub instead: Node,
 

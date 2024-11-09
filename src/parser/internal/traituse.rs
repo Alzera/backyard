@@ -108,8 +108,8 @@ impl TraitUsePrecedenceParser {
       tokens,
       [
         Lookup::Equal(vec![TokenType::Identifier]),
-        Lookup::Optional(vec![TokenType::DoubleColon]),
-        Lookup::Optional(vec![TokenType::Identifier]),
+        Lookup::Equal(vec![TokenType::DoubleColon]),
+        Lookup::Equal(vec![TokenType::Identifier]),
         Lookup::Equal(vec![TokenType::InsteadOf]),
         Lookup::Equal(vec![TokenType::Identifier]),
       ].to_vec()
@@ -117,18 +117,11 @@ impl TraitUsePrecedenceParser {
   }
 
   pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, _: &mut LoopArgument) -> Option<Node> {
-    if let [trait_name, double_colon, name, _, instead] = matched.as_slice() {
-      let has_trait = double_colon.len() > 0;
-      let trait_to_parsed = if has_trait { trait_name } else { name };
-      let name_to_parsed = if has_trait { name } else { trait_name };
-      let trait_name_parsed = match trait_to_parsed.get(0) {
-        Some(t) => Some(IdentifierParser::new(t.value.to_owned())),
-        _ => None,
-      };
+    if let [trait_name, _, name, _, instead] = matched.as_slice() {
       return Some(
         TraitUsePrecedenceNode::new(
-          trait_name_parsed,
-          IdentifierParser::from_matched(name_to_parsed),
+          IdentifierParser::from_matched(trait_name),
+          IdentifierParser::from_matched(name),
           IdentifierParser::from_matched(instead)
         )
       );

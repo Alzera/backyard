@@ -81,10 +81,8 @@ impl TraitUseGenerator {
     let node = guard_ok!(node.to_owned().cast::<TraitUsePrecedenceNode>(), {
       return;
     });
-    if let Some(trait_name) = &node.trait_name {
-      IdentifierGenerator::generate(generator, builder, trait_name);
-      builder.push("::");
-    }
+    IdentifierGenerator::generate(generator, builder, &node.trait_name);
+    builder.push("::");
     IdentifierGenerator::generate(generator, builder, &node.method);
     builder.push(" insteadof ");
     IdentifierGenerator::generate(generator, builder, &node.instead);
