@@ -72,7 +72,11 @@ impl FunctionGenerator {
       builder.push(": ");
       builder.extend_first_line(n);
     }
-    Self::fill_body(generator, builder, &node.body);
+    if let Some(n) = &node.body {
+      Self::fill_body(generator, builder, &n);
+    } else {
+      builder.push(";");
+    }
   }
 
   pub fn generate_anonymous(generator: &mut Generator, builder: &mut Builder, node: &Node) {

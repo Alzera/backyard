@@ -11,7 +11,7 @@ pub struct FunctionNode {
   pub name: Node,
   pub parameters: Nodes,
   pub return_type: Option<Node>,
-  pub body: Node,
+  pub body: Option<Node>,
 
   pub leading_comments: Nodes,
   pub trailing_comments: Nodes,

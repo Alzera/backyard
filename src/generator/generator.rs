@@ -6,63 +6,9 @@ use crate::{
   },
 };
 
-// #[napi(object)]
-// #[derive(Debug, Clone)]
-// pub struct GenPart {
-//   pub groups: GenLine,
-//   pub values: Vec<String>,
-//   pub use_group: bool,
-//   pub priority: u32,
-// }
-// impl GenPart {
-//   pub fn new_values(values: Vec<String>, priority: u32) -> Self {
-//     Self { groups: vec![], values, use_group: false, priority }
-//   }
-
-//   pub fn new_group(groups: GenLine, priority: u32) -> Self {
-//     Self { groups, values: vec![], use_group: true, priority }
-//   }
-
-//   pub fn total_length(&self) -> usize {
-//     if self.use_group {
-//       self.groups
-//         .iter()
-//         .map(|i| i.total_length())
-//         .sum()
-//     } else {
-//       self.values
-//         .iter()
-//         .map(|v| v.len())
-//         .sum()
-//     }
-//   }
-
-//   pub fn shift_values(&mut self, value: String) {
-//     self.values.insert(0, value);
-//   }
-
-//   pub fn push_values(&mut self, value: String) {
-//     self.values.push(value);
-//   }
-// }
-// pub type GenLine = Vec<GenPart>;
-// pub trait GenLineTrait {
-//   fn max_priority(&self) -> u32;
-// }
-// impl GenLineTrait for GenLine {
-//   fn max_priority(&self) -> u32 {
-//     self
-//       .iter()
-//       .map(|i| i.priority)
-//       .max()
-//       .unwrap()
-//   }
-// }
-
-// pub type GenLines = Vec<GenLine>;
 type InternalGenerator = fn(&mut Generator, &mut Builder, &Node);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 25] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 29] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
   (NodeType::Array, super::internal::array::ArrayGenerator::generate),
@@ -77,7 +23,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 25] = [
   // (NodeType::Case, CaseGenerator::generate),
   // (NodeType::Cast, super::internal::parenthesis::ParenthesisGenerator::generate_cast),
   // (NodeType::Catch, CatchGenerator::generate),
-  // (NodeType::Class, ClassGenerator::generate),
+  (NodeType::Class, super::internal::class::ClassGenerator::generate),
   (NodeType::Clone, super::internal::singles::SinglesGenerator::generate),
   // (NodeType::CommentBlock, CommentBlockGenerator::generate),
   // (NodeType::CommentLine, CommentLineGenerator::generate),
@@ -90,7 +36,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 25] = [
   (NodeType::Echo, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Encapsed, super::internal::string::StringGenerator::generate_encapsed),
   // (NodeType::EncapsedPart, StringGenerator::generate_encapsed_part),
-  // (NodeType::Enum, EnumGenerator::generate),
+  (NodeType::Enum, super::internal::enums::EnumGenerator::generate),
   // (NodeType::EnumItem, EnumItemGenerator::generate),
   // (NodeType::Eval, EvalGenerator::generate),
   // (NodeType::Exit, ExitGenerator::generate),
@@ -103,7 +49,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 25] = [
   // (NodeType::If, IfGenerator::generate),
   // (NodeType::Include, IncludeGenerator::generate),
   // (NodeType::InstanceOf, InstanceOfGenerator::generate),
-  // (NodeType::Interface, InterfaceGenerator::generate),
+  (NodeType::Interface, super::internal::interface::InterfaceGenerator::generate),
   // (NodeType::Label, LabelGenerator::generate),
   // (NodeType::List, ListGenerator::generate),
   // (NodeType::Magic, MagicGenerator::generate),
@@ -129,7 +75,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 25] = [
   (NodeType::String, super::internal::string::StringGenerator::generate),
   // (NodeType::Switch, SwitchGenerator::generate),
   // (NodeType::Ternary, TernaryGenerator::generate),
-  // (NodeType::Trait, TraitGenerator::generate),
+  (NodeType::Trait, super::internal::traits::TraitGenerator::generate),
   // (NodeType::TraitUse, TraitUseGenerator::generate),
   // (NodeType::TraitUseAlias, TraitUseAliasGenerator::generate),
   // (NodeType::TraitUsePrecedence, TraitUsePrecedenceGenerator::generate),
@@ -154,9 +100,9 @@ impl Line {
     Self { line: String::new(), indent: 0 }
   }
 
-  // pub fn shift(&mut self, line: &str) {
-  //   self.line.insert_str(0, line);
-  // }
+  pub fn shift(&mut self, line: &str) {
+    self.line.insert_str(0, line);
+  }
 
   pub fn push(&mut self, line: &str) {
     self.line.push_str(line);
@@ -190,27 +136,17 @@ impl Builder {
     self.lines.push(Line::new());
   }
 
-  // pub fn shift(&mut self, line: &str) {
-  //   guard!(self.lines.last_mut(), {
-  //     return;
-  //   }).shift(line);
-  // }
+  pub fn shift(&mut self, line: &str) {
+    guard!(self.lines.last_mut(), {
+      return;
+    }).shift(line);
+  }
 
   pub fn push(&mut self, line: &str) {
     guard!(self.lines.last_mut(), {
       return;
     }).push(line);
   }
-
-  // pub fn pop(&mut self) -> Option<char> {
-  //   guard!(self.lines.last_mut()).line.pop()
-  // }
-
-  // pub fn push_all_lines(&mut self, line: &str) {
-  //   self.lines.iter_mut().for_each(|i| {
-  //     i.push(line);
-  //   });
-  // }
 
   pub fn total_len(&self) -> usize {
     self.lines
@@ -237,21 +173,6 @@ impl Builder {
     self.lines.iter_mut().for_each(|i| {
       i.indent += 1;
     });
-  }
-
-  pub fn indent_at(&mut self, index: usize) {
-    self.lines
-      .iter_mut()
-      .enumerate()
-      .for_each(|(i, line)| {
-        if i == index {
-          line.indent += 1;
-        }
-      });
-  }
-
-  pub fn indent_last(&mut self) {
-    self.indent_at(self.lines.len() - 1);
   }
 
   pub fn extend_first_line(&mut self, builder: &Builder) {
@@ -320,7 +241,15 @@ impl<'a> GeneratorArgument<'a> {
 
   fn get_end_statement(&mut self, node_type: &NodeType) -> Option<&str> {
     if self.end == EndMode::SemicolonDynamic {
-      if ![NodeType::Function, NodeType::Program].contains(node_type) {
+      if
+        ![
+          NodeType::Function,
+          NodeType::Program,
+          NodeType::Class,
+          NodeType::Interface,
+          NodeType::Trait,
+        ].contains(node_type)
+      {
         return Some(";");
       }
     } else if self.end == EndMode::CommaWithoutEnd {
@@ -452,24 +381,3 @@ impl Generator {
       )
   }
 }
-
-// pub struct Formatter {}
-
-// impl Formatter {
-//   pub fn get_indent(i: usize) -> String {
-//     let mut indent = String::new();
-//     for _ in 0..i {
-//       indent.push_str("  ");
-//     }
-//     indent
-//   }
-
-//   pub fn format(input: String, i: usize) -> String {
-//     let indent = Self::get_indent(i);
-//     input
-//       .split("\n")
-//       .map(|i| format!("{indent}{i}"))
-//       .collect::<Vec<String>>()
-//       .join("\n")
-//   }
-// }

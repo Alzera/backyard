@@ -14,11 +14,9 @@ impl BinGenerator {
     generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
     let mut expr = generator.generate_node_new(&node.right);
     if builder.last_len() + expr.first_len() + node.operator.len() > generator.max_length {
+      expr.shift(format!("{} ", node.operator).as_str());
       expr.indent();
-      builder.new_line();
-      builder.push(format!("{} ", node.operator).as_str());
-      builder.indent_last();
-      builder.extend_first_line(&expr);
+      builder.extend(&expr);
     } else {
       builder.push(format!(" {} ", node.operator).as_str());
       builder.extend_first_line(&expr);
