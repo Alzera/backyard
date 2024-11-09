@@ -8,7 +8,7 @@ use crate::{
 
 pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Node);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 32] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 45] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
   (NodeType::Array, super::internal::array::ArrayGenerator::generate),
@@ -32,7 +32,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 32] = [
   (NodeType::Continue, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Declare, super::internal::declare::DeclareGenerator::generate),
   // (NodeType::DeclareArgument, DeclareArgumentGenerator::generate),
-  // (NodeType::DoWhile, DoWhileGenerator::generate),
+  (NodeType::DoWhile, super::internal::dowhile::DoWhileGenerator::generate),
   (NodeType::Echo, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Encapsed, super::internal::string::StringGenerator::generate_encapsed),
   // (NodeType::EncapsedPart, StringGenerator::generate_encapsed_part),
@@ -40,20 +40,20 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 32] = [
   // (NodeType::EnumItem, EnumItemGenerator::generate),
   // (NodeType::Eval, EvalGenerator::generate),
   // (NodeType::Exit, ExitGenerator::generate),
-  // (NodeType::For, ForGenerator::generate),
-  // (NodeType::Foreach, ForeachGenerator::generate),
+  (NodeType::For, super::internal::fors::ForGenerator::generate),
+  (NodeType::Foreach, super::internal::foreach::ForeachGenerator::generate),
   (NodeType::Function, super::internal::function::FunctionGenerator::generate),
   // (NodeType::Global, GlobalGenerator::generate),
   // (NodeType::Goto, GotoGenerator::generate),
   (NodeType::Identifier, super::internal::identifier::IdentifierGenerator::generate),
-  // (NodeType::If, IfGenerator::generate),
+  (NodeType::If, super::internal::ifs::IfGenerator::generate),
   // (NodeType::Include, IncludeGenerator::generate),
   // (NodeType::InstanceOf, InstanceOfGenerator::generate),
   (NodeType::Interface, super::internal::interface::InterfaceGenerator::generate),
   // (NodeType::Label, LabelGenerator::generate),
   // (NodeType::List, ListGenerator::generate),
   // (NodeType::Magic, MagicGenerator::generate),
-  // (NodeType::Match, MatchGenerator::generate),
+  (NodeType::Match, super::internal::matchs::MatchGenerator::generate),
   // (NodeType::MatchArm, MatchArmGenerator::generate),
   // (NodeType::Method, super::internal::method::MethodGenerator::generate),
   (NodeType::Namespace, super::internal::namespace::NamespaceGenerator::generate),
@@ -63,8 +63,8 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 32] = [
   // (NodeType::Parameter, ParameterGenerator::generate),
   // (NodeType::Parent, ParentGenerator::generate),
   // (NodeType::Parenthesis, super::internal::parenthesis::ParenthesisGenerator::generate),
-  // (NodeType::Post, PostGenerator::generate),
-  // (NodeType::Pre, PreGenerator::generate),
+  (NodeType::Post, super::internal::post::PostGenerator::generate),
+  (NodeType::Pre, super::internal::pre::PreGenerator::generate),
   (NodeType::Print, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Program, super::internal::program::ProgramGenerator::generate),
   // (NodeType::Property, super::internal::property::PropertyGenerator::generate),
@@ -73,20 +73,20 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 32] = [
   // (NodeType::Static, StaticGenerator::generate),
   (NodeType::StaticLookup, super::internal::staticlookup::StaticLookupGenerator::generate),
   (NodeType::String, super::internal::string::StringGenerator::generate),
-  // (NodeType::Switch, SwitchGenerator::generate),
-  // (NodeType::Ternary, TernaryGenerator::generate),
+  (NodeType::Switch, super::internal::switch::SwitchGenerator::generate),
+  (NodeType::Ternary, super::internal::ternary::TernaryGenerator::generate),
   (NodeType::Trait, super::internal::traits::TraitGenerator::generate),
   // (NodeType::TraitUse, super::internal::traituse::TraitUseGenerator::generate),
   // (NodeType::TraitUseAlias, TraitUseAliasGenerator::generate),
   // (NodeType::TraitUsePrecedence, TraitUsePrecedenceGenerator::generate),
   (NodeType::Throw, super::internal::singles::SinglesGenerator::generate),
-  // (NodeType::Try, TryGenerator::generate),
+  (NodeType::Try, super::internal::tries::TryGenerator::generate),
   (NodeType::Type, super::internal::types::TypeGenerator::generate),
   (NodeType::Use, super::internal::uses::UseGenerator::generate),
   (NodeType::Variable, super::internal::variable::VariableGenerator::generate),
-  // (NodeType::While, WhileGenerator::generate),
-  // (NodeType::Yield, YieldGenerator::generate),
-  // (NodeType::YieldFrom, YieldFromGenerator::generate),
+  (NodeType::While, super::internal::whiles::WhileGenerator::generate),
+  (NodeType::Yield, super::internal::yields::YieldGenerator::generate),
+  (NodeType::YieldFrom, super::internal::yields::YieldGenerator::generate_from),
 ];
 
 #[derive(Debug, Clone)]
@@ -257,6 +257,13 @@ impl<'a> GeneratorArgument<'a> {
           NodeType::TraitUse,
           NodeType::Declare,
           NodeType::Namespace,
+          NodeType::If,
+          NodeType::Switch,
+          NodeType::Case,
+          NodeType::Foreach,
+          NodeType::For,
+          NodeType::While,
+          NodeType::DoWhile,
         ].contains(node_type)
       {
         return Some(";");
@@ -320,7 +327,7 @@ impl Generator {
   ) {
     for (node_type, generator) in args.generators.iter() {
       if *node_type == node.get_type() {
-        println!("Generating node: {:?}", node_type);
+        // println!("Generating node: {:?}", node_type);
         let leading_comments = node.get_leading_comments();
         let trailing_comments = node.get_trailing_comments();
         if leading_comments.len() > 0 || trailing_comments.len() > 0 {

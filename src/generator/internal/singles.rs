@@ -20,16 +20,6 @@ pub struct SinglesGenerator {}
 
 impl SinglesGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    // BreakNode,
-    // CloneNode,
-    // ContinueNode,
-    // EchoNode,
-    // NewNode,
-    // ParentNode,
-    // PrintNode,
-    // ReturnNode,
-    // StaticNode,
-    // ThrowNode,
     let node = match node.get_type() {
       NodeType::Break => {
         builder.push("break");
