@@ -15,12 +15,6 @@ impl InterfaceGenerator {
     });
     builder.push("interface ");
     IdentifierGenerator::generate(generator, builder, &node.name);
-    builder.push(" {");
-    let mut block = Builder::new();
-    BlockGenerator::generate(generator, &mut block, &node.body);
-    block.indent();
-    builder.extend(&block);
-    builder.new_line();
-    builder.push("}");
+    BlockGenerator::generate(generator, builder, &node.body);
   }
 }

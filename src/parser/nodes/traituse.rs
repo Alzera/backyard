@@ -8,7 +8,7 @@ use crate::parser::node::{ NodeType, Node, Nodes };
 #[implement_node_trait(NodeType::TraitUse)]
 pub struct TraitUseNode {
   pub traits: Nodes,
-  pub adaptations: Option<Node>,
+  pub adaptations: Nodes,
 
   pub leading_comments: Nodes,
   pub trailing_comments: Nodes,

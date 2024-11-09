@@ -4,7 +4,14 @@ use crate::{
   parser::{ node::{ Node, NodeTraitCast, NodeType }, nodes::class::ClassNode },
 };
 
-use super::{ block::BlockGenerator, identifier::IdentifierGenerator };
+use super::{
+  block::BlockGenerator,
+  consts::ConstGenerator,
+  identifier::IdentifierGenerator,
+  method::MethodGenerator,
+  property::PropertyGenerator,
+  traituse::TraitUseGenerator,
+};
 
 pub struct ClassGenerator {}
 
@@ -32,12 +39,16 @@ impl ClassGenerator {
       );
       builder.push(&implements.to_string(" "));
     }
-    builder.push(" {");
-    let mut block = Builder::new();
-    BlockGenerator::generate(generator, &mut block, &node.body);
-    block.indent();
-    builder.extend(&block);
-    builder.new_line();
-    builder.push("}");
+    BlockGenerator::generate_specific(
+      generator,
+      builder,
+      &node.body,
+      &[
+        (NodeType::TraitUse, TraitUseGenerator::generate),
+        (NodeType::ConstProperty, ConstGenerator::generate_property),
+        (NodeType::Property, PropertyGenerator::generate),
+        (NodeType::Method, MethodGenerator::generate),
+      ]
+    );
   }
 }

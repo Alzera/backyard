@@ -15,20 +15,20 @@ impl ArrayGenerator {
     if node.is_ellipsis {
       builder.push("...");
     }
-    let mut values = generator.generate_nodes_new(
-      &node.values,
+    let mut items = generator.generate_nodes_new(
+      &node.items,
       &mut GeneratorArgument::for_parameter(&[(NodeType::ArrayItem, Self::generate_item)])
     );
     builder.push("[");
     if
-      Generator::check_nodes_has_comments(&node.values) ||
-      2 + builder.last_len() + values.total_len_with_separator(", ") > generator.max_length
+      Generator::check_nodes_has_comments(&node.items) ||
+      2 + builder.last_len() + items.total_len_with_separator(", ") > generator.max_length
     {
-      values.indent();
-      builder.extend(&values);
+      items.indent();
+      builder.extend(&items);
       builder.new_line();
     } else {
-      builder.push(&values.to_string(" "));
+      builder.push(&items.to_string(" "));
     }
     builder.push("]");
   }

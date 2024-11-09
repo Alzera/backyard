@@ -6,7 +6,7 @@ use crate::{
   },
 };
 
-type InternalGenerator = fn(&mut Generator, &mut Builder, &Node);
+pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Node);
 
 pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 29] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
@@ -17,7 +17,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 29] = [
   (NodeType::ArrowFunction, super::internal::function::FunctionGenerator::generate_arrow),
   (NodeType::Assignment, super::internal::assignment::AssignmentGenerator::generate),
   (NodeType::Bin, super::internal::bin::BinGenerator::generate),
-  (NodeType::Block, super::internal::block::BlockGenerator::generate),
+  // (NodeType::Block, super::internal::block::BlockGenerator::generate),
   (NodeType::Break, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Call, super::internal::call::CallGenerator::generate),
   // (NodeType::Case, CaseGenerator::generate),
@@ -27,7 +27,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 29] = [
   (NodeType::Clone, super::internal::singles::SinglesGenerator::generate),
   // (NodeType::CommentBlock, CommentBlockGenerator::generate),
   // (NodeType::CommentLine, CommentLineGenerator::generate),
-  // (NodeType::Const, ConstGenerator::generate),
+  (NodeType::Const, super::internal::consts::ConstGenerator::generate),
   // (NodeType::ConstProperty, ConstPropertyGenerator::generate),
   (NodeType::Continue, super::internal::singles::SinglesGenerator::generate),
   // (NodeType::Declare, DeclareGenerator::generate),
@@ -55,7 +55,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 29] = [
   // (NodeType::Magic, MagicGenerator::generate),
   // (NodeType::Match, MatchGenerator::generate),
   // (NodeType::MatchArm, MatchArmGenerator::generate),
-  // (NodeType::Method, MethodGenerator::generate),
+  // (NodeType::Method, super::internal::method::MethodGenerator::generate),
   // (NodeType::Namespace, NamespaceGenerator::generate),
   (NodeType::New, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Number, super::internal::number::NumberGenerator::generate),
@@ -67,7 +67,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 29] = [
   // (NodeType::Pre, PreGenerator::generate),
   (NodeType::Print, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Program, super::internal::program::ProgramGenerator::generate),
-  // (NodeType::Property, PropertyGenerator::generate),
+  // (NodeType::Property, super::internal::property::PropertyGenerator::generate),
   // (NodeType::PropertyItem, PropertyItemGenerator::generate),
   (NodeType::Return, super::internal::singles::SinglesGenerator::generate),
   // (NodeType::Static, StaticGenerator::generate),
@@ -76,7 +76,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 29] = [
   // (NodeType::Switch, SwitchGenerator::generate),
   // (NodeType::Ternary, TernaryGenerator::generate),
   (NodeType::Trait, super::internal::traits::TraitGenerator::generate),
-  // (NodeType::TraitUse, TraitUseGenerator::generate),
+  // (NodeType::TraitUse, super::internal::traituse::TraitUseGenerator::generate),
   // (NodeType::TraitUseAlias, TraitUseAliasGenerator::generate),
   // (NodeType::TraitUsePrecedence, TraitUsePrecedenceGenerator::generate),
   (NodeType::Throw, super::internal::singles::SinglesGenerator::generate),
@@ -205,7 +205,7 @@ impl Builder {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-enum EndMode {
+pub enum EndMode {
   CommaWithoutEnd,
   SemicolonDynamic,
   None,
@@ -221,6 +221,10 @@ pub struct GeneratorArgument<'a> {
 impl<'a> GeneratorArgument<'a> {
   pub fn default() -> Self {
     Self { generators: &DEFAULT_GENERATORS, is_last: false, end: EndMode::None }
+  }
+
+  pub fn new(end: EndMode, generators: &'a [(NodeType, InternalGenerator)]) -> Self {
+    Self { generators, is_last: false, end }
   }
 
   pub fn generator(generators: &'a [(NodeType, InternalGenerator)]) -> Self {
@@ -248,6 +252,9 @@ impl<'a> GeneratorArgument<'a> {
           NodeType::Class,
           NodeType::Interface,
           NodeType::Trait,
+          NodeType::Enum,
+          NodeType::Method,
+          NodeType::TraitUse,
         ].contains(node_type)
       {
         return Some(";");

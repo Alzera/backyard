@@ -49,7 +49,7 @@ pub struct ConstNode {
 // }
 
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
-#[implement_node_trait(NodeType::ArrayLookup)]
+#[implement_node_trait(NodeType::ConstProperty)]
 pub struct ConstPropertyNode {
   pub visibility: String,
   pub consts: Nodes,

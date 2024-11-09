@@ -32,16 +32,6 @@ impl FunctionGenerator {
     (return_type, return_type_len)
   }
 
-  pub fn fill_body(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    builder.push(" {");
-    let mut block = Builder::new();
-    BlockGenerator::generate(generator, &mut block, &node);
-    block.indent();
-    builder.extend(&block);
-    builder.new_line();
-    builder.push("}");
-  }
-
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = guard_ok!(node.to_owned().cast::<FunctionNode>(), {
       return;
@@ -73,7 +63,7 @@ impl FunctionGenerator {
       builder.extend_first_line(n);
     }
     if let Some(n) = &node.body {
-      Self::fill_body(generator, builder, &n);
+      BlockGenerator::generate(generator, builder, &n);
     } else {
       builder.push(";");
     }
@@ -131,7 +121,8 @@ impl FunctionGenerator {
       builder.push(": ");
       builder.extend_first_line(n);
     }
-    Self::fill_body(generator, builder, &node.body);
+
+    BlockGenerator::generate(generator, builder, &node.body);
   }
 
   pub fn generate_arrow(generator: &mut Generator, builder: &mut Builder, node: &Node) {
@@ -174,6 +165,7 @@ impl FunctionGenerator {
     });
     if let Some(n) = &node.variable_type {
       generator.generate_node(builder, n, &mut GeneratorArgument::default());
+      builder.push(" ");
     }
     if node.is_ref {
       builder.push("&");
@@ -184,6 +176,7 @@ impl FunctionGenerator {
     builder.push("$");
     IdentifierGenerator::generate(generator, builder, &node.name);
     if let Some(n) = &node.value {
+      builder.push(" = ");
       generator.generate_node(builder, n, &mut GeneratorArgument::default());
     };
   }

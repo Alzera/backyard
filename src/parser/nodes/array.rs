@@ -8,7 +8,7 @@ use crate::parser::node::{ Node, NodeType, Nodes };
 #[implement_node_trait(NodeType::Array)]
 pub struct ArrayNode {
   pub is_ellipsis: bool,
-  pub values: Nodes,
+  pub items: Nodes,
 
   pub leading_comments: Nodes,
   pub trailing_comments: Nodes,

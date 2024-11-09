@@ -3,10 +3,7 @@ use crate::{
   lexer::token::{ Token, TokenType },
   parser::{
     node::Node,
-    nodes::{
-      block::BlockNode,
-      traituse::{ TraitUseAliasNode, TraitUseNode, TraitUsePrecedenceNode },
-    },
+    nodes::traituse::{ TraitUseAliasNode, TraitUseNode, TraitUsePrecedenceNode },
     parser::{ LoopArgument, Parser },
     utils::{ match_pattern, some_or_default, Lookup },
   },
@@ -39,11 +36,11 @@ impl TraitUseParser {
           ]
         )
       );
-      let mut adaptations: Option<Node> = None;
+      let mut adaptations = vec![];
       if guard!(parser.tokens.get(parser.position - 1)).token_type == TokenType::Semicolon {
         parser.position -= 1;
       } else {
-        let adaptations_body = parser.get_children(
+        adaptations = parser.get_children(
           &mut LoopArgument::new(
             "traituse_body",
             &[TokenType::Semicolon],
@@ -55,7 +52,6 @@ impl TraitUseParser {
             ]
           )
         );
-        adaptations = Some(BlockNode::new(adaptations_body));
       }
       return Some(TraitUseNode::new(traits, adaptations));
     }
