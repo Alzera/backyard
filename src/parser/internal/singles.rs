@@ -23,7 +23,7 @@ use crate::{
 pub struct SinglesParser {}
 
 impl SinglesParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -46,7 +46,11 @@ impl SinglesParser {
     )
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &mut LoopArgument
+  ) -> Option<Node> {
     if let [key] = matched.as_slice() {
       if let Some(key) = key.first() {
         if [TokenType::Parent, TokenType::Static].contains(&key.token_type) {

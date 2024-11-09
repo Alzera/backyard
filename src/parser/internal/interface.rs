@@ -14,7 +14,7 @@ use super::{ comment::CommentParser, identifier::IdentifierParser, method::Metho
 pub struct InterfaceParser {}
 
 impl InterfaceParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -25,7 +25,11 @@ impl InterfaceParser {
     )
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    _: &mut LoopArgument
+  ) -> Option<Node> {
     if let [_, name, _] = matched.as_slice() {
       let implements = parser.get_children(
         &mut LoopArgument::new(

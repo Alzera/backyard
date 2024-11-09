@@ -16,6 +16,6 @@ impl BlockGenerator {
     let node = guard_ok!(node.to_owned().cast::<BlockNode>(), {
       return;
     });
-    generator.generate_nodes(builder, &node.statements, args);
+    generator.generate_nodes(builder, &node.statements, Builder::block_end_callback, args);
   }
 }

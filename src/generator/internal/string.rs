@@ -26,17 +26,15 @@ impl StringGenerator {
     generator: &mut Generator,
     builder: &mut Builder,
     node: &Node,
-    args: &mut GeneratorArgument
+    _: &mut GeneratorArgument
   ) {
     let node = guard_ok!(node.to_owned().cast::<EncapsedNode>(), {
       return;
     });
     let parts = generator.generate_nodes_new(
       &node.values,
-      &mut GeneratorArgument::new(
-        &[(NodeType::EncapsedPart, Self::generate_encapsed_part)],
-        args.max_length
-      )
+      |_| None,
+      &mut GeneratorArgument::generator(&[(NodeType::EncapsedPart, Self::generate_encapsed_part)])
     );
     builder.push(format!("\"{}\"", parts.to_string("")).as_str());
   }
@@ -58,7 +56,7 @@ impl StringGenerator {
       return;
     }
     let expr = generator
-      .generate_node_new(&node.value, &mut GeneratorArgument::default())
+      .generate_node_new(&node.value, |_| None, &mut GeneratorArgument::default())
       .to_string("");
     if node.is_advanced {
       builder.push(format!("{{{}}}", expr).as_str());

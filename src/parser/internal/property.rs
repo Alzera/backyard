@@ -17,7 +17,7 @@ use super::{ comment::CommentParser, identifier::IdentifierParser, types::TypesP
 pub struct PropertyParser {}
 
 impl PropertyParser {
-  pub fn test(tokens: &Vec<Token>, args: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     if
       let Some(first_test) = match_pattern(
         tokens,
@@ -49,7 +49,11 @@ impl PropertyParser {
     None
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    _: &mut LoopArgument
+  ) -> Option<Node> {
     if let [visibility, modifier] = matched.as_slice() {
       let items = parser.get_children(
         &mut LoopArgument::new(
@@ -79,7 +83,7 @@ impl PropertyParser {
 pub struct PropertyItemParser {}
 
 impl PropertyItemParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -89,7 +93,11 @@ impl PropertyItemParser {
     )
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &mut LoopArgument
+  ) -> Option<Node> {
     if let [name, has_value] = matched.as_slice() {
       let value = if has_value.len() > 0 {
         parser.get_statement(

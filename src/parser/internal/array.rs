@@ -12,7 +12,7 @@ use crate::{
 pub struct ArrayParser {}
 
 impl ArrayParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -22,7 +22,11 @@ impl ArrayParser {
     )
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    _: &mut LoopArgument
+  ) -> Option<Node> {
     if let [is_ellipsis, _] = matched.as_slice() {
       let mut loop_parsers = DEFAULT_PARSERS.to_vec();
       loop_parsers.insert(0, (ArrayItemParser::test, ArrayItemParser::parse));
@@ -54,11 +58,15 @@ impl ArrayParser {
 pub struct ArrayItemParser {}
 
 impl ArrayItemParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Arrow])].to_vec())
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &mut LoopArgument
+  ) -> Option<Node> {
     if let [_] = matched.as_slice() {
       let value = parser.get_statement(
         &mut LoopArgument::with_tokens(

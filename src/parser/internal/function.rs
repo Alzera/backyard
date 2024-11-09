@@ -25,7 +25,7 @@ use super::{
 pub struct FunctionParser {}
 
 impl FunctionParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     if
       let Some(m) = match_pattern(
         tokens,
@@ -61,7 +61,11 @@ impl FunctionParser {
     )
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &mut LoopArgument
+  ) -> Option<Node> {
     match matched.len() {
       4 => FunctionParser::parse_basic(matched, parser),
       3 => {
@@ -202,11 +206,15 @@ impl FunctionParser {
 pub struct ConstructorParameterParser {}
 
 impl ConstructorParameterParser {
-  pub fn test(tokens: &Vec<Token>, args: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     PropertyParser::test(tokens, args)
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    _: &mut LoopArgument
+  ) -> Option<Node> {
     if let [visibility, modifier] = matched.as_slice() {
       let item = guard!(
         parser.get_statement(
@@ -238,7 +246,7 @@ impl ConstructorParameterParser {
 pub struct ParameterParser {}
 
 impl ParameterParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -250,7 +258,11 @@ impl ParameterParser {
     )
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &mut LoopArgument
+  ) -> Option<Node> {
     if let [is_ref, is_ellipsis, name, has_value] = matched.as_slice() {
       let value = if has_value.len() > 0 {
         parser.get_statement(

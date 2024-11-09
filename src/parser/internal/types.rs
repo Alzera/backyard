@@ -27,7 +27,7 @@ pub struct TypesParser {}
 // }
 impl TypesParser {
   #[allow(unused_assignments)]
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     if
       let Some(m) = match_pattern(
         tokens,
@@ -68,7 +68,7 @@ impl TypesParser {
     Some(vec![matched])
   }
 
-  pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, _: &mut LoopArgument) -> Option<Node> {
     if matched.len() == 2 {
       if let [is_nullable, type_name] = matched.as_slice() {
         if let Some(type_name) = type_name.get(0) {

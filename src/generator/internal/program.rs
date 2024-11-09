@@ -17,7 +17,6 @@ impl ProgramGenerator {
       return;
     });
     builder.push("<?php");
-    builder.new_line();
-    generator.generate_nodes(builder, &node.children, args);
+    generator.generate_nodes(builder, &node.children, Builder::block_end_callback, args);
   }
 }

@@ -12,14 +12,14 @@ use crate::{
 pub struct PostParser {}
 
 impl PostParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [Lookup::Equal(vec![TokenType::PostIncrement, TokenType::PostDecrement])].to_vec()
     )
   }
 
-  pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
+  pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, args: &mut LoopArgument) -> Option<Node> {
     if let [operator] = matched.as_slice() {
       if args.last_expr.is_none() {
         return None;

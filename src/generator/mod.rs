@@ -7,7 +7,5 @@ pub mod internal;
 
 pub fn generate(nodes: Nodes) -> String {
   let mut generator = Generator::new(nodes);
-  let res = generator.start();
-  // println!("{:?}", res);
-  res
+  generator.start()
 }

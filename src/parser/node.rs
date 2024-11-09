@@ -315,6 +315,8 @@ pub trait NodeTrait: Debug + DynClone + Any {
 
   fn add_leading_comments(&mut self, comments: Node);
   fn add_trailing_comments(&mut self, comments: Node);
+  fn get_leading_comments(&self) -> &Nodes;
+  fn get_trailing_comments(&self) -> &Nodes;
 
   unsafe fn to_napi(&self, env: napi::sys::napi_env) -> napi::Result<napi::sys::napi_value>;
   fn from_napi(env: napi::sys::napi_env, val: napi::JsObject) -> Box<Self> where Self: Sized;

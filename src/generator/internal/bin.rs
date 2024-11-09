@@ -16,8 +16,8 @@ impl BinGenerator {
     let node = guard_ok!(node.to_owned().cast::<BinNode>(), {
       return;
     });
-    generator.generate_node(builder, &node.left, args);
-    let mut expr = generator.generate_node_new(&node.right, args);
+    generator.generate_node(builder, &node.left, |_| None, args);
+    let mut expr = generator.generate_node_new(&node.right, |_| None, args);
     if builder.last_len() + expr.first_len() + node.operator.len() > args.max_length {
       expr.indent();
       builder.new_line();

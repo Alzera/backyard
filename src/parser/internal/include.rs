@@ -12,7 +12,7 @@ use crate::{
 pub struct IncludeParser {}
 
 impl IncludeParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -29,7 +29,11 @@ impl IncludeParser {
     )
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    _: &mut LoopArgument
+  ) -> Option<Node> {
     if let [keyword, _] = matched.as_slice() {
       let mut is_require = false;
       let mut is_once = false;

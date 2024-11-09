@@ -26,7 +26,7 @@ impl VariableGenerator {
       IdentifierGenerator::generate(generator, builder, &node.name, args);
     } else {
       builder.push("{");
-      let mut expr = generator.generate_node_new(&node.name, args);
+      let mut expr = generator.generate_node_new(&node.name, |_| None, args);
       if 1 + builder.last_len() + expr.first_len() > args.max_length {
         expr.indent();
         builder.extend(&expr);

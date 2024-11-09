@@ -13,7 +13,7 @@ use super::variable::VariableParser;
 pub struct StringParser {}
 
 impl StringParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     if let Some(token) = tokens.get(0) {
       if [TokenType::EncapsedStringOpen, TokenType::String].contains(&token.token_type) {
         return Some(vec![vec![token.to_owned()]]);
@@ -22,7 +22,11 @@ impl StringParser {
     None
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    _: &mut LoopArgument
+  ) -> Option<Node> {
     if let [string_type] = matched.as_slice() {
       if let Some(string_type) = string_type.get(0) {
         if string_type.token_type == TokenType::EncapsedStringOpen {

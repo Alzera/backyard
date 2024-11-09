@@ -14,7 +14,7 @@ use super::{ comment::CommentParser, identifier::IdentifierParser };
 pub struct EnumParser {}
 
 impl EnumParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -25,7 +25,11 @@ impl EnumParser {
     )
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    _: &mut LoopArgument
+  ) -> Option<Node> {
     if let [_, name, _] = matched.as_slice() {
       let items = parser.get_children(
         &mut LoopArgument::new(
@@ -48,11 +52,15 @@ impl EnumParser {
 pub struct EnumItemParser {}
 
 impl EnumItemParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Case])].to_vec())
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    _: &mut LoopArgument
+  ) -> Option<Node> {
     if let [_] = matched.as_slice() {
       if
         let Some(value) = parser.get_statement(

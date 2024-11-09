@@ -14,7 +14,7 @@ use super::{ comment::CommentParser, function::FunctionParser };
 pub struct MethodParser {}
 
 impl MethodParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     let basic_grammar = [
       Lookup::Optional(vec![TokenType::Public, TokenType::Private, TokenType::Protected]),
       Lookup::Optional(vec![TokenType::Abstract, TokenType::Final]),
@@ -24,7 +24,11 @@ impl MethodParser {
     match_pattern(tokens, basic_grammar)
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    _: &mut LoopArgument
+  ) -> Option<Node> {
     if let [visibility, modifier, is_static, _] = matched.as_slice() {
       parser.position -= 1;
       let function = parser.get_statement(

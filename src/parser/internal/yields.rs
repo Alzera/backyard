@@ -13,14 +13,18 @@ use crate::{
 pub struct YieldParser {}
 
 impl YieldParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [Lookup::Equal(vec![TokenType::Yield]), Lookup::Optional(vec![TokenType::From])].to_vec()
     )
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &mut LoopArgument
+  ) -> Option<Node> {
     if let [_, has_from] = matched.as_slice() {
       let mut value = guard!(
         parser.get_statement(

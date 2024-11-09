@@ -15,11 +15,15 @@ use super::block::BlockParser;
 pub struct DoWhileParser {}
 
 impl DoWhileParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Do])].to_vec())
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    _: &mut LoopArgument
+  ) -> Option<Node> {
     if let [_] = matched.as_slice() {
       let body = BlockParser::new(parser);
       parser.position += 2;

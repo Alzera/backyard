@@ -53,8 +53,8 @@ use super::{
   node::{ Node, NodeType, Nodes },
 };
 
-type InternalParserTest = fn(&Vec<Token>, &LoopArgument) -> Option<Vec<Vec<Token>>>;
-type InternalParserParse = fn(&mut Parser, Vec<Vec<Token>>, &LoopArgument) -> Option<Node>;
+type InternalParserTest = fn(&Vec<Token>, &mut LoopArgument) -> Option<Vec<Vec<Token>>>;
+type InternalParserParse = fn(&mut Parser, Vec<Vec<Token>>, &mut LoopArgument) -> Option<Node>;
 type InternalParser = (InternalParserTest, InternalParserParse);
 pub static DEFAULT_PARSERS: [InternalParser; 46] = [
   (CommentParser::test, CommentParser::parse),
@@ -113,6 +113,7 @@ pub struct LoopArgument<'a> {
   pub separators: &'a [TokenType],
   pub breakers: &'a [TokenType],
   pub last_expr: Option<Node>,
+  pub statements: Nodes,
 }
 
 impl<'a> LoopArgument<'a> {
@@ -128,6 +129,7 @@ impl<'a> LoopArgument<'a> {
       separators,
       breakers,
       last_expr: None,
+      statements: vec![],
     }
   }
 
@@ -138,6 +140,7 @@ impl<'a> LoopArgument<'a> {
       separators: &[TokenType::Semicolon],
       breakers: &[TokenType::RightCurlyBracket],
       last_expr: None,
+      statements: vec![],
     }
   }
 
@@ -152,6 +155,7 @@ impl<'a> LoopArgument<'a> {
       separators,
       breakers,
       last_expr: None,
+      statements: vec![],
     }
   }
 }
@@ -174,8 +178,6 @@ impl Parser {
   }
 
   pub fn get_children(&mut self, args: &mut LoopArgument) -> Nodes {
-    let mut statements = vec![];
-
     while let Some(token) = self.tokens.get(self.position) {
       if args.breakers.contains(&token.token_type) {
         self.position += 1;
@@ -186,7 +188,7 @@ impl Parser {
         continue;
       }
       if let Some(n) = self.get_statement(args) {
-        statements.push(n);
+        args.statements.push(n);
       } else {
         if let Some(t) = self.tokens.get(self.position) {
           if !(args.separators.contains(&t.token_type) || args.breakers.contains(&t.token_type)) {
@@ -196,7 +198,7 @@ impl Parser {
         break;
       }
     }
-    statements
+    args.statements.clone()
   }
 
   pub fn get_statement(&mut self, args: &mut LoopArgument) -> Option<Node> {
@@ -205,7 +207,7 @@ impl Parser {
       if args.separators.contains(&token.token_type) || args.breakers.contains(&token.token_type) {
         break;
       }
-      if let Some(n) = self.find_match(&args) {
+      if let Some(n) = self.find_match(args) {
         let force_end_statement = [
           NodeType::Declare,
           NodeType::Namespace,
@@ -257,7 +259,7 @@ impl Parser {
     last_expr
   }
 
-  pub fn find_match(&mut self, args: &LoopArgument) -> Option<Node> {
+  pub fn find_match(&mut self, args: &mut LoopArgument) -> Option<Node> {
     let tokens = self.tokens[self.position..].to_vec();
 
     for (test, parse) in args.parsers {

@@ -15,7 +15,7 @@ use super::identifier::IdentifierParser;
 pub struct StaticLookupParser {}
 
 impl StaticLookupParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -25,7 +25,7 @@ impl StaticLookupParser {
     )
   }
 
-  pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
+  pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, args: &mut LoopArgument) -> Option<Node> {
     if let [_, prop] = matched.as_slice() {
       let on = guard!(args.last_expr.to_owned());
       return Some(StaticLookupNode::new(on, IdentifierParser::from_matched(prop)));

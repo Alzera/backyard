@@ -1,4 +1,10 @@
-use crate::{ guard, parser::node::{ Node, NodeType, Nodes } };
+use crate::{
+  guard,
+  parser::{
+    node::{ Node, NodeTraitCast, NodeType, Nodes },
+    nodes::comment::{ CommentBlockNode, CommentLineNode },
+  },
+};
 
 // #[napi(object)]
 // #[derive(Debug, Clone)]
@@ -172,7 +178,7 @@ impl Line {
 
 #[derive(Debug, Clone)]
 pub struct Builder {
-  lines: Vec<Line>,
+  pub lines: Vec<Line>,
 }
 
 impl Builder {
@@ -196,11 +202,15 @@ impl Builder {
     }).push(line);
   }
 
-  pub fn push_all_lines(&mut self, line: &str) {
-    self.lines.iter_mut().for_each(|i| {
-      i.push(line);
-    });
+  pub fn pop(&mut self) -> Option<char> {
+    guard!(self.lines.last_mut()).line.pop()
   }
+
+  // pub fn push_all_lines(&mut self, line: &str) {
+  //   self.lines.iter_mut().for_each(|i| {
+  //     i.push(line);
+  //   });
+  // }
 
   pub fn total_len(&self) -> usize {
     self.lines
@@ -250,7 +260,9 @@ impl Builder {
     }
     let mut lines = builder.lines.clone();
     let first = lines.remove(0);
-    self.lines.last_mut().unwrap().push(&first.line);
+    guard!(self.lines.last_mut(), {
+      return;
+    }).push(&first.line);
     self.lines.extend(lines);
   }
 
@@ -259,11 +271,19 @@ impl Builder {
   }
 
   pub fn to_string(&self, separator: &str) -> String {
-    self.lines
+    let mut lines = self.lines.clone();
+    if self.last_len() == 0 {
+      lines.pop();
+    }
+    lines
       .iter()
       .map(|i| i.to_string())
       .collect::<Vec<String>>()
       .join(separator)
+  }
+
+  pub fn block_end_callback(node: &Node) -> Option<&str> {
+    if [NodeType::Function].contains(&node.get_type()) { None } else { Some(";") }
   }
 }
 
@@ -273,8 +293,6 @@ pub struct Generator {
 
 #[derive(Debug, Clone)]
 pub struct GeneratorArgument<'a> {
-  // separator: &'a str,
-  // closure: &'a str,
   generators: &'a [(NodeType, InternalGenerator)],
   pub max_length: usize,
 }
@@ -284,13 +302,9 @@ impl<'a> GeneratorArgument<'a> {
     Self { generators: &DEFAULT_GENERATORS, max_length: 60 }
   }
 
-  pub fn new(generators: &'a [(NodeType, InternalGenerator)], max_length: usize) -> Self {
-    Self { generators, max_length }
+  pub fn generator(generators: &'a [(NodeType, InternalGenerator)]) -> Self {
+    Self { generators, max_length: 60 }
   }
-
-  // pub fn clone_with_indent(&self, indent: usize) -> Self {
-  //   Self { separator: self.separator, closure: self.closure, generators: self.generators, indent }
-  // }
 }
 
 impl Generator {
@@ -299,48 +313,127 @@ impl Generator {
   }
 
   pub fn start(&mut self) -> String {
-    self.generate_nodes_new(&self.nodes.clone(), &mut GeneratorArgument::default()).to_string("\n")
+    self
+      .generate_nodes_new(
+        &self.nodes.clone(),
+        Builder::block_end_callback,
+        &mut GeneratorArgument::default()
+      )
+      .to_string("\n")
   }
 
-  pub fn generate_nodes_new(&mut self, nodes: &Nodes, args: &mut GeneratorArgument) -> Builder {
+  pub fn generate_nodes_new<T>(
+    &mut self,
+    nodes: &Nodes,
+    end_callback: T,
+    args: &mut GeneratorArgument
+  ) -> Builder
+    where T: Fn(&Node) -> Option<&str>
+  {
     let mut builder = Builder::new();
-    self.generate_nodes(&mut builder, nodes, args);
+    self.generate_nodes(&mut builder, nodes, end_callback, args);
     builder
   }
 
-  pub fn generate_nodes(
+  pub fn generate_nodes<T>(
     &mut self,
     builder: &mut Builder,
     nodes: &Nodes,
+    end_callback: T,
     args: &mut GeneratorArgument
-  ) {
+  )
+    where T: Fn(&Node) -> Option<&str>
+  {
     for node in nodes.iter() {
       builder.new_line();
-      self.generate_node(builder, node, args);
+      self.generate_node(builder, node, &end_callback, args);
     }
   }
 
-  pub fn generate_node_new(&mut self, node: &Node, args: &mut GeneratorArgument) -> Builder {
+  pub fn generate_node_new<T>(
+    &mut self,
+    node: &Node,
+    end_callback: T,
+    args: &mut GeneratorArgument
+  ) -> Builder
+    where T: Fn(&Node) -> Option<&str>
+  {
     let mut builder = Builder::new();
     builder.new_line();
-    self.generate_node(&mut builder, node, args);
+    self.generate_node(&mut builder, node, end_callback, args);
     builder
   }
 
-  pub fn generate_node(
+  pub fn generate_node<T>(
     &mut self,
     builder: &mut Builder,
     node: &Node,
+    end_callback: T,
     args: &mut GeneratorArgument
-  ) {
+  )
+    where T: Fn(&Node) -> Option<&str>
+  {
     for (node_type, generator) in args.generators.iter() {
       if *node_type == node.get_type() {
         println!("Generating node: {:?}", node_type);
-        generator(self, builder, node, args);
+        let leading_comments = node.get_leading_comments();
+        let trailing_comments = node.get_trailing_comments();
+        if leading_comments.len() > 0 || trailing_comments.len() > 0 {
+          let mut scoped_builder = Builder::new();
+          Self::handle_comments(&mut scoped_builder, leading_comments);
+          if scoped_builder.total_len() == 0 {
+            scoped_builder.new_line();
+          }
+          generator(self, &mut scoped_builder, node, args);
+          if let Some(end) = end_callback(node) {
+            scoped_builder.push(&end);
+          }
+          Self::handle_comments(&mut scoped_builder, trailing_comments);
+          if builder.last_len() == 0 {
+            builder.extend_first_line(&scoped_builder);
+          } else {
+            scoped_builder.indent();
+            builder.extend(&scoped_builder);
+          }
+        } else {
+          generator(self, builder, node, args);
+          if let Some(end) = end_callback(node) {
+            builder.push(&end);
+          }
+        }
         return;
       }
     }
     println!("No generator for node: {:?}", node.get_type());
+  }
+
+  fn handle_comments(builder: &mut Builder, nodes: &Nodes) {
+    if nodes.len() > 0 {
+      builder.new_line();
+      builder.push(
+        &nodes
+          .iter()
+          .filter_map(|i| {
+            let comment = match i.get_type() {
+              NodeType::CommentBlock => {
+                let c = guard!(i.to_owned().cast::<CommentBlockNode>().ok()).comment;
+                format!("/*{}*/", c)
+              }
+              NodeType::CommentLine => {
+                let c = guard!(i.to_owned().cast::<CommentLineNode>().ok()).comment;
+                format!("//{}", c)
+              }
+              _ => {
+                return None;
+              }
+            };
+            Some(comment)
+          })
+          .collect::<Vec<String>>()
+          .join("\n")
+      );
+      builder.new_line();
+    }
   }
 }
 

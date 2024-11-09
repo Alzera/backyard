@@ -15,7 +15,7 @@ use super::identifier::IdentifierParser;
 pub struct ObjectAccessParser {}
 
 impl ObjectAccessParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     if
       let Some(m) = match_pattern(
         tokens,
@@ -37,7 +37,11 @@ impl ObjectAccessParser {
     )
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &mut LoopArgument
+  ) -> Option<Node> {
     match matched.len() {
       2 => {
         if let [_, prop] = matched.as_slice() {

@@ -15,15 +15,15 @@ impl FunctionGenerator {
   pub fn get_parameters(
     generator: &mut Generator,
     parameters: &Nodes,
-    args: &mut GeneratorArgument
+    _: &mut GeneratorArgument
   ) -> Builder {
-    generator.generate_nodes_new(
+    let mut builder = generator.generate_nodes_new(
       parameters,
-      &mut GeneratorArgument::new(
-        &[(NodeType::Parameter, Self::generate_parameter)],
-        args.max_length
-      )
-    )
+      |_| Some(","),
+      &mut GeneratorArgument::generator(&[(NodeType::Parameter, Self::generate_parameter)])
+    );
+    builder.pop();
+    builder
   }
 
   pub fn get_return_type(
@@ -32,7 +32,7 @@ impl FunctionGenerator {
     args: &mut GeneratorArgument
   ) -> (Option<Builder>, usize) {
     let return_type = if let Some(n) = &node {
-      Some(generator.generate_node_new(n, args))
+      Some(generator.generate_node_new(n, |_| None, args))
     } else {
       None
     };
@@ -79,11 +79,10 @@ impl FunctionGenerator {
     builder.push("(");
     if 3 + builder.last_len() + parameters.first_len() + return_type_len > args.max_length {
       parameters.indent();
-      parameters.push_all_lines(",");
       builder.extend(&parameters);
       builder.new_line();
     } else {
-      builder.push(&parameters.to_string(", "));
+      builder.push(&parameters.to_string(" "));
     }
     builder.push(")");
 
@@ -108,7 +107,8 @@ impl FunctionGenerator {
       builder.push("&");
     }
     let mut parameters = Self::get_parameters(generator, &node.parameters, args);
-    let mut uses = generator.generate_nodes_new(&node.uses, args);
+    let mut uses = generator.generate_nodes_new(&node.uses, |_| Some(","), args);
+    uses.pop();
     let uses_len = if node.uses.is_empty() { 0 } else { uses.total_len_with_separator(", ") + 7 };
     let (return_type, return_type_len) = Self::get_return_type(generator, &node.return_type, args);
 
@@ -117,22 +117,21 @@ impl FunctionGenerator {
       3 + builder.last_len() + parameters.first_len() + uses_len + return_type_len > args.max_length
     {
       parameters.indent();
-      parameters.push_all_lines(",");
       builder.extend(&parameters);
       builder.new_line();
     } else {
-      builder.push(&parameters.to_string(", "));
+      builder.push(&parameters.to_string(" "));
     }
     builder.push(")");
 
     if !node.uses.is_empty() {
       builder.push(" use (");
       if builder.last_len() + uses_len + return_type_len > args.max_length {
-        uses.push_all_lines(",");
+        uses.indent();
         builder.extend(&uses);
         builder.new_line();
       } else {
-        builder.push(&uses.to_string(", "));
+        builder.push(&uses.to_string(" "));
       }
       builder.push(")");
     }
@@ -163,11 +162,10 @@ impl FunctionGenerator {
     builder.push("(");
     if 3 + builder.last_len() + parameters.first_len() + return_type_len > args.max_length {
       parameters.indent();
-      parameters.push_all_lines(",");
       builder.extend(&parameters);
       builder.new_line();
     } else {
-      builder.push(&parameters.to_string(", "));
+      builder.push(&parameters.to_string(" "));
     }
     builder.push(")");
 
@@ -177,7 +175,7 @@ impl FunctionGenerator {
     }
 
     builder.push(" => ");
-    generator.generate_node(builder, &node.body, args);
+    generator.generate_node(builder, &node.body, |_| None, args);
   }
 
   pub fn generate_parameter(
@@ -190,7 +188,7 @@ impl FunctionGenerator {
       return;
     });
     if let Some(n) = &node.variable_type {
-      generator.generate_node(builder, n, &mut GeneratorArgument::default());
+      generator.generate_node(builder, n, |_| None, &mut GeneratorArgument::default());
     }
     if node.is_ref {
       builder.push("&");
@@ -201,7 +199,7 @@ impl FunctionGenerator {
     builder.push("$");
     IdentifierGenerator::generate(generator, builder, &node.name, args);
     if let Some(n) = &node.value {
-      generator.generate_node(builder, n, &mut GeneratorArgument::default());
+      generator.generate_node(builder, n, |_| None, &mut GeneratorArgument::default());
     };
   }
 }

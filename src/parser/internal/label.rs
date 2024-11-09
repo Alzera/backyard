@@ -14,7 +14,7 @@ use super::identifier::IdentifierParser;
 pub struct LabelParser {}
 
 impl LabelParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     let grammar = [
       Lookup::Equal(vec![TokenType::Identifier]),
       Lookup::Equal(vec![TokenType::Colon]),
@@ -22,7 +22,7 @@ impl LabelParser {
     match_pattern(tokens, grammar)
   }
 
-  pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, _: &mut LoopArgument) -> Option<Node> {
     if let [name, _] = matched.as_slice() {
       return Some(LabelNode::new(IdentifierParser::from_matched(name)));
     }

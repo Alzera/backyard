@@ -16,7 +16,7 @@ use super::call::CallParser;
 pub struct ParenthesisParser {}
 
 impl ParenthesisParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -26,7 +26,11 @@ impl ParenthesisParser {
     )
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &mut LoopArgument
+  ) -> Option<Node> {
     if let [_] = matched.as_slice() {
       if let Some(le) = args.last_expr.clone() {
         if le.get_type() == NodeType::Parenthesis {

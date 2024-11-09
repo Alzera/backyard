@@ -22,7 +22,7 @@ impl IdentifierParser {
 }
 
 impl IdentifierParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     let token = tokens.get(0).unwrap();
     if [TokenType::Identifier].contains(&token.token_type) {
       return Some(vec![vec![token.to_owned()]]);
@@ -30,7 +30,7 @@ impl IdentifierParser {
     None
   }
 
-  pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, _: &LoopArgument) -> Option<Node> {
+  pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, _: &mut LoopArgument) -> Option<Node> {
     if let [identifier] = matched.as_slice() {
       return Some(IdentifierParser::from_matched(identifier));
     }

@@ -13,7 +13,7 @@ use crate::{
 pub struct CommentParser {}
 
 impl CommentParser {
-  pub fn test(tokens: &Vec<Token>, _: &LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -22,7 +22,11 @@ impl CommentParser {
     )
   }
 
-  pub fn parse(parser: &mut Parser, matched: Vec<Vec<Token>>, args: &LoopArgument) -> Option<Node> {
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &mut LoopArgument
+  ) -> Option<Node> {
     if let [comment] = matched.as_slice() {
       let comment = guard!(comment.get(0));
       let comment: Node = if comment.token_type == TokenType::CommentLine {
@@ -37,9 +41,9 @@ impl CommentParser {
         expr.add_leading_comments(comment);
         return Some(expr);
       }
-      if let Some(mut expr) = args.last_expr.to_owned() {
+      if let Some(expr) = args.statements.last_mut() {
         expr.add_trailing_comments(comment);
-        return Some(expr);
+        return None;
       }
       return Some(comment);
     }
