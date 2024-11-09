@@ -46,6 +46,7 @@ impl PropertyGenerator {
       generator.generate_node(builder, variable_type, &mut GeneratorArgument::default());
       builder.push(" ");
     }
+    builder.push("$");
     IdentifierGenerator::generate(generator, builder, &node.name);
     if let Some(value) = &node.value {
       builder.push(" = ");
