@@ -8,7 +8,7 @@ use crate::{
 
 pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Node);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 29] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 32] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
   (NodeType::Array, super::internal::array::ArrayGenerator::generate),
@@ -30,7 +30,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 29] = [
   (NodeType::Const, super::internal::consts::ConstGenerator::generate),
   // (NodeType::ConstProperty, ConstPropertyGenerator::generate),
   (NodeType::Continue, super::internal::singles::SinglesGenerator::generate),
-  // (NodeType::Declare, DeclareGenerator::generate),
+  (NodeType::Declare, super::internal::declare::DeclareGenerator::generate),
   // (NodeType::DeclareArgument, DeclareArgumentGenerator::generate),
   // (NodeType::DoWhile, DoWhileGenerator::generate),
   (NodeType::Echo, super::internal::singles::SinglesGenerator::generate),
@@ -56,7 +56,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 29] = [
   // (NodeType::Match, MatchGenerator::generate),
   // (NodeType::MatchArm, MatchArmGenerator::generate),
   // (NodeType::Method, super::internal::method::MethodGenerator::generate),
-  // (NodeType::Namespace, NamespaceGenerator::generate),
+  (NodeType::Namespace, super::internal::namespace::NamespaceGenerator::generate),
   (NodeType::New, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Number, super::internal::number::NumberGenerator::generate),
   // (NodeType::ObjectAccess, ObjectAccessGenerator::generate),
@@ -82,7 +82,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 29] = [
   (NodeType::Throw, super::internal::singles::SinglesGenerator::generate),
   // (NodeType::Try, TryGenerator::generate),
   (NodeType::Type, super::internal::types::TypeGenerator::generate),
-  // (NodeType::Use, UseGenerator::generate),
+  (NodeType::Use, super::internal::uses::UseGenerator::generate),
   (NodeType::Variable, super::internal::variable::VariableGenerator::generate),
   // (NodeType::While, WhileGenerator::generate),
   // (NodeType::Yield, YieldGenerator::generate),
@@ -255,6 +255,8 @@ impl<'a> GeneratorArgument<'a> {
           NodeType::Enum,
           NodeType::Method,
           NodeType::TraitUse,
+          NodeType::Declare,
+          NodeType::Namespace,
         ].contains(node_type)
       {
         return Some(";");

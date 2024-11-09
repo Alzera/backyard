@@ -15,6 +15,6 @@ impl InterfaceGenerator {
     });
     builder.push("interface ");
     IdentifierGenerator::generate(generator, builder, &node.name);
-    BlockGenerator::generate(generator, builder, &node.body);
+    BlockGenerator::generate(generator, builder, &node.body, None);
   }
 }

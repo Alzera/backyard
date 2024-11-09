@@ -63,7 +63,7 @@ impl FunctionGenerator {
       builder.extend_first_line(n);
     }
     if let Some(n) = &node.body {
-      BlockGenerator::generate(generator, builder, &n);
+      BlockGenerator::generate(generator, builder, &n, None);
     } else {
       builder.push(";");
     }
@@ -122,7 +122,7 @@ impl FunctionGenerator {
       builder.extend_first_line(n);
     }
 
-    BlockGenerator::generate(generator, builder, &node.body);
+    BlockGenerator::generate(generator, builder, &node.body, None);
   }
 
   pub fn generate_arrow(generator: &mut Generator, builder: &mut Builder, node: &Node) {

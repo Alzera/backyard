@@ -7,7 +7,7 @@ use crate::parser::node::{ NodeType, Node, Nodes };
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Namespace)]
 pub struct NamespaceNode {
-  pub name: Nodes,
+  pub names: Nodes,
   pub body: Node,
   pub is_bracket: bool,
 

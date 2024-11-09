@@ -43,6 +43,7 @@ impl ClassGenerator {
       generator,
       builder,
       &node.body,
+      None,
       &[
         (NodeType::TraitUse, TraitUseGenerator::generate),
         (NodeType::ConstProperty, ConstGenerator::generate_property),
