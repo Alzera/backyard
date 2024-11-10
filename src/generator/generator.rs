@@ -8,7 +8,7 @@ use crate::{
 
 pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Node);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 56] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 58] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
   (NodeType::Array, super::internal::array::ArrayGenerator::generate),
@@ -47,7 +47,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 56] = [
   (NodeType::Goto, super::internal::goto::GotoGenerator::generate),
   (NodeType::Identifier, super::internal::identifier::IdentifierGenerator::generate),
   (NodeType::If, super::internal::ifs::IfGenerator::generate),
-  // (NodeType::Include, IncludeGenerator::generate),
+  (NodeType::Include, super::internal::include::IncludeGenerator::generate),
   (NodeType::InstanceOf, super::internal::instanceof::InstanceOfGenerator::generate),
   (NodeType::Interface, super::internal::interface::InterfaceGenerator::generate),
   (NodeType::Label, super::internal::label::LabelGenerator::generate),
@@ -62,7 +62,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 56] = [
   (NodeType::ObjectAccess, super::internal::objectaccess::ObjectAccessGenerator::generate),
   // (NodeType::Parameter, ParameterGenerator::generate),
   (NodeType::Parent, super::internal::singles::SinglesGenerator::generate),
-  // (NodeType::Parenthesis, super::internal::parenthesis::ParenthesisGenerator::generate),
+  (NodeType::Parenthesis, super::internal::parenthesis::ParenthesisGenerator::generate),
   (NodeType::Post, super::internal::post::PostGenerator::generate),
   (NodeType::Pre, super::internal::pre::PreGenerator::generate),
   (NodeType::Print, super::internal::singles::SinglesGenerator::generate),
