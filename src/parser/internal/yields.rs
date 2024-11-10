@@ -1,5 +1,5 @@
 use crate::{
-  guard,
+  guard_none,
   lexer::token::{ Token, TokenType, TokenTypeArrayCombine },
   parser::{
     node::Node,
@@ -26,7 +26,7 @@ impl YieldParser {
     args: &mut LoopArgument
   ) -> Option<Node> {
     if let [_, has_from] = matched.as_slice() {
-      let mut value = guard!(
+      let mut value = guard_none!(
         parser.get_statement(
           &mut LoopArgument::with_tokens(
             "singles",
@@ -39,10 +39,10 @@ impl YieldParser {
         return Some(YieldFromNode::new(value));
       }
       let mut key = None;
-      if guard!(parser.tokens.get(parser.position)).token_type == TokenType::Arrow {
+      if guard_none!(parser.tokens.get(parser.position)).token_type == TokenType::Arrow {
         key = Some(value);
         parser.position += 1;
-        value = guard!(
+        value = guard_none!(
           parser.get_statement(
             &mut LoopArgument::with_tokens(
               "singles",

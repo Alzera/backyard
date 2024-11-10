@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{
     node::{ Node, NodeTraitCast, NodeType },
     nodes::singles::{
@@ -25,77 +25,43 @@ impl SinglesGenerator {
     let node = match node.get_type() {
       NodeType::Break => {
         builder.push("break");
-        guard_ok!(node.to_owned().cast::<BreakNode>(), {
-          return;
-        }).argument
+        guard!(node.to_owned().cast::<BreakNode>()).argument
       }
       NodeType::Continue => {
         builder.push("continue");
-        guard_ok!(node.to_owned().cast::<ContinueNode>(), {
-          return;
-        }).argument
+        guard!(node.to_owned().cast::<ContinueNode>()).argument
       }
       NodeType::Return => {
         builder.push("return");
-        guard_ok!(node.to_owned().cast::<ReturnNode>(), {
-          return;
-        }).argument
+        guard!(node.to_owned().cast::<ReturnNode>()).argument
       }
       NodeType::Global => {
         builder.push("global");
-        Some(
-          guard_ok!(node.to_owned().cast::<GlobalNode>(), {
-            return;
-          }).argument
-        )
+        Some(guard!(node.to_owned().cast::<GlobalNode>()).argument)
       }
       NodeType::Clone => {
         builder.push("clone");
-        Some(
-          guard_ok!(node.to_owned().cast::<CloneNode>(), {
-            return;
-          }).argument
-        )
+        Some(guard!(node.to_owned().cast::<CloneNode>()).argument)
       }
       NodeType::Echo => {
         builder.push("echo");
-        Some(
-          guard_ok!(node.to_owned().cast::<EchoNode>(), {
-            return;
-          }).argument
-        )
+        Some(guard!(node.to_owned().cast::<EchoNode>()).argument)
       }
       NodeType::New => {
         builder.push("new");
-        Some(
-          guard_ok!(node.to_owned().cast::<NewNode>(), {
-            return;
-          }).argument
-        )
+        Some(guard!(node.to_owned().cast::<NewNode>()).argument)
       }
       NodeType::Print => {
         builder.push("print");
-        Some(
-          guard_ok!(node.to_owned().cast::<PrintNode>(), {
-            return;
-          }).argument
-        )
+        Some(guard!(node.to_owned().cast::<PrintNode>()).argument)
       }
       NodeType::Throw => {
         builder.push("throw");
-        Some(
-          guard_ok!(node.to_owned().cast::<ThrowNode>(), {
-            return;
-          }).argument
-        )
+        Some(guard!(node.to_owned().cast::<ThrowNode>()).argument)
       }
       NodeType::Goto => {
         builder.push("goto");
-        Some(
-          guard_ok!(node.to_owned().cast::<GotoNode>(), {
-            return;
-          }).label
-        )
+        Some(guard!(node.to_owned().cast::<GotoNode>()).label)
       }
       NodeType::Parent => {
         builder.push("parent");

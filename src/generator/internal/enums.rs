@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, EndMode, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast, NodeType }, nodes::enums::{ EnumItemNode, EnumNode } },
 };
 
@@ -10,9 +10,7 @@ pub struct EnumGenerator {}
 
 impl EnumGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<EnumNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<EnumNode>());
     builder.push("enum ");
     IdentifierGenerator::generate(generator, builder, &node.name);
     let mut items = generator.generate_nodes_new(
@@ -30,9 +28,7 @@ impl EnumGenerator {
   }
 
   pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<EnumItemNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<EnumItemNode>());
     builder.push("case ");
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());
   }

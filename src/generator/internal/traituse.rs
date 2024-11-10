@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, EndMode, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{
     node::{ Node, NodeTraitCast, NodeType },
     nodes::traituse::{ TraitUseAliasNode, TraitUseNode, TraitUsePrecedenceNode },
@@ -13,9 +13,7 @@ pub struct TraitUseGenerator {}
 
 impl TraitUseGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<TraitUseNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<TraitUseNode>());
     builder.push("use ");
     let mut traits = generator.generate_nodes_new(
       &node.traits,
@@ -62,9 +60,7 @@ impl TraitUseGenerator {
   }
 
   pub fn generate_alias(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<TraitUseAliasNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<TraitUseAliasNode>());
     if let Some(trait_name) = &node.trait_name {
       IdentifierGenerator::generate(generator, builder, trait_name);
       builder.push("::");
@@ -78,9 +74,7 @@ impl TraitUseGenerator {
   }
 
   pub fn generate_precedence(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<TraitUsePrecedenceNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<TraitUsePrecedenceNode>());
     IdentifierGenerator::generate(generator, builder, &node.trait_name);
     builder.push("::");
     IdentifierGenerator::generate(generator, builder, &node.method);

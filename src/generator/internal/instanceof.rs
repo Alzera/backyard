@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::instanceof::InstanceOfNode },
 };
 
@@ -8,9 +8,7 @@ pub struct InstanceOfGenerator {}
 
 impl InstanceOfGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<InstanceOfNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<InstanceOfNode>());
 
     generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
     builder.push(" instanceof ");

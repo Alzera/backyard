@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::ternary::TernaryNode },
 };
 
@@ -8,9 +8,7 @@ pub struct TernaryGenerator {}
 
 impl TernaryGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<TernaryNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<TernaryNode>());
 
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
     builder.push(" ? ");

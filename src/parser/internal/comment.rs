@@ -1,9 +1,9 @@
 use crate::{
-  guard,
+  guard_none,
   lexer::token::{ Token, TokenType },
   parser::{
     node::Node,
-    nodes::comment::{ CommentBlockNode, CommentLineNode },
+    nodes::comment::{ CommentBlockNode, CommentDocNode, CommentLineNode },
     parser::{ LoopArgument, Parser },
     utils::{ match_pattern, Lookup },
   },
@@ -28,11 +28,14 @@ impl CommentParser {
     args: &mut LoopArgument
   ) -> Option<Node> {
     if let [comment] = matched.as_slice() {
-      let comment = guard!(comment.get(0));
-      let comment: Node = if comment.token_type == TokenType::CommentLine {
-        CommentLineNode::new(comment.value.to_owned())
-      } else {
-        CommentBlockNode::new(comment.value.to_owned())
+      let comment = guard_none!(comment.get(0));
+      let comment: Node = match comment.token_type {
+        TokenType::CommentLine => CommentLineNode::new(comment.value.to_owned()),
+        TokenType::CommentBlock => CommentBlockNode::new(comment.value.to_owned()),
+        TokenType::CommentDoc => CommentDocNode::new(comment.value.to_owned()),
+        _ => {
+          return None;
+        }
       };
       let expr = parser.get_statement(
         &mut LoopArgument::new("comment", args.separators, args.breakers, args.parsers)

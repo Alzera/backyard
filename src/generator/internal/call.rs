@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast, NodeType }, nodes::call::{ ArgumentNode, CallNode } },
 };
 
@@ -8,9 +8,7 @@ pub struct CallGenerator {}
 
 impl CallGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<CallNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<CallNode>());
     generator.generate_node(builder, &node.name, &mut GeneratorArgument::default());
     let mut arguments = generator.generate_nodes_new(
       &node.arguments,
@@ -31,9 +29,7 @@ impl CallGenerator {
   }
 
   pub fn generate_argument(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<ArgumentNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<ArgumentNode>());
     if let Some(name) = &node.name {
       generator.generate_node(builder, name, &mut GeneratorArgument::default());
       builder.push(": ");
@@ -52,5 +48,12 @@ mod tests {
     test("(fn () => 0)();");
     test("call(0);");
     test("call(a: 0, b: 0);");
+    test(
+      "call(
+  an_unneccessary_very_long_variable_name: 0,
+  another_unneccessary_very_long_variable_name: 0,
+  still_another_unneccessary_very_long_variable_name: 0
+);"
+    );
   }
 }

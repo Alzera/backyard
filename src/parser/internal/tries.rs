@@ -1,5 +1,5 @@
 use crate::{
-  guard,
+  guard_none,
   lexer::token::{ Token, TokenType },
   parser::{
     node::Node,
@@ -34,7 +34,7 @@ impl TryParser {
       let mut catches: Vec<Node> = vec![];
       let mut finally = None;
       loop {
-        let is_finally = match guard!(parser.tokens.get(parser.position)).token_type {
+        let is_finally = match guard_none!(parser.tokens.get(parser.position)).token_type {
           TokenType::Finally => true,
           TokenType::Catch => false,
           _ => {
@@ -59,7 +59,7 @@ impl TryParser {
           )
         );
         parser.position -= 1;
-        let variable = guard!(
+        let variable = guard_none!(
           parser.get_statement(
             &mut LoopArgument::new(
               "catch_variable",

@@ -1,5 +1,5 @@
 use crate::{
-  guard,
+  guard_none,
   lexer::token::{ Token, TokenType, TokenTypeArrayCombine },
   parser::{
     node::{ Node, Nodes },
@@ -95,7 +95,7 @@ impl FunctionParser {
       let arguments = FunctionParser::get_parameters(parser);
       let return_type = FunctionParser::get_return_type(parser);
       parser.position += 1;
-      let body = guard!(
+      let body = guard_none!(
         parser.get_statement(
           &mut LoopArgument::with_tokens(
             "function_arrow",
@@ -152,7 +152,9 @@ impl FunctionParser {
         FunctionParser::get_parameters(parser)
       };
       let return_type = FunctionParser::get_return_type(parser);
-      let body = if guard!(parser.tokens.get(parser.position)).token_type == TokenType::Semicolon {
+      let body = if
+        guard_none!(parser.tokens.get(parser.position)).token_type == TokenType::Semicolon
+      {
         None
       } else {
         Some(BlockParser::new(parser))
@@ -226,7 +228,7 @@ impl ConstructorParameterParser {
     _: &mut LoopArgument
   ) -> Option<Node> {
     if let [visibility, modifier] = matched.as_slice() {
-      let item = guard!(
+      let item = guard_none!(
         parser.get_statement(
           &mut LoopArgument::new(
             "constructor_parameter",

@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{
     node::{ Node, NodeTraitCast, NodeType },
     nodes::property::{ PropertyItemNode, PropertyNode },
@@ -13,9 +13,7 @@ pub struct PropertyGenerator {}
 
 impl PropertyGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<PropertyNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<PropertyNode>());
     if node.visibility.len() > 0 {
       builder.push(format!("{} ", node.visibility).as_str());
     }
@@ -39,9 +37,7 @@ impl PropertyGenerator {
   }
 
   pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<PropertyItemNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<PropertyItemNode>());
     if let Some(variable_type) = &node.variable_type {
       generator.generate_node(builder, variable_type, &mut GeneratorArgument::default());
       builder.push(" ");

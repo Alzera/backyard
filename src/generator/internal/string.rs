@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{
     node::{ Node, NodeTraitCast, NodeType },
     nodes::string::{ EncapsedNode, EncapsedPartNode, StringNode },
@@ -11,16 +11,12 @@ pub struct StringGenerator {}
 
 impl StringGenerator {
   pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<StringNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<StringNode>());
     builder.push(format!("\"{}\"", node.value).as_str());
   }
 
   pub fn generate_encapsed(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<EncapsedNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<EncapsedNode>());
     let parts = generator.generate_nodes_new(
       &node.values,
       &mut GeneratorArgument::generator(&[(NodeType::EncapsedPart, Self::generate_encapsed_part)])
@@ -29,11 +25,9 @@ impl StringGenerator {
   }
 
   pub fn generate_encapsed_part(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<EncapsedPartNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<EncapsedPartNode>());
     if node.value.get_type() == NodeType::String {
-      let value = guard_ok!(node.value.to_owned().cast::<StringNode>(), {
+      let value = guard!(node.value.to_owned().cast::<StringNode>(), {
         return;
       });
       builder.push(&value.value);

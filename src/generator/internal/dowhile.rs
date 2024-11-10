@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::dowhile::DoWhileNode },
 };
 
@@ -10,9 +10,7 @@ pub struct DoWhileGenerator {}
 
 impl DoWhileGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<DoWhileNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<DoWhileNode>());
 
     builder.push("do");
     BlockGenerator::generate(generator, builder, &node.body, None);

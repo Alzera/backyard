@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATORS },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast, NodeType }, nodes::switch::{ CaseNode, SwitchNode } },
 };
 
@@ -10,9 +10,7 @@ pub struct SwitchGenerator {}
 
 impl SwitchGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<SwitchNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<SwitchNode>());
 
     builder.push("switch (");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
@@ -28,9 +26,7 @@ impl SwitchGenerator {
   }
 
   pub fn generate_case(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<CaseNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<CaseNode>());
 
     if let Some(n) = &node.condition {
       builder.push("case ");

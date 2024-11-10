@@ -1,5 +1,5 @@
 use crate::{
-  guard,
+  guard_none,
   lexer::token::{ Token, TokenType, TokenTypeArrayCombine },
   parser::{
     node::Node,
@@ -23,7 +23,7 @@ impl InstanceOfParser {
     args: &mut LoopArgument
   ) -> Option<Node> {
     if let [_] = matched.as_slice() {
-      let right = guard!(
+      let right = guard_none!(
         parser.get_statement(
           &mut LoopArgument::with_tokens(
             "instanceof",

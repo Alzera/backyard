@@ -1,5 +1,5 @@
 use crate::{
-  guard,
+  guard_none,
   lexer::token::{ Token, TokenType },
   parser::{
     node::{ Node, NodeType },
@@ -14,7 +14,7 @@ pub struct ArrayLookupParser {}
 
 impl ArrayLookupParser {
   pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    let last_expr = guard!(&args.last_expr);
+    let last_expr = guard_none!(&args.last_expr);
     if
       ![
         NodeType::Variable,
@@ -38,8 +38,8 @@ impl ArrayLookupParser {
     args: &mut LoopArgument
   ) -> Option<Node> {
     if let [_] = matched.as_slice() {
-      let on = guard!(args.last_expr.to_owned());
-      let target = guard!(
+      let on = guard_none!(args.last_expr.to_owned());
+      let target = guard_none!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("arraylookup", &[], &[TokenType::RightSquareBracket])
         )

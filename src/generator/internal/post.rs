@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::post::PostNode },
 };
 
@@ -8,9 +8,7 @@ pub struct PostGenerator {}
 
 impl PostGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<PostNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<PostNode>());
     generator.generate_node(builder, &node.variable, &mut GeneratorArgument::default());
     builder.push(&node.operator.as_str());
   }
@@ -23,5 +21,6 @@ mod tests {
   #[test]
   fn basic() {
     test("$a = ++($a++);");
+    test("$a = --($a--);");
   }
 }

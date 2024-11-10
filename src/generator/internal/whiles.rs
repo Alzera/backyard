@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::whiles::WhileNode },
 };
 
@@ -10,9 +10,7 @@ pub struct WhileGenerator {}
 
 impl WhileGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<WhileNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<WhileNode>());
 
     builder.push("while (");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());

@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::pre::PreNode },
 };
 
@@ -8,9 +8,7 @@ pub struct PreGenerator {}
 
 impl PreGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<PreNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<PreNode>());
     builder.push(&node.operator.as_str());
     generator.generate_node(builder, &node.variable, &mut GeneratorArgument::default());
   }
@@ -23,5 +21,7 @@ mod tests {
   #[test]
   fn basic() {
     test("$a = ++($a++);");
+    test("~$a;");
+    test("!$a;");
   }
 }

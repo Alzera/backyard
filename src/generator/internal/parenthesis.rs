@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::parenthesis::{ CastNode, ParenthesisNode } },
 };
 
@@ -8,18 +8,14 @@ pub struct ParenthesisGenerator {}
 
 impl ParenthesisGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<ParenthesisNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<ParenthesisNode>());
     builder.push("(");
     generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
     builder.push(")");
   }
 
   pub fn generate_cast(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<CastNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<CastNode>());
     builder.push("(");
     generator.generate_node(builder, &node.target, &mut GeneratorArgument::default());
     builder.push(") ");

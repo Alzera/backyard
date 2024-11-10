@@ -3,9 +3,7 @@ macro_rules! guard {
   ($option:expr) => {
       match $option {
           Some(value) => value,
-          None => {
-              return None;
-          }
+          None => { return; }
       }
   };
   ($option:expr, $default:expr) => {
@@ -25,21 +23,33 @@ macro_rules! guard {
 }
 
 #[macro_export]
-macro_rules! guard_ok {
+macro_rules! guard_none {
   ($option:expr) => {
       match $option {
-          Ok(value) => value,
-          Err(_) => {
+          Some(value) => value,
+          None => {
               return None;
           }
       }
   };
-  ($option:expr, $failure:block) => {
-      match $option {
-        Ok(value) => value,
-        Err(_) => {
-              $failure;
-          }
-      }
-  };
 }
+
+// #[macro_export]
+// macro_rules! guard_ok {
+//   ($option:expr) => {
+//       match $option {
+//           Ok(value) => value,
+//           Err(_) => {
+//               return None;
+//           }
+//       }
+//   };
+//   ($option:expr, $failure:block) => {
+//       match $option {
+//         Ok(value) => value,
+//         Err(_) => {
+//               $failure;
+//           }
+//       }
+//   };
+// }

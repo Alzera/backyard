@@ -1,5 +1,5 @@
 use crate::{
-  guard,
+  guard_none,
   lexer::token::{ Token, TokenType },
   parser::{
     node::Node,
@@ -37,7 +37,7 @@ impl TraitUseParser {
         )
       );
       let mut adaptations = vec![];
-      if guard!(parser.tokens.get(parser.position - 1)).token_type == TokenType::Semicolon {
+      if guard_none!(parser.tokens.get(parser.position - 1)).token_type == TokenType::Semicolon {
         parser.position -= 1;
       } else {
         adaptations = parser.get_children(

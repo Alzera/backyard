@@ -1,6 +1,5 @@
 use crate::{
-  guard,
-  guard_ok,
+  guard_none,
   lexer::token::{ Token, TokenType, TokenTypeArrayCombine },
   parser::{
     node::{ Node, NodeTraitCast, NodeType },
@@ -34,7 +33,7 @@ impl ParenthesisParser {
     if let [_] = matched.as_slice() {
       if let Some(le) = args.last_expr.clone() {
         if le.get_type() == NodeType::Parenthesis {
-          let le = guard_ok!(le.cast::<ParenthesisNode>());
+          let le = guard_none!(le.cast::<ParenthesisNode>());
           if
             [NodeType::AnonymousFunction, NodeType::ArrowFunction].contains(
               &le.statement.get_type()
@@ -50,7 +49,7 @@ impl ParenthesisParser {
           );
         }
       }
-      let statement = guard!(
+      let statement = guard_none!(
         parser.get_statement(
           &mut LoopArgument::with_tokens(
             "parenthesis",
@@ -63,7 +62,7 @@ impl ParenthesisParser {
       if statement.get_type() != NodeType::Type {
         return Some(ParenthesisNode::new(statement));
       }
-      let expression = guard!(
+      let expression = guard_none!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("cast", &args.separators, &args.breakers)
         )

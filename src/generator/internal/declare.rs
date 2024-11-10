@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{
     node::{ BodyType, Node, NodeTraitCast, NodeType },
     nodes::declare::{ DeclareArgumentNode, DeclareNode },
@@ -13,9 +13,7 @@ pub struct DeclareGenerator {}
 
 impl DeclareGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<DeclareNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<DeclareNode>());
     builder.push("declare");
     let mut arguments = generator.generate_nodes_new(
       &node.arguments,
@@ -51,9 +49,7 @@ impl DeclareGenerator {
   }
 
   pub fn generate_argument(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<DeclareArgumentNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<DeclareArgumentNode>());
     IdentifierGenerator::generate(generator, builder, &node.name);
     builder.push(" = ");
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());

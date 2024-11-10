@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast, NodeType }, nodes::objectaccess::ObjectAccessNode },
 };
 
@@ -10,9 +10,7 @@ pub struct ObjectAccessGenerator {}
 
 impl ObjectAccessGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<ObjectAccessNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<ObjectAccessNode>());
     generator.generate_node(builder, &node.object, &mut GeneratorArgument::default());
     builder.push("->");
     if node.property.get_type() == NodeType::Identifier {

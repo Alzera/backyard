@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::yields::{ YieldFromNode, YieldNode } },
 };
 
@@ -8,9 +8,7 @@ pub struct YieldGenerator {}
 
 impl YieldGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<YieldNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<YieldNode>());
 
     builder.push("yield ");
     if let Some(key) = node.key {
@@ -21,9 +19,7 @@ impl YieldGenerator {
   }
 
   pub fn generate_from(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<YieldFromNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<YieldFromNode>());
 
     builder.push("yield from ");
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());

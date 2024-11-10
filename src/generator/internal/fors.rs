@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATORS },
-  guard_ok,
+  guard,
   parser::{ node::{ BodyType, Node, NodeTraitCast }, nodes::fors::ForNode },
 };
 
@@ -10,9 +10,7 @@ pub struct ForGenerator {}
 
 impl ForGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<ForNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<ForNode>());
 
     builder.push("for (");
     let mut inits = Builder::new();

@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATORS },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::consts::{ ConstNode, ConstPropertyNode } },
 };
 
@@ -8,9 +8,7 @@ pub struct ConstGenerator {}
 
 impl ConstGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<ConstNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<ConstNode>());
 
     builder.push("const ");
     let mut consts = generator.generate_nodes_new(
@@ -29,9 +27,7 @@ impl ConstGenerator {
   }
 
   pub fn generate_property(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<ConstPropertyNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<ConstPropertyNode>());
 
     if node.visibility.len() > 0 {
       builder.push(format!("{} ", node.visibility).as_str());

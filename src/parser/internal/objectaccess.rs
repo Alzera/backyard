@@ -1,5 +1,5 @@
 use crate::{
-  guard,
+  guard_none,
   lexer::token::{ Token, TokenType },
   parser::{
     node::Node,
@@ -54,7 +54,7 @@ impl ObjectAccessParser {
         }
       }
       1 => {
-        let expr = guard!(
+        let expr = guard_none!(
           parser.get_statement(
             &mut LoopArgument::with_tokens(
               "objectaccess",

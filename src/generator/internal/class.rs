@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast, NodeType }, nodes::class::ClassNode },
 };
 
@@ -17,9 +17,7 @@ pub struct ClassGenerator {}
 
 impl ClassGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<ClassNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<ClassNode>());
     if node.modifier.len() > 0 {
       builder.push(format!("{} ", node.modifier).as_str());
     }

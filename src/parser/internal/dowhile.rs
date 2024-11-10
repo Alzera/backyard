@@ -1,5 +1,5 @@
 use crate::{
-  guard,
+  guard_none,
   lexer::token::{ Token, TokenType },
   parser::{
     node::Node,
@@ -27,7 +27,7 @@ impl DoWhileParser {
     if let [_] = matched.as_slice() {
       let body = BlockParser::new(parser);
       parser.position += 2;
-      let condition = guard!(
+      let condition = guard_none!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("do_while", &[], &[TokenType::RightParenthesis])
         )

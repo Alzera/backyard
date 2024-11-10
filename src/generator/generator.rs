@@ -1,5 +1,6 @@
 use crate::{
   guard,
+  guard_none,
   parser::{
     node::{ Node, NodeTraitCast, NodeType, Nodes },
     nodes::comment::{ CommentBlockNode, CommentLineNode },
@@ -8,7 +9,7 @@ use crate::{
 
 pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Node);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 59] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 62] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
   (NodeType::Array, super::internal::array::ArrayGenerator::generate),
@@ -25,8 +26,9 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 59] = [
   // (NodeType::Catch, CatchGenerator::generate),
   (NodeType::Class, super::internal::class::ClassGenerator::generate),
   (NodeType::Clone, super::internal::singles::SinglesGenerator::generate),
-  // (NodeType::CommentBlock, CommentBlockGenerator::generate),
-  // (NodeType::CommentLine, CommentLineGenerator::generate),
+  (NodeType::CommentBlock, super::internal::comment::CommentGenerator::generate_block),
+  (NodeType::CommentDoc, super::internal::comment::CommentGenerator::generate_doc),
+  (NodeType::CommentLine, super::internal::comment::CommentGenerator::generate),
   (NodeType::Const, super::internal::consts::ConstGenerator::generate),
   // (NodeType::ConstProperty, ConstPropertyGenerator::generate),
   (NodeType::Continue, super::internal::singles::SinglesGenerator::generate),
@@ -137,15 +139,11 @@ impl Builder {
   }
 
   pub fn shift(&mut self, line: &str) {
-    guard!(self.lines.last_mut(), {
-      return;
-    }).shift(line);
+    guard!(self.lines.last_mut()).shift(line);
   }
 
   pub fn push(&mut self, line: &str) {
-    guard!(self.lines.last_mut(), {
-      return;
-    }).push(line);
+    guard!(self.lines.last_mut()).push(line);
   }
 
   pub fn total_len(&self) -> usize {
@@ -181,9 +179,7 @@ impl Builder {
     }
     let mut lines = builder.lines.clone();
     let first = lines.remove(0);
-    guard!(self.lines.last_mut(), {
-      return;
-    }).push(&first.line);
+    guard!(self.lines.last_mut()).push(&first.line);
     self.lines.extend(lines);
   }
 
@@ -266,6 +262,9 @@ impl<'a> GeneratorArgument<'a> {
           NodeType::DoWhile,
           NodeType::Try,
           NodeType::Label,
+          NodeType::CommentBlock,
+          NodeType::CommentDoc,
+          NodeType::CommentLine,
         ].contains(node_type)
       {
         return Some(";");
@@ -370,11 +369,11 @@ impl Generator {
           .filter_map(|i| {
             let comment = match i.get_type() {
               NodeType::CommentBlock => {
-                let c = guard!(i.to_owned().cast::<CommentBlockNode>().ok()).comment;
+                let c = guard_none!(i.to_owned().cast::<CommentBlockNode>()).comment;
                 format!("/*{}*/", c)
               }
               NodeType::CommentLine => {
-                let c = guard!(i.to_owned().cast::<CommentLineNode>().ok()).comment;
+                let c = guard_none!(i.to_owned().cast::<CommentLineNode>()).comment;
                 format!("//{}", c)
               }
               _ => {

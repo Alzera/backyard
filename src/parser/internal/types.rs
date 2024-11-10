@@ -1,5 +1,5 @@
 use crate::{
-  guard,
+  guard_none,
   lexer::token::{ Token, TokenType },
   parser::{
     node::Node,
@@ -43,7 +43,7 @@ impl TypesParser {
     let mut index = 0;
     let mut last_token_type = None;
     loop {
-      let token = guard!(tokens.get(index));
+      let token = guard_none!(tokens.get(index));
       index += 1;
       if
         ((last_token_type == None || last_token_type.unwrap() == TokenType::BitwiseOr) &&

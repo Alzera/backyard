@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast, NodeType }, nodes::ifs::IfNode },
 };
 
@@ -10,9 +10,7 @@ pub struct IfGenerator {}
 
 impl IfGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<IfNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<IfNode>());
 
     builder.push("if (");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());

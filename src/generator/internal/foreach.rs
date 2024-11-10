@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::foreach::ForeachNode },
 };
 
@@ -10,9 +10,7 @@ pub struct ForeachGenerator {}
 
 impl ForeachGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<ForeachNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<ForeachNode>());
 
     builder.push("foreach (");
     generator.generate_node(builder, &node.source, &mut GeneratorArgument::default());

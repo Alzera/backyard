@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::include::IncludeNode },
 };
 
@@ -8,9 +8,7 @@ pub struct IncludeGenerator {}
 
 impl IncludeGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<IncludeNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<IncludeNode>());
     if node.is_require {
       builder.push("require");
     } else {

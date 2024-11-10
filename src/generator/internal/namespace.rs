@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, EndMode, Generator, GeneratorArgument, DEFAULT_GENERATORS },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::namespace::NamespaceNode },
 };
 
@@ -10,9 +10,7 @@ pub struct NamespaceGenerator {}
 
 impl NamespaceGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<NamespaceNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<NamespaceNode>());
     builder.push("namespace ");
     let names = generator.generate_nodes_new(
       &node.names,

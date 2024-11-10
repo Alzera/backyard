@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::exit::ExitNode },
 };
 
@@ -8,9 +8,7 @@ pub struct ExitGenerator {}
 
 impl ExitGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<ExitNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<ExitNode>());
     builder.push("exit(");
     generator.generate_node(builder, &node.argument, &mut GeneratorArgument::default());
     builder.push(")");

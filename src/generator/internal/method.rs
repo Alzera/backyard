@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::method::MethodNode },
 };
 
@@ -10,9 +10,7 @@ pub struct MethodGenerator {}
 
 impl MethodGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<MethodNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<MethodNode>());
     if node.visibility.len() > 0 {
       builder.push(format!("{} ", node.visibility).as_str());
     }
@@ -36,7 +34,7 @@ mod tests {
       "abstract class A {
   function a(int $x, int $y = 0): int {
   }
-  public function b(int $x, int $y = 0): int;
+  public final static function b(int $x, int $y = 0): int;
 }"
     );
   }

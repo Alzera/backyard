@@ -292,3 +292,13 @@ impl Lexer {
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::lexer::lex;
+
+  #[test]
+  fn basic() {
+    lex("+++");
+  }
+}

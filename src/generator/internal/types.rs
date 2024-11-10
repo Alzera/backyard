@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::types::TypeNode },
 };
 
@@ -8,9 +8,7 @@ pub struct TypeGenerator {}
 
 impl TypeGenerator {
   pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<TypeNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<TypeNode>());
     if node.is_nullable {
       builder.push("?");
     }

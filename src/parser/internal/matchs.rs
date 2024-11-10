@@ -1,5 +1,5 @@
 use crate::{
-  guard,
+  guard_none,
   lexer::token::{ Token, TokenType },
   parser::{
     node::Node,
@@ -31,7 +31,7 @@ impl MatchParser {
     _: &mut LoopArgument
   ) -> Option<Node> {
     if let [_, _] = matched.as_slice() {
-      let condition = guard!(
+      let condition = guard_none!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("match", &[], &[TokenType::RightParenthesis])
         )
@@ -63,7 +63,7 @@ impl MatchArmParser {
   }
 
   pub fn parse(parser: &mut Parser, _: Vec<Vec<Token>>, _: &mut LoopArgument) -> Option<Node> {
-    let conditions = match guard!(parser.tokens.get(parser.position)).token_type {
+    let conditions = match guard_none!(parser.tokens.get(parser.position)).token_type {
       TokenType::Default => {
         parser.position += 2;
         vec![]
@@ -77,7 +77,7 @@ impl MatchArmParser {
           )
         ),
     };
-    let body = guard!(
+    let body = guard_none!(
       parser.get_statement(
         &mut LoopArgument::with_tokens("match_arm_body", &[], &[TokenType::Comma])
       )

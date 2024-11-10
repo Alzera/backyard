@@ -1,5 +1,5 @@
 use crate::{
-  guard,
+  guard_none,
   lexer::token::{ Token, TokenType },
   parser::{
     node::Node,
@@ -28,14 +28,14 @@ impl IfParser {
     args: &mut LoopArgument
   ) -> Option<Node> {
     if let [_, _] = matched.as_slice() {
-      let condition = guard!(
+      let condition = guard_none!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("if", &[], &[TokenType::RightParenthesis])
         )
       );
       parser.position += 1;
 
-      let next_token = guard!(parser.tokens.get(parser.position));
+      let next_token = guard_none!(parser.tokens.get(parser.position));
       let mut is_short = false;
       let valid = match next_token.token_type {
         TokenType::Colon => {
@@ -49,7 +49,7 @@ impl IfParser {
         }
         TokenType::LeftCurlyBracket => BlockParser::new(parser),
         _ => {
-          let parsed = guard!(
+          let parsed = guard_none!(
             parser.get_statement(
               &mut LoopArgument::with_tokens("if_body", &[], &[TokenType::Semicolon])
             )

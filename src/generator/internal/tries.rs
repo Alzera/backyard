@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::tries::{ CatchNode, TryNode } },
 };
 
@@ -10,9 +10,7 @@ pub struct TryGenerator {}
 
 impl TryGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<TryNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<TryNode>());
     builder.push("try");
     BlockGenerator::generate(generator, builder, &node.body, None);
     for catch in &node.catches {
@@ -25,9 +23,7 @@ impl TryGenerator {
   }
 
   pub fn generate_catch(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<CatchNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<CatchNode>());
     builder.push(" catch (");
     let types = generator.generate_nodes_new(&node.types, &mut GeneratorArgument::default());
     builder.push(&types.to_string(" | "));

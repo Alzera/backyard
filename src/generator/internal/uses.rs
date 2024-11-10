@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, EndMode, Generator, GeneratorArgument, DEFAULT_GENERATORS },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast, NodeType }, nodes::uses::UseNode },
 };
 
@@ -10,9 +10,7 @@ pub struct UseGenerator {}
 
 impl UseGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<UseNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<UseNode>());
     builder.push("use ");
     if node.modifier.len() > 0 {
       builder.push(format!("{} ", node.modifier).as_str());

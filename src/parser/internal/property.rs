@@ -1,7 +1,7 @@
 use std::vec;
 
 use crate::{
-  guard,
+  guard_none,
   lexer::token::{ Token, TokenType },
   parser::{
     node::Node,
@@ -31,7 +31,7 @@ impl PropertyParser {
         .iter()
         .map(|i| i.len())
         .sum();
-      let tmp_tokens = guard!(tokens.get(first_test_count..)).to_vec();
+      let tmp_tokens = guard_none!(tokens.get(first_test_count..)).to_vec();
       let type_test = TypesParser::test(&tmp_tokens, args);
       let type_test_count: usize = if type_test.is_none() {
         0
@@ -42,8 +42,8 @@ impl PropertyParser {
           .sum()
       };
       let tmp_tokens_index = type_test_count + first_test_count;
-      let tmp_tokens = guard!(tokens.get(tmp_tokens_index..)).to_vec();
-      guard!(match_pattern(&tmp_tokens, [Lookup::Equal(vec![TokenType::Variable])].to_vec()));
+      let tmp_tokens = guard_none!(tokens.get(tmp_tokens_index..)).to_vec();
+      guard_none!(match_pattern(&tmp_tokens, [Lookup::Equal(vec![TokenType::Variable])].to_vec()));
       return Some(first_test);
     }
     None

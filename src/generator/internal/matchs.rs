@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, EndMode, Generator, GeneratorArgument, DEFAULT_GENERATORS },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast, NodeType }, nodes::matchs::{ MatchArmNode, MatchNode } },
 };
 
@@ -8,9 +8,7 @@ pub struct MatchGenerator {}
 
 impl MatchGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<MatchNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<MatchNode>());
     builder.push("match(");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
     builder.push(") {");
@@ -28,9 +26,7 @@ impl MatchGenerator {
   }
 
   pub fn generate_arm(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<MatchArmNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<MatchArmNode>());
     if node.conditions.len() > 0 {
       let conditions = generator.generate_nodes_new(
         &node.conditions,

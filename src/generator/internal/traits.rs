@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast, NodeType }, nodes::traits::TraitNode },
 };
 
@@ -17,9 +17,7 @@ pub struct TraitGenerator {}
 
 impl TraitGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<TraitNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<TraitNode>());
     builder.push("trait ");
     IdentifierGenerator::generate(generator, builder, &node.name);
     BlockGenerator::generate_specific(

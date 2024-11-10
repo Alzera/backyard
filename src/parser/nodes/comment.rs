@@ -13,6 +13,15 @@ pub struct CommentBlockNode {
   pub trailing_comments: Nodes,
 }
 
+#[derive(Debug, Clone, macros::ImplementNodeTrait)]
+#[implement_node_trait(NodeType::CommentDoc)]
+pub struct CommentDocNode {
+  pub comment: String,
+
+  pub leading_comments: Nodes,
+  pub trailing_comments: Nodes,
+}
+
 // impl NodeTrait for CommentBlockNode {
 //   fn add_leading_comments(&mut self, comments: crate::parser::node::Node) {
 //     self.leading_comments.push(comments);

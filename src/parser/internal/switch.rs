@@ -1,5 +1,5 @@
 use crate::{
-  guard,
+  guard_none,
   lexer::token::{ Token, TokenType },
   parser::{
     node::Node,
@@ -31,13 +31,13 @@ impl SwitchParser {
     _: &mut LoopArgument
   ) -> Option<Node> {
     if let [_, _] = matched.as_slice() {
-      let condition = guard!(
+      let condition = guard_none!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("switch", &[], &[TokenType::RightParenthesis])
         )
       );
       parser.position += 1;
-      let is_short = guard!(parser.tokens.get(parser.position)).token_type == TokenType::Colon;
+      let is_short = guard_none!(parser.tokens.get(parser.position)).token_type == TokenType::Colon;
       parser.position += 1;
       let statements = parser.get_children(
         &mut LoopArgument::new(
@@ -70,7 +70,7 @@ impl CaseParser {
     _: &mut LoopArgument
   ) -> Option<Node> {
     if let [is_default] = matched.as_slice() {
-      let condition = match guard!(is_default.get(0)).token_type {
+      let condition = match guard_none!(is_default.get(0)).token_type {
         TokenType::Default => None,
         _ => {
           parser.get_statement(

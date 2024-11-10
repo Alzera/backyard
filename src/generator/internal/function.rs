@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATORS },
-  guard_ok,
+  guard,
   parser::{
     node::{ Node, NodeTraitCast, NodeType, Nodes },
     nodes::{
@@ -36,16 +36,12 @@ impl FunctionGenerator {
   }
 
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<FunctionNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<FunctionNode>());
     builder.push("function ");
     if node.is_ref {
       builder.push("&");
     }
-    let name = guard_ok!(node.name.to_owned().cast::<IdentifierNode>(), {
-      return;
-    });
+    let name = guard!(node.name.to_owned().cast::<IdentifierNode>());
     builder.push(&name.name);
 
     let mut parameters = if name.name == "__construct" {
@@ -84,9 +80,7 @@ impl FunctionGenerator {
   }
 
   pub fn generate_anonymous(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<AnonymousFunctionNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<AnonymousFunctionNode>());
     builder.push("function ");
     if node.is_ref {
       builder.push("&");
@@ -140,9 +134,7 @@ impl FunctionGenerator {
   }
 
   pub fn generate_arrow(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<ArrowFunctionNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<ArrowFunctionNode>());
     builder.push("fn ");
     if node.is_ref {
       builder.push("&");
@@ -174,9 +166,7 @@ impl FunctionGenerator {
   }
 
   pub fn generate_parameter(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<ParameterNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<ParameterNode>());
     if let Some(n) = &node.variable_type {
       generator.generate_node(builder, n, &mut GeneratorArgument::default());
       builder.push(" ");

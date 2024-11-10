@@ -7,7 +7,7 @@ use crate::{
     InternalGenerator,
     DEFAULT_GENERATORS,
   },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast, NodeType }, nodes::block::BlockNode },
 };
 
@@ -52,7 +52,7 @@ impl BlockGenerator {
     generators: &[(NodeType, InternalGenerator)]
   ) -> Builder {
     let mut block = Builder::new();
-    let node = guard_ok!(node.to_owned().cast::<BlockNode>(), {
+    let node = guard!(node.to_owned().cast::<BlockNode>(), {
       return block;
     });
     generator.generate_nodes(

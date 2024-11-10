@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATORS },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::list::ListNode },
 };
 
@@ -8,9 +8,7 @@ pub struct ListGenerator {}
 
 impl ListGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<ListNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<ListNode>());
     builder.push("list(");
     let mut values = generator.generate_nodes_new(
       &node.values,
@@ -37,5 +35,12 @@ mod tests {
   #[test]
   fn basic() {
     test("list($a, $b) = [0, 1];");
+    test(
+      "list(
+  $an_unneccessary_very_long_variable_name,
+  $another_unneccessary_very_long_variable_name,
+  $still_another_unneccessary_very_long_variable_name
+) = [0, 1];"
+    );
   }
 }

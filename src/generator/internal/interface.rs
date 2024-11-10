@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast, NodeType }, nodes::interface::InterfaceNode },
 };
 
@@ -15,9 +15,7 @@ pub struct InterfaceGenerator {}
 
 impl InterfaceGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<InterfaceNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<InterfaceNode>());
     builder.push("interface ");
     IdentifierGenerator::generate(generator, builder, &node.name);
     BlockGenerator::generate_specific(

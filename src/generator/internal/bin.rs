@@ -1,6 +1,6 @@
 use crate::{
   generator::generator::{ Builder, Generator, GeneratorArgument },
-  guard_ok,
+  guard,
   parser::{ node::{ Node, NodeTraitCast }, nodes::bin::BinNode },
 };
 
@@ -8,9 +8,7 @@ pub struct BinGenerator {}
 
 impl BinGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = guard_ok!(node.to_owned().cast::<BinNode>(), {
-      return;
-    });
+    let node = guard!(node.to_owned().cast::<BinNode>());
     generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
     let mut expr = generator.generate_node_new(&node.right);
     if builder.last_len() + expr.first_len() + node.operator.len() > generator.max_length {
@@ -30,6 +28,42 @@ mod tests {
 
   #[test]
   fn basic() {
-    test("$a . 0;");
+    [
+      "+",
+      "-",
+      "*",
+      "/",
+      "%",
+      "**",
+      "&",
+      "|",
+      "^",
+      "<<",
+      ">>",
+      "==",
+      "===",
+      "!=",
+      "!==",
+      "<",
+      ">",
+      "<=",
+      ">=",
+      "<=>",
+      ".",
+      "??",
+      "&&",
+      "||",
+      "&",
+      "|",
+      "^",
+    ]
+      .iter()
+      .for_each(|i| {
+        test(format!("$a {} 0;", i).as_str());
+      });
+    test(
+      "$an_unneccessary_very_long_variable_name
+  . $another_unnecessary_very_long_variable_name_that_should_be_on_new_line;"
+    );
   }
 }

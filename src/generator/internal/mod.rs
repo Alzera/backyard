@@ -5,7 +5,7 @@ pub mod bin;
 pub mod block;
 pub mod call;
 pub mod class;
-// pub mod comment;
+pub mod comment;
 pub mod consts;
 pub mod declare;
 pub mod dowhile;
