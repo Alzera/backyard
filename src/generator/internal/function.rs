@@ -3,11 +3,14 @@ use crate::{
   guard_ok,
   parser::{
     node::{ Node, NodeTraitCast, NodeType, Nodes },
-    nodes::function::{ AnonymousFunctionNode, ArrowFunctionNode, FunctionNode, ParameterNode },
+    nodes::{
+      function::{ AnonymousFunctionNode, ArrowFunctionNode, FunctionNode, ParameterNode },
+      identifier::IdentifierNode,
+    },
   },
 };
 
-use super::{ block::BlockGenerator, identifier::IdentifierGenerator };
+use super::{ block::BlockGenerator, identifier::IdentifierGenerator, property::PropertyGenerator };
 
 pub struct FunctionGenerator {}
 
@@ -40,14 +43,25 @@ impl FunctionGenerator {
     if node.is_ref {
       builder.push("&");
     }
-    IdentifierGenerator::generate(generator, builder, &node.name);
-    let mut parameters = Self::get_parameters(generator, &node.parameters);
+    let name = guard_ok!(node.name.to_owned().cast::<IdentifierNode>(), {
+      return;
+    });
+    builder.push(&name.name);
+
+    let mut parameters = if name.name == "__construct" {
+      generator.generate_nodes_new(
+        &node.parameters,
+        &mut GeneratorArgument::for_parameter(&[(NodeType::Property, PropertyGenerator::generate)])
+      )
+    } else {
+      Self::get_parameters(generator, &node.parameters)
+    };
     let (return_type, return_type_len) = Self::get_return_type(generator, &node.return_type);
 
     builder.push("(");
     if
       Generator::check_nodes_has_comments(&node.parameters) ||
-      3 + builder.last_len() + parameters.total_len_with_separator(", ") + return_type_len >
+      3 + builder.last_len() + parameters.total_len_with_separator(" ") + return_type_len >
         generator.max_length
     {
       parameters.indent();
@@ -82,7 +96,7 @@ impl FunctionGenerator {
       &node.uses,
       &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
     );
-    let uses_len = if node.uses.is_empty() { 0 } else { uses.total_len_with_separator(", ") + 7 };
+    let uses_len = if node.uses.is_empty() { 0 } else { uses.total_len_with_separator(" ") + 7 };
     let (return_type, return_type_len) = Self::get_return_type(generator, &node.return_type);
 
     builder.push("(");
@@ -90,7 +104,7 @@ impl FunctionGenerator {
       Generator::check_nodes_has_comments(&node.parameters) ||
       3 +
         builder.last_len() +
-        parameters.total_len_with_separator(", ") +
+        parameters.total_len_with_separator(" ") +
         uses_len +
         return_type_len > generator.max_length
     {
@@ -139,7 +153,7 @@ impl FunctionGenerator {
     builder.push("(");
     if
       Generator::check_nodes_has_comments(&node.parameters) ||
-      3 + builder.last_len() + parameters.total_len_with_separator(", ") + return_type_len >
+      3 + builder.last_len() + parameters.total_len_with_separator(" ") + return_type_len >
         generator.max_length
     {
       parameters.indent();
@@ -179,5 +193,21 @@ impl FunctionGenerator {
       builder.push(" = ");
       generator.generate_node(builder, n, &mut GeneratorArgument::default());
     };
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("class A {
+  public function __construct(protected int $x, protected int $y = 0) {
+  }
+}");
+    test("function &a(?int ...$b = 0, String &$c = [0.01, 0x12], bool $d): ?int {\n}");
+    test("$a = fn &(int $x): ?int => null;");
+    test("$a = function &(int $x, ?int $y) use ($arg2): static {\n};");
   }
 }

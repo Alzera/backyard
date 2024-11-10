@@ -19,7 +19,21 @@ impl IncludeGenerator {
     if node.is_once {
       builder.push("_once");
     }
-    builder.push(" ");
+    builder.push("(");
     generator.generate_node(builder, &node.argument, &mut GeneratorArgument::default());
+    builder.push(")");
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("require(__DIR__ . \"/something_that_does_not_exist\");");
+    test("require_once(__DIR__ . \"/something_that_does_not_exist\");");
+    test("include(\"something_that_does_not_exist\");");
+    test("include_once(\"something_that_does_not_exist\");");
   }
 }

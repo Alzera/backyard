@@ -24,3 +24,14 @@ impl ObjectAccessGenerator {
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("$a->b;");
+    test("$a->{\"b\"};");
+  }
+}

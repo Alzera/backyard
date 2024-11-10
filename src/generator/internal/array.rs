@@ -22,7 +22,7 @@ impl ArrayGenerator {
     builder.push("[");
     if
       Generator::check_nodes_has_comments(&node.items) ||
-      2 + builder.last_len() + items.total_len_with_separator(", ") > generator.max_length
+      2 + builder.last_len() + items.total_len_with_separator(" ") > generator.max_length
     {
       items.indent();
       builder.extend(&items);
@@ -42,5 +42,16 @@ impl ArrayGenerator {
       builder.push(" => ");
     }
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("[1, 2, 3];");
+    test("[\"a\" => 1, \"b\" => 2, \"c\" => 3];");
   }
 }

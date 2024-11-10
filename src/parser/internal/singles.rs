@@ -8,6 +8,7 @@ use crate::{
       ContinueNode,
       EchoNode,
       GlobalNode,
+      GotoNode,
       NewNode,
       ParentNode,
       PrintNode,
@@ -89,6 +90,7 @@ impl SinglesParser {
           TokenType::Throw => Some(ThrowNode::new(argument)),
           TokenType::Clone => Some(CloneNode::new(argument)),
           TokenType::Global => Some(GlobalNode::new(argument)),
+          TokenType::Goto => Some(GotoNode::new(argument)),
           _ => None,
         };
       }

@@ -19,3 +19,13 @@ impl AssignmentGenerator {
     generator.generate_node(builder, &node.right, &mut GeneratorArgument::default());
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("$a = 0;");
+  }
+}

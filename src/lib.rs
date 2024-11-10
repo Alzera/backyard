@@ -7,6 +7,7 @@ mod macros;
 mod lexer;
 mod parser;
 mod generator;
+mod test_utils;
 
 use parser::node::Nodes;
 

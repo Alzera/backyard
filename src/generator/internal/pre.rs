@@ -15,3 +15,13 @@ impl PreGenerator {
     generator.generate_node(builder, &node.variable, &mut GeneratorArgument::default());
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("$a = ++($a++);");
+  }
+}

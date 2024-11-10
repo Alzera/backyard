@@ -15,3 +15,13 @@ impl ProgramGenerator {
     generator.generate_nodes(builder, &node.children, &mut GeneratorArgument::for_block());
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("<?php\n$a = ++($a++);");
+  }
+}

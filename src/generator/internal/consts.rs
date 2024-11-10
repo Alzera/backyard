@@ -1,5 +1,5 @@
 use crate::{
-  generator::generator::{ Builder, Generator, GeneratorArgument },
+  generator::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATORS },
   guard_ok,
   parser::{ node::{ Node, NodeTraitCast }, nodes::consts::{ ConstNode, ConstPropertyNode } },
 };
@@ -13,10 +13,13 @@ impl ConstGenerator {
     });
 
     builder.push("const ");
-    let mut consts = generator.generate_nodes_new(&node.consts, &mut GeneratorArgument::default());
+    let mut consts = generator.generate_nodes_new(
+      &node.consts,
+      &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
+    );
     if
       Generator::check_nodes_has_comments(&node.consts) ||
-      2 + builder.last_len() + consts.total_len_with_separator(", ") > generator.max_length
+      2 + builder.last_len() + consts.total_len_with_separator(" ") > generator.max_length
     {
       consts.indent();
       builder.extend_first_line(&consts);
@@ -34,15 +37,30 @@ impl ConstGenerator {
       builder.push(format!("{} ", node.visibility).as_str());
     }
     builder.push("const ");
-    let mut consts = generator.generate_nodes_new(&node.consts, &mut GeneratorArgument::default());
+    let mut consts = generator.generate_nodes_new(
+      &node.consts,
+      &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
+    );
     if
       Generator::check_nodes_has_comments(&node.consts) ||
-      2 + builder.last_len() + consts.total_len_with_separator(", ") > generator.max_length
+      2 + builder.last_len() + consts.total_len_with_separator(" ") > generator.max_length
     {
       consts.indent();
       builder.extend_first_line(&consts);
     } else {
       builder.push(&consts.to_string(" "));
     }
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("class A {\n  const A = 0, B = 1;\n}");
+    test("class A {\n  public const A = 0, B = 1;\n}");
+    test("const A = 0, B = 1;");
   }
 }

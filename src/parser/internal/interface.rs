@@ -8,7 +8,12 @@ use crate::{
   },
 };
 
-use super::{ comment::CommentParser, identifier::IdentifierParser, method::MethodParser };
+use super::{
+  comment::CommentParser,
+  consts::ConstPropertyParser,
+  identifier::IdentifierParser,
+  method::MethodParser,
+};
 
 #[derive(Debug, Clone)]
 pub struct InterfaceParser {}
@@ -48,6 +53,7 @@ impl InterfaceParser {
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
           &[
+            (ConstPropertyParser::test, ConstPropertyParser::parse),
             (MethodParser::test, MethodParser::parse),
             (CommentParser::test, CommentParser::parse),
           ]

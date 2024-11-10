@@ -19,7 +19,6 @@ use super::{
     foreach::ForeachParser,
     fors::ForParser,
     function::FunctionParser,
-    goto::GotoParser,
     identifier::IdentifierParser,
     ifs::IfParser,
     include::IncludeParser,
@@ -55,7 +54,7 @@ use super::{
 type InternalParserTest = fn(&Vec<Token>, &mut LoopArgument) -> Option<Vec<Vec<Token>>>;
 type InternalParserParse = fn(&mut Parser, Vec<Vec<Token>>, &mut LoopArgument) -> Option<Node>;
 type InternalParser = (InternalParserTest, InternalParserParse);
-pub static DEFAULT_PARSERS: [InternalParser; 45] = [
+pub static DEFAULT_PARSERS: [InternalParser; 44] = [
   (CommentParser::test, CommentParser::parse),
   (ListParser::test, ListParser::parse),
   (ParenthesisParser::test, ParenthesisParser::parse),
@@ -97,7 +96,6 @@ pub static DEFAULT_PARSERS: [InternalParser; 45] = [
   (VariableParser::test, VariableParser::parse),
   (TernaryParser::test, TernaryParser::parse),
   (WhileParser::test, WhileParser::parse),
-  (GotoParser::test, GotoParser::parse),
   (LabelParser::test, LabelParser::parse),
   (IdentifierParser::test, IdentifierParser::parse),
   (TypesParser::test, TypesParser::parse),

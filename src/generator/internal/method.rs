@@ -25,3 +25,19 @@ impl MethodGenerator {
     FunctionGenerator::generate(generator, builder, &node.function);
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test(
+      "abstract class A {
+  function a(int $x, int $y = 0): int {
+  }
+  public function b(int $x, int $y = 0): int;
+}"
+    );
+  }
+}

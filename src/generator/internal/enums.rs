@@ -1,5 +1,5 @@
 use crate::{
-  generator::generator::{ Builder, Generator, GeneratorArgument },
+  generator::generator::{ Builder, EndMode, Generator, GeneratorArgument },
   guard_ok,
   parser::{ node::{ Node, NodeTraitCast, NodeType }, nodes::enums::{ EnumItemNode, EnumNode } },
 };
@@ -17,19 +17,15 @@ impl EnumGenerator {
     IdentifierGenerator::generate(generator, builder, &node.name);
     let mut items = generator.generate_nodes_new(
       &node.items,
-      &mut GeneratorArgument::for_parameter(&[(NodeType::EnumItem, Self::generate_item)])
+      &mut GeneratorArgument::new(
+        EndMode::SemicolonDynamic,
+        &[(NodeType::EnumItem, Self::generate_item)]
+      )
     );
     builder.push(" {");
-    if
-      Generator::check_nodes_has_comments(&node.items) ||
-      2 + builder.last_len() + items.total_len_with_separator(", ") > generator.max_length
-    {
-      items.indent();
-      builder.extend(&items);
-      builder.new_line();
-    } else {
-      builder.push(&items.to_string(" "));
-    }
+    items.indent();
+    builder.extend(&items);
+    builder.new_line();
     builder.push("}");
   }
 
@@ -39,5 +35,15 @@ impl EnumGenerator {
     });
     builder.push("case ");
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("enum Suit {\n  case Hearts;\n  case Spades;\n}");
   }
 }

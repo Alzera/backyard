@@ -21,3 +21,13 @@ impl DoWhileGenerator {
     builder.push(");");
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("do {\n} while (false);");
+  }
+}

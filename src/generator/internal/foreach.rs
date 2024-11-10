@@ -27,3 +27,15 @@ impl ForeachGenerator {
     BlockGenerator::generate(generator, builder, &node.body, end);
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("foreach ($A as $x):\nendforeach;");
+    test("foreach ($A as &$x) {\n}");
+    test("foreach ($arr as $key => $value) {\n}");
+  }
+}

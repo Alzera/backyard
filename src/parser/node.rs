@@ -23,7 +23,6 @@ use super::nodes::{
   foreach::*,
   fors::*,
   function::*,
-  goto::*,
   identifier::*,
   ifs::*,
   include::*,

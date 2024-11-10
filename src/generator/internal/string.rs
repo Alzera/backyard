@@ -47,3 +47,13 @@ impl StringGenerator {
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("$a = \"ale\" . \" ini string $ \\\" \\$var $b {${\"ale\" . 5}} {$a}\";");
+  }
+}

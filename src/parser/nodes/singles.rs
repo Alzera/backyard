@@ -314,3 +314,12 @@ pub struct GlobalNode {
   pub leading_comments: Nodes,
   pub trailing_comments: Nodes,
 }
+
+#[derive(Debug, Clone, macros::ImplementNodeTrait)]
+#[implement_node_trait(NodeType::Goto)]
+pub struct GotoNode {
+  pub label: Node,
+
+  pub leading_comments: Nodes,
+  pub trailing_comments: Nodes,
+}

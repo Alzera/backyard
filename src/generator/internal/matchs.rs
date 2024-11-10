@@ -11,7 +11,7 @@ impl MatchGenerator {
     let node = guard_ok!(node.to_owned().cast::<MatchNode>(), {
       return;
     });
-    builder.push("match (");
+    builder.push("match(");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
     builder.push(") {");
     let mut arms = generator.generate_nodes_new(
@@ -42,5 +42,19 @@ impl MatchGenerator {
     }
     builder.push(" => ");
     generator.generate_node(builder, &node.body, &mut GeneratorArgument::default());
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("echo match($myVar) {
+  1 => \"One\",
+  2, 3 => \"Two\",
+  default => \"Other\"
+};");
   }
 }

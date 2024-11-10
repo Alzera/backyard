@@ -14,3 +14,13 @@ impl MagicGenerator {
     builder.push(&node.name)
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("__DIR__ . \"/something_that_does_not_exist\";");
+  }
+}

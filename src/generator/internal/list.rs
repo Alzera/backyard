@@ -18,7 +18,7 @@ impl ListGenerator {
     );
     if
       Generator::check_nodes_has_comments(&node.values) ||
-      2 + builder.last_len() + values.total_len_with_separator(", ") > generator.max_length
+      2 + builder.last_len() + values.total_len_with_separator(" ") > generator.max_length
     {
       values.indent();
       builder.extend(&values);
@@ -27,5 +27,15 @@ impl ListGenerator {
       builder.push(&values.to_string(" "));
     }
     builder.push(")");
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("list($a, $b) = [0, 1];");
   }
 }

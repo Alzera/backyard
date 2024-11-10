@@ -9,6 +9,7 @@ use crate::{
       ContinueNode,
       EchoNode,
       GlobalNode,
+      GotoNode,
       NewNode,
       PrintNode,
       ReturnNode,
@@ -88,6 +89,14 @@ impl SinglesGenerator {
           }).argument
         )
       }
+      NodeType::Goto => {
+        builder.push("goto");
+        Some(
+          guard_ok!(node.to_owned().cast::<GotoNode>(), {
+            return;
+          }).label
+        )
+      }
       NodeType::Parent => {
         builder.push("parent");
         None
@@ -104,5 +113,29 @@ impl SinglesGenerator {
       builder.push(" ");
       generator.generate_node(builder, &node, &mut GeneratorArgument::default());
     }
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("break;");
+    test("break 2;");
+    test("continue;");
+    test("continue 2;");
+    test("return;");
+    test("return 2;");
+    test("global $a;");
+    test("clone $a;");
+    test("echo \"Hello\";");
+    test("new A;");
+    test("print \"Hello\";");
+    test("throw new A;");
+    test("goto jumpHere;");
+    test("parent::a();");
+    test("static::a();");
   }
 }

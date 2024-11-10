@@ -62,3 +62,16 @@ impl ForGenerator {
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("for (; ; ):\nendfor;");
+    test("for ($i = 1; $i <= 10; $i++) {\n}");
+    test("for ($i = 1; ; $i++) {\n}");
+    test("for ($i = 1, $j = 0; $i <= 10; $j += $i, print $i, $i++);");
+  }
+}

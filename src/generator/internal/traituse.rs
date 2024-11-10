@@ -25,7 +25,7 @@ impl TraitUseGenerator {
     );
     if
       Generator::check_nodes_has_comments(&node.traits) ||
-      2 + builder.last_len() + traits.total_len_with_separator(", ") > generator.max_length
+      2 + builder.last_len() + traits.total_len_with_separator(" ") > generator.max_length
     {
       traits.indent();
       builder.extend_first_line(&traits);
@@ -46,7 +46,7 @@ impl TraitUseGenerator {
       builder.push(" {");
       if
         Generator::check_nodes_has_comments(&node.adaptations) ||
-        2 + builder.last_len() + adaptations_builder.total_len_with_separator(", ") >
+        2 + builder.last_len() + adaptations_builder.total_len_with_separator(" ") >
           generator.max_length
       {
         adaptations_builder.indent();

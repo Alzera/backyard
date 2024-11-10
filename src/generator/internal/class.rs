@@ -53,3 +53,15 @@ impl ClassGenerator {
     );
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("abstract class A {\n}");
+    test("final class A extends B {\n}");
+    test("class A implements C, D, E {\n}");
+  }
+}

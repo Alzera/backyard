@@ -8,7 +8,7 @@ use crate::{
 
 pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Node);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 58] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 59] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
   (NodeType::Array, super::internal::array::ArrayGenerator::generate),
@@ -21,7 +21,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 58] = [
   (NodeType::Break, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Call, super::internal::call::CallGenerator::generate),
   // (NodeType::Case, CaseGenerator::generate),
-  // (NodeType::Cast, super::internal::parenthesis::ParenthesisGenerator::generate_cast),
+  (NodeType::Cast, super::internal::parenthesis::ParenthesisGenerator::generate_cast),
   // (NodeType::Catch, CatchGenerator::generate),
   (NodeType::Class, super::internal::class::ClassGenerator::generate),
   (NodeType::Clone, super::internal::singles::SinglesGenerator::generate),
@@ -44,7 +44,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 58] = [
   (NodeType::Foreach, super::internal::foreach::ForeachGenerator::generate),
   (NodeType::Function, super::internal::function::FunctionGenerator::generate),
   (NodeType::Global, super::internal::singles::SinglesGenerator::generate),
-  (NodeType::Goto, super::internal::goto::GotoGenerator::generate),
+  (NodeType::Goto, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Identifier, super::internal::identifier::IdentifierGenerator::generate),
   (NodeType::If, super::internal::ifs::IfGenerator::generate),
   (NodeType::Include, super::internal::include::IncludeGenerator::generate),
@@ -285,7 +285,7 @@ pub struct Generator {
 
 impl Generator {
   pub fn new(nodes: Nodes) -> Self {
-    Self { nodes, max_length: 60 }
+    Self { nodes, max_length: 100 }
   }
 
   pub fn start(&mut self) -> String {

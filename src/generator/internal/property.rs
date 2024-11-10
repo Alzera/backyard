@@ -29,7 +29,7 @@ impl PropertyGenerator {
     );
     if
       Generator::check_nodes_has_comments(&node.items) ||
-      2 + builder.last_len() + items.total_len_with_separator(", ") > generator.max_length
+      2 + builder.last_len() + items.total_len_with_separator(" ") > generator.max_length
     {
       items.indent();
       builder.extend_first_line(&items);

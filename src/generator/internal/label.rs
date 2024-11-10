@@ -18,3 +18,13 @@ impl LabelGenerator {
     builder.push(":");
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("jumpHere:");
+  }
+}
