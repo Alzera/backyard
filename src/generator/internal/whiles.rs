@@ -21,3 +21,14 @@ impl WhileGenerator {
     BlockGenerator::generate(generator, builder, &node.body, end);
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("while ($i <= 10) {\n}");
+    test("while ($i <= 10):\nendwhile;");
+  }
+}

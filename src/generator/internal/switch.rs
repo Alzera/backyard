@@ -44,3 +44,29 @@ impl SwitchGenerator {
     builder.extend(&body);
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("switch ($a):
+  case 1:
+    echo \"1\";
+    break;
+endswitch;");
+    test(
+      "switch ($a) {
+  case 1:
+    echo \"1\";
+    break;
+  case 2:
+    echo \"2\";
+    return;
+  default:
+    echo \"default\";
+}"
+    );
+  }
+}

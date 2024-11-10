@@ -83,36 +83,20 @@ impl Lexer {
         }
       }
       '&' => {
-        let t = self.until(|ch| !['&', '='].contains(ch));
+        let t = self.until(|ch| !['&', '=', '$'].contains(ch));
         match t.as_str() {
           "&=" => Some(vec![Token::new(TokenType::BitwiseAndAssignment, "&=")]),
           "&&" => Some(vec![Token::new(TokenType::BooleanAnd, "&&")]),
-          "&" => {
-            let t = self.until(|ch| !['.', '&', '$'].contains(ch));
-            match t.as_str() {
-              "&$" => {
-                if let Some(tokens) = VariableToken::lex(self) {
-                  let mut tokens = tokens.clone();
-                  tokens.insert(0, Token::new(TokenType::Reference, "&"));
-                  return Some(tokens);
-                } else {
-                  None
-                }
-              }
-              "&...$" => {
-                if let Some(tokens) = VariableToken::lex(self) {
-                  let mut tokens = tokens.clone();
-                  tokens.insert(0, Token::new(TokenType::Ellipsis, "..."));
-                  tokens.insert(0, Token::new(TokenType::Reference, "&"));
-                  return Some(tokens);
-                } else {
-                  None
-                }
-              }
-              "&" => Some(vec![Token::new(TokenType::BitwiseAnd, "&")]),
-              _ => Lexer::unable_to_handle(t),
+          "&$" => {
+            if let Some(tokens) = VariableToken::lex(self) {
+              let mut tokens = tokens.clone();
+              tokens.insert(0, Token::new(TokenType::Reference, "&"));
+              return Some(tokens);
+            } else {
+              None
             }
           }
+          "&" => Some(vec![Token::new(TokenType::BitwiseAnd, "&")]),
           _ => Lexer::unable_to_handle(t),
         }
       }

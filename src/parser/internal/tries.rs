@@ -21,13 +21,7 @@ pub struct TryParser {}
 
 impl TryParser {
   pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(
-      tokens,
-      [
-        Lookup::Equal(vec![TokenType::Try]),
-        Lookup::Equal(vec![TokenType::LeftCurlyBracket]),
-      ].to_vec()
-    )
+    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Try])].to_vec())
   }
 
   pub fn parse(
@@ -35,7 +29,7 @@ impl TryParser {
     matched: Vec<Vec<Token>>,
     _: &mut LoopArgument
   ) -> Option<Node> {
-    if let [_, _] = matched.as_slice() {
+    if let [_] = matched.as_slice() {
       let body = BlockParser::new(parser);
       let mut catches: Vec<Node> = vec![];
       let mut finally = None;

@@ -264,6 +264,7 @@ impl<'a> GeneratorArgument<'a> {
           NodeType::For,
           NodeType::While,
           NodeType::DoWhile,
+          NodeType::Try,
           NodeType::Label,
         ].contains(node_type)
       {

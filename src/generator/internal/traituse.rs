@@ -88,3 +88,22 @@ impl TraitUseGenerator {
     IdentifierGenerator::generate(generator, builder, &node.instead);
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test(
+      "class A {
+  use Ale;
+  use Loggable, Usable {
+    log as private alias;
+    Loggable::log as aliasLoggable;
+    Usable::useResource insteadof Loggable;
+  }
+}"
+    );
+  }
+}

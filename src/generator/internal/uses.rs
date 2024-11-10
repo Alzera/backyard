@@ -44,3 +44,14 @@ impl UseGenerator {
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test("use const App\\Models\\User;");
+    test("use function App\\Models\\{User, Post, Comment};");
+  }
+}

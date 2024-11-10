@@ -62,6 +62,17 @@ mod tests {
   fn basic() {
     test("abstract class A {\n}");
     test("final class A extends B {\n}");
-    test("class A implements C, D, E {\n}");
+    test(
+      "class A implements C, D, E {
+  use Ale;
+  use Loggable, Usable {
+    log as private alias;
+    Loggable::log as aliasLoggable;
+    Usable::useResource insteadof Loggable;
+  }
+  public const MY_CONST = \"constant\";
+  public static ?A $instance = 4;
+}"
+    );
   }
 }
