@@ -1,6 +1,6 @@
 use crate::{
   guard,
-  lexer::token::{ Token, TokenType },
+  lexer::token::{ Token, TokenType, TokenTypeArrayCombine },
   parser::{
     node::{ Node, Nodes },
     nodes::{
@@ -96,7 +96,13 @@ impl FunctionParser {
       let return_type = FunctionParser::get_return_type(parser);
       parser.position += 1;
       let body = guard!(
-        parser.get_statement(&mut LoopArgument::with_tokens("function_arrow", &[], args.breakers))
+        parser.get_statement(
+          &mut LoopArgument::with_tokens(
+            "function_arrow",
+            &[],
+            &args.breakers.combine(args.separators)
+          )
+        )
       );
       return Some(ArrowFunctionNode::new(is_ref.len() > 0, arguments, return_type, body));
     }

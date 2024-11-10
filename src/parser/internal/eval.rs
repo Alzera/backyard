@@ -31,6 +31,7 @@ impl EvalParser {
       let argument = parser.get_statement(
         &mut LoopArgument::with_tokens("eval", &[TokenType::RightParenthesis], &[])
       );
+      parser.position += 1;
       if argument.is_none() {
         return None;
       }

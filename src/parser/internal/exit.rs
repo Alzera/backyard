@@ -29,8 +29,9 @@ impl ExitParser {
   ) -> Option<Node> {
     if let [_, _] = matched.as_slice() {
       let argument = parser.get_statement(
-        &mut LoopArgument::with_tokens("exit", &[TokenType::RightParenthesis], &[])
+        &mut LoopArgument::with_tokens("exit", &[], &[TokenType::RightParenthesis])
       );
+      parser.position += 1;
       if argument.is_none() {
         return None;
       }

@@ -19,7 +19,6 @@ use super::{
     foreach::ForeachParser,
     fors::ForParser,
     function::FunctionParser,
-    global::GlobalParser,
     goto::GotoParser,
     identifier::IdentifierParser,
     ifs::IfParser,
@@ -56,7 +55,7 @@ use super::{
 type InternalParserTest = fn(&Vec<Token>, &mut LoopArgument) -> Option<Vec<Vec<Token>>>;
 type InternalParserParse = fn(&mut Parser, Vec<Vec<Token>>, &mut LoopArgument) -> Option<Node>;
 type InternalParser = (InternalParserTest, InternalParserParse);
-pub static DEFAULT_PARSERS: [InternalParser; 46] = [
+pub static DEFAULT_PARSERS: [InternalParser; 45] = [
   (CommentParser::test, CommentParser::parse),
   (ListParser::test, ListParser::parse),
   (ParenthesisParser::test, ParenthesisParser::parse),
@@ -77,7 +76,6 @@ pub static DEFAULT_PARSERS: [InternalParser; 46] = [
   (ForParser::test, ForParser::parse),
   (ForeachParser::test, ForeachParser::parse),
   (FunctionParser::test, FunctionParser::parse),
-  (GlobalParser::test, GlobalParser::parse),
   (CallParser::test, CallParser::parse),
   (ClassParser::test, ClassParser::parse),
   (InterfaceParser::test, InterfaceParser::parse),
@@ -86,7 +84,6 @@ pub static DEFAULT_PARSERS: [InternalParser; 46] = [
   (ConstParser::test, ConstParser::parse),
   (EvalParser::test, EvalParser::parse),
   (ExitParser::test, ExitParser::parse),
-  (IdentifierParser::test, IdentifierParser::parse),
   (MagicParser::test, MagicParser::parse),
   (NumberParser::test, NumberParser::parse),
   (PostParser::test, PostParser::parse),
@@ -99,10 +96,11 @@ pub static DEFAULT_PARSERS: [InternalParser; 46] = [
   (SwitchParser::test, SwitchParser::parse),
   (VariableParser::test, VariableParser::parse),
   (TernaryParser::test, TernaryParser::parse),
-  (TypesParser::test, TypesParser::parse),
   (WhileParser::test, WhileParser::parse),
   (GotoParser::test, GotoParser::parse),
   (LabelParser::test, LabelParser::parse),
+  (IdentifierParser::test, IdentifierParser::parse),
+  (TypesParser::test, TypesParser::parse),
 ];
 
 #[derive(Debug)]
@@ -158,6 +156,23 @@ impl<'a> LoopArgument<'a> {
       statements: vec![],
     }
   }
+
+  fn to_string(&self) -> String {
+    let last_statement = if let Some(last) = self.statements.last() {
+      Some(last.get_type())
+    } else {
+      None
+    };
+    let last_expr = if let Some(last) = &self.last_expr { Some(last.get_type()) } else { None };
+    format!(
+      "LoopArgument {{ context: {}, separators: {:?}, breakers: {:?}, last_expr: {:?}, last_statements: {:?} }}",
+      self.context,
+      self.separators,
+      self.breakers,
+      last_expr,
+      last_statement
+    )
+  }
 }
 
 pub struct Parser {
@@ -192,7 +207,7 @@ impl Parser {
       } else {
         if let Some(t) = self.tokens.get(self.position) {
           if !(args.separators.contains(&t.token_type) || args.breakers.contains(&t.token_type)) {
-            println!("Fail to parse children: {:?}, {:?}", t, args);
+            println!("Fail to parse children: {:?}, {:?}", t, args.to_string());
           }
         }
         break;
@@ -202,6 +217,7 @@ impl Parser {
   }
 
   pub fn get_statement(&mut self, args: &mut LoopArgument) -> Option<Node> {
+    // println!("get_statement start: {:?}, {:?}", args.separators, args.breakers);
     while let Some(token) = self.tokens.get(self.position) {
       // println!("get_statement while: {:?}", token.token_type);
       if args.separators.contains(&token.token_type) || args.breakers.contains(&token.token_type) {
@@ -247,7 +263,7 @@ impl Parser {
       } else {
         if let Some(t) = self.tokens.get(self.position) {
           if !(args.separators.contains(&t.token_type) || args.breakers.contains(&t.token_type)) {
-            println!("Fail to parse statement: {:?}, {:?}", t, args);
+            println!("Fail to parse statement: {:?}, {:?}", t, args.to_string());
           }
         }
         break;
@@ -269,7 +285,7 @@ impl Parser {
           .iter()
           .map(|x| x.len())
           .sum::<usize>();
-        // println!("parse_statement matched: {:?}", parser);
+        // println!("parse_statement matched: {:?}", i);
         return parse(self, matched, args);
       }
     }

@@ -7,6 +7,7 @@ use crate::{
       CloneNode,
       ContinueNode,
       EchoNode,
+      GlobalNode,
       NewNode,
       ParentNode,
       PrintNode,
@@ -39,7 +40,8 @@ impl SinglesParser {
             TokenType::Throw,
             TokenType::Parent,
             TokenType::Static,
-            TokenType::Clone
+            TokenType::Clone,
+            TokenType::Global
           ]
         ),
       ].to_vec()
@@ -86,6 +88,7 @@ impl SinglesParser {
           TokenType::Print => Some(PrintNode::new(argument)),
           TokenType::Throw => Some(ThrowNode::new(argument)),
           TokenType::Clone => Some(CloneNode::new(argument)),
+          TokenType::Global => Some(GlobalNode::new(argument)),
           _ => None,
         };
       }

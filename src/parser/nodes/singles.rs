@@ -305,3 +305,12 @@ pub struct CloneNode {
   pub leading_comments: Nodes,
   pub trailing_comments: Nodes,
 }
+
+#[derive(Debug, Clone, macros::ImplementNodeTrait)]
+#[implement_node_trait(NodeType::Global)]
+pub struct GlobalNode {
+  pub argument: Node,
+
+  pub leading_comments: Nodes,
+  pub trailing_comments: Nodes,
+}

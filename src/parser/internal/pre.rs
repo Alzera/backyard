@@ -26,7 +26,7 @@ impl PreParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
+    args: &mut LoopArgument
   ) -> Option<Node> {
     if let [operator] = matched.as_slice() {
       let operator = operator.get(0);
@@ -34,7 +34,7 @@ impl PreParser {
         return None;
       }
       let argument = parser.get_statement(
-        &mut LoopArgument::with_tokens("pre", &[TokenType::Semicolon], &[])
+        &mut LoopArgument::with_tokens("pre", args.separators, args.breakers)
       );
       if argument.is_none() {
         return None;
