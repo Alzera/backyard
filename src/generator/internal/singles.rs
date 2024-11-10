@@ -8,6 +8,7 @@ use crate::{
       CloneNode,
       ContinueNode,
       EchoNode,
+      GlobalNode,
       NewNode,
       PrintNode,
       ReturnNode,
@@ -38,6 +39,14 @@ impl SinglesGenerator {
         guard_ok!(node.to_owned().cast::<ReturnNode>(), {
           return;
         }).argument
+      }
+      NodeType::Global => {
+        builder.push("global");
+        Some(
+          guard_ok!(node.to_owned().cast::<GlobalNode>(), {
+            return;
+          }).argument
+        )
       }
       NodeType::Clone => {
         builder.push("clone");
