@@ -40,51 +40,41 @@ pub fn implement_node_trait(input: TokenStream) -> TokenStream {
     let ty = &f.ty;
     quote! { #name: #ty, }
   });
-  let field_setters = field_filtered.iter().map(|f| {
-    let name = f.ident.as_ref().unwrap();
-    let name_str = name.to_string();
+  // let field_setters = field_filtered.iter().map(|f| {
+  //   let name = f.ident.as_ref().unwrap();
+  //   let name_str = name.to_string();
 
-    return quote! { let _ = obj.set(#name_str, val.#name); };
-  });
-  let field_getter = field_filtered.iter().map(|f| {
-    let name = f.ident.as_ref().unwrap();
-    let name_str = name.to_string();
-    let ty = &f.ty;
+  //   return quote! { let _ = obj.set(#name_str, val.#name); };
+  // });
+  // let field_getter = field_filtered.iter().map(|f| {
+  //   let name = f.ident.as_ref().unwrap();
+  //   let name_str = name.to_string();
+  //   let ty = &f.ty;
 
-    quote! { #name: val.get::<&str, #ty>(#name_str).unwrap().unwrap() }
-  });
+  //   quote! { #name: val.get::<&str, #ty>(#name_str).unwrap().unwrap() }
+  // });
+  let func_args_cloned = func_args.clone();
+  let field_inits_cloned = field_inits.clone();
 
   let expanded =
     quote! {
+      #[napi]
       impl #struct_name {
+        #[napi]
+        pub fn create(#(#func_args_cloned)*) -> Self {
+          Self {
+            #(#field_inits_cloned),*,
+            leading_comments: vec![],
+            trailing_comments: vec![],
+          }
+        }
+
         pub fn new(#(#func_args)*) -> Box<Self> {
           Box::new(Self {
             #(#field_inits),*,
             leading_comments: vec![],
             trailing_comments: vec![],
           })
-        }
-      }
-
-      impl napi::bindgen_prelude::ToNapiValue for #struct_name {
-        unsafe fn to_napi_value(
-          env: napi::sys::napi_env,
-          val: Self
-        ) -> napi::Result<napi::sys::napi_value> {
-          let unraw_env = napi::Env::from_raw(env);
-          let mut obj = unraw_env.create_object()?;
-          let _ = obj.set("type", #node_type.to_string());
-          
-          #(#field_setters)*
-
-          if val.leading_comments.len() > 0 {
-            let _ = obj.set("leading_comments", val.leading_comments);
-          }
-          if val.trailing_comments.len() > 0 {
-            let _ = obj.set("trailing_comments", val.trailing_comments);
-          }
-
-          napi::bindgen_prelude::Object::to_napi_value(env, obj)
         }
       }
 
@@ -117,12 +107,9 @@ pub fn implement_node_trait(input: TokenStream) -> TokenStream {
           #struct_name::to_napi_value(env, self.clone())
         }
 
-        fn from_napi(env: napi::sys::napi_env, val: napi::JsObject) -> Box<Self> where Self: Sized {
-          Box::new(Self {
-            #(#field_getter),*,
-            leading_comments: crate::guard!(val.get::<&str, Nodes>("leading_comments").unwrap(), vec![]), 
-            trailing_comments: crate::guard!(val.get::<&str, Nodes>("trailing_comments").unwrap(), vec![]),
-          })
+        unsafe fn from_napi(env: napi::sys::napi_env, val: napi::sys::napi_value) -> Box<Self> {
+          let node = Self::from_napi_ref(env, val).ok().unwrap();
+          Box::new(node.to_owned())
         }
       }
     };

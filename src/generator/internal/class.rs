@@ -23,7 +23,7 @@ impl ClassGenerator {
     }
     builder.push("class ");
     IdentifierGenerator::generate(generator, builder, &node.name);
-    if let Some(n) = &node.extends {
+    if let Some(n) = &node.extend {
       builder.push(" extends ");
       IdentifierGenerator::generate(generator, builder, &n);
     }

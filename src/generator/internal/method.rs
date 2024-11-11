@@ -20,7 +20,7 @@ impl MethodGenerator {
     if node.is_static {
       builder.push("static ");
     }
-    FunctionGenerator::generate(generator, builder, &node.function);
+    FunctionGenerator::generate(generator, builder, &node.fun);
   }
 }
 

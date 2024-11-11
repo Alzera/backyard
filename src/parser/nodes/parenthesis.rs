@@ -1,9 +1,10 @@
 use std::any::Any;
 
 use napi::bindgen_prelude::ToNapiValue;
+use napi::bindgen_prelude::FromNapiRef;
 
 use crate::parser::node::{ NodeType, Node, Nodes };
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Parenthesis)]
 pub struct ParenthesisNode {
@@ -41,7 +42,7 @@ pub struct ParenthesisNode {
 //     obj
 //   }
 // }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Cast)]
 pub struct CastNode {

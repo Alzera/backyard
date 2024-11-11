@@ -18,8 +18,8 @@
   },
   "scripts": {
     "artifacts": "napi artifacts",
-    "build": "napi build --platform --release",
-    "debug": "napi build --platform && node ./test-run/test.js",
+    "build": "napi build --platform --release  && node ./scripts/update-dts.js",
+    "debug": "napi build --platform && node ./scripts/update-dts.js && node ./test-run/test.js",
     "prepublishOnly": "napi prepublish -t npm",
     "cargo:test": "cargo test",
     "cargo:coverage": "cargo tarpaulin --out Html",

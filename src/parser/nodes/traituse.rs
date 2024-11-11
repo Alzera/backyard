@@ -1,9 +1,10 @@
 use std::any::Any;
 
 use napi::bindgen_prelude::ToNapiValue;
+use napi::bindgen_prelude::FromNapiRef;
 
 use crate::parser::node::{ NodeType, Node, Nodes };
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::TraitUse)]
 pub struct TraitUseNode {
@@ -52,7 +53,7 @@ pub struct TraitUseNode {
 //     obj
 //   }
 // }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::TraitUseAlias)]
 pub struct TraitUseAliasNode {
@@ -99,7 +100,7 @@ pub struct TraitUseAliasNode {
 //     obj
 //   }
 // }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::TraitUsePrecedence)]
 pub struct TraitUsePrecedenceNode {

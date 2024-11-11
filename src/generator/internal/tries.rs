@@ -16,7 +16,7 @@ impl TryGenerator {
     for catch in &node.catches {
       Self::generate_catch(generator, builder, catch);
     }
-    if let Some(finally) = &node.finally {
+    if let Some(finally) = &node.finally_block {
       builder.push(" finally");
       BlockGenerator::generate(generator, builder, &finally, None);
     }

@@ -175,3 +175,415 @@ export const enum BodyType {
 export declare function lex(input: string): Array<Token>
 export declare function parse(input: string): Nodes
 export declare function generate(input: Nodes): string
+export declare class ArrayNode extends Node {
+  isEllipsis: boolean
+  items: Nodes
+  static create(isEllipsis: boolean, items: Nodes): ArrayNode
+}
+export declare class ArrayItemNode extends Node {
+  key?: Node
+  value: Node
+  static create(key: Node | undefined | null, value: Node): ArrayItemNode
+}
+export declare class ArrayLookupNode extends Node {
+  target: Node
+  on: Node
+  static create(target: Node, on: Node): ArrayLookupNode
+}
+export declare class AssignmentNode extends Node {
+  left: Node
+  operator: string
+  right: Node
+  static create(left: Node, operator: string, right: Node): AssignmentNode
+}
+export declare class BinNode extends Node {
+  left: Node
+  operator: string
+  right: Node
+  static create(left: Node, operator: string, right: Node): BinNode
+}
+export declare class BlockNode extends Node {
+  statements: Nodes
+  static create(statements: Nodes): BlockNode
+}
+export declare class CallNode extends Node {
+  name: Node
+  arguments: Nodes
+  static create(name: Node, arguments: Nodes): CallNode
+}
+export declare class ArgumentNode extends Node {
+  name?: Node
+  value: Node
+  static create(name: Node | undefined | null, value: Node): ArgumentNode
+}
+export declare class ClassNode extends Node {
+  modifier: string
+  name: Node
+  extend?: Node
+  implements: Nodes
+  body: Node
+  static create(modifier: string, name: Node, extend: Node | undefined | null, implements: Nodes, body: Node): ClassNode
+}
+export declare class CommentBlockNode extends Node {
+  comment: string
+  static create(comment: string): CommentBlockNode
+}
+export declare class CommentDocNode extends Node {
+  comment: string
+  static create(comment: string): CommentDocNode
+}
+export declare class CommentLineNode extends Node {
+  comment: string
+  static create(comment: string): CommentLineNode
+}
+export declare class ConstNode extends Node {
+  consts: Nodes
+  static create(consts: Nodes): ConstNode
+}
+export declare class ConstPropertyNode extends Node {
+  visibility: string
+  consts: Nodes
+  static create(visibility: string, consts: Nodes): ConstPropertyNode
+}
+export declare class DeclareNode extends Node {
+  arguments: Nodes
+  body?: Node
+  bodyType: BodyType
+  static create(arguments: Nodes, body: Node | undefined | null, bodyType: BodyType): DeclareNode
+}
+export declare class DeclareArgumentNode extends Node {
+  name: Node
+  value: Node
+  static create(name: Node, value: Node): DeclareArgumentNode
+}
+export declare class DoWhileNode extends Node {
+  condition: Node
+  body: Node
+  static create(condition: Node, body: Node): DoWhileNode
+}
+export declare class EnumNode extends Node {
+  name: Node
+  items: Nodes
+  static create(name: Node, items: Nodes): EnumNode
+}
+export declare class EnumItemNode extends Node {
+  value: Node
+  static create(value: Node): EnumItemNode
+}
+export declare class EvalNode extends Node {
+  argument: Node
+  static create(argument: Node): EvalNode
+}
+export declare class ExitNode extends Node {
+  argument: Node
+  static create(argument: Node): ExitNode
+}
+export declare class ForeachNode extends Node {
+  source: Node
+  key?: Node
+  value: Node
+  body: Node
+  isShort: boolean
+  static create(source: Node, key: Node | undefined | null, value: Node, body: Node, isShort: boolean): ForeachNode
+}
+export declare class ForNode extends Node {
+  inits: Nodes
+  tests: Nodes
+  increments: Nodes
+  body?: Node
+  bodyType: BodyType
+  static create(inits: Nodes, tests: Nodes, increments: Nodes, body: Node | undefined | null, bodyType: BodyType): ForNode
+}
+export declare class FunctionNode extends Node {
+  isRef: boolean
+  name: Node
+  parameters: Nodes
+  returnType?: Node
+  body?: Node
+  static create(isRef: boolean, name: Node, parameters: Nodes, returnType?: Node | undefined | null, body?: Node | undefined | null): FunctionNode
+}
+export declare class ArrowFunctionNode extends Node {
+  isRef: boolean
+  parameters: Nodes
+  returnType?: Node
+  body: Node
+  static create(isRef: boolean, parameters: Nodes, returnType: Node | undefined | null, body: Node): ArrowFunctionNode
+}
+export declare class AnonymousFunctionNode extends Node {
+  isRef: boolean
+  parameters: Nodes
+  uses: Nodes
+  returnType?: Node
+  body: Node
+  static create(isRef: boolean, parameters: Nodes, uses: Nodes, returnType: Node | undefined | null, body: Node): AnonymousFunctionNode
+}
+export declare class ParameterNode extends Node {
+  variableType?: Node
+  isRef: boolean
+  isEllipsis: boolean
+  name: Node
+  value?: Node
+  static create(variableType: Node | undefined | null, isRef: boolean, isEllipsis: boolean, name: Node, value?: Node | undefined | null): ParameterNode
+}
+export declare class IdentifierNode extends Node {
+  name: string
+  static create(name: string): IdentifierNode
+}
+export declare class IfNode extends Node {
+  condition: Node
+  valid: Node
+  invalid?: Node
+  isShort: boolean
+  static create(condition: Node, valid: Node, invalid: Node | undefined | null, isShort: boolean): IfNode
+}
+export declare class IncludeNode extends Node {
+  isRequire: boolean
+  isOnce: boolean
+  argument: Node
+  static create(isRequire: boolean, isOnce: boolean, argument: Node): IncludeNode
+}
+export declare class InstanceOfNode extends Node {
+  left: Node
+  right: Node
+  static create(left: Node, right: Node): InstanceOfNode
+}
+export declare class InterfaceNode extends Node {
+  name: Node
+  implements: Nodes
+  body: Node
+  static create(name: Node, implements: Nodes, body: Node): InterfaceNode
+}
+export declare class LabelNode extends Node {
+  label: Node
+  static create(label: Node): LabelNode
+}
+export declare class ListNode extends Node {
+  values: Nodes
+  static create(values: Nodes): ListNode
+}
+export declare class MagicNode extends Node {
+  name: string
+  static create(name: string): MagicNode
+}
+export declare class MatchNode extends Node {
+  condition: Node
+  arms: Nodes
+  static create(condition: Node, arms: Nodes): MatchNode
+}
+export declare class MatchArmNode extends Node {
+  conditions: Nodes
+  body: Node
+  static create(conditions: Nodes, body: Node): MatchArmNode
+}
+export declare class MethodNode extends Node {
+  visibility: string
+  modifier: string
+  isStatic: boolean
+  fun: Node
+  static create(visibility: string, modifier: string, isStatic: boolean, fun: Node): MethodNode
+}
+export declare class NamespaceNode extends Node {
+  names: Nodes
+  body: Node
+  isBracket: boolean
+  static create(names: Nodes, body: Node, isBracket: boolean): NamespaceNode
+}
+export declare class NumberNode extends Node {
+  value: string
+  static create(value: string): NumberNode
+}
+export declare class ObjectAccessNode extends Node {
+  object: Node
+  property: Node
+  static create(object: Node, property: Node): ObjectAccessNode
+}
+export declare class ParenthesisNode extends Node {
+  statement: Node
+  static create(statement: Node): ParenthesisNode
+}
+export declare class CastNode extends Node {
+  target: Node
+  expression: Node
+  static create(target: Node, expression: Node): CastNode
+}
+export declare class PostNode extends Node {
+  variable: Node
+  operator: string
+  static create(variable: Node, operator: string): PostNode
+}
+export declare class PreNode extends Node {
+  variable: Node
+  operator: string
+  static create(variable: Node, operator: string): PreNode
+}
+export declare class ProgramNode extends Node {
+  children: Nodes
+  static create(children: Nodes): ProgramNode
+}
+export declare class PropertyItemNode extends Node {
+  name: Node
+  variableType?: Node
+  value?: Node
+  static create(name: Node, variableType?: Node | undefined | null, value?: Node | undefined | null): PropertyItemNode
+}
+export declare class PropertyNode extends Node {
+  visibility: string
+  modifier: string
+  items: Nodes
+  static create(visibility: string, modifier: string, items: Nodes): PropertyNode
+}
+export declare class BreakNode extends Node {
+  argument?: Node
+  static create(argument?: Node | undefined | null): BreakNode
+}
+export declare class ContinueNode extends Node {
+  argument?: Node
+  static create(argument?: Node | undefined | null): ContinueNode
+}
+export declare class ReturnNode extends Node {
+  argument?: Node
+  static create(argument?: Node | undefined | null): ReturnNode
+}
+export declare class EchoNode extends Node {
+  argument: Node
+  static create(argument: Node): EchoNode
+}
+export declare class NewNode extends Node {
+  argument: Node
+  static create(argument: Node): NewNode
+}
+export declare class ThrowNode extends Node {
+  argument: Node
+  static create(argument: Node): ThrowNode
+}
+export declare class PrintNode extends Node {
+  argument: Node
+  static create(argument: Node): PrintNode
+}
+export declare class ParentNode extends Node {
+  raw: string
+  static create(raw: string): ParentNode
+}
+export declare class StaticNode extends Node {
+  raw: string
+  static create(raw: string): StaticNode
+}
+export declare class CloneNode extends Node {
+  argument: Node
+  static create(argument: Node): CloneNode
+}
+export declare class GlobalNode extends Node {
+  argument: Node
+  static create(argument: Node): GlobalNode
+}
+export declare class GotoNode extends Node {
+  label: Node
+  static create(label: Node): GotoNode
+}
+export declare class StaticLookupNode extends Node {
+  target: Node
+  on: Node
+  static create(target: Node, on: Node): StaticLookupNode
+}
+export declare class StringNode extends Node {
+  value: string
+  static create(value: string): StringNode
+}
+export declare class EncapsedNode extends Node {
+  values: Nodes
+  static create(values: Nodes): EncapsedNode
+}
+export declare class EncapsedPartNode extends Node {
+  isAdvanced: boolean
+  value: Node
+  static create(isAdvanced: boolean, value: Node): EncapsedPartNode
+}
+export declare class SwitchNode extends Node {
+  condition: Node
+  body: Node
+  isShort: boolean
+  static create(condition: Node, body: Node, isShort: boolean): SwitchNode
+}
+export declare class CaseNode extends Node {
+  condition?: Node
+  body: Node
+  static create(condition: Node | undefined | null, body: Node): CaseNode
+}
+export declare class TernaryNode extends Node {
+  condition: Node
+  valid: Node
+  invalid: Node
+  static create(condition: Node, valid: Node, invalid: Node): TernaryNode
+}
+export declare class TraitNode extends Node {
+  name: Node
+  body: Node
+  static create(name: Node, body: Node): TraitNode
+}
+export declare class TraitUseNode extends Node {
+  traits: Nodes
+  adaptations: Nodes
+  static create(traits: Nodes, adaptations: Nodes): TraitUseNode
+}
+export declare class TraitUseAliasNode extends Node {
+  traitName?: Node
+  method: Node
+  alias: Node
+  visibility: string
+  static create(traitName: Node | undefined | null, method: Node, alias: Node, visibility: string): TraitUseAliasNode
+}
+export declare class TraitUsePrecedenceNode extends Node {
+  traitName: Node
+  method: Node
+  instead: Node
+  static create(traitName: Node, method: Node, instead: Node): TraitUsePrecedenceNode
+}
+export declare class TryNode extends Node {
+  body: Node
+  catches: Nodes
+  finallyBlock?: Node
+  static create(body: Node, catches: Nodes, finallyBlock?: Node | undefined | null): TryNode
+}
+export declare class CatchNode extends Node {
+  types: Nodes
+  variable: Node
+  body: Node
+  static create(types: Nodes, variable: Node, body: Node): CatchNode
+}
+export declare class TypeNode extends Node {
+  isNullable: boolean
+  name: Array<string>
+  static create(isNullable: boolean, name: Array<string>): TypeNode
+}
+export declare class UseNode extends Node {
+  modifier: string
+  names: Nodes
+  items: Nodes
+  static create(modifier: string, names: Nodes, items: Nodes): UseNode
+}
+export declare class VariableNode extends Node {
+  isRef: boolean
+  name: Node
+  static create(isRef: boolean, name: Node): VariableNode
+}
+export declare class WhileNode extends Node {
+  condition: Node
+  body: Node
+  isShort: boolean
+  static create(condition: Node, body: Node, isShort: boolean): WhileNode
+}
+export declare class YieldFromNode extends Node {
+  value: Node
+  static create(value: Node): YieldFromNode
+}
+export declare class YieldNode extends Node {
+  key?: Node
+  value: Node
+  static create(key: Node | undefined | null, value: Node): YieldNode
+}
+
+export type Node = {
+  leadingComments: Nodes;
+  trailingComments: Nodes;
+};
+export type Nodes = Array<Node>;

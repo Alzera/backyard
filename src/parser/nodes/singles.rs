@@ -1,9 +1,10 @@
 use std::any::Any;
 
 use napi::bindgen_prelude::ToNapiValue;
+use napi::bindgen_prelude::FromNapiRef;
 
 use crate::parser::node::{ NodeType, Node, Nodes };
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Break)]
 pub struct BreakNode {
@@ -44,7 +45,7 @@ pub struct BreakNode {
 //     obj
 //   }
 // }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Continue)]
 pub struct ContinueNode {
@@ -85,7 +86,7 @@ pub struct ContinueNode {
 //     obj
 //   }
 // }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Return)]
 pub struct ReturnNode {
@@ -126,7 +127,7 @@ pub struct ReturnNode {
 //     obj
 //   }
 // }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Echo)]
 pub struct EchoNode {
@@ -164,7 +165,7 @@ pub struct EchoNode {
 //     obj
 //   }
 // }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::New)]
 pub struct NewNode {
@@ -202,7 +203,7 @@ pub struct NewNode {
 //     obj
 //   }
 // }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Throw)]
 pub struct ThrowNode {
@@ -240,7 +241,7 @@ pub struct ThrowNode {
 //     obj
 //   }
 // }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Print)]
 pub struct PrintNode {
@@ -278,7 +279,7 @@ pub struct PrintNode {
 //     obj
 //   }
 // }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Parent)]
 pub struct ParentNode {
@@ -287,7 +288,7 @@ pub struct ParentNode {
   pub leading_comments: Nodes,
   pub trailing_comments: Nodes,
 }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Static)]
 pub struct StaticNode {
@@ -296,7 +297,7 @@ pub struct StaticNode {
   pub leading_comments: Nodes,
   pub trailing_comments: Nodes,
 }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Clone)]
 pub struct CloneNode {
@@ -305,7 +306,7 @@ pub struct CloneNode {
   pub leading_comments: Nodes,
   pub trailing_comments: Nodes,
 }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Global)]
 pub struct GlobalNode {
@@ -314,7 +315,7 @@ pub struct GlobalNode {
   pub leading_comments: Nodes,
   pub trailing_comments: Nodes,
 }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::Goto)]
 pub struct GotoNode {

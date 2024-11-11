@@ -1,9 +1,10 @@
 use std::any::Any;
 
 use napi::bindgen_prelude::ToNapiValue;
+use napi::bindgen_prelude::FromNapiRef;
 
 use crate::parser::node::{ NodeType, Nodes };
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::CommentBlock)]
 pub struct CommentBlockNode {
@@ -12,7 +13,7 @@ pub struct CommentBlockNode {
   pub leading_comments: Nodes,
   pub trailing_comments: Nodes,
 }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::CommentDoc)]
 pub struct CommentDocNode {
@@ -50,7 +51,7 @@ pub struct CommentDocNode {
 //     obj
 //   }
 // }
-
+#[napi]
 #[derive(Debug, Clone, macros::ImplementNodeTrait)]
 #[implement_node_trait(NodeType::CommentLine)]
 pub struct CommentLineNode {
