@@ -73,9 +73,9 @@ impl TryParser {
           )
         );
         parser.position += 1;
-        catches.push(CatchNode::new(types, variable, BlockParser::new(parser)));
+        catches.push(CatchNode::boxed(types, variable, BlockParser::new(parser)));
       }
-      return Some(TryNode::new(body, catches, finally));
+      return Some(TryNode::boxed(body, catches, finally));
     }
     None
   }

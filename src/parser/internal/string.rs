@@ -32,7 +32,7 @@ impl StringParser {
         if string_type.token_type == TokenType::EncapsedStringOpen {
           return StringParser::parse_encapsed(parser);
         } else if string_type.token_type == TokenType::String {
-          return Some(StringNode::new(string_type.value.to_owned()));
+          return Some(StringNode::boxed(string_type.value.to_owned()));
         }
       }
     }
@@ -50,9 +50,11 @@ impl StringParser {
           break;
         }
         TokenType::EncapsedString =>
-          values.push(EncapsedPartNode::new(false, StringNode::new(i.value.to_owned()))),
+          values.push(EncapsedPartNode::boxed(false, StringNode::boxed(i.value.to_owned()))),
         TokenType::Variable =>
-          values.push(EncapsedPartNode::new(false, VariableParser::new(i.value.to_owned(), false))),
+          values.push(
+            EncapsedPartNode::boxed(false, VariableParser::new(i.value.to_owned(), false))
+          ),
         TokenType::AdvanceInterpolationOpen => {
           let value = parser.get_statement(
             &mut LoopArgument::with_tokens("string", &[TokenType::AdvanceInterpolationClose], &[])
@@ -61,13 +63,13 @@ impl StringParser {
           if value.is_none() {
             continue;
           }
-          values.push(EncapsedPartNode::new(true, value.unwrap()));
+          values.push(EncapsedPartNode::boxed(true, value.unwrap()));
         }
         _ => {
           continue;
         }
       }
     }
-    return Some(EncapsedNode::new(values));
+    return Some(EncapsedNode::boxed(values));
   }
 }

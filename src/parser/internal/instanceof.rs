@@ -32,7 +32,7 @@ impl InstanceOfParser {
           )
         )
       );
-      return Some(InstanceOfNode::new(args.last_expr.to_owned().unwrap(), right));
+      return Some(InstanceOfNode::boxed(args.last_expr.to_owned().unwrap(), right));
     }
     None
   }

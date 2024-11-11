@@ -29,7 +29,7 @@ impl PostParser {
         return None;
       }
       return Some(
-        PostNode::new(args.last_expr.to_owned().unwrap(), operator.unwrap().value.to_owned())
+        PostNode::boxed(args.last_expr.to_owned().unwrap(), operator.unwrap().value.to_owned())
       );
     }
     None

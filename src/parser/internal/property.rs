@@ -68,7 +68,7 @@ impl PropertyParser {
         )
       );
       return Some(
-        PropertyNode::new(
+        PropertyNode::boxed(
           some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
           some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
           items
@@ -111,7 +111,7 @@ impl PropertyItemParser {
         None
       };
       return Some(
-        PropertyItemNode::new(
+        PropertyItemNode::boxed(
           IdentifierParser::from_matched(name),
           args.last_expr.to_owned(),
           value

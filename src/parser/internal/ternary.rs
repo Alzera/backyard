@@ -43,7 +43,7 @@ impl TernaryParser {
         return None;
       }
       return Some(
-        TernaryNode::new(args.last_expr.to_owned().unwrap(), valid.unwrap(), invalid.unwrap())
+        TernaryNode::boxed(args.last_expr.to_owned().unwrap(), valid.unwrap(), invalid.unwrap())
       );
     }
     None

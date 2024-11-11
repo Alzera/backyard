@@ -43,7 +43,7 @@ impl ConstParser {
     _: &mut LoopArgument
   ) -> Option<Node> {
     if let [_] = matched.as_slice() {
-      return Some(ConstNode::new(ConstParser::get_consts(parser)));
+      return Some(ConstNode::boxed(ConstParser::get_consts(parser)));
     }
     None
   }
@@ -70,7 +70,7 @@ impl ConstPropertyParser {
   ) -> Option<Node> {
     if let [visibility, _] = matched.as_slice() {
       return Some(
-        ConstPropertyNode::new(
+        ConstPropertyNode::boxed(
           some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
           ConstParser::get_consts(parser)
         )

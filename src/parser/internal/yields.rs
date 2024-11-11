@@ -36,7 +36,7 @@ impl YieldParser {
         )
       );
       if has_from.len() > 0 {
-        return Some(YieldFromNode::new(value));
+        return Some(YieldFromNode::boxed(value));
       }
       let mut key = None;
       if guard_none!(parser.tokens.get(parser.position)).token_type == TokenType::Arrow {
@@ -52,7 +52,7 @@ impl YieldParser {
           )
         );
       }
-      return Some(YieldNode::new(key, value));
+      return Some(YieldNode::boxed(key, value));
     }
     None
   }

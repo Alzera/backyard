@@ -9,12 +9,12 @@ pub struct BlockParser {}
 impl BlockParser {
   pub fn new(parser: &mut Parser) -> Node {
     parser.position += 1;
-    BlockNode::new(parser.get_children(&mut LoopArgument::default("block")))
+    BlockNode::boxed(parser.get_children(&mut LoopArgument::default("block")))
   }
 
   pub fn new_short(parser: &mut Parser, breakers: &[TokenType]) -> Node {
     parser.position += 1;
-    BlockNode::new(
+    BlockNode::boxed(
       parser.get_children(
         &mut LoopArgument::with_tokens("block_short", &[TokenType::Semicolon], breakers)
       )

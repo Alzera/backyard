@@ -31,7 +31,7 @@ impl ListParser {
       let values = parser.get_children(
         &mut LoopArgument::with_tokens("list", &[TokenType::Comma], &[TokenType::RightParenthesis])
       );
-      return Some(ListNode::new(values));
+      return Some(ListNode::boxed(values));
     }
     None
   }

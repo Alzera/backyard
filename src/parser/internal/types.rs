@@ -19,7 +19,7 @@ pub struct TypesParser {}
 //         let is_nullable =
 //           is_nullable.len() > 0 &&
 //           is_nullable.get(0).unwrap().token_type == TokenType::QuestionMark;
-//         return Some(TypeNode::new(is_nullable, type_name.value.to_owned()));
+//         return Some(TypeNode::boxed(is_nullable, type_name.value.to_owned()));
 //       }
 //     }
 //     None
@@ -76,14 +76,14 @@ impl TypesParser {
             let is_nullable =
               is_nullable.len() > 0 &&
               is_nullable.get(0).unwrap().token_type == TokenType::QuestionMark;
-            return Some(TypeNode::new(is_nullable, vec![type_name.value.to_owned()]));
+            return Some(TypeNode::boxed(is_nullable, vec![type_name.value.to_owned()]));
           }
         }
       }
     } else if matched.len() == 1 {
       if let [types] = matched.as_slice() {
         return Some(
-          TypeNode::new(
+          TypeNode::boxed(
             false,
             types
               .iter()

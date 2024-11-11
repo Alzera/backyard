@@ -53,7 +53,7 @@ impl TraitUseParser {
           )
         );
       }
-      return Some(TraitUseNode::new(traits, adaptations));
+      return Some(TraitUseNode::boxed(traits, adaptations));
     }
     None
   }
@@ -87,7 +87,7 @@ impl TraitUseAliasParser {
         _ => None,
       };
       return Some(
-        TraitUseAliasNode::new(
+        TraitUseAliasNode::boxed(
           trait_name_parsed,
           IdentifierParser::from_matched(name_to_parsed),
           IdentifierParser::from_matched(alias),
@@ -119,7 +119,7 @@ impl TraitUsePrecedenceParser {
   pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, _: &mut LoopArgument) -> Option<Node> {
     if let [trait_name, _, name, _, instead] = matched.as_slice() {
       return Some(
-        TraitUsePrecedenceNode::new(
+        TraitUsePrecedenceNode::boxed(
           IdentifierParser::from_matched(trait_name),
           IdentifierParser::from_matched(name),
           IdentifierParser::from_matched(instead)

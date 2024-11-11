@@ -48,7 +48,7 @@ impl MatchParser {
           ]
         )
       );
-      return Some(MatchNode::new(condition, arms));
+      return Some(MatchNode::boxed(condition, arms));
     }
     None
   }
@@ -83,6 +83,6 @@ impl MatchArmParser {
       )
     );
     parser.position += 1;
-    Some(MatchArmNode::new(conditions, body))
+    Some(MatchArmNode::boxed(conditions, body))
   }
 }

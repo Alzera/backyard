@@ -71,12 +71,12 @@ impl ClassParser {
         _ => None,
       };
       return Some(
-        ClassNode::new(
+        ClassNode::boxed(
           some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
           IdentifierParser::from_matched(name),
           extends,
           implements,
-          BlockNode::new(body)
+          BlockNode::boxed(body)
         )
       );
     }

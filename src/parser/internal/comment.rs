@@ -30,9 +30,9 @@ impl CommentParser {
     if let [comment] = matched.as_slice() {
       let comment = guard_none!(comment.get(0));
       let comment: Node = match comment.token_type {
-        TokenType::CommentLine => CommentLineNode::new(comment.value.to_owned()),
-        TokenType::CommentBlock => CommentBlockNode::new(comment.value.to_owned()),
-        TokenType::CommentDoc => CommentDocNode::new(comment.value.to_owned()),
+        TokenType::CommentLine => CommentLineNode::boxed(comment.value.to_owned()),
+        TokenType::CommentBlock => CommentBlockNode::boxed(comment.value.to_owned()),
+        TokenType::CommentDoc => CommentDocNode::boxed(comment.value.to_owned()),
         _ => {
           return None;
         }

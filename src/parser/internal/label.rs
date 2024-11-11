@@ -24,7 +24,7 @@ impl LabelParser {
 
   pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, _: &mut LoopArgument) -> Option<Node> {
     if let [name, _] = matched.as_slice() {
-      return Some(LabelNode::new(IdentifierParser::from_matched(name)));
+      return Some(LabelNode::boxed(IdentifierParser::from_matched(name)));
     }
     None
   }

@@ -49,7 +49,7 @@ impl TraitParser {
           ]
         )
       );
-      return Some(TraitNode::new(IdentifierParser::from_matched(name), BlockNode::new(body)));
+      return Some(TraitNode::boxed(IdentifierParser::from_matched(name), BlockNode::boxed(body)));
     }
     None
   }

@@ -54,7 +54,7 @@ impl ForParser {
         };
         body = Some(parsed_block);
       }
-      return Some(ForNode::new(inits, tests, increments, body, body_type));
+      return Some(ForNode::boxed(inits, tests, increments, body, body_type));
     }
     None
   }

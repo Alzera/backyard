@@ -35,7 +35,7 @@ impl EvalParser {
       if argument.is_none() {
         return None;
       }
-      return Some(EvalNode::new(argument.unwrap()));
+      return Some(EvalNode::boxed(argument.unwrap()));
     }
     None
   }

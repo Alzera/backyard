@@ -69,7 +69,7 @@ impl ForeachParser {
         let (is_short, body) = guard_none!(
           BlockParser::new_or_short(parser, &[TokenType::EndForeach])
         );
-        return Some(ForeachNode::new(source, key, value, body, is_short));
+        return Some(ForeachNode::boxed(source, key, value, body, is_short));
       }
     }
     None

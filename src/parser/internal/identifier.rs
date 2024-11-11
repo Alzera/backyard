@@ -13,7 +13,7 @@ pub struct IdentifierParser {}
 
 impl IdentifierParser {
   pub fn new(name: String) -> Node {
-    IdentifierNode::new(name)
+    IdentifierNode::boxed(name)
   }
 
   pub fn from_matched(name: &Vec<Token>) -> Node {

@@ -48,7 +48,7 @@ impl IncludeParser {
         return None;
       }
       parser.position += 1;
-      return Some(IncludeNode::new(is_require, is_once, argument.unwrap()));
+      return Some(IncludeNode::boxed(is_require, is_once, argument.unwrap()));
     }
     None
   }

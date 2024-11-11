@@ -39,7 +39,7 @@ impl PreParser {
       if argument.is_none() {
         return None;
       }
-      return Some(PreNode::new(argument.unwrap(), operator.unwrap().value.to_owned()));
+      return Some(PreNode::boxed(argument.unwrap(), operator.unwrap().value.to_owned()));
     }
     None
   }

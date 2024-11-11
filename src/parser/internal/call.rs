@@ -48,7 +48,7 @@ impl CallParser {
     if let [name, _] = matched.as_slice() {
       if let Some(name) = name.get(0) {
         return Some(
-          CallNode::new(
+          CallNode::boxed(
             IdentifierParser::new(name.value.to_owned()),
             CallParser::get_arguments(parser)
           )
@@ -94,7 +94,7 @@ impl ArgumentParser {
         1 => Some(IdentifierParser::from_matched(name)),
         _ => None,
       };
-      return Some(ArgumentNode::new(name, value.unwrap()));
+      return Some(ArgumentNode::boxed(name, value.unwrap()));
     }
     None
   }

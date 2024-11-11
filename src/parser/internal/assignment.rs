@@ -55,7 +55,7 @@ impl AssignmentParser {
           )
         {
           return Some(
-            AssignmentNode::new(
+            AssignmentNode::boxed(
               args.last_expr.to_owned().unwrap(),
               operator.value.to_owned(),
               right

@@ -43,7 +43,7 @@ impl NamespaceParser {
         false
       };
       let body = BlockParser::new(parser);
-      return Some(NamespaceNode::new(name, body, is_bracket));
+      return Some(NamespaceNode::boxed(name, body, is_bracket));
     }
     None
   }

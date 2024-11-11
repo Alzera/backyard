@@ -26,7 +26,7 @@ impl ProgramParser {
   ) -> Option<Node> {
     if let [_] = matched.as_slice() {
       let program = parser.get_children(&mut LoopArgument::default("main"));
-      return Some(ProgramNode::new(program));
+      return Some(ProgramNode::boxed(program));
     }
     None
   }

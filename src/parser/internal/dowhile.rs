@@ -33,7 +33,7 @@ impl DoWhileParser {
         )
       );
       parser.position += 1;
-      return Some(DoWhileNode::new(condition, body));
+      return Some(DoWhileNode::boxed(condition, body));
     }
     None
   }

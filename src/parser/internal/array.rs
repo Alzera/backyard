@@ -44,11 +44,11 @@ impl ArrayParser {
           if i.get_type() == NodeType::ArrayItem {
             i.to_owned()
           } else {
-            ArrayItemNode::new(None, i.to_owned())
+            ArrayItemNode::boxed(None, i.to_owned())
           }
         ))
         .collect::<Nodes>();
-      return Some(ArrayNode::new(is_ellipsis.len() > 0, values));
+      return Some(ArrayNode::boxed(is_ellipsis.len() > 0, values));
     }
     None
   }
@@ -79,7 +79,7 @@ impl ArrayItemParser {
         return None;
       }
       let key = args.last_expr.to_owned();
-      return Some(ArrayItemNode::new(key, value.unwrap()));
+      return Some(ArrayItemNode::boxed(key, value.unwrap()));
     }
     None
   }

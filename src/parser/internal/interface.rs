@@ -60,7 +60,11 @@ impl InterfaceParser {
         )
       );
       return Some(
-        InterfaceNode::new(IdentifierParser::from_matched(name), implements, BlockNode::new(body))
+        InterfaceNode::boxed(
+          IdentifierParser::from_matched(name),
+          implements,
+          BlockNode::boxed(body)
+        )
       );
     }
     None

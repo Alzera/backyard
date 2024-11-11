@@ -38,7 +38,7 @@ impl WhileParser {
       );
       parser.position += 1;
       let (is_short, body) = guard_none!(BlockParser::new_or_short(parser, &[TokenType::EndWhile]));
-      return Some(WhileNode::new(condition, body, is_short));
+      return Some(WhileNode::boxed(condition, body, is_short));
     }
     None
   }

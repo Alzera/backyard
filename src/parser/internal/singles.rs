@@ -58,8 +58,8 @@ impl SinglesParser {
       if let Some(key) = key.first() {
         if [TokenType::Parent, TokenType::Static].contains(&key.token_type) {
           return match key.token_type {
-            TokenType::Parent => Some(ParentNode::new(key.value.to_owned())),
-            TokenType::Static => Some(StaticNode::new(key.value.to_owned())),
+            TokenType::Parent => Some(ParentNode::boxed(key.value.to_owned())),
+            TokenType::Static => Some(StaticNode::boxed(key.value.to_owned())),
             _ => None,
           };
         }
@@ -71,9 +71,9 @@ impl SinglesParser {
           )
         );
         let node: Option<Node> = match key.token_type {
-          TokenType::Break => Some(BreakNode::new(argument.to_owned())),
-          TokenType::Continue => Some(ContinueNode::new(argument.to_owned())),
-          TokenType::Return => Some(ReturnNode::new(argument.to_owned())),
+          TokenType::Break => Some(BreakNode::boxed(argument.to_owned())),
+          TokenType::Continue => Some(ContinueNode::boxed(argument.to_owned())),
+          TokenType::Return => Some(ReturnNode::boxed(argument.to_owned())),
           _ => None,
         };
         if node.is_some() {
@@ -84,13 +84,13 @@ impl SinglesParser {
         }
         let argument = argument.unwrap();
         return match key.token_type {
-          TokenType::Echo => Some(EchoNode::new(argument)),
-          TokenType::New => Some(NewNode::new(argument)),
-          TokenType::Print => Some(PrintNode::new(argument)),
-          TokenType::Throw => Some(ThrowNode::new(argument)),
-          TokenType::Clone => Some(CloneNode::new(argument)),
-          TokenType::Global => Some(GlobalNode::new(argument)),
-          TokenType::Goto => Some(GotoNode::new(argument)),
+          TokenType::Echo => Some(EchoNode::boxed(argument)),
+          TokenType::New => Some(NewNode::boxed(argument)),
+          TokenType::Print => Some(PrintNode::boxed(argument)),
+          TokenType::Throw => Some(ThrowNode::boxed(argument)),
+          TokenType::Clone => Some(CloneNode::boxed(argument)),
+          TokenType::Global => Some(GlobalNode::boxed(argument)),
+          TokenType::Goto => Some(GotoNode::boxed(argument)),
           _ => None,
         };
       }

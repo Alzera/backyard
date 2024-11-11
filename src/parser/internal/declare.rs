@@ -57,7 +57,7 @@ impl DeclareParser {
         BodyType::Basic => Some(BlockParser::new(parser)),
         BodyType::Short => Some(BlockParser::new_short(parser, &[TokenType::EndDeclare])),
       };
-      return Some(DeclareNode::new(arguments, body, body_type));
+      return Some(DeclareNode::boxed(arguments, body, body_type));
     }
     None
   }
@@ -92,7 +92,7 @@ impl DeclareArgumentParser {
           )
         )
       {
-        return Some(DeclareArgumentNode::new(IdentifierParser::from_matched(name), value));
+        return Some(DeclareArgumentNode::boxed(IdentifierParser::from_matched(name), value));
       }
     }
     None

@@ -45,7 +45,7 @@ impl ArrayLookupParser {
         )
       );
       parser.position += 1;
-      return Some(ArrayLookupNode::new(on, target));
+      return Some(ArrayLookupNode::boxed(on, target));
     }
     None
   }

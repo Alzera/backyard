@@ -94,7 +94,7 @@ impl IfParser {
           _ => {}
         }
       }
-      return Some(IfNode::new(condition, valid, invalid, is_short));
+      return Some(IfNode::boxed(condition, valid, invalid, is_short));
     }
     None
   }

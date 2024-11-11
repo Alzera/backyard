@@ -40,12 +40,12 @@ impl ParenthesisParser {
             )
           {
             return Some(
-              CallNode::new(args.last_expr.to_owned().unwrap(), CallParser::get_arguments(parser))
+              CallNode::boxed(args.last_expr.to_owned().unwrap(), CallParser::get_arguments(parser))
             );
           }
         } else if [NodeType::StaticLookup, NodeType::ObjectAccess].contains(&le.get_type()) {
           return Some(
-            CallNode::new(args.last_expr.to_owned().unwrap(), CallParser::get_arguments(parser))
+            CallNode::boxed(args.last_expr.to_owned().unwrap(), CallParser::get_arguments(parser))
           );
         }
       }
@@ -60,7 +60,7 @@ impl ParenthesisParser {
       );
       parser.position += 1;
       if statement.get_type() != NodeType::Type {
-        return Some(ParenthesisNode::new(statement));
+        return Some(ParenthesisNode::boxed(statement));
       }
       let expression = guard_none!(
         parser.get_statement(
@@ -68,7 +68,7 @@ impl ParenthesisParser {
         )
       );
 
-      return Some(CastNode::new(statement, expression));
+      return Some(CastNode::boxed(statement, expression));
     }
     None
   }

@@ -50,7 +50,7 @@ impl SwitchParser {
           ]
         )
       );
-      return Some(SwitchNode::new(condition, BlockNode::new(statements), is_short));
+      return Some(SwitchNode::boxed(condition, BlockNode::boxed(statements), is_short));
     }
     None
   }
@@ -87,7 +87,7 @@ impl CaseParser {
         )
       );
       parser.position -= 1;
-      return Some(CaseNode::new(condition, BlockNode::new(statements)));
+      return Some(CaseNode::boxed(condition, BlockNode::boxed(statements)));
     }
     None
   }

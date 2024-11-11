@@ -28,7 +28,7 @@ impl StaticLookupParser {
   pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, args: &mut LoopArgument) -> Option<Node> {
     if let [_, prop] = matched.as_slice() {
       let on = guard_none!(args.last_expr.to_owned());
-      return Some(StaticLookupNode::new(on, IdentifierParser::from_matched(prop)));
+      return Some(StaticLookupNode::boxed(on, IdentifierParser::from_matched(prop)));
     }
     None
   }

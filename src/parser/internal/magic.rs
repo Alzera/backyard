@@ -19,7 +19,7 @@ impl MagicParser {
   pub fn parse(_: &mut Parser, matched: Vec<Vec<Token>>, _: &mut LoopArgument) -> Option<Node> {
     if let [number] = matched.as_slice() {
       return Some(
-        MagicNode::new(some_or_default(number.get(0), String::from("0"), |i| i.value.to_owned()))
+        MagicNode::boxed(some_or_default(number.get(0), String::from("0"), |i| i.value.to_owned()))
       );
     }
     None

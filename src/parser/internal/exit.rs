@@ -35,7 +35,7 @@ impl ExitParser {
       if argument.is_none() {
         return None;
       }
-      return Some(ExitNode::new(argument.unwrap()));
+      return Some(ExitNode::boxed(argument.unwrap()));
     }
     None
   }

@@ -46,7 +46,7 @@ impl ObjectAccessParser {
       2 => {
         if let [_, prop] = matched.as_slice() {
           return Some(
-            ObjectAccessNode::new(
+            ObjectAccessNode::boxed(
               args.last_expr.to_owned().unwrap(),
               IdentifierParser::from_matched(prop)
             )
@@ -64,7 +64,7 @@ impl ObjectAccessParser {
           )
         );
         parser.position += 1;
-        return Some(ObjectAccessNode::new(args.last_expr.to_owned().unwrap(), expr));
+        return Some(ObjectAccessNode::boxed(args.last_expr.to_owned().unwrap(), expr));
       }
       _ => {
         return None;

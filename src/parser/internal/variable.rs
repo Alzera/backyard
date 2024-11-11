@@ -19,7 +19,7 @@ impl VariableParser {
   }
 
   pub fn new_bracked(name: Node, is_ref: bool) -> Node {
-    VariableNode::new(is_ref, name)
+    VariableNode::boxed(is_ref, name)
   }
 }
 

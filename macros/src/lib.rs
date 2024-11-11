@@ -61,7 +61,7 @@ pub fn implement_node_trait(input: TokenStream) -> TokenStream {
       #[napi]
       impl #struct_name {
         #[napi]
-        pub fn create(#(#func_args_cloned)*) -> Self {
+        pub fn new(#(#func_args_cloned)*) -> Self {
           Self {
             #(#field_inits_cloned),*,
             leading_comments: vec![],
@@ -69,7 +69,7 @@ pub fn implement_node_trait(input: TokenStream) -> TokenStream {
           }
         }
 
-        pub fn new(#(#func_args)*) -> Box<Self> {
+        pub fn boxed(#(#func_args)*) -> Box<Self> {
           Box::new(Self {
             #(#field_inits),*,
             leading_comments: vec![],
@@ -110,6 +110,22 @@ pub fn implement_node_trait(input: TokenStream) -> TokenStream {
         unsafe fn from_napi(env: napi::sys::napi_env, val: napi::sys::napi_value) -> Box<Self> {
           let node = Self::from_napi_ref(env, val).ok().unwrap();
           Box::new(node.to_owned())
+        }
+      }
+
+      impl napi::bindgen_prelude::FromNapiValue for #struct_name {
+        unsafe fn from_napi_value(
+          env: napi::sys::napi_env,
+          napi_val: napi::sys::napi_value
+        ) -> napi::Result<Self> {
+          let napi_env = napi::Env::from_raw(env);
+          let val = napi::JsUnknown::from_napi_value(env, napi_val)?;
+
+          if #struct_name::instance_of(napi_env, &val)? {
+            let node = Self::from_napi_ref(env, napi_val).ok().unwrap();
+            return Ok(node.to_owned());
+          }
+          Err(napi::Error::new(napi::Status::InvalidArg, format!("Invalid node type").as_str()))
         }
       }
     };

@@ -42,7 +42,7 @@ impl EnumParser {
           ]
         )
       );
-      return Some(EnumNode::new(IdentifierParser::from_matched(name), items));
+      return Some(EnumNode::boxed(IdentifierParser::from_matched(name), items));
     }
     None
   }
@@ -71,7 +71,7 @@ impl EnumItemParser {
           )
         )
       {
-        return Some(EnumItemNode::new(value));
+        return Some(EnumItemNode::boxed(value));
       }
     }
     None

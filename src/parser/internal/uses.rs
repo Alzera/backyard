@@ -63,7 +63,7 @@ impl UsesParser {
         }
         items
       };
-      return Some(UseNode::new(modifier, name, items));
+      return Some(UseNode::boxed(modifier, name, items));
     }
     None
   }

@@ -104,7 +104,7 @@ impl FunctionParser {
           )
         )
       );
-      return Some(ArrowFunctionNode::new(is_ref.len() > 0, arguments, return_type, body));
+      return Some(ArrowFunctionNode::boxed(is_ref.len() > 0, arguments, return_type, body));
     }
     None
   }
@@ -127,7 +127,9 @@ impl FunctionParser {
       }
       let return_type = FunctionParser::get_return_type(parser);
       let body = BlockParser::new(parser);
-      return Some(AnonymousFunctionNode::new(is_ref.len() > 0, arguments, uses, return_type, body));
+      return Some(
+        AnonymousFunctionNode::boxed(is_ref.len() > 0, arguments, uses, return_type, body)
+      );
     }
     None
   }
@@ -160,7 +162,7 @@ impl FunctionParser {
         Some(BlockParser::new(parser))
       };
       return Some(
-        FunctionNode::new(
+        FunctionNode::boxed(
           is_ref.len() > 0,
           IdentifierParser::new(name),
           arguments,
@@ -194,7 +196,7 @@ impl FunctionParser {
         if let Some(next_token) = parser.tokens.get(parser.position) {
           if next_token.token_type == TokenType::Static {
             parser.position += 1;
-            return Some(StaticNode::new(String::from("static")));
+            return Some(StaticNode::boxed(String::from("static")));
           }
         }
         return parser.get_statement(
@@ -243,7 +245,7 @@ impl ConstructorParameterParser {
         )
       );
       return Some(
-        PropertyNode::new(
+        PropertyNode::boxed(
           some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
           some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
           vec![item]
@@ -300,7 +302,7 @@ impl ParameterParser {
         }
       }
       return Some(
-        ParameterNode::new(
+        ParameterNode::boxed(
           args.last_expr.to_owned(),
           is_ref,
           is_ellipsis,

@@ -46,7 +46,7 @@ impl MethodParser {
         return None;
       }
       return Some(
-        MethodNode::new(
+        MethodNode::boxed(
           some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
           some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
           is_static.len() > 0,

@@ -68,7 +68,7 @@ impl BinParser {
           )
         {
           return Some(
-            BinNode::new(args.last_expr.to_owned().unwrap(), operator.value.to_owned(), right)
+            BinNode::boxed(args.last_expr.to_owned().unwrap(), operator.value.to_owned(), right)
           );
         }
       }
