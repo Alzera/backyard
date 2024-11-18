@@ -1,3 +1,4 @@
+use crate::error::LexResult;
 use crate::lexer::Lexer;
 use crate::utils::{ get_char_until, get_tokens_until_right_bracket };
 use crate::token::{ Token, TokenType };
@@ -5,7 +6,7 @@ use crate::token::{ Token, TokenType };
 pub struct VariableToken;
 
 impl VariableToken {
-  pub fn lex(lexer: &mut Lexer) -> Option<Vec<Token>> {
+  pub fn lex(lexer: &mut Lexer) -> LexResult {
     let mut tokens: Vec<Token> = Vec::new();
     if let Some(next_char) = lexer.chars.get(lexer.position) {
       if *next_char == '{' {
@@ -26,6 +27,6 @@ impl VariableToken {
         }
       }
     }
-    Some(tokens)
+    Ok(tokens)
   }
 }

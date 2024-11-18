@@ -1,4 +1,5 @@
 use crate::internal::variable::VariableToken;
+use crate::error::LexResult;
 use crate::lexer::Lexer;
 use crate::utils::{ get_char_until, get_tokens_until_right_bracket };
 use crate::token::{ Token, TokenType };
@@ -6,7 +7,7 @@ use crate::token::{ Token, TokenType };
 pub struct StringToken;
 
 impl StringToken {
-  pub fn lex(lexer: &mut Lexer, breaker: char) -> Option<Vec<Token>> {
+  pub fn lex(lexer: &mut Lexer, breaker: char) -> LexResult {
     let mut result: Vec<Token> = vec![
       Token::new(TokenType::EncapsedStringOpen, String::from(breaker))
     ];
@@ -67,7 +68,7 @@ impl StringToken {
           result.extend(tokens);
         } else {
           lexer.position += 1;
-          if let Some(token) = VariableToken::lex(lexer) {
+          if let Ok(token) = VariableToken::lex(lexer) {
             result.extend(token);
           }
         }
@@ -86,11 +87,11 @@ impl StringToken {
         Some(t) => t.value.clone(),
         _ => String::from(""),
       };
-      return Some(vec![Token::new(TokenType::String, t)]);
+      return Ok(vec![Token::new(TokenType::String, t)]);
     }
 
     result.push(Token::new(TokenType::EncapsedStringClose, String::from(breaker)));
 
-    Some(result)
+    Ok(result)
   }
 }

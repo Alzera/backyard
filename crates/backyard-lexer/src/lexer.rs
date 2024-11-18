@@ -1,5 +1,4 @@
-use std::fmt::Display;
-
+use crate::error::{ LexError, LexResult };
 use crate::token::{ Token, TokenType };
 use crate::internal::{
   comment::CommentToken,
@@ -27,9 +26,9 @@ impl Lexer {
     }
   }
 
-  fn unable_to_handle<T: Display>(d: T) -> Option<Vec<Token>> {
+  fn unable_to_handle(d: &str) -> LexResult {
     println!("Unknown character: {}", d);
-    None
+    Err(LexError::Unrecognized(d.to_string()))
   }
 
   fn until<F>(&mut self, mut callback: F) -> String where F: FnMut(&char) -> bool {
@@ -37,14 +36,14 @@ impl Lexer {
     get_char_until(&self.chars, &mut self.position, |ch, _| callback(ch))
   }
 
-  pub fn next_tokens(&mut self, skip_whitespace: bool) -> Option<Vec<Token>> {
+  pub fn next_tokens(&mut self, skip_whitespace: bool) -> LexResult {
     if skip_whitespace {
       get_char_until(&self.chars, &mut self.position, |ch, _| !ch.is_whitespace());
     }
 
     let cc = self.chars.get(self.position);
     if cc.is_none() {
-      return None;
+      return Err(LexError::Eof);
     }
 
     let current_char = cc.unwrap();
@@ -55,249 +54,241 @@ impl Lexer {
     match current_char {
       '$' => VariableToken::lex(self),
       c if c.is_whitespace() =>
-        Some(vec![Token::new(TokenType::Whitespace, current_char.to_string())]),
+        Ok(vec![Token::new(TokenType::Whitespace, current_char.to_string())]),
       c if c.is_digit(10) => NumberToken::lex(&self.chars, &mut self.position),
       c if c.is_alphabetic() || *c == '_' => {
         let t = self.until(|ch| !(ch.is_alphanumeric() || *ch == '_'));
         if t.starts_with("__") && t.ends_with("__") && MagicToken::is_magic(&t) {
-          return Some(vec![Token::new(TokenType::Magic, t)]);
+          return Ok(vec![Token::new(TokenType::Magic, t)]);
         }
         if TypeToken::is_type(&t) {
-          return Some(vec![Token::new(TokenType::Type, t)]);
+          return Ok(vec![Token::new(TokenType::Type, t)]);
         }
         if KeywordToken::is_keyword(&t) {
           return KeywordToken::lex(&t, self);
         }
-        return Some(vec![Token::new(TokenType::Identifier, t)]);
+        return Ok(vec![Token::new(TokenType::Identifier, t)]);
       }
       '=' => {
         let t = self.until(|ch| !['=', '>'].contains(ch));
         match t.as_str() {
-          "===" => Some(vec![Token::new(TokenType::IsIdentical, "===")]),
-          "==" => Some(vec![Token::new(TokenType::IsEqual, "==")]),
-          "=" => Some(vec![Token::new(TokenType::Assignment, "=")]),
-          "=>" => Some(vec![Token::new(TokenType::Arrow, "=>")]),
-          _ => Lexer::unable_to_handle(t),
+          "===" => Ok(vec![Token::new(TokenType::IsIdentical, "===")]),
+          "==" => Ok(vec![Token::new(TokenType::IsEqual, "==")]),
+          "=" => Ok(vec![Token::new(TokenType::Assignment, "=")]),
+          "=>" => Ok(vec![Token::new(TokenType::Arrow, "=>")]),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       '&' => {
         let t = self.until(|ch| !['&', '=', '$'].contains(ch));
         match t.as_str() {
-          "&=" => Some(vec![Token::new(TokenType::BitwiseAndAssignment, "&=")]),
-          "&&" => Some(vec![Token::new(TokenType::BooleanAnd, "&&")]),
+          "&=" => Ok(vec![Token::new(TokenType::BitwiseAndAssignment, "&=")]),
+          "&&" => Ok(vec![Token::new(TokenType::BooleanAnd, "&&")]),
           "&$" => {
-            if let Some(tokens) = VariableToken::lex(self) {
+            let last_position = self.position.clone();
+            if let Ok(tokens) = VariableToken::lex(self) {
               let mut tokens = tokens.clone();
               tokens.insert(0, Token::new(TokenType::Reference, "&"));
-              return Some(tokens);
+              return Ok(tokens);
             } else {
-              None
+              self.position = last_position;
+              return Lexer::unable_to_handle(&t);
             }
           }
-          "&" => Some(vec![Token::new(TokenType::BitwiseAnd, "&")]),
-          _ => Lexer::unable_to_handle(t),
+          "&" => Ok(vec![Token::new(TokenType::BitwiseAnd, "&")]),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       '#' => {
         let t = self.until(|ch| !['#', '['].contains(ch));
         match t.as_str() {
-          "#[" => Some(vec![Token::new(TokenType::Attribute, "#[")]),
+          "#[" => Ok(vec![Token::new(TokenType::Attribute, "#[")]),
           "#" => CommentToken::lex_line(&self.chars, &mut self.position),
-          _ => Lexer::unable_to_handle(t),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       '?' => {
         let t = self.until(|ch| !['?', '>', '=', '-', '{', ':'].contains(ch));
         match t.as_str() {
-          "?:" => Some(vec![Token::new(TokenType::Elvis, "?:")]),
-          "?>" => Some(vec![Token::new(TokenType::CloseTag, "?>")]),
-          "?->" => Some(vec![Token::new(TokenType::NullsafeObjectAccess, "?->")]),
-          "?->{" => Some(vec![Token::new(TokenType::NullsafeObjectAccessBracketOpen, "?->{")]),
-          "??=" => Some(vec![Token::new(TokenType::CoalesceAssignment, "??=")]),
-          "??" => Some(vec![Token::new(TokenType::Coalesce, "??")]),
-          "?" => Some(vec![Token::new(TokenType::QuestionMark, "?")]),
-          _ => Lexer::unable_to_handle(t),
+          "?:" => Ok(vec![Token::new(TokenType::Elvis, "?:")]),
+          "?>" => Ok(vec![Token::new(TokenType::CloseTag, "?>")]),
+          "?->" => Ok(vec![Token::new(TokenType::NullsafeObjectAccess, "?->")]),
+          "?->{" => Ok(vec![Token::new(TokenType::NullsafeObjectAccessBracketOpen, "?->{")]),
+          "??=" => Ok(vec![Token::new(TokenType::CoalesceAssignment, "??=")]),
+          "??" => Ok(vec![Token::new(TokenType::Coalesce, "??")]),
+          "?" => Ok(vec![Token::new(TokenType::QuestionMark, "?")]),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       '%' => {
         let t = self.until(|ch| !['%', '=', '>'].contains(ch));
         match t.as_str() {
-          "%>" => Some(vec![Token::new(TokenType::CloseTagShort, "%>")]),
-          "%=" => Some(vec![Token::new(TokenType::ModulusAssignment, "%=")]),
-          "%" => Some(vec![Token::new(TokenType::Modulus, "%")]),
-          _ => Lexer::unable_to_handle(t),
+          "%>" => Ok(vec![Token::new(TokenType::CloseTagShort, "%>")]),
+          "%=" => Ok(vec![Token::new(TokenType::ModulusAssignment, "%=")]),
+          "%" => Ok(vec![Token::new(TokenType::Modulus, "%")]),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       '^' => {
         let t = self.until(|ch| !['^', '='].contains(ch));
         match t.as_str() {
-          "^=" => Some(vec![Token::new(TokenType::BitwiseXorAssignment, "^=")]),
-          "^" => Some(vec![Token::new(TokenType::BitwiseXor, "^")]),
-          _ => Lexer::unable_to_handle(t),
+          "^=" => Ok(vec![Token::new(TokenType::BitwiseXorAssignment, "^=")]),
+          "^" => Ok(vec![Token::new(TokenType::BitwiseXor, "^")]),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       '*' => {
         let t = self.until(|ch| !['*', '/', '='].contains(ch));
         match t.as_str() {
-          "**=" => Some(vec![Token::new(TokenType::ExponentiationAssignment, "**=")]),
-          "*=" => Some(vec![Token::new(TokenType::MultiplicationAssignment, "*=")]),
-          // "*/" => Some(vec![Token::new(TokenType::CommentClose, "*/")]),
-          "**" => Some(vec![Token::new(TokenType::Exponentiation, "**")]),
-          "*" => Some(vec![Token::new(TokenType::Multiplication, "*")]),
-          _ => Lexer::unable_to_handle(t),
+          "**=" => Ok(vec![Token::new(TokenType::ExponentiationAssignment, "**=")]),
+          "*=" => Ok(vec![Token::new(TokenType::MultiplicationAssignment, "*=")]),
+          // "*/" => Ok(vec![Token::new(TokenType::CommentClose, "*/")]),
+          "**" => Ok(vec![Token::new(TokenType::Exponentiation, "**")]),
+          "*" => Ok(vec![Token::new(TokenType::Multiplication, "*")]),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       '/' => {
         let t = self.until(|ch| !['/', '*', '='].contains(ch));
         match t.as_str() {
-          "/=" => Some(vec![Token::new(TokenType::DivisionAssignment, "/=")]),
+          "/=" => Ok(vec![Token::new(TokenType::DivisionAssignment, "/=")]),
           "/**" => CommentToken::lex_doc(&self.chars, &mut self.position),
           "/*" => CommentToken::lex_block(&self.chars, &mut self.position),
           "//" => CommentToken::lex_line(&self.chars, &mut self.position),
-          "/" => Some(vec![Token::new(TokenType::Division, "/")]),
-          _ => Lexer::unable_to_handle(t),
+          "/" => Ok(vec![Token::new(TokenType::Division, "/")]),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       '.' => {
         let t = self.until(|ch| !['.', '='].contains(ch));
         match t.as_str() {
-          ".=" => Some(vec![Token::new(TokenType::ConcatenationAssignment, ".=")]),
-          "..." => Some(vec![Token::new(TokenType::Ellipsis, "...")]),
+          ".=" => Ok(vec![Token::new(TokenType::ConcatenationAssignment, ".=")]),
+          "..." => Ok(vec![Token::new(TokenType::Ellipsis, "...")]),
           "." => {
             let mut t = get_char_until(&self.chars, &mut self.position, |ch, _| !ch.is_digit(10));
             if t.len() == 0 {
-              Some(vec![Token::new(TokenType::Concatenation, ".")])
+              Ok(vec![Token::new(TokenType::Concatenation, ".")])
             } else {
               t.insert(0, '.');
-              Some(vec![Token::new(TokenType::Number, t.to_string())])
+              Ok(vec![Token::new(TokenType::Number, t.to_string())])
             }
           }
-          _ => Lexer::unable_to_handle(t),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       '|' => {
         let t = self.until(|ch| !['|', '='].contains(ch));
         match t.as_str() {
-          "|=" => Some(vec![Token::new(TokenType::BitwiseOrAssignment, "|=")]),
-          "||" => Some(vec![Token::new(TokenType::BooleanOr, "||")]),
-          "|" => Some(vec![Token::new(TokenType::BitwiseOr, "|")]),
-          _ => Lexer::unable_to_handle(t),
+          "|=" => Ok(vec![Token::new(TokenType::BitwiseOrAssignment, "|=")]),
+          "||" => Ok(vec![Token::new(TokenType::BooleanOr, "||")]),
+          "|" => Ok(vec![Token::new(TokenType::BitwiseOr, "|")]),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       '-' => {
         let t = self.until(|ch| !['-', '=', '>', '{'].contains(ch));
         match t.as_str() {
-          "-=" => Some(vec![Token::new(TokenType::SubtractionAssignment, "-=")]),
+          "-=" => Ok(vec![Token::new(TokenType::SubtractionAssignment, "-=")]),
           "->{" => ObjectAccessToken::lex(self),
-          "->" => Some(vec![Token::new(TokenType::ObjectAccess, "->")]),
+          "->" => Ok(vec![Token::new(TokenType::ObjectAccess, "->")]),
           "--" => {
             let is_post = match self.chars.get(self.position) {
               Some(t) => t.is_whitespace() || [';', ',', ')', ']', '}', '?'].contains(&t),
               None => true,
             };
             if is_post {
-              return Some(vec![Token::new(TokenType::PostDecrement, "--")]);
+              return Ok(vec![Token::new(TokenType::PostDecrement, "--")]);
             }
-            return Some(vec![Token::new(TokenType::PreDecrement, "--")]);
+            return Ok(vec![Token::new(TokenType::PreDecrement, "--")]);
           }
-          "-" => Some(vec![Token::new(TokenType::Subtraction, "-")]),
-          _ => Lexer::unable_to_handle(t),
+          "-" => Ok(vec![Token::new(TokenType::Subtraction, "-")]),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       '>' => {
         let t = self.until(|ch| !['>', '='].contains(ch));
         match t.as_str() {
-          ">>=" => Some(vec![Token::new(TokenType::BitwiseShiftRightAssignment, ">>=")]),
-          ">=" => Some(vec![Token::new(TokenType::IsGreaterOrEqual, ">=")]),
-          ">>" => Some(vec![Token::new(TokenType::BitwiseShiftRight, ">>")]),
-          ">" => Some(vec![Token::new(TokenType::IsGreater, ">")]),
-          _ => Lexer::unable_to_handle(t),
+          ">>=" => Ok(vec![Token::new(TokenType::BitwiseShiftRightAssignment, ">>=")]),
+          ">=" => Ok(vec![Token::new(TokenType::IsGreaterOrEqual, ">=")]),
+          ">>" => Ok(vec![Token::new(TokenType::BitwiseShiftRight, ">>")]),
+          ">" => Ok(vec![Token::new(TokenType::IsGreater, ">")]),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       '<' => {
         let t = self.until(|ch| !['<', '?', '=', '>', 'p', 'h', '%'].contains(ch));
         match t.as_str() {
-          "<%" => Some(vec![Token::new(TokenType::OpenTagShort, "<%")]),
-          "<?php" => Some(vec![Token::new(TokenType::OpenTag, "<?php")]),
-          "<?=" => Some(vec![Token::new(TokenType::OpenTagEcho, "<?=")]),
-          "<=>" => Some(vec![Token::new(TokenType::Spaceship, "<=>")]),
-          "<>" => Some(vec![Token::new(TokenType::IsNotEqual, "<>")]),
-          "<=" => Some(vec![Token::new(TokenType::IsLesserOrEqual, "<=")]),
-          "<<=" => Some(vec![Token::new(TokenType::BitwiseShiftLeftAssignment, "<<=")]),
-          "<<<" => Some(vec![Token::new(TokenType::HeredocStart, "<<<")]),
-          "<<" => Some(vec![Token::new(TokenType::BitwiseShiftLeft, "<<")]),
-          "<" => Some(vec![Token::new(TokenType::IsLesser, "<")]),
-          _ => Lexer::unable_to_handle(t),
+          "<%" => Ok(vec![Token::new(TokenType::OpenTagShort, "<%")]),
+          "<?php" => Ok(vec![Token::new(TokenType::OpenTag, "<?php")]),
+          "<?=" => Ok(vec![Token::new(TokenType::OpenTagEcho, "<?=")]),
+          "<=>" => Ok(vec![Token::new(TokenType::Spaceship, "<=>")]),
+          "<>" => Ok(vec![Token::new(TokenType::IsNotEqual, "<>")]),
+          "<=" => Ok(vec![Token::new(TokenType::IsLesserOrEqual, "<=")]),
+          "<<=" => Ok(vec![Token::new(TokenType::BitwiseShiftLeftAssignment, "<<=")]),
+          "<<<" => Ok(vec![Token::new(TokenType::HeredocStart, "<<<")]),
+          "<<" => Ok(vec![Token::new(TokenType::BitwiseShiftLeft, "<<")]),
+          "<" => Ok(vec![Token::new(TokenType::IsLesser, "<")]),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       ':' => {
         let t = self.until(|ch| ![':'].contains(ch));
         match t.as_str() {
-          "::" => Some(vec![Token::new(TokenType::DoubleColon, "::")]),
-          ":" => Some(vec![Token::new(TokenType::Colon, ":")]),
-          _ => Lexer::unable_to_handle(t),
+          "::" => Ok(vec![Token::new(TokenType::DoubleColon, "::")]),
+          ":" => Ok(vec![Token::new(TokenType::Colon, ":")]),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       '!' => {
         let t = self.until(|ch| !['!', '='].contains(ch));
         match t.as_str() {
-          "!==" => Some(vec![Token::new(TokenType::IsNotIdentical, "!==")]),
-          "!=" => Some(vec![Token::new(TokenType::IsNotEqual, "!=")]),
-          "!" => Some(vec![Token::new(TokenType::BooleanNegate, "!")]),
-          _ => Lexer::unable_to_handle(t),
+          "!==" => Ok(vec![Token::new(TokenType::IsNotIdentical, "!==")]),
+          "!=" => Ok(vec![Token::new(TokenType::IsNotEqual, "!=")]),
+          "!" => Ok(vec![Token::new(TokenType::BooleanNegate, "!")]),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
       '+' => {
         let t = self.until(|ch| !['+', '='].contains(ch));
         match t.as_str() {
-          "+=" => Some(vec![Token::new(TokenType::AdditionAssignment, "+=")]),
+          "+=" => Ok(vec![Token::new(TokenType::AdditionAssignment, "+=")]),
           "++" => {
             let is_post = match self.chars.get(self.position) {
               Some(t) => t.is_whitespace() || [';', ',', ')', ']', '}', '?'].contains(&t),
               None => true,
             };
             if is_post {
-              return Some(vec![Token::new(TokenType::PostIncrement, "++")]);
+              return Ok(vec![Token::new(TokenType::PostIncrement, "++")]);
             }
-            return Some(vec![Token::new(TokenType::PreIncrement, "++")]);
+            return Ok(vec![Token::new(TokenType::PreIncrement, "++")]);
           }
-          "+" => Some(vec![Token::new(TokenType::Addition, "+")]),
-          _ => Lexer::unable_to_handle(t),
+          "+" => Ok(vec![Token::new(TokenType::Addition, "+")]),
+          _ => Lexer::unable_to_handle(&t),
         }
       }
-      '(' => Some(vec![Token::new(TokenType::LeftParenthesis, "(")]),
-      ')' => Some(vec![Token::new(TokenType::RightParenthesis, ")")]),
-      '{' => Some(vec![Token::new(TokenType::LeftCurlyBracket, "{")]),
+      '(' => Ok(vec![Token::new(TokenType::LeftParenthesis, "(")]),
+      ')' => Ok(vec![Token::new(TokenType::RightParenthesis, ")")]),
+      '{' => Ok(vec![Token::new(TokenType::LeftCurlyBracket, "{")]),
       // '{' => {
       //   let t = self.until(|ch| !['$'].contains(ch));
       //   match t.as_str() {
-      //     // "{$" => Some(vec![Token::new(TokenType::AdvanceInterpolationOpen, "{$")]),
-      //     "{" => Some(vec![Token::new(TokenType::LeftCurlyBracket, "{")]),
-      //     _ => Lexer::unable_to_handle(t),
+      //     // "{$" => Ok(vec![Token::new(TokenType::AdvanceInterpolationOpen, "{$")]),
+      //     "{" => Ok(vec![Token::new(TokenType::LeftCurlyBracket, "{")]),
+      //     _ => Lexer::unable_to_handle(&t),
       //   }
       // }
-      '}' => Some(vec![Token::new(TokenType::RightCurlyBracket, "}")]),
-      '[' => Some(vec![Token::new(TokenType::LeftSquareBracket, "[")]),
-      ']' => Some(vec![Token::new(TokenType::RightSquareBracket, "]")]),
+      '}' => Ok(vec![Token::new(TokenType::RightCurlyBracket, "}")]),
+      '[' => Ok(vec![Token::new(TokenType::LeftSquareBracket, "[")]),
+      ']' => Ok(vec![Token::new(TokenType::RightSquareBracket, "]")]),
       '`' => StringToken::lex(self, '`'),
       '"' => StringToken::lex(self, '"'),
       '\'' => StringToken::lex(self, '\''),
-      '\\' => Some(vec![Token::new(TokenType::BackSlash, "\\")]),
-      ',' => Some(vec![Token::new(TokenType::Comma, ",")]),
-      ';' => Some(vec![Token::new(TokenType::Semicolon, ";")]),
-      '~' => Some(vec![Token::new(TokenType::BooleanNegate, "~")]),
-      // '\n' => Some(vec![Token::new(TokenType::LineBreak, "\n")]),
-      _ => Lexer::unable_to_handle(current_char),
+      '\\' => Ok(vec![Token::new(TokenType::BackSlash, "\\")]),
+      ',' => Ok(vec![Token::new(TokenType::Comma, ",")]),
+      ';' => Ok(vec![Token::new(TokenType::Semicolon, ";")]),
+      '~' => Ok(vec![Token::new(TokenType::BooleanNegate, "~")]),
+      // '\n' => Ok(vec![Token::new(TokenType::LineBreak, "\n")]),
+      _ => Lexer::unable_to_handle(&current_char.to_string()),
     }
-  }
-}
-
-#[cfg(test)]
-mod tests {
-  use crate::lex;
-
-  #[test]
-  fn basic() {
-    lex("+++");
   }
 }

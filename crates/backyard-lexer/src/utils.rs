@@ -35,7 +35,7 @@ pub fn get_tokens_level(
   let mut result: Vec<Token> = Vec::new();
   let mut level = start_level;
   loop {
-    if let Some(tokens) = lexer.next_tokens(true) {
+    if let Ok(tokens) = lexer.next_tokens(true) {
       if let Some(token) = tokens.first() {
         if level_ups.contains(&token.token_type) {
           level += 1;

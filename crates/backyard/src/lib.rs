@@ -19,16 +19,21 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn lex(input: String) -> Result<TokenArray, Error> {
-  let tokens = process_lex(&input);
-  serde_wasm_bindgen::to_value(&tokens).map(|v| v.into())
+  match process_lex(&input) {
+    Ok(tokens) => serde_wasm_bindgen::to_value(&tokens).map(|v| v.into()),
+    Err(err) => Err(Error::new(&format!("{}", err))),
+  }
 }
 
 #[wasm_bindgen]
 pub fn parse(input: String) -> Result<NodeArray, Error> {
-  let nodes = process_parse(&input);
-
-  let serializer = Serializer::new().serialize_maps_as_objects(true);
-  nodes.serialize(&serializer).map(|v| v.into())
+  match process_parse(&input) {
+    Ok(nodes) => {
+      let serializer = Serializer::new().serialize_maps_as_objects(true);
+      nodes.serialize(&serializer).map(|v| v.into())
+    }
+    Err(err) => Err(Error::new(&format!("{}", err))),
+  }
 }
 
 #[wasm_bindgen]

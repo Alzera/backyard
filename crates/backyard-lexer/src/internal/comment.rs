@@ -1,3 +1,4 @@
+use crate::error::LexResult;
 use crate::utils::get_char_until;
 use crate::token::{ Token, TokenType };
 
@@ -21,18 +22,18 @@ impl CommentToken {
     comment
   }
 
-  pub fn lex_doc(chars: &Vec<char>, position: &mut usize) -> Option<Vec<Token>> {
+  pub fn lex_doc(chars: &Vec<char>, position: &mut usize) -> LexResult {
     let comment: String = CommentToken::parse(&chars, position);
-    Some(vec![Token::new(TokenType::CommentDoc, comment)])
+    Ok(vec![Token::new(TokenType::CommentDoc, comment)])
   }
 
-  pub fn lex_block(chars: &Vec<char>, position: &mut usize) -> Option<Vec<Token>> {
+  pub fn lex_block(chars: &Vec<char>, position: &mut usize) -> LexResult {
     let comment: String = CommentToken::parse(&chars, position);
-    Some(vec![Token::new(TokenType::CommentBlock, comment)])
+    Ok(vec![Token::new(TokenType::CommentBlock, comment)])
   }
 
-  pub fn lex_line(chars: &Vec<char>, position: &mut usize) -> Option<Vec<Token>> {
+  pub fn lex_line(chars: &Vec<char>, position: &mut usize) -> LexResult {
     let comment: String = get_char_until(&chars, position, |ch, _| ['\n'].contains(ch));
-    Some(vec![Token::new(TokenType::CommentLine, comment)])
+    Ok(vec![Token::new(TokenType::CommentLine, comment)])
   }
 }
