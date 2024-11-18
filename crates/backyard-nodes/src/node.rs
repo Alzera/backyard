@@ -169,6 +169,7 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::String => { serde_json::from_value(node_data).map(NodeWrapper::String) }
             NodeType::Switch => { serde_json::from_value(node_data).map(NodeWrapper::Switch) }
             NodeType::Ternary => { serde_json::from_value(node_data).map(NodeWrapper::Ternary) }
+            NodeType::This => { serde_json::from_value(node_data).map(NodeWrapper::This) }
             NodeType::Trait => { serde_json::from_value(node_data).map(NodeWrapper::Trait) }
             NodeType::TraitUse => { serde_json::from_value(node_data).map(NodeWrapper::TraitUse) }
             NodeType::TraitUseAlias => {
@@ -271,6 +272,7 @@ pub enum NodeWrapper {
   String(StringNode),
   Switch(SwitchNode),
   Ternary(TernaryNode),
+  This(ThisNode),
   Trait(TraitNode),
   TraitUse(TraitUseNode),
   TraitUseAlias(TraitUseAliasNode),
@@ -356,6 +358,7 @@ pub enum NodeType {
   String,
   Switch,
   Ternary,
+  This,
   Trait,
   TraitUse,
   TraitUseAlias,
@@ -732,6 +735,10 @@ new_node!(Ternary, TernaryNode {
   condition: Box<Node>,
   valid: Box<Node>,
   invalid: Box<Node>,
+});
+
+new_node!(This, ThisNode {
+  raw: String,
 });
 
 new_node!(Trait, TraitNode {

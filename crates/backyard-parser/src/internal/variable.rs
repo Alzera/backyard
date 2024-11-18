@@ -54,3 +54,14 @@ impl VariableParser {
     None
   }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::parse;
+
+
+  #[test]
+  fn basic() {
+    parse("$this->a;");
+  }
+}

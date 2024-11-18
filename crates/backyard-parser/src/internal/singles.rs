@@ -1,6 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
 use backyard_nodes::node::{
-  Node,
   BreakNode,
   CloneNode,
   ContinueNode,
@@ -8,10 +7,12 @@ use backyard_nodes::node::{
   GlobalNode,
   GotoNode,
   NewNode,
+  Node,
   ParentNode,
   PrintNode,
   ReturnNode,
   StaticNode,
+  ThisNode,
   ThrowNode,
 };
 
@@ -38,7 +39,8 @@ impl SinglesParser {
             TokenType::Parent,
             TokenType::Static,
             TokenType::Clone,
-            TokenType::Global
+            TokenType::Global,
+            TokenType::This
           ]
         ),
       ].to_vec()
@@ -52,10 +54,11 @@ impl SinglesParser {
   ) -> Option<Box<Node>> {
     if let [key] = matched.as_slice() {
       if let Some(key) = key.first() {
-        if [TokenType::Parent, TokenType::Static].contains(&key.token_type) {
+        if [TokenType::Parent, TokenType::Static, TokenType::This].contains(&key.token_type) {
           return match key.token_type {
             TokenType::Parent => Some(ParentNode::new(key.value.to_owned())),
             TokenType::Static => Some(StaticNode::new(key.value.to_owned())),
+            TokenType::This => Some(ThisNode::new(key.value.to_owned())),
             _ => None,
           };
         }

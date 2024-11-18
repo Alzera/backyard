@@ -47,6 +47,10 @@ impl SinglesGenerator {
         builder.push("goto");
         Some(cast_node!(NodeWrapper::Goto, node.node.to_owned()).label)
       }
+      NodeType::This => {
+        builder.push("$this");
+        None
+      }
       NodeType::Parent => {
         builder.push("parent");
         None
@@ -85,6 +89,7 @@ mod tests {
     test("print \"Hello\";");
     test("throw new A;");
     test("goto jumpHere;");
+    test("$this->a();");
     test("parent::a();");
     test("static::a();");
   }

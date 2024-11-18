@@ -200,6 +200,7 @@ pub enum TokenType {
   Parent,
   SelfKeyword,
   Switch,
+  This,
   Throw,
   Trait,
   Try,

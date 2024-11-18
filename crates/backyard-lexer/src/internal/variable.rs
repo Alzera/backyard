@@ -19,7 +19,11 @@ impl VariableToken {
           &mut lexer.position,
           |ch, _| !(ch.is_alphanumeric() || *ch == '_')
         );
-        tokens.push(Token::new(TokenType::Variable, t));
+        if t == "this" {
+          tokens.push(Token::new(TokenType::This, t));
+        } else {
+          tokens.push(Token::new(TokenType::Variable, t));
+        }
       }
     }
     Some(tokens)
