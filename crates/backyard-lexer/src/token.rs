@@ -42,6 +42,7 @@ pub enum TokenType {
   CoalesceAssignment,
   Coalesce,
   QuestionMark,
+  Elvis,
 
   // %
   CloseTagShort,

@@ -2,6 +2,8 @@ use std::fmt::Debug;
 
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, NodeType };
+use crate::internal::elvis::ElvisParser;
+
 use super::internal::{
   array::ArrayParser,
   arraylookup::ArrayLookupParser,
@@ -52,7 +54,7 @@ use super::internal::{
 type InternalParserTest = fn(&Vec<Token>, &mut LoopArgument) -> Option<Vec<Vec<Token>>>;
 type InternalParserParse = fn(&mut Parser, Vec<Vec<Token>>, &mut LoopArgument) -> Option<Box<Node>>;
 type InternalParser = (InternalParserTest, InternalParserParse);
-pub static DEFAULT_PARSERS: [InternalParser; 44] = [
+pub static DEFAULT_PARSERS: [InternalParser; 45] = [
   (CommentParser::test, CommentParser::parse),
   (ListParser::test, ListParser::parse),
   (ParenthesisParser::test, ParenthesisParser::parse),
@@ -97,6 +99,7 @@ pub static DEFAULT_PARSERS: [InternalParser; 44] = [
   (LabelParser::test, LabelParser::parse),
   (IdentifierParser::test, IdentifierParser::parse),
   (TypesParser::test, TypesParser::parse),
+  (ElvisParser::test, ElvisParser::parse),
 ];
 
 #[derive(Debug)]

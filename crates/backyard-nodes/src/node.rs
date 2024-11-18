@@ -114,6 +114,7 @@ impl<'de> Deserialize<'de> for Node {
             }
             NodeType::DoWhile => { serde_json::from_value(node_data).map(NodeWrapper::DoWhile) }
             NodeType::Echo => { serde_json::from_value(node_data).map(NodeWrapper::Echo) }
+            NodeType::Elvis => { serde_json::from_value(node_data).map(NodeWrapper::Elvis) }
             NodeType::Encapsed => { serde_json::from_value(node_data).map(NodeWrapper::Encapsed) }
             NodeType::EncapsedPart => {
               serde_json::from_value(node_data).map(NodeWrapper::EncapsedPart)
@@ -231,6 +232,7 @@ pub enum NodeWrapper {
   DeclareArgument(DeclareArgumentNode),
   DoWhile(DoWhileNode),
   Echo(EchoNode),
+  Elvis(ElvisNode),
   Encapsed(EncapsedNode),
   EncapsedPart(EncapsedPartNode),
   Enum(EnumNode),
@@ -317,6 +319,7 @@ pub enum NodeType {
   DeclareArgument,
   DoWhile,
   Echo,
+  Elvis,
   Encapsed,
   EncapsedPart,
   Enum,
@@ -668,6 +671,11 @@ new_node!(Return, ReturnNode {
 
 new_node!(Echo, EchoNode {
   argument: Box<Node>,
+});
+
+new_node!(Elvis, ElvisNode {
+  left: Box<Node>,
+  right: Box<Node>,
 });
 
 new_node!(New, NewNode {

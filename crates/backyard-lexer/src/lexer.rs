@@ -107,8 +107,9 @@ impl Lexer {
         }
       }
       '?' => {
-        let t = self.until(|ch| !['?', '>', '=', '-', '{'].contains(ch));
+        let t = self.until(|ch| !['?', '>', '=', '-', '{', ':'].contains(ch));
         match t.as_str() {
+          "?:" => Some(vec![Token::new(TokenType::Elvis, "?:")]),
           "?>" => Some(vec![Token::new(TokenType::CloseTag, "?>")]),
           "?->" => Some(vec![Token::new(TokenType::NullsafeObjectAccess, "?->")]),
           "?->{" => Some(vec![Token::new(TokenType::NullsafeObjectAccessBracketOpen, "?->{")]),
