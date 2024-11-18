@@ -147,6 +147,30 @@ export { builder };`;
   }
 }
 
+async function updatePackageJson() {
+  try {
+    const packageJsonPath = "./dist/package.json";
+
+    const packageJson = JSON.parse(await fs.readFile(packageJsonPath, "utf8"));
+
+    const updatedPackageJson = {
+      name: packageJson.name,
+      version: packageJson.version,
+      main: "index.js",
+    };
+
+    await fs.promises.writeFile(
+      packageJsonPath,
+      JSON.stringify(updatedPackageJson, null, 2),
+      "utf8"
+    );
+
+    console.log("package.json updated successfully.");
+  } catch (error) {
+    console.error("Error updating package.json:", error);
+  }
+}
+
 fs.removeSync("./dist");
 fs.moveSync("./crates/backyard/pkg", "./dist");
 fs.moveSync("./crates/backyard-lexer/bindings", "./dist/token");
@@ -174,3 +198,4 @@ module.exports = {
     builder,
 };`
 );
+updatePackageJson();
