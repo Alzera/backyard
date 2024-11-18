@@ -1,0 +1,10 @@
+[package]
+name = "backyard-parser"
+edition.workspace = true
+version.workspace = true
+
+[dependencies]
+backyard-lexer = { workspace = true }
+backyard-nodes = { workspace = true }
+
+utils = { workspace = true }

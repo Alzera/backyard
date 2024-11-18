@@ -1,0 +1,11 @@
+[package]
+name = "backyard-nodes"
+edition.workspace = true
+version.workspace = true
+
+[dependencies]
+ts-rs = { workspace = true }
+serde = { workspace = true }
+wasm-bindgen = { workspace = true }
+serde-wasm-bindgen = { workspace = true }
+serde_json = { workspace = true }

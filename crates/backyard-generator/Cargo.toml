@@ -1,0 +1,10 @@
+[package]
+name = "backyard-generator"
+edition.workspace = true
+version.workspace = true
+
+[dependencies]
+backyard-nodes = { workspace = true }
+backyard-parser = { workspace = true }
+
+utils = { workspace = true }

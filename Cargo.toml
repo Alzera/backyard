@@ -1,20 +1,25 @@
-[package]
+[workspace]
+resolver = "2"
+members = ["crates/*"]
+
+[workspace.package]
 edition = "2021"
-name = "backyard"
 version = "0.0.0"
 
-[lib]
-crate-type = ["cdylib"]
+[workspace.dependencies]
+backyard-lexer = { path = "crates/backyard-lexer" }
+backyard-nodes = { path = "crates/backyard-nodes" }
+backyard-parser = { path = "crates/backyard-parser" }
+backyard-generator = { path = "crates/backyard-generator" }
+backyard = { path = "crates/backyard" }
 
-[dependencies]
-macros = { path = "./macros" }
-dyn-clone = "1.0"
-# Default enable napi4 feature, see https://nodejs.org/api/n-api.html#node-api-version-matrix
-napi = { version = "2.12.2", default-features = false, features = ["napi4"] }
-napi-derive = "2.12.2"
+utils = { path = "crates/utils" }
 
-[build-dependencies]
-napi-build = "2.0.1"
+ts-rs = "10.0"
+serde = { version = "1.0", features = ["derive"] }
+serde-wasm-bindgen = "0.4"
+wasm-bindgen = "0.2.95"
+serde_json = "1.0"
 
 [profile.release]
 lto = true

@@ -1,0 +1,9 @@
+[package]
+name = "backyard-lexer"
+edition.workspace = true
+version.workspace = true
+
+[dependencies]
+ts-rs = { workspace = true }
+serde = { workspace = true }
+wasm-bindgen = { workspace = true }

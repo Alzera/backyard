@@ -1,31 +1,9 @@
 {
-  "name": "backyard",
-  "version": "0.0.0",
-  "main": "index.js",
-  "types": "index.d.ts",
-  "napi": {
-    "name": "backyard",
-    "triples": {}
-  },
-  "license": "MIT",
-  "devDependencies": {
-    "@napi-rs/cli": "^2.18.4",
-    "@vitest/coverage-v8": "^2.1.3",
-    "vitest": "^2.1.3"
-  },
-  "engines": {
-    "node": ">= 10"
-  },
   "scripts": {
-    "artifacts": "napi artifacts",
-    "build": "napi build --platform --release  && node ./scripts/update-dts.js",
-    "debug": "napi build --platform && node ./scripts/update-dts.js && node ./test-run/test.js",
-    "prepublishOnly": "napi prepublish -t npm",
-    "cargo:test": "cargo test",
-    "cargo:coverage": "cargo tarpaulin --out Html",
-    "test": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "universal": "napi universal",
-    "version": "napi version"
+    "prebuild": "cargo test && cd ./crates/backyard && npm run build",
+    "build": "node ./scripts/combine.js"
+  },
+  "devDependencies": {
+    "fs-extra": "^11.2.0"
   }
 }
