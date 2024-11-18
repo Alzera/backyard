@@ -406,7 +406,7 @@ new_node!(ArrayItem, ArrayItemNode {
 
 new_node!(ArrayLookup, ArrayLookupNode {
   target: Box<Node>,
-  on: Box<Node>,
+  on: Option<Box<Node>>,
 });
 
 new_node!(Assignment, AssignmentNode {

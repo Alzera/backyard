@@ -34,10 +34,8 @@ impl ArrayLookupParser {
   ) -> Option<Box<Node>> {
     if let [_] = matched.as_slice() {
       let on = guard_none!(args.last_expr.to_owned());
-      let target = guard_none!(
-        parser.get_statement(
-          &mut LoopArgument::with_tokens("arraylookup", &[], &[TokenType::RightSquareBracket])
-        )
+      let target = parser.get_statement(
+        &mut LoopArgument::with_tokens("arraylookup", &[], &[TokenType::RightSquareBracket])
       );
       parser.position += 1;
       return Some(ArrayLookupNode::new(on, target));

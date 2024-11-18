@@ -9,7 +9,13 @@ impl ArrayLookupGenerator {
     let node = cast_node!(NodeWrapper::ArrayLookup, &node.node);
     generator.generate_node(builder, &node.target, &mut GeneratorArgument::default());
     builder.push("[");
-    generator.generate_node(builder, &node.on, &mut GeneratorArgument::default());
+    if node.on.is_some() {
+      generator.generate_node(
+        builder,
+        &node.on.to_owned().unwrap(),
+        &mut GeneratorArgument::default()
+      );
+    }
     builder.push("]");
   }
 }
@@ -22,5 +28,6 @@ mod tests {
   fn basic() {
     test("[][0];");
     test("$a[0];");
+    test("$a[] = 1;");
   }
 }
