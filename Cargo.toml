@@ -24,3 +24,5 @@ serde_json = "1.0"
 [profile.release]
 lto = true
 strip = "symbols"
+opt-level = "z"
+codegen-units = 1
