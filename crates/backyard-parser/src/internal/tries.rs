@@ -1,6 +1,6 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ CatchNode, Node, TryNode };
-use utils::guard_none;
+use utils::guard;
 
 use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
 
@@ -29,7 +29,11 @@ impl TryParser {
       let mut catches: Vec<Box<Node>> = vec![];
       let mut finally = None;
       loop {
-        let is_finally = match guard_none!(parser.tokens.get(parser.position)).token_type {
+        let is_finally = match
+          guard!(parser.tokens.get(parser.position), {
+            break;
+          }).token_type
+        {
           TokenType::Finally => true,
           TokenType::Catch => false,
           _ => {
@@ -46,7 +50,7 @@ impl TryParser {
           &mut LoopArgument::new(
             "catch_types",
             &[TokenType::BitwiseOr],
-            &[TokenType::Variable, TokenType::VariableBracketOpen],
+            &[TokenType::Variable, TokenType::VariableBracketOpen, TokenType::RightParenthesis],
             &[
               (IdentifierParser::test, IdentifierParser::parse),
               (CommentParser::test, CommentParser::parse),
@@ -54,19 +58,22 @@ impl TryParser {
           )
         );
         parser.position -= 1;
-        let variable = guard_none!(
-          parser.get_statement(
-            &mut LoopArgument::new(
-              "catch_variable",
-              &[],
-              &[TokenType::RightParenthesis],
-              &[
-                (VariableParser::test, VariableParser::parse),
-                (CommentParser::test, CommentParser::parse),
-              ]
-            )
-          )
-        );
+        let mut variable = None;
+        if let Some(last_token) = parser.tokens.get(parser.position) {
+          if last_token.token_type != TokenType::RightParenthesis {
+            variable = parser.get_statement(
+              &mut LoopArgument::new(
+                "catch_variable",
+                &[],
+                &[TokenType::RightParenthesis],
+                &[
+                  (VariableParser::test, VariableParser::parse),
+                  (CommentParser::test, CommentParser::parse),
+                ]
+              )
+            );
+          }
+        }
         parser.position += 1;
         catches.push(CatchNode::new(types, variable, BlockParser::new(parser)));
       }

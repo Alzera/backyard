@@ -794,7 +794,7 @@ new_node!(Try, TryNode {
 
 new_node!(Catch, CatchNode {
   types: Vec<Box<Node>>,
-  variable: Box<Node>,
+  variable: Option<Box<Node>>,
   body: Box<Node>,
 });
 

@@ -25,8 +25,10 @@ impl TryGenerator {
     builder.push(" catch (");
     let types = generator.generate_nodes_new(&node.types, &mut GeneratorArgument::default());
     builder.push(&types.to_string(" | "));
-    builder.push(" ");
-    generator.generate_node(builder, &node.variable, &mut GeneratorArgument::default());
+    if let Some(variable) = &node.variable {
+      builder.push(" ");
+      generator.generate_node(builder, variable, &mut GeneratorArgument::default());
+    }
     builder.push(")");
     BlockGenerator::generate(generator, builder, &node.body, None);
   }
@@ -38,6 +40,9 @@ mod tests {
 
   #[test]
   fn basic() {
+    test("try {
+} catch (UnknownGetterException | ReflectionException) {
+}");
     test(
       "try {
   throw new Error(\"Custom error occurred\");
