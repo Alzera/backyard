@@ -1,22 +1,22 @@
 use crate::error::LexResult;
-use crate::utils::get_char_until;
+use crate::lexer::Lexer;
 use crate::token::{ Token, TokenType };
 
 pub struct NumberToken;
 
 impl NumberToken {
-  pub fn lex(chars: &Vec<char>, position: &mut usize) -> LexResult {
-    if let Some(&next) = chars.get(*position) {
+  pub fn lex(lexer: &mut Lexer, current_char: char) -> LexResult {
+    if let Some(next) = lexer.control.peek_char(None) {
       if next == 'x' {
-        *position += 1;
-        let t = get_char_until(&chars, position, |ch, _| !ch.is_alphanumeric());
+        lexer.control.next_char();
+        let t = lexer.control.next_char_until(|_, ch, _| !ch.is_alphanumeric());
         let mut n = "0x".to_string();
         n.push_str(&t);
         return Ok(vec![Token::new(TokenType::NumberHex, n)]);
       }
     }
-    *position -= 1;
-    let t = get_char_until(&chars, position, |ch, _| !(ch.is_digit(10) || *ch == '.'));
-    Ok(vec![Token::new(TokenType::Number, t.to_string())])
+    let mut t = lexer.control.next_char_until(|_, ch, _| !(ch.is_digit(10) || *ch == '.'));
+    t.insert(0, current_char);
+    Ok(vec![Token::new(TokenType::Number, t)])
   }
 }

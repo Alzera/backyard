@@ -1,4 +1,4 @@
-use crate::{ error::{ LexError, LexResult }, lexer::Lexer, token::{ Token, TokenType } };
+use crate::{ error::LexResult, lexer::Lexer, token::{ Token, TokenType } };
 
 pub struct KeywordToken;
 
@@ -80,7 +80,7 @@ impl KeywordToken {
     Self::KEYS.contains(&input.as_str())
   }
 
-  pub fn lex(input: &String, _: &mut Lexer) -> LexResult {
+  pub fn lex(lexer: &mut Lexer, input: &String) -> LexResult {
     match input.as_str() {
       "abstract" => Ok(vec![Token::new(TokenType::Abstract, input)]),
       "array" => Ok(vec![Token::new(TokenType::Array, input)]),
@@ -152,7 +152,7 @@ impl KeywordToken {
       "while" => Ok(vec![Token::new(TokenType::While, input)]),
       "yield" => Ok(vec![Token::new(TokenType::Yield, input)]),
       "xor" => Ok(vec![Token::new(TokenType::Xor, input)]),
-      _ => Err(LexError::Unrecognized(input.to_owned())),
+      _ => Err(lexer.control.error_unrecognized(&input.to_owned())),
     }
   }
 }

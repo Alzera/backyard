@@ -1,7 +1,8 @@
+use utils::guard;
+
 use crate::internal::variable::VariableToken;
 use crate::error::LexResult;
 use crate::lexer::Lexer;
-use crate::utils::{ get_char_until, get_tokens_until_right_bracket };
 use crate::token::{ Token, TokenType };
 
 pub struct StringToken;
@@ -15,7 +16,7 @@ impl StringToken {
     loop {
       let mut ignore_last_escape = false;
       let mut last_char = None;
-      let t = get_char_until(&lexer.chars, &mut lexer.position, |ch, end_position| {
+      let t = lexer.control.next_char_until(|control, ch, end_position| {
         let is_escaped = last_char.is_some() && last_char.unwrap() == '\\' && !ignore_last_escape;
         ignore_last_escape = is_escaped;
         last_char = Some(*ch);
@@ -27,8 +28,8 @@ impl StringToken {
             if is_escaped {
               return false;
             }
-            if let Some(next) = lexer.chars.get(*end_position + 1) {
-              if *next == '_' || next.is_alphabetic() {
+            if let Some(next) = control.peek_char(Some(*end_position + 1)) {
+              if next == '_' || next.is_alphabetic() {
                 return true;
               }
             }
@@ -36,8 +37,8 @@ impl StringToken {
             if is_escaped {
               return false;
             }
-            if let Some(next) = lexer.chars.get(*end_position + 1) {
-              if *next == '$' {
+            if let Some(next) = control.peek_char(Some(*end_position + 1)) {
+              if next == '$' {
                 return true;
               }
             }
@@ -50,35 +51,31 @@ impl StringToken {
         result.push(Token::new(TokenType::EncapsedString, t));
       }
 
-      let c = lexer.chars.get(lexer.position);
-      if c.is_none() {
+      let current = guard!(lexer.control.peek_char(None), {
+        break;
+      });
+      if current == breaker {
+        lexer.control.next_char();
         break;
       }
-      let current = c.unwrap();
+      let next = lexer.control.peek_char(Some(lexer.control.get_position() + 1));
 
-      if *current == breaker {
-        lexer.position += 1;
-        break;
-      }
-      let next = lexer.chars.get(lexer.position + 1);
-
-      if *current == '$' {
-        if next.is_some() && *next.unwrap() == '{' {
-          let tokens = get_tokens_until_right_bracket(lexer);
+      if current == '$' {
+        if next.is_some() && next.unwrap() == '{' {
+          let tokens = lexer.next_tokens_until_right_bracket();
           result.extend(tokens);
         } else {
-          lexer.position += 1;
+          lexer.control.next_char();
           if let Ok(token) = VariableToken::lex(lexer) {
             result.extend(token);
           }
         }
-      } else if next.is_some() && *current == '{' && *next.unwrap() == '$' {
-        lexer.position += 1;
-        let tokens = get_tokens_until_right_bracket(lexer);
+      } else if next.is_some() && current == '{' && next.unwrap() == '$' {
+        lexer.control.next_char();
+        let tokens = lexer.next_tokens_until_right_bracket();
         result.push(Token::new(TokenType::AdvanceInterpolationOpen, "{"));
         result.extend(tokens);
         result.push(Token::new(TokenType::AdvanceInterpolationClose, "}"));
-        // lexer.position += 1;
       }
     }
 

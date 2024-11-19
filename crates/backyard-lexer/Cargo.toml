@@ -4,6 +4,8 @@ edition.workspace = true
 version.workspace = true
 
 [dependencies]
+utils = { workspace = true }
+
 ts-rs = { workspace = true }
 serde = { workspace = true }
 wasm-bindgen = { workspace = true }

@@ -1,7 +1,6 @@
 pub mod token;
 mod internal;
 pub mod lexer;
-mod utils;
 pub mod error;
 
 use error::{ LexError, LexResult };
