@@ -1,5 +1,6 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, PreNode } };
+use backyard_nodes::node::{ NegateNode, Node, PreNode, SilentNode };
+use utils::guard_none;
 
 use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
 
@@ -12,7 +13,12 @@ impl PreParser {
       tokens,
       [
         Lookup::Equal(
-          vec![TokenType::PreIncrement, TokenType::PreDecrement, TokenType::BooleanNegate]
+          vec![
+            TokenType::PreIncrement,
+            TokenType::PreDecrement,
+            TokenType::BooleanNegate,
+            TokenType::AtSign
+          ]
         ),
       ].to_vec()
     )
@@ -24,17 +30,17 @@ impl PreParser {
     args: &mut LoopArgument
   ) -> Option<Box<Node>> {
     if let [operator] = matched.as_slice() {
-      let operator = operator.get(0);
-      if operator.is_none() {
-        return None;
-      }
-      let argument = parser.get_statement(
-        &mut LoopArgument::with_tokens("pre", args.separators, args.breakers)
+      let operator = guard_none!(operator.get(0));
+      let argument = guard_none!(
+        parser.get_statement(&mut LoopArgument::with_tokens("pre", args.separators, args.breakers))
       );
-      if argument.is_none() {
-        return None;
-      }
-      return Some(PreNode::new(argument.unwrap(), operator.unwrap().value.to_owned()));
+      return match operator.token_type {
+        TokenType::PreIncrement | TokenType::PreDecrement =>
+          Some(PreNode::new(argument, operator.value.to_owned())),
+        TokenType::BooleanNegate => Some(NegateNode::new(argument)),
+        TokenType::AtSign => Some(SilentNode::new(argument)),
+        _ => None,
+      };
     }
     None
   }

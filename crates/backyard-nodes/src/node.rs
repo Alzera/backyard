@@ -144,6 +144,7 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::MatchArm => { serde_json::from_value(node_data).map(NodeWrapper::MatchArm) }
             NodeType::Method => { serde_json::from_value(node_data).map(NodeWrapper::Method) }
             NodeType::Namespace => { serde_json::from_value(node_data).map(NodeWrapper::Namespace) }
+            NodeType::Negate => { serde_json::from_value(node_data).map(NodeWrapper::Negate) }
             NodeType::New => { serde_json::from_value(node_data).map(NodeWrapper::New) }
             NodeType::Number => { serde_json::from_value(node_data).map(NodeWrapper::Number) }
             NodeType::ObjectAccess => {
@@ -163,6 +164,7 @@ impl<'de> Deserialize<'de> for Node {
               serde_json::from_value(node_data).map(NodeWrapper::PropertyItem)
             }
             NodeType::Return => { serde_json::from_value(node_data).map(NodeWrapper::Return) }
+            NodeType::Silent => { serde_json::from_value(node_data).map(NodeWrapper::Silent) }
             NodeType::Static => { serde_json::from_value(node_data).map(NodeWrapper::Static) }
             NodeType::StaticLookup => {
               serde_json::from_value(node_data).map(NodeWrapper::StaticLookup)
@@ -256,6 +258,7 @@ pub enum NodeWrapper {
   MatchArm(MatchArmNode),
   Method(MethodNode),
   Namespace(NamespaceNode),
+  Negate(NegateNode),
   New(NewNode),
   Number(NumberNode),
   ObjectAccess(ObjectAccessNode),
@@ -269,6 +272,7 @@ pub enum NodeWrapper {
   Property(PropertyNode),
   PropertyItem(PropertyItemNode),
   Return(ReturnNode),
+  Silent(SilentNode),
   Static(StaticNode),
   StaticLookup(StaticLookupNode),
   String(StringNode),
@@ -343,6 +347,7 @@ pub enum NodeType {
   MatchArm,
   Method,
   Namespace,
+  Negate,
   New,
   Number,
   ObjectAccess,
@@ -356,6 +361,7 @@ pub enum NodeType {
   Property,
   PropertyItem,
   Return,
+  Silent,
   Static,
   StaticLookup,
   String,
@@ -639,6 +645,14 @@ new_node!(Post, PostNode {
 new_node!(Pre, PreNode {
   variable: Box<Node>,
   operator: String,
+});
+
+new_node!(Negate, NegateNode {
+  variable: Box<Node>,
+});
+
+new_node!(Silent, SilentNode {
+  variable: Box<Node>,
 });
 
 new_node!(Program, ProgramNode {

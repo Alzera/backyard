@@ -3,7 +3,7 @@ use utils::guard;
 
 pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Box<Node>);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 64] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 66] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
   (NodeType::Array, super::internal::array::ArrayGenerator::generate),
@@ -54,6 +54,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 64] = [
   // (NodeType::MatchArm, MatchArmGenerator::generate),
   // (NodeType::Method, super::internal::method::MethodGenerator::generate),
   (NodeType::Namespace, super::internal::namespace::NamespaceGenerator::generate),
+  (NodeType::Negate, super::internal::pre::PreGenerator::generate_negate),
   (NodeType::New, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Number, super::internal::number::NumberGenerator::generate),
   (NodeType::ObjectAccess, super::internal::objectaccess::ObjectAccessGenerator::generate),
@@ -67,6 +68,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 64] = [
   // (NodeType::Property, super::internal::property::PropertyGenerator::generate),
   // (NodeType::PropertyItem, PropertyItemGenerator::generate),
   (NodeType::Return, super::internal::singles::SinglesGenerator::generate),
+  (NodeType::Silent, super::internal::pre::PreGenerator::generate_silent),
   (NodeType::Static, super::internal::singles::SinglesGenerator::generate),
   (NodeType::StaticLookup, super::internal::staticlookup::StaticLookupGenerator::generate),
   (NodeType::String, super::internal::string::StringGenerator::generate),

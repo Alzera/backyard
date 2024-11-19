@@ -10,6 +10,18 @@ impl PreGenerator {
     builder.push(&node.operator.as_str());
     generator.generate_node(builder, &node.variable, &mut GeneratorArgument::default());
   }
+
+  pub fn generate_negate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+    let node = cast_node!(NodeWrapper::Negate, &node.node);
+    builder.push("!");
+    generator.generate_node(builder, &node.variable, &mut GeneratorArgument::default());
+  }
+
+  pub fn generate_silent(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+    let node = cast_node!(NodeWrapper::Silent, &node.node);
+    builder.push("@");
+    generator.generate_node(builder, &node.variable, &mut GeneratorArgument::default());
+  }
 }
 
 #[cfg(test)]
@@ -19,7 +31,7 @@ mod tests {
   #[test]
   fn basic() {
     test("$a = ++($a++);");
-    test("~$a;");
     test("!$a;");
+    test("@$a;");
   }
 }

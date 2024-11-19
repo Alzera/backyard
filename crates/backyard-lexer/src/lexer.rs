@@ -282,6 +282,14 @@ impl Lexer {
       ',' => Ok(vec![Token::new(TokenType::Comma, ",")]),
       ';' => Ok(vec![Token::new(TokenType::Semicolon, ";")]),
       '~' => Ok(vec![Token::new(TokenType::BooleanNegate, "~")]),
+      '@' => {
+        if let Some(next) = self.chars.get(self.position) {
+          if !next.is_whitespace() {
+            return Ok(vec![Token::new(TokenType::AtSign, "@")]);
+          }
+        }
+        Lexer::unable_to_handle("@")
+      }
       // '\n' => Ok(vec![Token::new(TokenType::LineBreak, "\n")]),
       _ => Lexer::unable_to_handle(&current_char.to_string()),
     }
