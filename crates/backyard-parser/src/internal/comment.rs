@@ -36,7 +36,7 @@ impl CommentParser {
         &mut LoopArgument::new("comment", args.separators, args.breakers, args.parsers)
       );
       if let Some(mut expr) = expr {
-        expr.leading_comments.push(comment);
+        expr.leading_comments.insert(0, comment);
         return Some(expr);
       }
       if let Some(expr) = args.statements.last_mut() {
