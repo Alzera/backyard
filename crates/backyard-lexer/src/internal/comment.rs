@@ -39,10 +39,8 @@ impl CommentToken {
 
   pub fn lex_line(lexer: &mut Lexer, t: &str) -> LexResult {
     let comment = lexer.control.next_char_until(|_, ch, _| ['\n'].contains(ch));
-    println!("comment {}", comment);
     let mut t = t.to_string();
     t.push_str(&comment);
-    println!("t {}", t);
     Ok(vec![Token::new(TokenType::CommentLine, t)])
   }
 }
