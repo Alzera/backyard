@@ -138,23 +138,26 @@ impl Lexer {
         }
       }
       '*' => {
-        let t = self.until(|ch| !['*', '/', '='].contains(ch));
+        let t = self.until(|ch| !['*', '='].contains(ch));
         match t.as_str() {
           "**=" => Ok(vec![Token::new(TokenType::ExponentiationAssignment, "**=")]),
           "*=" => Ok(vec![Token::new(TokenType::MultiplicationAssignment, "*=")]),
-          // "*/" => Ok(vec![Token::new(TokenType::CommentClose, "*/")]),
           "**" => Ok(vec![Token::new(TokenType::Exponentiation, "**")]),
           "*" => Ok(vec![Token::new(TokenType::Multiplication, "*")]),
           _ => Lexer::unable_to_handle(&t),
         }
       }
       '/' => {
+        let last_position = self.position.clone();
         let t = self.until(|ch| !['/', '*', '='].contains(ch));
+        if t.starts_with("//") {
+          self.position = last_position + 1;
+          return CommentToken::lex_line(&self.chars, &mut self.position);
+        }
         match t.as_str() {
           "/=" => Ok(vec![Token::new(TokenType::DivisionAssignment, "/=")]),
           "/**" => CommentToken::lex_doc(&self.chars, &mut self.position),
           "/*" => CommentToken::lex_block(&self.chars, &mut self.position),
-          "//" => CommentToken::lex_line(&self.chars, &mut self.position),
           "/" => Ok(vec![Token::new(TokenType::Division, "/")]),
           _ => Lexer::unable_to_handle(&t),
         }
@@ -269,14 +272,6 @@ impl Lexer {
       '(' => Ok(vec![Token::new(TokenType::LeftParenthesis, "(")]),
       ')' => Ok(vec![Token::new(TokenType::RightParenthesis, ")")]),
       '{' => Ok(vec![Token::new(TokenType::LeftCurlyBracket, "{")]),
-      // '{' => {
-      //   let t = self.until(|ch| !['$'].contains(ch));
-      //   match t.as_str() {
-      //     // "{$" => Ok(vec![Token::new(TokenType::AdvanceInterpolationOpen, "{$")]),
-      //     "{" => Ok(vec![Token::new(TokenType::LeftCurlyBracket, "{")]),
-      //     _ => Lexer::unable_to_handle(&t),
-      //   }
-      // }
       '}' => Ok(vec![Token::new(TokenType::RightCurlyBracket, "}")]),
       '[' => Ok(vec![Token::new(TokenType::LeftSquareBracket, "[")]),
       ']' => Ok(vec![Token::new(TokenType::RightSquareBracket, "]")]),
