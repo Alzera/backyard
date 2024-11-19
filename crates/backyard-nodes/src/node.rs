@@ -87,6 +87,7 @@ impl<'de> Deserialize<'de> for Node {
             }
             NodeType::Bin => { serde_json::from_value(node_data).map(NodeWrapper::Bin) }
             NodeType::Block => { serde_json::from_value(node_data).map(NodeWrapper::Block) }
+            NodeType::Boolean => { serde_json::from_value(node_data).map(NodeWrapper::Boolean) }
             NodeType::Break => { serde_json::from_value(node_data).map(NodeWrapper::Break) }
             NodeType::Call => { serde_json::from_value(node_data).map(NodeWrapper::Call) }
             NodeType::Case => { serde_json::from_value(node_data).map(NodeWrapper::Case) }
@@ -217,6 +218,7 @@ pub enum NodeWrapper {
   Assignment(AssignmentNode),
   Bin(BinNode),
   Block(BlockNode),
+  Boolean(BooleanNode),
   Break(BreakNode),
   Call(CallNode),
   Case(CaseNode),
@@ -306,6 +308,7 @@ pub enum NodeType {
   Assignment,
   Bin,
   Block,
+  Boolean,
   Break,
   Call,
   Case,
@@ -704,12 +707,12 @@ new_node!(Print, PrintNode {
   argument: Box<Node>,
 });
 
-new_node!(Parent, ParentNode {
-  raw: String,
-});
+new_node!(Parent, ParentNode {});
 
-new_node!(Static, StaticNode {
-  raw: String,
+new_node!(Static, StaticNode {});
+
+new_node!(Boolean, BooleanNode {
+  is_true: bool,
 });
 
 new_node!(Clone, CloneNode {
@@ -759,9 +762,7 @@ new_node!(Ternary, TernaryNode {
   invalid: Box<Node>,
 });
 
-new_node!(This, ThisNode {
-  raw: String,
-});
+new_node!(This, ThisNode {});
 
 new_node!(Trait, TraitNode {
   name: Box<Node>,

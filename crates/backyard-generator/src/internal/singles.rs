@@ -47,6 +47,15 @@ impl SinglesGenerator {
         builder.push("goto");
         Some(cast_node!(NodeWrapper::Goto, node.node.to_owned()).label)
       }
+      NodeType::Boolean => {
+        let node = cast_node!(NodeWrapper::Boolean, node.node.to_owned());
+        if node.is_true {
+          builder.push("true");
+        } else {
+          builder.push("false");
+        }
+        None
+      }
       NodeType::This => {
         builder.push("$this");
         None

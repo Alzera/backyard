@@ -3,7 +3,7 @@ use crate::{ error::LexResult, lexer::Lexer, token::{ Token, TokenType } };
 pub struct KeywordToken;
 
 impl KeywordToken {
-  const KEYS: [&str; 70] = [
+  const KEYS: [&str; 72] = [
     "abstract",
     "array",
     "as",
@@ -32,6 +32,7 @@ impl KeywordToken {
     "eval",
     "die",
     "extends",
+    "false",
     "final",
     "finally",
     "fn",
@@ -63,6 +64,7 @@ impl KeywordToken {
     "require_once",
     "return",
     "static",
+    "true",
     "parent",
     "self",
     "switch",
@@ -110,6 +112,7 @@ impl KeywordToken {
       "eval" => Ok(vec![Token::new(TokenType::Eval, input)]),
       "die" => Ok(vec![Token::new(TokenType::Die, input)]),
       "extends" => Ok(vec![Token::new(TokenType::Extends, input)]),
+      "false" => Ok(vec![Token::new(TokenType::False, input)]),
       "final" => Ok(vec![Token::new(TokenType::Final, input)]),
       "finally" => Ok(vec![Token::new(TokenType::Finally, input)]),
       "fn" => Ok(vec![Token::new(TokenType::Fn, input)]),
@@ -146,6 +149,7 @@ impl KeywordToken {
       "switch" => Ok(vec![Token::new(TokenType::Switch, input)]),
       "throw" => Ok(vec![Token::new(TokenType::Throw, input)]),
       "trait" => Ok(vec![Token::new(TokenType::Trait, input)]),
+      "true" => Ok(vec![Token::new(TokenType::True, input)]),
       "try" => Ok(vec![Token::new(TokenType::Try, input)]),
       "use" => Ok(vec![Token::new(TokenType::Use, input)]),
       "var" => Ok(vec![Token::new(TokenType::Var, input)]),

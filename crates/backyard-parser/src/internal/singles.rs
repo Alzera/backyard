@@ -1,5 +1,6 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
 use backyard_nodes::node::{
+  BooleanNode,
   BreakNode,
   CloneNode,
   ContinueNode,
@@ -44,7 +45,9 @@ impl SinglesParser {
             TokenType::Static,
             TokenType::Clone,
             TokenType::Global,
-            TokenType::This
+            TokenType::This,
+            TokenType::True,
+            TokenType::False
           ]
         ),
       ].to_vec()
@@ -58,12 +61,22 @@ impl SinglesParser {
   ) -> Result<Box<Node>, ParserError> {
     if let [key] = matched.as_slice() {
       if let Some(key) = key.first() {
-        if [TokenType::Parent, TokenType::Static, TokenType::This].contains(&key.token_type) {
+        if
+          [
+            TokenType::Parent,
+            TokenType::Static,
+            TokenType::This,
+            TokenType::True,
+            TokenType::False,
+          ].contains(&key.token_type)
+        {
           return match key.token_type {
-            TokenType::Parent => Ok(ParentNode::new(key.value.to_owned())),
-            TokenType::Static => Ok(StaticNode::new(key.value.to_owned())),
-            TokenType::This => Ok(ThisNode::new(key.value.to_owned())),
-            _ => Err(ParserError::internal("Single", args)),
+            TokenType::Parent => Ok(ParentNode::new()),
+            TokenType::Static => Ok(StaticNode::new()),
+            TokenType::This => Ok(ThisNode::new()),
+            TokenType::True => Ok(BooleanNode::new(true)),
+            TokenType::False => Ok(BooleanNode::new(false)),
+            _ => Err(ParserError::internal("Single: first group", args)),
           };
         }
         let argument = parser.get_statement(
@@ -86,7 +99,7 @@ impl SinglesParser {
           _ => {}
         }
         if argument.is_none() {
-          return Err(ParserError::internal("Single", args));
+          return Err(ParserError::internal("Single: second group", args));
         }
         let argument = argument.unwrap();
         return match key.token_type {
@@ -97,7 +110,7 @@ impl SinglesParser {
           TokenType::Clone => Ok(CloneNode::new(argument)),
           TokenType::Global => Ok(GlobalNode::new(argument)),
           TokenType::Goto => Ok(GotoNode::new(argument)),
-          _ => Err(ParserError::internal("Single", args)),
+          _ => Err(ParserError::internal("Single: third group", args)),
         };
       }
     }

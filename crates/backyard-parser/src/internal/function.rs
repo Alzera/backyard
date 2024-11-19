@@ -213,7 +213,7 @@ impl FunctionParser {
         if let Some(next_token) = parser.tokens.get(parser.position) {
           if next_token.token_type == TokenType::Static {
             parser.position += 1;
-            return Ok(StaticNode::new(String::from("static")));
+            return Ok(StaticNode::new());
           }
         }
         if

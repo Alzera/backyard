@@ -44,7 +44,7 @@ mod tests {
   fn basic() {
     test("call();");
     test("(fn () => 0)();");
-    test("call(0);");
+    test("call(true);");
     test("call(a: 0, b: 0);");
     test(
       "call(
