@@ -1,8 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, ForeachNode };
-use utils::guard_none;
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::block::BlockParser;
 
@@ -10,30 +14,41 @@ use super::block::BlockParser;
 pub struct ForeachParser {}
 
 impl ForeachParser {
-  fn get_key_value(parser: &mut Parser) -> Option<(Option<Box<Node>>, Box<Node>)> {
-    let key_or_value = guard_none!(
+  fn get_key_value(
+    parser: &mut Parser,
+    args: &LoopArgument
+  ) -> Result<(Option<Box<Node>>, Box<Node>), ParserError> {
+    let key_or_value = guard!(
       parser.get_statement(
         &mut LoopArgument::with_tokens(
           "foreach_key_or_value",
           &[],
           &[TokenType::Arrow, TokenType::RightParenthesis]
         )
-      )
+      )?,
+      {
+        return Err(ParserError::internal("Foreach", args));
+      }
     );
-    let has_key = guard_none!(parser.tokens.get(parser.position));
+    let has_key = guard!(parser.tokens.get(parser.position), {
+      return Err(ParserError::internal("Foreach", args));
+    });
     parser.position += 1;
     if has_key.token_type == TokenType::RightParenthesis {
-      return Some((None, key_or_value));
+      return Ok((None, key_or_value));
     } else if has_key.token_type == TokenType::Arrow {
-      let value = guard_none!(
+      let value = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("foreach_value", &[], &[TokenType::RightParenthesis])
-        )
+        )?,
+        {
+          return Err(ParserError::internal("Foreach", args));
+        }
       );
       parser.position += 1;
-      return Some((Some(key_or_value), value));
+      return Ok((Some(key_or_value), value));
     }
-    None
+    Err(ParserError::internal("Foreach", args))
   }
 }
 
@@ -51,22 +66,22 @@ impl ForeachParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
-      let source = guard_none!(
+      let source = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("foreach_source", &[], &[TokenType::As])
-        )
+        )?,
+        {
+          return Err(ParserError::internal("Foreach", args));
+        }
       );
       parser.position += 1;
-      if let Some((key, value)) = ForeachParser::get_key_value(parser) {
-        let (is_short, body) = guard_none!(
-          BlockParser::new_or_short(parser, &[TokenType::EndForeach])
-        );
-        return Some(ForeachNode::new(source, key, value, body, is_short));
-      }
+      let (key, value) = ForeachParser::get_key_value(parser, args)?;
+      let (is_short, body) = BlockParser::new_or_short(parser, &[TokenType::EndForeach], args)?;
+      return Ok(ForeachNode::new(source, key, value, body, is_short));
     }
-    None
+    Err(ParserError::internal("Foreach", args))
   }
 }

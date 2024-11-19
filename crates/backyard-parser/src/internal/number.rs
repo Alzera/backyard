@@ -1,7 +1,7 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, NumberNode } };
+use backyard_nodes::node::{ Node, NumberNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::some_or_default };
+use crate::{ error::ParserError, parser::{ LoopArgument, Parser }, utils::some_or_default };
 
 #[derive(Debug, Clone)]
 pub struct NumberParser {}
@@ -18,13 +18,13 @@ impl NumberParser {
   pub fn parse(
     _: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [number] = matched.as_slice() {
-      return Some(
+      return Ok(
         NumberNode::new(some_or_default(number.get(0), String::from("0"), |i| i.value.to_owned()))
       );
     }
-    None
+    Err(ParserError::internal("Number", args))
   }
 }

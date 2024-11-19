@@ -10,21 +10,17 @@ pub fn match_pattern(tokens: &Vec<Token>, pattern: Vec<Lookup>) -> Option<Vec<Ve
   let mut result: Vec<Vec<Token>> = Vec::new();
   let mut check_position = 0;
 
-  // println!("tokens: {:?}", tokens);
-
   for p in pattern.iter() {
     match p {
       Lookup::Equal(contains_tokens) => {
         let cur = tokens.get(check_position);
         check_position += 1;
         if cur.is_none() {
-          //          println!("Contains test exhausted: {:?}", result);
           return None;
         }
         let current_token = cur.unwrap();
         result.push(vec![current_token.to_owned()]);
         if !contains_tokens.contains(&current_token.token_type) {
-          //          println!("Contains fail: {:?}", p);
           return None;
         }
       }

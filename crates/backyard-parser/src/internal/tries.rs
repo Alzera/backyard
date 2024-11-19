@@ -2,7 +2,11 @@ use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ CatchNode, Node, TryNode };
 use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::{
   block::BlockParser,
@@ -22,10 +26,10 @@ impl TryParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      let body = BlockParser::new(parser);
+      let body = BlockParser::new(parser)?;
       let mut catches: Vec<Box<Node>> = vec![];
       let mut finally = None;
       loop {
@@ -42,7 +46,7 @@ impl TryParser {
         };
         parser.position += 1;
         if is_finally {
-          finally = Some(BlockParser::new(parser));
+          finally = Some(BlockParser::new(parser)?);
           break;
         }
         parser.position += 1;
@@ -56,7 +60,7 @@ impl TryParser {
               (CommentParser::test, CommentParser::parse),
             ]
           )
-        );
+        )?;
         parser.position -= 1;
         let mut variable = None;
         if let Some(last_token) = parser.tokens.get(parser.position) {
@@ -71,14 +75,14 @@ impl TryParser {
                   (CommentParser::test, CommentParser::parse),
                 ]
               )
-            );
+            )?;
           }
         }
         parser.position += 1;
-        catches.push(CatchNode::new(types, variable, BlockParser::new(parser)));
+        catches.push(CatchNode::new(types, variable, BlockParser::new(parser)?));
       }
-      return Some(TryNode::new(body, catches, finally));
+      return Ok(TryNode::new(body, catches, finally));
     }
-    None
+    Err(ParserError::internal("Try", args))
   }
 }

@@ -1,7 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, PostNode } };
+use backyard_nodes::node::{ Node, PostNode };
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct PostParser {}
@@ -18,19 +23,16 @@ impl PostParser {
     _: &mut Parser,
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+  ) -> Result<Box<Node>, ParserError> {
     if let [operator] = matched.as_slice() {
       if args.last_expr.is_none() {
-        return None;
+        return Err(ParserError::internal("Post", args));
       }
-      let operator = operator.get(0);
-      if operator.is_none() {
-        return None;
-      }
-      return Some(
-        PostNode::new(args.last_expr.to_owned().unwrap(), operator.unwrap().value.to_owned())
-      );
+      let operator = guard!(operator.get(0), {
+        return Err(ParserError::internal("Post", args));
+      });
+      return Ok(PostNode::new(args.last_expr.to_owned().unwrap(), operator.value.to_owned()));
     }
-    None
+    Err(ParserError::internal("Post", args))
   }
 }

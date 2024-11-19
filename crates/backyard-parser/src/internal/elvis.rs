@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
-use backyard_nodes::{ node::{ Node, ElvisNode } };
+use backyard_nodes::node::{ Node, ElvisNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct ElvisParser {}
@@ -15,7 +19,7 @@ impl ElvisParser {
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+  ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       if
         let Some(right) = parser.get_statement(
@@ -24,11 +28,11 @@ impl ElvisParser {
             &args.separators.combine(&[TokenType::Semicolon, TokenType::Comma]),
             &args.breakers
           )
-        )
+        )?
       {
-        return Some(ElvisNode::new(args.last_expr.to_owned().unwrap(), right));
+        return Ok(ElvisNode::new(args.last_expr.to_owned().unwrap(), right));
       }
     }
-    None
+    Err(ParserError::internal("Elvis", args))
   }
 }

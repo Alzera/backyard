@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, BlockNode, ClassNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, some_or_default, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, some_or_default, Lookup },
+};
 
 use super::{
   comment::CommentParser,
@@ -33,8 +37,8 @@ impl ClassParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [modifier, _, name, _, extends, _] = matched.as_slice() {
       let implements = parser.get_children(
         &mut LoopArgument::new(
@@ -46,7 +50,7 @@ impl ClassParser {
             (CommentParser::test, CommentParser::parse),
           ]
         )
-      );
+      )?;
       let body = parser.get_children(
         &mut LoopArgument::new(
           "class_body",
@@ -54,18 +58,18 @@ impl ClassParser {
           &[TokenType::RightCurlyBracket],
           &[
             (TraitUseParser::test, TraitUseParser::parse),
-            (PropertyParser::test, PropertyParser::parse),
             (MethodParser::test, MethodParser::parse),
             (ConstPropertyParser::test, ConstPropertyParser::parse),
+            (PropertyParser::test, PropertyParser::parse),
             (CommentParser::test, CommentParser::parse),
           ]
         )
-      );
+      )?;
       let extends = match extends.len() {
         1 => Some(IdentifierParser::from_matched(extends)),
         _ => None,
       };
-      return Some(
+      return Ok(
         ClassNode::new(
           some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
           IdentifierParser::from_matched(name),
@@ -75,6 +79,6 @@ impl ClassParser {
         )
       );
     }
-    None
+    Err(ParserError::internal("Class", args))
   }
 }

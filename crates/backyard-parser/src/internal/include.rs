@@ -1,7 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, IncludeNode } };
+use backyard_nodes::node::{ Node, IncludeNode };
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct IncludeParser {}
@@ -27,8 +32,8 @@ impl IncludeParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [keyword, _] = matched.as_slice() {
       let mut is_require = false;
       let mut is_once = false;
@@ -36,15 +41,17 @@ impl IncludeParser {
         is_require = t.token_type == TokenType::Require || t.token_type == TokenType::RequireOnce;
         is_once = t.token_type == TokenType::RequireOnce || t.token_type == TokenType::IncludeOnce;
       }
-      let argument = parser.get_statement(
-        &mut LoopArgument::with_tokens("include", &[], &[TokenType::RightParenthesis])
+      let argument = guard!(
+        parser.get_statement(
+          &mut LoopArgument::with_tokens("include", &[], &[TokenType::RightParenthesis])
+        )?,
+        {
+          return Err(ParserError::internal("Include", args));
+        }
       );
-      if argument.is_none() {
-        return None;
-      }
       parser.position += 1;
-      return Some(IncludeNode::new(is_require, is_once, argument.unwrap()));
+      return Ok(IncludeNode::new(is_require, is_once, argument));
     }
-    None
+    Err(ParserError::internal("Include", args))
   }
 }

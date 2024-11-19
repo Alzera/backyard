@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ BlockNode, Node, TraitNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::{
   comment::CommentParser,
@@ -26,8 +30,8 @@ impl TraitParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_, name] = matched.as_slice() {
       parser.position += 1;
       let body = parser.get_children(
@@ -37,15 +41,15 @@ impl TraitParser {
           &[TokenType::RightCurlyBracket],
           &[
             (TraitUseParser::test, TraitUseParser::parse),
-            (PropertyParser::test, PropertyParser::parse),
             (MethodParser::test, MethodParser::parse),
             (ConstPropertyParser::test, ConstPropertyParser::parse),
+            (PropertyParser::test, PropertyParser::parse),
             (CommentParser::test, CommentParser::parse),
           ]
         )
-      );
-      return Some(TraitNode::new(IdentifierParser::from_matched(name), BlockNode::new(body)));
+      )?;
+      return Ok(TraitNode::new(IdentifierParser::from_matched(name), BlockNode::new(body)));
     }
-    None
+    Err(ParserError::internal("Trait", args))
   }
 }

@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, ListNode } };
+use backyard_nodes::node::{ Node, ListNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct ListParser {}
@@ -20,14 +24,14 @@ impl ListParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let values = parser.get_children(
         &mut LoopArgument::with_tokens("list", &[TokenType::Comma], &[TokenType::RightParenthesis])
-      );
-      return Some(ListNode::new(values));
+      )?;
+      return Ok(ListNode::new(values));
     }
-    None
+    Err(ParserError::internal("List", args))
   }
 }

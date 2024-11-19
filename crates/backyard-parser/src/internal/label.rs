@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, LabelNode } };
+use backyard_nodes::node::{ Node, LabelNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::identifier::IdentifierParser;
 
@@ -20,11 +24,11 @@ impl LabelParser {
   pub fn parse(
     _: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [name, _] = matched.as_slice() {
-      return Some(LabelNode::new(IdentifierParser::from_matched(name)));
+      return Ok(LabelNode::new(IdentifierParser::from_matched(name)));
     }
-    None
+    Err(ParserError::internal("Label", args))
   }
 }

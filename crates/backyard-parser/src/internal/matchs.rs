@@ -1,8 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ MatchArmNode, MatchNode, Node };
-use utils::guard_none;
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::comment::CommentParser;
 
@@ -23,13 +27,16 @@ impl MatchParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
-      let condition = guard_none!(
+      let condition = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("match", &[], &[TokenType::RightParenthesis])
-        )
+        )?,
+        {
+          return Err(ParserError::internal("Match", args));
+        }
       );
       parser.position += 2;
       let arms = parser.get_children(
@@ -42,10 +49,10 @@ impl MatchParser {
             (CommentParser::test, CommentParser::parse),
           ]
         )
-      );
-      return Some(MatchNode::new(condition, arms));
+      )?;
+      return Ok(MatchNode::new(condition, arms));
     }
-    None
+    Err(ParserError::internal("Match", args))
   }
 }
 
@@ -57,8 +64,16 @@ impl MatchArmParser {
     Some(vec![])
   }
 
-  pub fn parse(parser: &mut Parser, _: Vec<Vec<Token>>, _: &mut LoopArgument) -> Option<Box<Node>> {
-    let conditions = match guard_none!(parser.tokens.get(parser.position)).token_type {
+  pub fn parse(
+    parser: &mut Parser,
+    _: Vec<Vec<Token>>,
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
+    let conditions = match
+      guard!(parser.tokens.get(parser.position), {
+        return Err(ParserError::internal("MatchArm", args));
+      }).token_type
+    {
       TokenType::Default => {
         parser.position += 2;
         vec![]
@@ -70,14 +85,25 @@ impl MatchArmParser {
             &[TokenType::Comma],
             &[TokenType::Arrow]
           )
-        ),
+        )?,
     };
-    let body = guard_none!(
+    let body = guard!(
       parser.get_statement(
-        &mut LoopArgument::with_tokens("match_arm_body", &[], &[TokenType::Comma])
-      )
+        &mut LoopArgument::with_tokens(
+          "match_arm_body",
+          &[],
+          &[TokenType::Comma, TokenType::RightCurlyBracket]
+        )
+      )?,
+      {
+        return Err(ParserError::internal("MatchArm", args));
+      }
     );
-    parser.position += 1;
-    Some(MatchArmNode::new(conditions, body))
+    if let Some(next_token) = parser.tokens.get(parser.position) {
+      if next_token.token_type == TokenType::Comma {
+        parser.position += 1;
+      }
+    }
+    Ok(MatchArmNode::new(conditions, body))
   }
 }

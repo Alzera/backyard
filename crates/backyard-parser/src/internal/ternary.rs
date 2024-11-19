@@ -1,7 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
-use backyard_nodes::{ node::{ Node, TernaryNode } };
+use backyard_nodes::node::{ Node, TernaryNode };
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct TernaryParser {}
@@ -15,32 +20,34 @@ impl TernaryParser {
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+  ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       if args.last_expr.is_none() {
-        return None;
+        return Err(ParserError::internal("Ternary", args));
       }
-      let valid = parser.get_statement(
-        &mut LoopArgument::with_tokens("ternary_valid", &[], &[TokenType::Colon])
+      let valid = guard!(
+        parser.get_statement(
+          &mut LoopArgument::with_tokens("ternary_valid", &[], &[TokenType::Colon])
+        )?,
+        {
+          return Err(ParserError::internal("Ternary", args));
+        }
       );
-      if valid.is_none() {
-        return None;
-      }
       parser.position += 1;
-      let invalid = parser.get_statement(
-        &mut LoopArgument::with_tokens(
-          "ternary_invalid",
-          &args.separators.combine(&[TokenType::Semicolon]),
-          &args.breakers
-        )
+      let invalid = guard!(
+        parser.get_statement(
+          &mut LoopArgument::with_tokens(
+            "ternary_invalid",
+            &args.separators.combine(&[TokenType::Semicolon]),
+            &args.breakers
+          )
+        )?,
+        {
+          return Err(ParserError::internal("Ternary", args));
+        }
       );
-      if invalid.is_none() {
-        return None;
-      }
-      return Some(
-        TernaryNode::new(args.last_expr.to_owned().unwrap(), valid.unwrap(), invalid.unwrap())
-      );
+      return Ok(TernaryNode::new(args.last_expr.to_owned().unwrap(), valid, invalid));
     }
-    None
+    Err(ParserError::internal("Ternary", args))
   }
 }

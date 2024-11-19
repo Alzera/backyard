@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, MagicNode } };
+use backyard_nodes::node::{ Node, MagicNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, some_or_default, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, some_or_default, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct MagicParser {}
@@ -14,13 +18,13 @@ impl MagicParser {
   pub fn parse(
     _: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [number] = matched.as_slice() {
-      return Some(
+      return Ok(
         MagicNode::new(some_or_default(number.get(0), String::from("0"), |i| i.value.to_owned()))
       );
     }
-    None
+    Err(ParserError::internal("Magic", args))
   }
 }

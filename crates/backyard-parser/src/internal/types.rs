@@ -1,25 +1,16 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, TypeNode } };
-use utils::guard_none;
+use backyard_nodes::node::{ Node, TypeNode };
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct TypesParser {}
 
-// impl TypesParser {
-//   pub fn new(is_nullable: &Vec<Token>, type_name: &Vec<Token>) -> Option<Box<Node>> {
-//     if let Some(type_name) = type_name.get(0) {
-//       if [TokenType::Type, TokenType::Identifier].contains(&type_name.token_type) {
-//         let is_nullable =
-//           is_nullable.len() > 0 &&
-//           is_nullable.get(0).unwrap().token_type == TokenType::QuestionMark;
-//         return Some(TypeNode::new(is_nullable, type_name.value.to_owned()));
-//       }
-//     }
-//     None
-//   }
-// }
 impl TypesParser {
   #[allow(unused_assignments)]
   pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
@@ -38,7 +29,9 @@ impl TypesParser {
     let mut index = 0;
     let mut last_token_type = None;
     loop {
-      let token = guard_none!(tokens.get(index));
+      let token = guard!(tokens.get(index), {
+        return None;
+      });
       index += 1;
       if
         ((last_token_type == None || last_token_type.unwrap() == TokenType::BitwiseOr) &&
@@ -66,8 +59,8 @@ impl TypesParser {
   pub fn parse(
     _: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if matched.len() == 2 {
       if let [is_nullable, type_name] = matched.as_slice() {
         if let Some(type_name) = type_name.get(0) {
@@ -75,13 +68,13 @@ impl TypesParser {
             let is_nullable =
               is_nullable.len() > 0 &&
               is_nullable.get(0).unwrap().token_type == TokenType::QuestionMark;
-            return Some(TypeNode::new(is_nullable, vec![type_name.value.to_owned()]));
+            return Ok(TypeNode::new(is_nullable, vec![type_name.value.to_owned()]));
           }
         }
       }
     } else if matched.len() == 1 {
       if let [types] = matched.as_slice() {
-        return Some(
+        return Ok(
           TypeNode::new(
             false,
             types
@@ -97,6 +90,6 @@ impl TypesParser {
         );
       }
     }
-    None
+    Err(ParserError::internal("Type", args))
   }
 }

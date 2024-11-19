@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, ProgramNode } };
+use backyard_nodes::node::{ Node, ProgramNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct ProgramParser {}
@@ -17,12 +21,12 @@ impl ProgramParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      let program = parser.get_children(&mut LoopArgument::default("main"));
-      return Some(ProgramNode::new(program));
+      let program = parser.get_children(&mut LoopArgument::default("main"))?;
+      return Ok(ProgramNode::new(program));
     }
-    None
+    Err(ParserError::internal("Program", args))
   }
 }

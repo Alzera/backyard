@@ -1,8 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ BlockNode, CaseNode, Node, SwitchNode };
-use utils::guard_none;
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::comment::CommentParser;
 
@@ -23,16 +27,22 @@ impl SwitchParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
-      let condition = guard_none!(
+      let condition = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("switch", &[], &[TokenType::RightParenthesis])
-        )
+        )?,
+        {
+          return Err(ParserError::internal("Switch", args));
+        }
       );
       parser.position += 1;
-      let is_short = guard_none!(parser.tokens.get(parser.position)).token_type == TokenType::Colon;
+      let is_short =
+        guard!(parser.tokens.get(parser.position), {
+          return Err(ParserError::internal("Switch", args));
+        }).token_type == TokenType::Colon;
       parser.position += 1;
       let statements = parser.get_children(
         &mut LoopArgument::new(
@@ -44,10 +54,10 @@ impl SwitchParser {
             (CommentParser::test, CommentParser::parse),
           ]
         )
-      );
-      return Some(SwitchNode::new(condition, BlockNode::new(statements), is_short));
+      )?;
+      return Ok(SwitchNode::new(condition, BlockNode::new(statements), is_short));
     }
-    None
+    Err(ParserError::internal("Switch", args))
   }
 }
 
@@ -62,15 +72,19 @@ impl CaseParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [is_default] = matched.as_slice() {
-      let condition = match guard_none!(is_default.get(0)).token_type {
+      let condition = match
+        guard!(is_default.get(0), {
+          return Err(ParserError::internal("Case", args));
+        }).token_type
+      {
         TokenType::Default => None,
         _ => {
           parser.get_statement(
             &mut LoopArgument::with_tokens("switch_case_condition", &[], &[TokenType::Colon])
-          )
+          )?
         }
       };
       parser.position += 1;
@@ -80,10 +94,10 @@ impl CaseParser {
           &[TokenType::Semicolon],
           &[TokenType::Case, TokenType::Default, TokenType::RightCurlyBracket, TokenType::EndSwitch]
         )
-      );
+      )?;
       parser.position -= 1;
-      return Some(CaseNode::new(condition, BlockNode::new(statements)));
+      return Ok(CaseNode::new(condition, BlockNode::new(statements)));
     }
-    None
+    Err(ParserError::internal("Case", args))
   }
 }

@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, NamespaceNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::{ block::BlockParser, comment::CommentParser, identifier::IdentifierParser };
 
@@ -16,8 +20,8 @@ impl NamespaceParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       let name = parser.get_children(
         &mut LoopArgument::new(
@@ -29,7 +33,7 @@ impl NamespaceParser {
             (CommentParser::test, CommentParser::parse),
           ]
         )
-      );
+      )?;
       let is_bracket = if let Some(t) = parser.tokens.get(parser.position - 1) {
         let is_bracket = t.token_type == TokenType::LeftCurlyBracket;
         parser.position -= 1;
@@ -37,9 +41,9 @@ impl NamespaceParser {
       } else {
         false
       };
-      let body = BlockParser::new(parser);
-      return Some(NamespaceNode::new(name, body, is_bracket));
+      let body = BlockParser::new(parser)?;
+      return Ok(NamespaceNode::new(name, body, is_bracket));
     }
-    None
+    Err(ParserError::internal("Namespace", args))
   }
 }

@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, ExitNode } };
+use backyard_nodes::node::{ Node, ExitNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct ExitParser {}
@@ -20,18 +24,18 @@ impl ExitParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let argument = parser.get_statement(
         &mut LoopArgument::with_tokens("exit", &[], &[TokenType::RightParenthesis])
-      );
+      )?;
       parser.position += 1;
       if argument.is_none() {
-        return None;
+        return Err(ParserError::internal("Exit", args));
       }
-      return Some(ExitNode::new(argument.unwrap()));
+      return Ok(ExitNode::new(argument.unwrap()));
     }
-    None
+    Err(ParserError::internal("Exit", args))
   }
 }

@@ -1,8 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, TraitUseAliasNode, TraitUseNode, TraitUsePrecedenceNode };
-use utils::guard_none;
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, some_or_default, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, some_or_default, Lookup },
+};
 
 use super::{ comment::CommentParser, identifier::IdentifierParser };
 
@@ -17,8 +21,8 @@ impl TraitUseParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       let traits = parser.get_children(
         &mut LoopArgument::new(
@@ -30,9 +34,13 @@ impl TraitUseParser {
             (CommentParser::test, CommentParser::parse),
           ]
         )
-      );
+      )?;
       let mut adaptations = vec![];
-      if guard_none!(parser.tokens.get(parser.position - 1)).token_type == TokenType::Semicolon {
+      if
+        guard!(parser.tokens.get(parser.position - 1), {
+          return Err(ParserError::internal("TraitUse", args));
+        }).token_type == TokenType::Semicolon
+      {
         parser.position -= 1;
       } else {
         adaptations = parser.get_children(
@@ -46,11 +54,11 @@ impl TraitUseParser {
               (CommentParser::test, CommentParser::parse),
             ]
           )
-        );
+        )?;
       }
-      return Some(TraitUseNode::new(traits, adaptations));
+      return Ok(TraitUseNode::new(traits, adaptations));
     }
-    None
+    Err(ParserError::internal("TraitUse", args))
   }
 }
 
@@ -75,8 +83,8 @@ impl TraitUseAliasParser {
   pub fn parse(
     _: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [trait_name, double_colon, name, _, visibility, alias] = matched.as_slice() {
       let has_trait = double_colon.len() > 0;
       let trait_to_parsed = if has_trait { trait_name } else { name };
@@ -85,7 +93,7 @@ impl TraitUseAliasParser {
         Some(t) => Some(IdentifierParser::new(t.value.to_owned())),
         _ => None,
       };
-      return Some(
+      return Ok(
         TraitUseAliasNode::new(
           trait_name_parsed,
           IdentifierParser::from_matched(name_to_parsed),
@@ -94,7 +102,7 @@ impl TraitUseAliasParser {
         )
       );
     }
-    None
+    Err(ParserError::internal("TraitUseAlias", args))
   }
 }
 
@@ -118,10 +126,10 @@ impl TraitUsePrecedenceParser {
   pub fn parse(
     _: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [trait_name, _, name, _, instead] = matched.as_slice() {
-      return Some(
+      return Ok(
         TraitUsePrecedenceNode::new(
           IdentifierParser::from_matched(trait_name),
           IdentifierParser::from_matched(name),
@@ -129,6 +137,6 @@ impl TraitUsePrecedenceParser {
         )
       );
     }
-    None
+    Err(ParserError::internal("TraitUsePrecedence", args))
   }
 }

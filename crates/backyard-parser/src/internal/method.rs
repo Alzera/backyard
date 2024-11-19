@@ -1,7 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, MethodNode } };
+use backyard_nodes::node::{ Node, MethodNode };
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, some_or_default, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, some_or_default, Lookup },
+};
 
 use super::{ comment::CommentParser, function::FunctionParser };
 
@@ -22,33 +27,35 @@ impl MethodParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [visibility, modifier, is_static, _] = matched.as_slice() {
       parser.position -= 1;
-      let function = parser.get_statement(
-        &mut LoopArgument::new(
-          "method",
-          &[TokenType::RightCurlyBracket],
-          &[],
-          &[
-            (FunctionParser::test, FunctionParser::parse),
-            (CommentParser::test, CommentParser::parse),
-          ]
-        )
+      let function = guard!(
+        parser.get_statement(
+          &mut LoopArgument::new(
+            "method",
+            &[TokenType::RightCurlyBracket],
+            &[],
+            &[
+              (FunctionParser::test, FunctionParser::parse),
+              (CommentParser::test, CommentParser::parse),
+            ]
+          )
+        )?,
+        {
+          return Err(ParserError::internal("Method", args));
+        }
       );
-      if function.is_none() {
-        return None;
-      }
-      return Some(
+      return Ok(
         MethodNode::new(
           some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
           some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
           is_static.len() > 0,
-          function.unwrap()
+          function
         )
       );
     }
-    None
+    Err(ParserError::internal("Method", args))
   }
 }

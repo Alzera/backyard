@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ BodyType, Node, DeclareArgumentNode, DeclareNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::{ block::BlockParser, comment::CommentParser, identifier::IdentifierParser };
 
@@ -22,8 +26,8 @@ impl DeclareParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let arguments = parser.get_children(
         &mut LoopArgument::new(
@@ -35,7 +39,7 @@ impl DeclareParser {
             (CommentParser::test, CommentParser::parse),
           ]
         )
-      );
+      )?;
       let body_type: BodyType = {
         let mut body_type = BodyType::Empty;
         if let Some(close) = parser.tokens.get(parser.position) {
@@ -49,12 +53,12 @@ impl DeclareParser {
       };
       let body = match body_type {
         BodyType::Empty => None,
-        BodyType::Basic => Some(BlockParser::new(parser)),
-        BodyType::Short => Some(BlockParser::new_short(parser, &[TokenType::EndDeclare])),
+        BodyType::Basic => Some(BlockParser::new(parser)?),
+        BodyType::Short => Some(BlockParser::new_short(parser, &[TokenType::EndDeclare])?),
       };
-      return Some(DeclareNode::new(arguments, body, body_type));
+      return Ok(DeclareNode::new(arguments, body, body_type));
     }
-    None
+    Err(ParserError::internal("Declare", args))
   }
 }
 
@@ -75,8 +79,8 @@ impl DeclareArgumentParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [name, _] = matched.as_slice() {
       if
         let Some(value) = parser.get_statement(
@@ -85,11 +89,11 @@ impl DeclareArgumentParser {
             &[TokenType::Comma],
             &[TokenType::RightParenthesis]
           )
-        )
+        )?
       {
-        return Some(DeclareArgumentNode::new(IdentifierParser::from_matched(name), value));
+        return Ok(DeclareArgumentNode::new(IdentifierParser::from_matched(name), value));
       }
     }
-    None
+    Err(ParserError::internal("DeclareArgument", args))
   }
 }

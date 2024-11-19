@@ -1,8 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, IfNode } };
-use utils::guard_none;
+use backyard_nodes::node::{ Node, IfNode };
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::block::BlockParser;
 
@@ -21,16 +25,21 @@ impl IfParser {
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+  ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
-      let condition = guard_none!(
+      let condition = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("if", &[], &[TokenType::RightParenthesis])
-        )
+        )?,
+        {
+          return Err(ParserError::internal("If", args));
+        }
       );
       parser.position += 1;
 
-      let next_token = guard_none!(parser.tokens.get(parser.position));
+      let next_token = guard!(parser.tokens.get(parser.position), {
+        return Err(ParserError::internal("If", args));
+      });
       let mut is_short = false;
       let valid = match next_token.token_type {
         TokenType::Colon => {
@@ -38,16 +47,19 @@ impl IfParser {
           let parsed = BlockParser::new_short(
             parser,
             &[TokenType::ElseIf, TokenType::Else, TokenType::EndIf]
-          );
+          )?;
           parser.position -= 1;
           parsed
         }
-        TokenType::LeftCurlyBracket => BlockParser::new(parser),
+        TokenType::LeftCurlyBracket => BlockParser::new(parser)?,
         _ => {
-          let parsed = guard_none!(
+          let parsed = guard!(
             parser.get_statement(
               &mut LoopArgument::with_tokens("if_body", &[], &[TokenType::Semicolon])
-            )
+            )?,
+            {
+              return Err(ParserError::internal("If", args));
+            }
           );
           parser.position += 1;
           parsed
@@ -62,13 +74,13 @@ impl IfParser {
               match next_token.token_type {
                 TokenType::LeftCurlyBracket | TokenType::Colon => {
                   if is_short {
-                    invalid = Some(BlockParser::new_short(parser, &[TokenType::EndIf]));
+                    invalid = Some(BlockParser::new_short(parser, &[TokenType::EndIf])?);
                   } else {
-                    invalid = Some(BlockParser::new(parser));
+                    invalid = Some(BlockParser::new(parser)?);
                   }
                 }
                 TokenType::If => {
-                  invalid = parser.get_statement(&mut LoopArgument::default("if_invalid"));
+                  invalid = parser.get_statement(&mut LoopArgument::default("if_invalid"))?;
                 }
                 _ => {
                   invalid = parser.get_statement(
@@ -77,20 +89,20 @@ impl IfParser {
                       &[],
                       &[TokenType::Semicolon, TokenType::Else, TokenType::EndIf]
                     )
-                  );
+                  )?;
                 }
               };
             }
           }
           TokenType::ElseIf => {
             parser.position += 2;
-            invalid = IfParser::parse(parser, vec![vec![], vec![]], args);
+            invalid = Some(IfParser::parse(parser, vec![vec![], vec![]], args)?);
           }
           _ => {}
         }
       }
-      return Some(IfNode::new(condition, valid, invalid, is_short));
+      return Ok(IfNode::new(condition, valid, invalid, is_short));
     }
-    None
+    Err(ParserError::internal("If", args))
   }
 }

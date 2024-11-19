@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ BodyType, Node, ForNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::block::BlockParser;
 
@@ -22,26 +26,26 @@ impl ForParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let inits = parser.get_children(
         &mut LoopArgument::with_tokens("for_inits", &[TokenType::Comma], &[TokenType::Semicolon])
-      );
+      )?;
       let tests = parser.get_children(
         &mut LoopArgument::with_tokens("for_tests", &[TokenType::Comma], &[TokenType::Semicolon])
-      );
+      )?;
       let increments = parser.get_children(
         &mut LoopArgument::with_tokens(
           "for_increments",
           &[TokenType::Comma],
           &[TokenType::RightParenthesis]
         )
-      );
-      let parsed_block = BlockParser::new_or_short(parser, &[TokenType::EndFor]);
+      )?;
+      let parsed_block = BlockParser::new_or_short(parser, &[TokenType::EndFor], args);
       let mut body = None;
       let mut body_type = BodyType::Empty;
-      if parsed_block.is_some() {
+      if parsed_block.is_ok() {
         let (is_short, parsed_block) = parsed_block.unwrap();
         body_type = match is_short {
           true => BodyType::Short,
@@ -49,8 +53,8 @@ impl ForParser {
         };
         body = Some(parsed_block);
       }
-      return Some(ForNode::new(inits, tests, increments, body, body_type));
+      return Ok(ForNode::new(inits, tests, increments, body, body_type));
     }
-    None
+    Err(ParserError::internal("For", args))
   }
 }

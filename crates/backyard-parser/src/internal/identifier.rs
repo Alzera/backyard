@@ -1,7 +1,7 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, IdentifierNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::some_or_default };
+use crate::{ error::ParserError, parser::{ LoopArgument, Parser }, utils::some_or_default };
 
 #[derive(Debug, Clone)]
 pub struct IdentifierParser {}
@@ -28,11 +28,11 @@ impl IdentifierParser {
   pub fn parse(
     _: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [identifier] = matched.as_slice() {
-      return Some(IdentifierParser::from_matched(identifier));
+      return Ok(IdentifierParser::from_matched(identifier));
     }
-    None
+    Err(ParserError::internal("Identifier", args))
   }
 }

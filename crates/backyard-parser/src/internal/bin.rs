@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
-use backyard_nodes::{ node::{ Node, BinNode } };
+use backyard_nodes::node::{ Node, BinNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct BinParser {}
@@ -50,7 +54,7 @@ impl BinParser {
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+  ) -> Result<Box<Node>, ParserError> {
     if let [operator] = matched.as_slice() {
       if let Some(operator) = operator.get(0) {
         if
@@ -60,14 +64,14 @@ impl BinParser {
               &args.separators.combine(&[TokenType::Semicolon]),
               &args.breakers
             )
-          )
+          )?
         {
-          return Some(
+          return Ok(
             BinNode::new(args.last_expr.to_owned().unwrap(), operator.value.to_owned(), right)
           );
         }
       }
     }
-    None
+    Err(ParserError::internal("Bin", args))
   }
 }

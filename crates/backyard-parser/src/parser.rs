@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, NodeType };
-use crate::internal::elvis::ElvisParser;
+use crate::{ error::ParserError, internal::elvis::ElvisParser };
 
 use super::internal::{
   array::ArrayParser,
@@ -52,7 +52,11 @@ use super::internal::{
 };
 
 type InternalParserTest = fn(&Vec<Token>, &mut LoopArgument) -> Option<Vec<Vec<Token>>>;
-type InternalParserParse = fn(&mut Parser, Vec<Vec<Token>>, &mut LoopArgument) -> Option<Box<Node>>;
+type InternalParserParse = fn(
+  &mut Parser,
+  Vec<Vec<Token>>,
+  &mut LoopArgument
+) -> Result<Box<Node>, ParserError>;
 type InternalParser = (InternalParserTest, InternalParserParse);
 pub static DEFAULT_PARSERS: [InternalParser; 45] = [
   (CommentParser::test, CommentParser::parse),
@@ -156,7 +160,7 @@ impl<'a> LoopArgument<'a> {
     }
   }
 
-  fn to_string(&self) -> String {
+  pub fn to_string(&self) -> String {
     let last_statement = if let Some(last) = self.statements.last() {
       Some(&last.node_type)
     } else {
@@ -176,22 +180,18 @@ impl<'a> LoopArgument<'a> {
 
 pub struct Parser {
   pub tokens: Vec<Token>,
-  // pub length: usize,
   pub position: usize,
-  // parsers: Vec<ParserInternal>,
 }
 
 impl Parser {
   pub fn new(tokens: &Vec<Token>) -> Self {
     Parser {
       tokens: tokens.to_vec(),
-      // length: tokens.len(),
       position: 0,
-      // parsers: ParserInternal::parsers(),
     }
   }
 
-  pub fn get_children(&mut self, args: &mut LoopArgument) -> Vec<Box<Node>> {
+  pub fn get_children(&mut self, args: &mut LoopArgument) -> Result<Vec<Box<Node>>, ParserError> {
     while let Some(token) = self.tokens.get(self.position) {
       if args.breakers.contains(&token.token_type) {
         self.position += 1;
@@ -201,93 +201,93 @@ impl Parser {
         self.position += 1;
         continue;
       }
-      if let Some(n) = self.get_statement(args) {
-        args.statements.push(n);
+      let statement = self.get_statement(args);
+      if statement.is_err() {
+        return Err(statement.err().unwrap());
+      }
+      if let Some(statement) = statement.unwrap() {
+        args.statements.push(statement);
       } else {
-        if let Some(t) = self.tokens.get(self.position) {
-          if !(args.separators.contains(&t.token_type) || args.breakers.contains(&t.token_type)) {
-            println!("Fail to parse children: {:?}, {:?}", t, args.to_string());
-          }
-        }
         break;
       }
     }
-    args.statements.clone()
+    Ok(args.statements.to_owned())
   }
 
-  pub fn get_statement(&mut self, args: &mut LoopArgument) -> Option<Box<Node>> {
-    // println!("get_statement start: {:?}, {:?}", args.separators, args.breakers);
+  pub fn get_statement(
+    &mut self,
+    args: &mut LoopArgument
+  ) -> Result<Option<Box<Node>>, ParserError> {
     while let Some(token) = self.tokens.get(self.position) {
-      // println!("get_statement while: {:?}", token.token_type);
       if args.separators.contains(&token.token_type) || args.breakers.contains(&token.token_type) {
         break;
       }
-      if let Some(n) = self.find_match(args) {
-        let force_end_statement = [
-          NodeType::Declare,
-          NodeType::Namespace,
-          NodeType::Function,
-          NodeType::AnonymousFunction,
-          NodeType::ArrowFunction,
-          NodeType::Class,
-          NodeType::Interface,
-          NodeType::Trait,
-          NodeType::Enum,
-          NodeType::Property,
-          NodeType::Method,
-          NodeType::TraitUse,
-          NodeType::Foreach,
-          NodeType::For,
-          NodeType::While,
-          NodeType::DoWhile,
-          NodeType::Match,
-          NodeType::MatchArm,
-          NodeType::If,
-          NodeType::Switch,
-          NodeType::Case,
-          NodeType::Label,
-          NodeType::Try,
-          NodeType::CommentLine,
-          NodeType::CommentBlock,
-        ].contains(&n.node_type);
-        // println!(
-        //   "get_statement force_end_statement: {:?}, {:?}",
-        //   force_end_statement,
-        //   n.get_type()
-        // );
-        args.last_expr = Some(n);
-        if force_end_statement {
-          break;
-        }
-      } else {
-        if let Some(t) = self.tokens.get(self.position) {
-          if !(args.separators.contains(&t.token_type) || args.breakers.contains(&t.token_type)) {
-            println!("Fail to parse statement: {:?}, {:?}", t, args.to_string());
+      match self.find_match(args) {
+        Ok(n) => {
+          let force_end_statement = [
+            NodeType::Declare,
+            NodeType::Namespace,
+            NodeType::Function,
+            NodeType::AnonymousFunction,
+            NodeType::ArrowFunction,
+            NodeType::Class,
+            NodeType::Interface,
+            NodeType::Trait,
+            NodeType::Enum,
+            NodeType::Property,
+            NodeType::Method,
+            NodeType::TraitUse,
+            NodeType::Foreach,
+            NodeType::For,
+            NodeType::While,
+            NodeType::DoWhile,
+            NodeType::Match,
+            NodeType::MatchArm,
+            NodeType::If,
+            NodeType::Switch,
+            NodeType::Case,
+            NodeType::Label,
+            NodeType::Try,
+            NodeType::CommentLine,
+            NodeType::CommentBlock,
+          ].contains(&n.node_type);
+          args.last_expr = Some(n);
+          if force_end_statement {
+            break;
           }
         }
-        break;
+        Err(e) => {
+          args.last_expr = None;
+          return Err(e);
+        }
       }
     }
 
     let last_expr = args.last_expr.to_owned();
     args.last_expr = None;
-    last_expr
+    Ok(last_expr.to_owned())
   }
 
-  pub fn find_match(&mut self, args: &mut LoopArgument) -> Option<Box<Node>> {
+  pub fn find_match(&mut self, args: &mut LoopArgument) -> Result<Box<Node>, ParserError> {
     let tokens = self.tokens[self.position..].to_vec();
 
     for (test, parse) in args.parsers {
-      // println!("parse_statement: {:?}", parser);
       if let Some(matched) = test(&tokens, args) {
         self.position += matched
           .iter()
           .map(|x| x.len())
           .sum::<usize>();
-        // println!("parse_statement matched: {:?}", i);
         return parse(self, matched, args);
       }
     }
-    None
+    Err(
+      ParserError::Failed(
+        format!(
+          "Failed to find match: {:?}, {:?}",
+          args.to_string(),
+          tokens.iter().take(3).collect::<Vec<&Token>>()
+        )
+      )
+    )
   }
 }

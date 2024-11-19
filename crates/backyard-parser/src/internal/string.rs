@@ -1,7 +1,8 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, EncapsedNode, EncapsedPartNode, StringNode };
+use utils::guard;
 
-use crate::parser::{ LoopArgument, Parser };
+use crate::{ error::ParserError, parser::{ LoopArgument, Parser } };
 
 use super::variable::VariableParser;
 
@@ -21,23 +22,23 @@ impl StringParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [string_type] = matched.as_slice() {
       if let Some(string_type) = string_type.get(0) {
         if string_type.token_type == TokenType::EncapsedStringOpen {
           return StringParser::parse_encapsed(parser);
         } else if string_type.token_type == TokenType::String {
-          return Some(StringNode::new(string_type.value.to_owned()));
+          return Ok(StringNode::new(string_type.value.to_owned()));
         }
       }
     }
-    None
+    Err(ParserError::internal("String", args))
   }
 }
 
 impl StringParser {
-  fn parse_encapsed(parser: &mut Parser) -> Option<Box<Node>> {
+  fn parse_encapsed(parser: &mut Parser) -> Result<Box<Node>, ParserError> {
     let mut values: Vec<Box<Node>> = vec![];
     while let Some(i) = parser.tokens.get(parser.position) {
       parser.position += 1;
@@ -50,20 +51,22 @@ impl StringParser {
         TokenType::Variable =>
           values.push(EncapsedPartNode::new(false, VariableParser::new(i.value.to_owned(), false))),
         TokenType::AdvanceInterpolationOpen => {
-          let value = parser.get_statement(
-            &mut LoopArgument::with_tokens("string", &[TokenType::AdvanceInterpolationClose], &[])
+          let value = guard!(
+            parser.get_statement(
+              &mut LoopArgument::with_tokens("string", &[TokenType::AdvanceInterpolationClose], &[])
+            )?,
+            {
+              continue;
+            }
           );
           parser.position += 1;
-          if value.is_none() {
-            continue;
-          }
-          values.push(EncapsedPartNode::new(true, value.unwrap()));
+          values.push(EncapsedPartNode::new(true, value));
         }
         _ => {
           continue;
         }
       }
     }
-    return Some(EncapsedNode::new(values));
+    return Ok(EncapsedNode::new(values));
   }
 }

@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ BlockNode, InterfaceNode, Node };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::{
   comment::CommentParser,
@@ -28,8 +32,8 @@ impl InterfaceParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_, name, _] = matched.as_slice() {
       let implements = parser.get_children(
         &mut LoopArgument::new(
@@ -41,23 +45,23 @@ impl InterfaceParser {
             (CommentParser::test, CommentParser::parse),
           ]
         )
-      );
+      )?;
       let body = parser.get_children(
         &mut LoopArgument::new(
           "interface_body",
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
           &[
-            (ConstPropertyParser::test, ConstPropertyParser::parse),
             (MethodParser::test, MethodParser::parse),
+            (ConstPropertyParser::test, ConstPropertyParser::parse),
             (CommentParser::test, CommentParser::parse),
           ]
         )
-      );
-      return Some(
+      )?;
+      return Ok(
         InterfaceNode::new(IdentifierParser::from_matched(name), implements, BlockNode::new(body))
       );
     }
-    None
+    Err(ParserError::internal("Interface", args))
   }
 }

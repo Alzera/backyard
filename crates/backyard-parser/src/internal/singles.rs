@@ -16,7 +16,11 @@ use backyard_nodes::node::{
   ThrowNode,
 };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct SinglesParser {}
@@ -51,15 +55,15 @@ impl SinglesParser {
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+  ) -> Result<Box<Node>, ParserError> {
     if let [key] = matched.as_slice() {
       if let Some(key) = key.first() {
         if [TokenType::Parent, TokenType::Static, TokenType::This].contains(&key.token_type) {
           return match key.token_type {
-            TokenType::Parent => Some(ParentNode::new(key.value.to_owned())),
-            TokenType::Static => Some(StaticNode::new(key.value.to_owned())),
-            TokenType::This => Some(ThisNode::new(key.value.to_owned())),
-            _ => None,
+            TokenType::Parent => Ok(ParentNode::new(key.value.to_owned())),
+            TokenType::Static => Ok(StaticNode::new(key.value.to_owned())),
+            TokenType::This => Ok(ThisNode::new(key.value.to_owned())),
+            _ => Err(ParserError::internal("Single", args)),
           };
         }
         let argument = parser.get_statement(
@@ -68,32 +72,35 @@ impl SinglesParser {
             &args.separators.combine(&[TokenType::Semicolon]),
             &args.breakers.combine(&[TokenType::RightCurlyBracket])
           )
-        );
-        let node: Option<Box<Node>> = match key.token_type {
-          TokenType::Break => Some(BreakNode::new(argument.to_owned())),
-          TokenType::Continue => Some(ContinueNode::new(argument.to_owned())),
-          TokenType::Return => Some(ReturnNode::new(argument.to_owned())),
-          _ => None,
-        };
-        if node.is_some() {
-          return node;
+        )?;
+        match key.token_type {
+          TokenType::Break => {
+            return Ok(BreakNode::new(argument.to_owned()));
+          }
+          TokenType::Continue => {
+            return Ok(ContinueNode::new(argument.to_owned()));
+          }
+          TokenType::Return => {
+            return Ok(ReturnNode::new(argument.to_owned()));
+          }
+          _ => {}
         }
         if argument.is_none() {
-          return None;
+          return Err(ParserError::internal("Single", args));
         }
         let argument = argument.unwrap();
         return match key.token_type {
-          TokenType::Echo => Some(EchoNode::new(argument)),
-          TokenType::New => Some(NewNode::new(argument)),
-          TokenType::Print => Some(PrintNode::new(argument)),
-          TokenType::Throw => Some(ThrowNode::new(argument)),
-          TokenType::Clone => Some(CloneNode::new(argument)),
-          TokenType::Global => Some(GlobalNode::new(argument)),
-          TokenType::Goto => Some(GotoNode::new(argument)),
-          _ => None,
+          TokenType::Echo => Ok(EchoNode::new(argument)),
+          TokenType::New => Ok(NewNode::new(argument)),
+          TokenType::Print => Ok(PrintNode::new(argument)),
+          TokenType::Throw => Ok(ThrowNode::new(argument)),
+          TokenType::Clone => Ok(CloneNode::new(argument)),
+          TokenType::Global => Ok(GlobalNode::new(argument)),
+          TokenType::Goto => Ok(GotoNode::new(argument)),
+          _ => Err(ParserError::internal("Single", args)),
         };
       }
     }
-    None
+    Err(ParserError::internal("Single", args))
   }
 }

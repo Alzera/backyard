@@ -1,7 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, ArgumentNode, CallNode };
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::{ comment::CommentParser, identifier::IdentifierParser };
 
@@ -9,7 +14,7 @@ use super::{ comment::CommentParser, identifier::IdentifierParser };
 pub struct CallParser {}
 
 impl CallParser {
-  pub fn get_arguments(parser: &mut Parser) -> Vec<Box<Node>> {
+  pub fn get_arguments(parser: &mut Parser) -> Result<Vec<Box<Node>>, ParserError> {
     parser.get_children(
       &mut LoopArgument::new(
         "call",
@@ -38,19 +43,19 @@ impl CallParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [name, _] = matched.as_slice() {
       if let Some(name) = name.get(0) {
-        return Some(
+        return Ok(
           CallNode::new(
             IdentifierParser::new(name.value.to_owned()),
-            CallParser::get_arguments(parser)
+            CallParser::get_arguments(parser)?
           )
         );
       }
     }
-    None
+    Err(ParserError::internal("Call", args))
   }
 }
 
@@ -71,26 +76,27 @@ impl ArgumentParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
-    // println!("ArgumentNode::parse: {:?}", matched);
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [name, _] = matched.as_slice() {
-      let value = parser.get_statement(
-        &mut LoopArgument::with_tokens(
-          "argument",
-          &[TokenType::Comma, TokenType::RightParenthesis],
-          &[]
-        )
+      let value = guard!(
+        parser.get_statement(
+          &mut LoopArgument::with_tokens(
+            "argument",
+            &[TokenType::Comma, TokenType::RightParenthesis],
+            &[]
+          )
+        )?,
+        {
+          return Err(ParserError::internal("Argument: failed to get value", args));
+        }
       );
-      if value.is_none() {
-        return None;
-      }
       let name = match name.len() {
         1 => Some(IdentifierParser::from_matched(name)),
         _ => None,
       };
-      return Some(ArgumentNode::new(name, value.unwrap()));
+      return Ok(ArgumentNode::new(name, value));
     }
-    None
+    Err(ParserError::internal("Argument", args))
   }
 }

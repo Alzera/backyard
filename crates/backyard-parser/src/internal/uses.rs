@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, UseNode } };
+use backyard_nodes::node::{ Node, UseNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, some_or_default, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, some_or_default, Lookup },
+};
 
 use super::{ comment::CommentParser, identifier::IdentifierParser };
 
@@ -22,8 +26,8 @@ impl UsesParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_, modifier] = matched.as_slice() {
       let modifier = some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned());
       let name = parser.get_children(
@@ -36,7 +40,7 @@ impl UsesParser {
             (CommentParser::test, CommentParser::parse),
           ]
         )
-      );
+      )?;
       parser.position -= 1;
       let items = {
         let mut items = vec![];
@@ -53,13 +57,13 @@ impl UsesParser {
                   (CommentParser::test, CommentParser::parse),
                 ]
               )
-            );
+            )?;
           }
         }
         items
       };
-      return Some(UseNode::new(modifier, name, items));
+      return Ok(UseNode::new(modifier, name, items));
     }
-    None
+    Err(ParserError::internal("Use", args))
   }
 }

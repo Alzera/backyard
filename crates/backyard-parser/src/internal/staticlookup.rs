@@ -1,8 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, StaticLookupNode } };
-use utils::guard_none;
+use backyard_nodes::node::{ Node, StaticLookupNode };
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::identifier::IdentifierParser;
 
@@ -24,11 +28,13 @@ impl StaticLookupParser {
     _: &mut Parser,
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+  ) -> Result<Box<Node>, ParserError> {
     if let [_, prop] = matched.as_slice() {
-      let on = guard_none!(args.last_expr.to_owned());
-      return Some(StaticLookupNode::new(on, IdentifierParser::from_matched(prop)));
+      let on = guard!(args.last_expr.to_owned(), {
+        return Err(ParserError::internal("StaticLookup", args));
+      });
+      return Ok(StaticLookupNode::new(on, IdentifierParser::from_matched(prop)));
     }
-    None
+    Err(ParserError::internal("StaticLookup", args))
   }
 }

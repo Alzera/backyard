@@ -22,34 +22,72 @@ macro_rules! guard {
   };
 }
 
+// #[macro_export]
+// macro_rules! guard_none {
+//   ($option:expr) => {
+//       match $option {
+//           Some(value) => value,
+//           None => {
+//               return None;
+//           }
+//       }
+//   };
+// }
+
 #[macro_export]
-macro_rules! guard_none {
-  ($option:expr) => {
+macro_rules! guard_ok {
+  //   ($option:expr) => {
+  //       match $option {
+  //           Ok(value) => value,
+  //           Err(err) => {
+  //               return Err(err);
+  //           }
+  //       }
+  //   };
+  ($option:expr, $failure:block) => {
       match $option {
-          Some(value) => value,
-          None => {
-              return None;
+        Ok(value) => value,
+        Err(_) => {
+              $failure;
           }
       }
   };
 }
 
 // #[macro_export]
-// macro_rules! guard_ok {
-//   ($option:expr) => {
+// macro_rules! guard_parser_statement {
+//   ($name:expr, $option:expr) => {
 //       match $option {
-//           Ok(value) => value,
-//           Err(_) => {
-//               return None;
-//           }
+//         Ok(value) => {
+//             match value {
+//                 Some(v) => v,
+//                 None => {
+//                     return Err(ParserError::internal($name, args))
+//                 }
+//             }
+//         },
+//         Err(err) => {
+//             return Err(err);
+//         }
 //       }
 //   };
+// }
+
+// #[macro_export]
+// macro_rules! guard_ok_some {
 //   ($option:expr, $failure:block) => {
 //       match $option {
-//         Ok(value) => value,
-//         Err(_) => {
-//               $failure;
-//           }
+//         Ok(value) => {
+//             match value {
+//                 Some(v) => v,
+//                 None => {
+//                     $failure
+//                 }
+//             }
+//         },
+//         Err(err) => {
+//             return Err(err);
+//         }
 //       }
 //   };
 // }

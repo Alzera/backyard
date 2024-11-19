@@ -1,8 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Node, DoWhileNode } };
-use utils::guard_none;
+use backyard_nodes::node::{ Node, DoWhileNode };
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::block::BlockParser;
 
@@ -17,19 +21,22 @@ impl DoWhileParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      let body = BlockParser::new(parser);
+      let body = BlockParser::new(parser)?;
       parser.position += 2;
-      let condition = guard_none!(
+      let condition = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("do_while", &[], &[TokenType::RightParenthesis])
-        )
+        )?,
+        {
+          return Err(ParserError::internal("DoWhile", args));
+        }
       );
       parser.position += 1;
-      return Some(DoWhileNode::new(condition, body));
+      return Ok(DoWhileNode::new(condition, body));
     }
-    None
+    Err(ParserError::internal("DoWhile", args))
   }
 }

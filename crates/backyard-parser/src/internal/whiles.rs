@@ -1,8 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, WhileNode };
-use utils::guard_none;
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 use super::block::BlockParser;
 
@@ -23,18 +27,21 @@ impl WhileParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
-      let condition = guard_none!(
+      let condition = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("while", &[], &[TokenType::RightParenthesis])
-        )
+        )?,
+        {
+          return Err(ParserError::internal("While", args));
+        }
       );
       parser.position += 1;
-      let (is_short, body) = guard_none!(BlockParser::new_or_short(parser, &[TokenType::EndWhile]));
-      return Some(WhileNode::new(condition, body, is_short));
+      let (is_short, body) = BlockParser::new_or_short(parser, &[TokenType::EndWhile], args)?;
+      return Ok(WhileNode::new(condition, body, is_short));
     }
-    None
+    Err(ParserError::internal("While", args))
   }
 }

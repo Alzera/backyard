@@ -1,8 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, CommentBlockNode, CommentDocNode, CommentLineNode };
-use utils::guard_none;
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct CommentParser {}
@@ -21,30 +25,32 @@ impl CommentParser {
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+  ) -> Result<Box<Node>, ParserError> {
     if let [comment] = matched.as_slice() {
-      let comment = guard_none!(comment.get(0));
+      let comment = guard!(comment.get(0), {
+        return Err(ParserError::internal("Comment: failed to get type", args));
+      });
       let comment: Box<Node> = match comment.token_type {
         TokenType::CommentLine => CommentLineNode::new(comment.value.to_owned()),
         TokenType::CommentBlock => CommentBlockNode::new(comment.value.to_owned()),
         TokenType::CommentDoc => CommentDocNode::new(comment.value.to_owned()),
         _ => {
-          return None;
+          return Err(ParserError::internal("Comment: failed creating node", args));
         }
       };
       let expr = parser.get_statement(
         &mut LoopArgument::new("comment", args.separators, args.breakers, args.parsers)
-      );
+      )?;
       if let Some(mut expr) = expr {
         expr.leading_comments.insert(0, comment);
-        return Some(expr);
+        return Ok(expr);
       }
-      if let Some(expr) = args.statements.last_mut() {
+      if let Some(mut expr) = args.statements.pop() {
         expr.trailing_comments.push(comment);
-        return None;
+        return Ok(expr);
       }
-      return Some(comment);
+      return Ok(comment);
     }
-    None
+    Err(ParserError::internal("Comment", args))
   }
 }

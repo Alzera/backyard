@@ -1,7 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, NodeType, ArrayItemNode, ArrayNode };
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser, DEFAULT_PARSERS }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
+  utils::{ match_pattern, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct ArrayParser {}
@@ -20,8 +25,8 @@ impl ArrayParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [is_ellipsis, _] = matched.as_slice() {
       let mut loop_parsers = DEFAULT_PARSERS.to_vec();
       loop_parsers.insert(0, (ArrayItemParser::test, ArrayItemParser::parse));
@@ -33,7 +38,7 @@ impl ArrayParser {
             &[TokenType::RightSquareBracket],
             &loop_parsers
           )
-        )
+        )?
         .iter()
         .map(|i| (
           if i.node_type == NodeType::ArrayItem {
@@ -43,9 +48,9 @@ impl ArrayParser {
           }
         ))
         .collect::<Vec<Box<Node>>>();
-      return Some(ArrayNode::new(is_ellipsis.len() > 0, values));
+      return Ok(ArrayNode::new(is_ellipsis.len() > 0, values));
     }
-    None
+    Err(ParserError::internal("Array", args))
   }
 }
 
@@ -61,21 +66,23 @@ impl ArrayItemParser {
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+  ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      let value = parser.get_statement(
-        &mut LoopArgument::with_tokens(
-          "array_item",
-          &[],
-          &[TokenType::Comma, TokenType::RightSquareBracket]
-        )
+      let value = guard!(
+        parser.get_statement(
+          &mut LoopArgument::with_tokens(
+            "array_item",
+            &[],
+            &[TokenType::Comma, TokenType::RightSquareBracket]
+          )
+        )?,
+        {
+          return Err(ParserError::internal("ArrayItem", args));
+        }
       );
-      if value.is_none() {
-        return None;
-      }
       let key = args.last_expr.to_owned();
-      return Some(ArrayItemNode::new(key, value.unwrap()));
+      return Ok(ArrayItemNode::new(key, value));
     }
-    None
+    Err(ParserError::internal("ArrayItem", args))
   }
 }

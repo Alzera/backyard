@@ -1,15 +1,21 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, NodeType, ArrayLookupNode };
-use utils::guard_none;
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct ArrayLookupParser {}
 
 impl ArrayLookupParser {
   pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    let last_expr = guard_none!(&args.last_expr);
+    let last_expr = guard!(&args.last_expr, {
+      return None;
+    });
     if
       ![
         NodeType::Variable,
@@ -31,15 +37,17 @@ impl ArrayLookupParser {
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+  ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      let on = guard_none!(args.last_expr.to_owned());
+      let on = guard!(args.last_expr.to_owned(), {
+        return Err(ParserError::internal("ArrayLookup", args));
+      });
       let target = parser.get_statement(
         &mut LoopArgument::with_tokens("arraylookup", &[], &[TokenType::RightSquareBracket])
-      );
+      )?;
       parser.position += 1;
-      return Some(ArrayLookupNode::new(on, target));
+      return Ok(ArrayLookupNode::new(on, target));
     }
-    None
+    Err(ParserError::internal("ArrayLookup", args))
   }
 }

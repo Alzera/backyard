@@ -1,7 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, ConstNode, ConstPropertyNode };
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, some_or_default, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, some_or_default, Lookup },
+};
 
 use super::{ assignment::AssignmentParser, comment::CommentParser, identifier::IdentifierParser };
 
@@ -9,7 +13,7 @@ use super::{ assignment::AssignmentParser, comment::CommentParser, identifier::I
 pub struct ConstParser {}
 
 impl ConstParser {
-  pub fn get_consts(parser: &mut Parser) -> Vec<Box<Node>> {
+  pub fn get_consts(parser: &mut Parser) -> Result<Vec<Box<Node>>, ParserError> {
     let consts = parser.get_children(
       &mut LoopArgument::new(
         "const",
@@ -35,12 +39,12 @@ impl ConstParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      return Some(ConstNode::new(ConstParser::get_consts(parser)));
+      return Ok(ConstNode::new(ConstParser::get_consts(parser)?));
     }
-    None
+    Err(ParserError::internal("Const", args))
   }
 }
 
@@ -61,16 +65,16 @@ impl ConstPropertyParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
-    _: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     if let [visibility, _] = matched.as_slice() {
-      return Some(
+      return Ok(
         ConstPropertyNode::new(
           some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
-          ConstParser::get_consts(parser)
+          ConstParser::get_consts(parser)?
         )
       );
     }
-    None
+    Err(ParserError::internal("ConstProperty", args))
   }
 }

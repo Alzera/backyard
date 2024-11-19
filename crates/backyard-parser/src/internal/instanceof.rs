@@ -1,8 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
-use backyard_nodes::{ node::{ Node, InstanceOfNode } };
-use utils::guard_none;
+use backyard_nodes::node::{ Node, InstanceOfNode };
+use utils::guard;
 
-use crate::{ parser::{ LoopArgument, Parser }, utils::{ match_pattern, Lookup } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct InstanceOfParser {}
@@ -16,19 +20,22 @@ impl InstanceOfParser {
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
-  ) -> Option<Box<Node>> {
+  ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      let right = guard_none!(
+      let right = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens(
             "instanceof",
             &args.separators.combine(&[TokenType::Semicolon]),
             &args.breakers
           )
-        )
+        )?,
+        {
+          return Err(ParserError::internal("InstanceOf", args));
+        }
       );
-      return Some(InstanceOfNode::new(args.last_expr.to_owned().unwrap(), right));
+      return Ok(InstanceOfNode::new(args.last_expr.to_owned().unwrap(), right));
     }
-    None
+    Err(ParserError::internal("InstanceOf", args))
   }
 }

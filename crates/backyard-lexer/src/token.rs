@@ -223,7 +223,7 @@ impl TokenTypeArrayCombine for &[TokenType] {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, TS)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct Token {
   pub token_type: TokenType,
