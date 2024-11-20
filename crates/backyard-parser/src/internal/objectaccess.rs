@@ -44,7 +44,7 @@ impl ObjectAccessParser {
         TokenType::ObjectAccess | TokenType::NullsafeObjectAccess => {
           let expr = guard!(
             parser.get_statement(
-              &mut LoopArgument::new(
+              &mut LoopArgument::safe(
                 "objectaccess",
                 &[],
                 &[

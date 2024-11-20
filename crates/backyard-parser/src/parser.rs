@@ -115,6 +115,7 @@ pub struct LoopArgument<'a> {
   pub breakers: &'a [TokenType],
   pub last_expr: Option<Box<Node>>,
   pub statements: Vec<Box<Node>>,
+  pub should_fail: bool,
 }
 
 impl<'a> LoopArgument<'a> {
@@ -131,6 +132,24 @@ impl<'a> LoopArgument<'a> {
       breakers,
       last_expr: None,
       statements: vec![],
+      should_fail: true,
+    }
+  }
+
+  pub fn safe(
+    context: &'a str,
+    separators: &'a [TokenType],
+    breakers: &'a [TokenType],
+    parsers: &'a [InternalParser]
+  ) -> Self {
+    LoopArgument {
+      context,
+      parsers,
+      separators,
+      breakers,
+      last_expr: None,
+      statements: vec![],
+      should_fail: false,
     }
   }
 
@@ -142,6 +161,7 @@ impl<'a> LoopArgument<'a> {
       breakers: &[TokenType::RightCurlyBracket],
       last_expr: None,
       statements: vec![],
+      should_fail: true,
     }
   }
 
@@ -157,6 +177,7 @@ impl<'a> LoopArgument<'a> {
       breakers,
       last_expr: None,
       statements: vec![],
+      should_fail: true,
     }
   }
 
@@ -224,6 +245,10 @@ impl Parser {
       }
       match self.find_match(args) {
         Ok(n) => {
+          if n.is_none() {
+            break;
+          }
+          let n = n.unwrap();
           let force_end_statement = [
             NodeType::Declare,
             NodeType::Namespace,
@@ -268,7 +293,7 @@ impl Parser {
     Ok(last_expr.to_owned())
   }
 
-  pub fn find_match(&mut self, args: &mut LoopArgument) -> Result<Box<Node>, ParserError> {
+  pub fn find_match(&mut self, args: &mut LoopArgument) -> Result<Option<Box<Node>>, ParserError> {
     let tokens = self.tokens[self.position..].to_vec();
 
     for (test, parse) in args.parsers {
@@ -277,17 +302,22 @@ impl Parser {
           .iter()
           .map(|x| x.len())
           .sum::<usize>();
-        return parse(self, matched, args);
+        let parsed = parse(self, matched, args)?;
+        return Ok(Some(parsed));
       }
     }
-    Err(
-      ParserError::Failed(
-        format!(
-          "Failed to find match: {:?}, {:?}",
-          args.to_string(),
-          tokens.iter().take(3).collect::<Vec<&Token>>()
+    if args.should_fail {
+      Err(
+        ParserError::Failed(
+          format!(
+            "Failed to find match: {:?}, {:?}",
+            args.to_string(),
+            tokens.iter().take(3).collect::<Vec<&Token>>()
+          )
         )
       )
-    )
+    } else {
+      Ok(None)
+    }
   }
 }
