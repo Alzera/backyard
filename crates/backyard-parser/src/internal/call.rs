@@ -78,7 +78,13 @@ impl ArgumentParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [name, _] = matched.as_slice() {
+    if let [name, has_name] = matched.as_slice() {
+      let name = if has_name.len() > 0 {
+        Some(IdentifierParser::from_matched(name))
+      } else {
+        parser.position -= name.len();
+        None
+      };
       let value = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens(
@@ -91,10 +97,6 @@ impl ArgumentParser {
           return Err(ParserError::internal("Argument: failed to get value", args));
         }
       );
-      let name = match name.len() {
-        1 => Some(IdentifierParser::from_matched(name)),
-        _ => None,
-      };
       return Ok(ArgumentNode::new(name, value));
     }
     Err(ParserError::internal("Argument", args))
