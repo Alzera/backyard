@@ -64,7 +64,19 @@ impl ObjectAccessParser {
               return Err(ParserError::internal("ObjectAccess", args));
             }
           );
-          parser.position += 1;
+          if let Some(next_token) = parser.tokens.get(parser.position) {
+            if
+              [
+                TokenType::Semicolon,
+                TokenType::ObjectAccess,
+                TokenType::NullsafeObjectAccess,
+                TokenType::ObjectAccessBracketOpen,
+                TokenType::NullsafeObjectAccessBracketOpen,
+              ].contains(&next_token.token_type)
+            {
+              parser.position += 1;
+            }
+          }
           return Ok(ObjectAccessNode::new(args.last_expr.to_owned().unwrap(), expr));
         }
         TokenType::ObjectAccessBracketOpen | TokenType::NullsafeObjectAccessBracketOpen => {

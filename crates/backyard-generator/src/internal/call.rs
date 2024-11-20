@@ -42,6 +42,7 @@ mod tests {
 
   #[test]
   fn basic() {
+    test("floor(((int) $this->rawFormat(\"u\")) / 1000);");
     test("call();");
     test("(fn () => 0)();");
     test("call(true);");
