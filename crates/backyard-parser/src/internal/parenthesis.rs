@@ -45,8 +45,6 @@ impl ParenthesisParser {
                 )
               );
             }
-          } else {
-            return Err(ParserError::internal("Parenthesis", args));
           }
         } else if [NodeType::StaticLookup, NodeType::ObjectAccess].contains(&le.node_type) {
           return Ok(
@@ -63,7 +61,7 @@ impl ParenthesisParser {
           )
         )?,
         {
-          return Err(ParserError::internal("Parenthesis", args));
+          return Err(ParserError::internal("Parenthesis: fail to get statement", args));
         }
       );
       parser.position += 1;
@@ -75,7 +73,7 @@ impl ParenthesisParser {
           &mut LoopArgument::with_tokens("cast", &args.separators, &args.breakers)
         )?,
         {
-          return Err(ParserError::internal("Parenthesis", args));
+          return Err(ParserError::internal("Parenthesis: fail to get expression", args));
         }
       );
 
