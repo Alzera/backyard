@@ -61,7 +61,6 @@ type InternalParser = (InternalParserTest, InternalParserParse);
 pub static DEFAULT_PARSERS: [InternalParser; 45] = [
   (CommentParser::test, CommentParser::parse),
   (ListParser::test, ListParser::parse),
-  (ParenthesisParser::test, ParenthesisParser::parse),
   (ArrayLookupParser::test, ArrayLookupParser::parse),
   (ArrayParser::test, ArrayParser::parse),
   (AssignmentParser::test, AssignmentParser::parse),
@@ -80,6 +79,7 @@ pub static DEFAULT_PARSERS: [InternalParser; 45] = [
   (ForeachParser::test, ForeachParser::parse),
   (FunctionParser::test, FunctionParser::parse),
   (CallParser::test, CallParser::parse),
+  (ParenthesisParser::test, ParenthesisParser::parse),
   (ClassParser::test, ClassParser::parse),
   (InterfaceParser::test, InterfaceParser::parse),
   (TraitParser::test, TraitParser::parse),
@@ -92,7 +92,6 @@ pub static DEFAULT_PARSERS: [InternalParser; 45] = [
   (PostParser::test, PostParser::parse),
   (PreParser::test, PreParser::parse),
   (ProgramParser::test, ProgramParser::parse),
-  (SinglesParser::test, SinglesParser::parse),
   (StaticLookupParser::test, StaticLookupParser::parse),
   (YieldParser::test, YieldParser::parse),
   (StringParser::test, StringParser::parse),
@@ -103,6 +102,7 @@ pub static DEFAULT_PARSERS: [InternalParser; 45] = [
   (LabelParser::test, LabelParser::parse),
   (IdentifierParser::test, IdentifierParser::parse),
   (TypesParser::test, TypesParser::parse),
+  (SinglesParser::test, SinglesParser::parse),
   (ElvisParser::test, ElvisParser::parse),
 ];
 
@@ -312,7 +312,7 @@ impl Parser {
           format!(
             "Failed to find match: {:?}, {:?}",
             args.to_string(),
-            tokens.iter().take(3).collect::<Vec<&Token>>()
+            tokens.iter().take(5).collect::<Vec<&Token>>()
           )
         )
       )

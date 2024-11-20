@@ -94,6 +94,9 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::Cast => { serde_json::from_value(node_data).map(NodeWrapper::Cast) }
             NodeType::Catch => { serde_json::from_value(node_data).map(NodeWrapper::Catch) }
             NodeType::Class => { serde_json::from_value(node_data).map(NodeWrapper::Class) }
+            NodeType::ClassKeyword => {
+              serde_json::from_value(node_data).map(NodeWrapper::ClassKeyword)
+            }
             NodeType::Clone => { serde_json::from_value(node_data).map(NodeWrapper::Clone) }
             NodeType::CommentBlock => {
               serde_json::from_value(node_data).map(NodeWrapper::CommentBlock)
@@ -166,6 +169,9 @@ impl<'de> Deserialize<'de> for Node {
               serde_json::from_value(node_data).map(NodeWrapper::PropertyItem)
             }
             NodeType::Return => { serde_json::from_value(node_data).map(NodeWrapper::Return) }
+            NodeType::SelfKeyword => {
+              serde_json::from_value(node_data).map(NodeWrapper::SelfKeyword)
+            }
             NodeType::Silent => { serde_json::from_value(node_data).map(NodeWrapper::Silent) }
             NodeType::Static => { serde_json::from_value(node_data).map(NodeWrapper::Static) }
             NodeType::StaticLookup => {
@@ -188,6 +194,7 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::Type => { serde_json::from_value(node_data).map(NodeWrapper::Type) }
             NodeType::Use => { serde_json::from_value(node_data).map(NodeWrapper::Use) }
             NodeType::Variable => { serde_json::from_value(node_data).map(NodeWrapper::Variable) }
+            NodeType::Variadic => { serde_json::from_value(node_data).map(NodeWrapper::Variadic) }
             NodeType::While => { serde_json::from_value(node_data).map(NodeWrapper::While) }
             NodeType::Yield => { serde_json::from_value(node_data).map(NodeWrapper::Yield) }
             NodeType::YieldFrom => { serde_json::from_value(node_data).map(NodeWrapper::YieldFrom) }
@@ -226,6 +233,7 @@ pub enum NodeWrapper {
   Cast(CastNode),
   Catch(CatchNode),
   Class(ClassNode),
+  ClassKeyword(ClassKeywordNode),
   Clone(CloneNode),
   CommentBlock(CommentBlockNode),
   CommentDoc(CommentDocNode),
@@ -276,6 +284,7 @@ pub enum NodeWrapper {
   Property(PropertyNode),
   PropertyItem(PropertyItemNode),
   Return(ReturnNode),
+  SelfKeyword(SelfNode),
   Silent(SilentNode),
   Static(StaticNode),
   StaticLookup(StaticLookupNode),
@@ -292,6 +301,7 @@ pub enum NodeWrapper {
   Type(TypeNode),
   Use(UseNode),
   Variable(VariableNode),
+  Variadic(VariadicNode),
   While(WhileNode),
   Yield(YieldNode),
   YieldFrom(YieldFromNode),
@@ -317,6 +327,7 @@ pub enum NodeType {
   Cast,
   Catch,
   Class,
+  ClassKeyword,
   Clone,
   CommentBlock,
   CommentDoc,
@@ -367,6 +378,7 @@ pub enum NodeType {
   Property,
   PropertyItem,
   Return,
+  SelfKeyword,
   Silent,
   Static,
   StaticLookup,
@@ -383,6 +395,7 @@ pub enum NodeType {
   Type,
   Use,
   Variable,
+  Variadic,
   While,
   Yield,
   YieldFrom,
@@ -413,8 +426,11 @@ macro_rules! new_node {
 }
 
 new_node!(Array, ArrayNode {
-  is_ellipsis: bool,
   items: Vec<Box<Node>>,
+});
+
+new_node!(Variadic, VariadicNode {
+  expr: Box<Node>,
 });
 
 new_node!(ArrayItem, ArrayItemNode {
@@ -718,6 +734,8 @@ new_node!(Parent, ParentNode {});
 
 new_node!(Static, StaticNode {});
 
+new_node!(ClassKeyword, ClassKeywordNode {});
+
 new_node!(Boolean, BooleanNode {
   is_true: bool,
 });
@@ -770,6 +788,8 @@ new_node!(Ternary, TernaryNode {
 });
 
 new_node!(This, ThisNode {});
+
+new_node!(SelfKeyword, SelfNode {});
 
 new_node!(Trait, TraitNode {
   name: Box<Node>,

@@ -25,8 +25,10 @@ mod tests {
 
   #[test]
   fn basic() {
-    test("$a->b;");
     test("$a->{\"b\"};");
     test("$this->setTimezone(date_default_timezone_get());");
+    test(
+      "while ($i <= 10) {\n  $this->subSecond();\n  $value += static::MICROSECONDS_PER_SECOND;\n}"
+    );
   }
 }

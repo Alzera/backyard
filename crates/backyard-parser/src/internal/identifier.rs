@@ -1,7 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, IdentifierNode };
+use utils::guard;
 
-use crate::{ error::ParserError, parser::{ LoopArgument, Parser }, utils::some_or_default };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, some_or_default, Lookup },
+};
 
 #[derive(Debug, Clone)]
 pub struct IdentifierParser {}
@@ -18,11 +23,13 @@ impl IdentifierParser {
 
 impl IdentifierParser {
   pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    let token = tokens.get(0).unwrap();
-    if [TokenType::Identifier].contains(&token.token_type) {
-      return Some(vec![vec![token.to_owned()]]);
-    }
-    None
+    match_pattern(
+      tokens,
+      [
+        Lookup::Optional(vec![TokenType::BackSlash]),
+        Lookup::Equal(vec![TokenType::Identifier]),
+      ].to_vec()
+    )
   }
 
   pub fn parse(
@@ -30,8 +37,12 @@ impl IdentifierParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [identifier] = matched.as_slice() {
-      return Ok(IdentifierParser::from_matched(identifier));
+    if let [backlash, identifier] = matched.as_slice() {
+      let id = guard!(identifier.get(0), {
+        return Err(ParserError::internal("Identifier", args));
+      });
+      let name = if backlash.len() > 0 { format!("\\{}", id.value) } else { id.value.to_owned() };
+      return Ok(IdentifierParser::new(name));
     }
     Err(ParserError::internal("Identifier", args))
   }

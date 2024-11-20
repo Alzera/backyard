@@ -10,9 +10,13 @@ impl BinGenerator {
     generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
     let mut expr = generator.generate_node_new(&node.right);
     if builder.last_len() + expr.first_len() + node.operator.len() > generator.max_length {
-      expr.shift(format!("{} ", node.operator).as_str());
+      let mut t = Builder::new();
+      t.new_line();
+      t.push(format!("{} ", node.operator).as_str());
+      t.indent();
+      builder.extend(&t);
       expr.indent();
-      builder.extend(&expr);
+      builder.extend_first_line(&expr);
     } else {
       builder.push(format!(" {} ", node.operator).as_str());
       builder.extend_first_line(&expr);
@@ -26,6 +30,11 @@ mod tests {
 
   #[test]
   fn basic() {
+    test(
+      "$this->callDiffAlias($unit, $parameters)
+  ?? $this->callHumanDiffAlias($unit, $parameters) ?? $this->callRoundMethod($unit, $parameters)
+    ?? $this->callGetOrSetMethod($method, $parameters) ?? $this->callMacroMethod($method, $parameters);"
+    );
     [
       "+",
       "-",

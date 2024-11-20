@@ -38,8 +38,8 @@ mod tests {
 ///////////////////////////////////////////////"
     );
     test("/*
-  testing leading
-*/
+ testing leading
+ */
 function a() {
   /** 
    * testing inside

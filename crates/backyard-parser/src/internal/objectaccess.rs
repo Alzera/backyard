@@ -4,11 +4,10 @@ use utils::guard;
 
 use crate::{
   error::ParserError,
+  internal::{ call::CallParser, identifier::IdentifierParser, variable::VariableParser },
   parser::{ LoopArgument, Parser },
   utils::{ match_pattern, Lookup },
 };
-
-use super::{ call::CallParser, identifier::IdentifierParser };
 
 #[derive(Debug, Clone)]
 pub struct ObjectAccessParser {}
@@ -55,28 +54,16 @@ impl ObjectAccessParser {
                   TokenType::NullsafeObjectAccessBracketOpen,
                 ],
                 &[
-                  (CallParser::test, CallParser::parse),
+                  (CallParser::class_test, CallParser::parse),
+                  (VariableParser::test, VariableParser::parse),
                   (IdentifierParser::test, IdentifierParser::parse),
                 ]
               )
             )?,
             {
-              return Err(ParserError::internal("ObjectAccess", args));
+              return Err(ParserError::internal("ObjectAccess: fail to parse basic", args));
             }
           );
-          if let Some(next_token) = parser.tokens.get(parser.position) {
-            if
-              [
-                TokenType::Semicolon,
-                TokenType::ObjectAccess,
-                TokenType::NullsafeObjectAccess,
-                TokenType::ObjectAccessBracketOpen,
-                TokenType::NullsafeObjectAccessBracketOpen,
-              ].contains(&next_token.token_type)
-            {
-              parser.position += 1;
-            }
-          }
           return Ok(ObjectAccessNode::new(args.last_expr.to_owned().unwrap(), expr));
         }
         TokenType::ObjectAccessBracketOpen | TokenType::NullsafeObjectAccessBracketOpen => {
@@ -89,15 +76,13 @@ impl ObjectAccessParser {
               )
             )?,
             {
-              return Err(ParserError::internal("ObjectAccess", args));
+              return Err(ParserError::internal("ObjectAccess: fail to parse bracket", args));
             }
           );
           parser.position += 1;
           return Ok(ObjectAccessNode::new(args.last_expr.to_owned().unwrap(), expr));
         }
-        _ => {
-          return Err(ParserError::internal("ObjectAccess", args));
-        }
+        _ => {}
       }
     }
     Err(ParserError::internal("ObjectAccess", args))

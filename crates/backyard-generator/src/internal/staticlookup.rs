@@ -1,4 +1,4 @@
-use backyard_nodes::{ cast_node, node::{ Node, NodeWrapper } };
+use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
@@ -9,7 +9,11 @@ impl StaticLookupGenerator {
     let node = cast_node!(NodeWrapper::StaticLookup, &node.node);
     generator.generate_node(builder, &node.target, &mut GeneratorArgument::default());
     builder.push("::");
-    generator.generate_node(builder, &node.on, &mut GeneratorArgument::default());
+    if node.on.node_type == NodeType::ClassKeyword {
+      builder.push("class");
+    } else {
+      generator.generate_node(builder, &node.on, &mut GeneratorArgument::default());
+    }
   }
 }
 
@@ -20,5 +24,6 @@ mod tests {
   #[test]
   fn basic() {
     test("++A::b();");
+    test("A::class;");
   }
 }

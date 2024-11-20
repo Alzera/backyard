@@ -7,9 +7,6 @@ impl ArrayGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Array, &node.node);
 
-    if node.is_ellipsis {
-      builder.push("...");
-    }
     let mut items = generator.generate_nodes_new(
       &node.items,
       &mut GeneratorArgument::for_parameter(&[(NodeType::ArrayItem, Self::generate_item)])

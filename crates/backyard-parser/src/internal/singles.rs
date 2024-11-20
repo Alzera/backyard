@@ -12,6 +12,7 @@ use backyard_nodes::node::{
   ParentNode,
   PrintNode,
   ReturnNode,
+  SelfNode,
   StaticNode,
   ThisNode,
   ThrowNode,
@@ -47,7 +48,8 @@ impl SinglesParser {
             TokenType::Global,
             TokenType::This,
             TokenType::True,
-            TokenType::False
+            TokenType::False,
+            TokenType::SelfKeyword
           ]
         ),
       ].to_vec()
@@ -66,6 +68,7 @@ impl SinglesParser {
             TokenType::Parent,
             TokenType::Static,
             TokenType::This,
+            TokenType::SelfKeyword,
             TokenType::True,
             TokenType::False,
           ].contains(&key.token_type)
@@ -74,6 +77,7 @@ impl SinglesParser {
             TokenType::Parent => Ok(ParentNode::new()),
             TokenType::Static => Ok(StaticNode::new()),
             TokenType::This => Ok(ThisNode::new()),
+            TokenType::SelfKeyword => Ok(SelfNode::new()),
             TokenType::True => Ok(BooleanNode::new(true)),
             TokenType::False => Ok(BooleanNode::new(false)),
             _ => Err(ParserError::internal("Single: first group", args)),

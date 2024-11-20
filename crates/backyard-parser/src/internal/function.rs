@@ -6,7 +6,6 @@ use backyard_nodes::node::{
   FunctionNode,
   ParameterNode,
   PropertyNode,
-  StaticNode,
 };
 use utils::guard;
 
@@ -28,6 +27,31 @@ use super::{
 pub struct FunctionParser {}
 
 impl FunctionParser {
+  pub fn class_test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+    match_pattern(
+      tokens,
+      [
+        Lookup::Equal(vec![TokenType::Function]),
+        Lookup::Optional(vec![TokenType::BitwiseAnd]),
+        Lookup::Equal(
+          vec![
+            TokenType::Identifier,
+            TokenType::Clone,
+            TokenType::Echo,
+            TokenType::For,
+            TokenType::If,
+            TokenType::While,
+            TokenType::Array,
+            TokenType::List,
+            TokenType::Global,
+            TokenType::Print
+          ]
+        ),
+        Lookup::Equal(vec![TokenType::LeftParenthesis]),
+      ].to_vec()
+    )
+  }
+
   pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     if
       let Some(m) = match_pattern(
@@ -35,7 +59,7 @@ impl FunctionParser {
         [
           Lookup::Equal(vec![TokenType::Function]),
           Lookup::Optional(vec![TokenType::BitwiseAnd]),
-          Lookup::Equal(vec![TokenType::Identifier, TokenType::Clone]),
+          Lookup::Equal(vec![TokenType::Identifier]),
           Lookup::Equal(vec![TokenType::LeftParenthesis]),
         ].to_vec()
       )
@@ -210,12 +234,6 @@ impl FunctionParser {
     if let Some(next_token) = parser.tokens.get(parser.position) {
       if next_token.token_type == TokenType::Colon {
         parser.position += 1;
-        if let Some(next_token) = parser.tokens.get(parser.position) {
-          if next_token.token_type == TokenType::Static {
-            parser.position += 1;
-            return Ok(StaticNode::new());
-          }
-        }
         if
           let Some(return_type) = parser.get_statement(
             &mut LoopArgument::new(

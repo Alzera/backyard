@@ -19,7 +19,9 @@ impl TypesParser {
         tokens,
         [
           Lookup::Equal(vec![TokenType::QuestionMark]),
-          Lookup::Equal(vec![TokenType::Type, TokenType::Identifier]),
+          Lookup::Equal(
+            vec![TokenType::Type, TokenType::Static, TokenType::Identifier, TokenType::SelfKeyword]
+          ),
         ].to_vec()
       )
     {
@@ -39,6 +41,8 @@ impl TypesParser {
             TokenType::Identifier,
             TokenType::Type,
             TokenType::Callable,
+            TokenType::Static,
+            TokenType::SelfKeyword,
             TokenType::True,
             TokenType::False,
           ].contains(&token.token_type)) ||
@@ -47,6 +51,8 @@ impl TypesParser {
             TokenType::Identifier,
             TokenType::Type,
             TokenType::Callable,
+            TokenType::Static,
+            TokenType::SelfKeyword,
             TokenType::True,
             TokenType::False,
           ].contains(&last_token_type.unwrap()) &&

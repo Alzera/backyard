@@ -3,7 +3,7 @@ use utils::guard;
 
 pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Box<Node>);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 67] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 69] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
   (NodeType::Array, super::internal::array::ArrayGenerator::generate),
@@ -55,7 +55,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 67] = [
   // (NodeType::MatchArm, MatchArmGenerator::generate),
   // (NodeType::Method, super::internal::method::MethodGenerator::generate),
   (NodeType::Namespace, super::internal::namespace::NamespaceGenerator::generate),
-  (NodeType::Negate, super::internal::pre::PreGenerator::generate_negate),
+  (NodeType::Negate, super::internal::pre::PreGenerator::generate),
   (NodeType::New, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Number, super::internal::number::NumberGenerator::generate),
   (NodeType::ObjectAccess, super::internal::objectaccess::ObjectAccessGenerator::generate),
@@ -69,7 +69,8 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 67] = [
   // (NodeType::Property, super::internal::property::PropertyGenerator::generate),
   // (NodeType::PropertyItem, PropertyItemGenerator::generate),
   (NodeType::Return, super::internal::singles::SinglesGenerator::generate),
-  (NodeType::Silent, super::internal::pre::PreGenerator::generate_silent),
+  (NodeType::SelfKeyword, super::internal::singles::SinglesGenerator::generate),
+  (NodeType::Silent, super::internal::pre::PreGenerator::generate),
   (NodeType::Static, super::internal::singles::SinglesGenerator::generate),
   (NodeType::StaticLookup, super::internal::staticlookup::StaticLookupGenerator::generate),
   (NodeType::String, super::internal::string::StringGenerator::generate),
@@ -85,6 +86,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 67] = [
   (NodeType::Type, super::internal::types::TypeGenerator::generate),
   (NodeType::Use, super::internal::uses::UseGenerator::generate),
   (NodeType::Variable, super::internal::variable::VariableGenerator::generate),
+  (NodeType::Variadic, super::internal::pre::PreGenerator::generate),
   (NodeType::While, super::internal::whiles::WhileGenerator::generate),
   (NodeType::Yield, super::internal::yields::YieldGenerator::generate),
   (NodeType::YieldFrom, super::internal::yields::YieldGenerator::generate_from),
@@ -365,24 +367,68 @@ impl Generator {
 
   fn handle_comments(builder: &mut Builder, nodes: &Vec<Box<Node>>) {
     if nodes.len() > 0 {
-      builder.new_line();
-      builder.push(
-        &nodes
-          .iter()
-          .filter_map(|i| {
-            let comment = match &i.node {
-              NodeWrapper::CommentBlock(n) => { format!("/*{}*/", n.comment) }
-              NodeWrapper::CommentDoc(n) => { format!("/**{}*/", n.comment) }
-              NodeWrapper::CommentLine(n) => { format!("//{}", n.comment) }
-              _ => {
-                return None;
-              }
-            };
-            Some(comment)
-          })
-          .collect::<Vec<String>>()
-          .join("\n")
-      );
+      for node in nodes.iter() {
+        match &node.node {
+          NodeWrapper::CommentBlock(n) => {
+            builder.new_line();
+            builder.push("/*");
+            builder.new_line();
+            println!("Comment block: {:?}", n.comment);
+            let n: Vec<&str> = n.comment
+              .split('\n')
+              .map(|i| i.trim_start())
+              .collect();
+            for i in n
+              .iter()
+              .enumerate()
+              .filter_map(|(index, i)| (
+                if (index == 0 || index == n.len() - 1) && i.is_empty() {
+                  None
+                } else {
+                  let mut i = i.to_string();
+                  i.insert(0, ' ');
+                  Some(i)
+                }
+              )) {
+              builder.push(&i);
+              builder.new_line();
+            }
+            builder.push(" */");
+          }
+          NodeWrapper::CommentDoc(n) => {
+            builder.new_line();
+            builder.push("/**");
+            builder.new_line();
+            let n: Vec<&str> = n.comment
+              .split('\n')
+              .map(|i| i.trim_start())
+              .collect();
+            for i in n
+              .iter()
+              .enumerate()
+              .filter_map(|(index, i)| (
+                if (index == 0 || index == n.len() - 1) && i.is_empty() {
+                  None
+                } else {
+                  let mut i = i.to_string();
+                  i.insert(0, ' ');
+                  Some(i)
+                }
+              )) {
+              builder.push(&i);
+              builder.new_line();
+            }
+            builder.push(" */");
+          }
+          NodeWrapper::CommentLine(n) => {
+            builder.new_line();
+            builder.push(&format!("//{}", n.comment));
+          }
+          _ => {
+            continue;
+          }
+        };
+      }
       builder.new_line();
     }
   }

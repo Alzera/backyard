@@ -38,7 +38,7 @@ impl MethodParser {
             &[TokenType::RightCurlyBracket],
             &[],
             &[
-              (FunctionParser::test, FunctionParser::parse),
+              (FunctionParser::class_test, FunctionParser::parse),
               (CommentParser::test, CommentParser::parse),
             ]
           )

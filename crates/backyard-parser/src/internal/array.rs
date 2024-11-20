@@ -13,13 +13,7 @@ pub struct ArrayParser {}
 
 impl ArrayParser {
   pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(
-      tokens,
-      [
-        Lookup::Optional(vec![TokenType::Ellipsis]),
-        Lookup::Equal(vec![TokenType::LeftSquareBracket]),
-      ].to_vec()
-    )
+    match_pattern(tokens, [Lookup::Equal(vec![TokenType::LeftSquareBracket])].to_vec())
   }
 
   pub fn parse(
@@ -27,7 +21,7 @@ impl ArrayParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [is_ellipsis, _] = matched.as_slice() {
+    if let [_] = matched.as_slice() {
       let mut loop_parsers = DEFAULT_PARSERS.to_vec();
       loop_parsers.insert(0, (ArrayItemParser::test, ArrayItemParser::parse));
       let values = parser
@@ -48,7 +42,7 @@ impl ArrayParser {
           }
         ))
         .collect::<Vec<Box<Node>>>();
-      return Ok(ArrayNode::new(is_ellipsis.len() > 0, values));
+      return Ok(ArrayNode::new(values));
     }
     Err(ParserError::internal("Array", args))
   }
