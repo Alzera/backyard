@@ -146,6 +146,7 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::Method => { serde_json::from_value(node_data).map(NodeWrapper::Method) }
             NodeType::Namespace => { serde_json::from_value(node_data).map(NodeWrapper::Namespace) }
             NodeType::Negate => { serde_json::from_value(node_data).map(NodeWrapper::Negate) }
+            NodeType::Negative => { serde_json::from_value(node_data).map(NodeWrapper::Negative) }
             NodeType::New => { serde_json::from_value(node_data).map(NodeWrapper::New) }
             NodeType::Number => { serde_json::from_value(node_data).map(NodeWrapper::Number) }
             NodeType::ObjectAccess => {
@@ -261,6 +262,7 @@ pub enum NodeWrapper {
   Method(MethodNode),
   Namespace(NamespaceNode),
   Negate(NegateNode),
+  Negative(NegativeNode),
   New(NewNode),
   Number(NumberNode),
   ObjectAccess(ObjectAccessNode),
@@ -351,6 +353,7 @@ pub enum NodeType {
   Method,
   Namespace,
   Negate,
+  Negative,
   New,
   Number,
   ObjectAccess,
@@ -655,6 +658,10 @@ new_node!(Negate, NegateNode {
 });
 
 new_node!(Silent, SilentNode {
+  variable: Box<Node>,
+});
+
+new_node!(Negative, NegativeNode {
   variable: Box<Node>,
 });
 

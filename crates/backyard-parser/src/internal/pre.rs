@@ -21,7 +21,8 @@ impl PreParser {
             TokenType::PreIncrement,
             TokenType::PreDecrement,
             TokenType::BooleanNegate,
-            TokenType::AtSign
+            TokenType::AtSign,
+            TokenType::Subtraction
           ]
         ),
       ].to_vec()
@@ -50,6 +51,7 @@ impl PreParser {
           Ok(PreNode::new(argument, operator.value.to_owned())),
         TokenType::BooleanNegate => Ok(NegateNode::new(argument)),
         TokenType::AtSign => Ok(SilentNode::new(argument)),
+        TokenType::Subtraction => Ok(SilentNode::new(argument)),
         _ => Err(ParserError::internal("Pre", args)),
       };
     }
