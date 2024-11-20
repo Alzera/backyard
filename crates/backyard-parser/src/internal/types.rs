@@ -35,13 +35,21 @@ impl TypesParser {
       index += 1;
       if
         ((last_token_type == None || last_token_type.unwrap() == TokenType::BitwiseOr) &&
-          [TokenType::Identifier, TokenType::Type, TokenType::Callable].contains(
-            &token.token_type
-          )) ||
+          [
+            TokenType::Identifier,
+            TokenType::Type,
+            TokenType::Callable,
+            TokenType::True,
+            TokenType::False,
+          ].contains(&token.token_type)) ||
         (last_token_type.is_some() &&
-          [TokenType::Identifier, TokenType::Type, TokenType::Callable].contains(
-            &last_token_type.unwrap()
-          ) &&
+          [
+            TokenType::Identifier,
+            TokenType::Type,
+            TokenType::Callable,
+            TokenType::True,
+            TokenType::False,
+          ].contains(&last_token_type.unwrap()) &&
           token.token_type == TokenType::BitwiseOr)
       {
         last_token_type = Some(token.token_type);
