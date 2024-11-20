@@ -11,7 +11,10 @@ use crate::{
 pub struct BinParser {}
 
 impl BinParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+    if args.last_expr.is_none() {
+      return None;
+    }
     match_pattern(
       tokens,
       [
