@@ -26,7 +26,7 @@ impl ClassParser {
       [
         Lookup::Optional(vec![TokenType::Abstract, TokenType::Final]),
         Lookup::Equal(vec![TokenType::Class]),
-        Lookup::Equal(vec![TokenType::Identifier]),
+        Lookup::Optional(vec![TokenType::Identifier]),
         Lookup::Optional(vec![TokenType::Extends]),
         Lookup::Optional(vec![TokenType::Identifier]),
         Lookup::Optional(vec![TokenType::Implements]),
@@ -69,10 +69,11 @@ impl ClassParser {
         1 => Some(IdentifierParser::from_matched(extends)),
         _ => None,
       };
+      let name = if name.len() > 0 { Some(IdentifierParser::from_matched(name)) } else { None };
       return Ok(
         ClassNode::new(
           some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
-          IdentifierParser::from_matched(name),
+          name,
           extends,
           implements,
           BlockNode::new(body)

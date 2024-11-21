@@ -19,8 +19,11 @@ impl ClassGenerator {
     if node.modifier.len() > 0 {
       builder.push(format!("{} ", node.modifier).as_str());
     }
-    builder.push("class ");
-    IdentifierGenerator::generate(generator, builder, &node.name);
+    builder.push("class");
+    if let Some(n) = &node.name {
+      builder.push(" ");
+      IdentifierGenerator::generate(generator, builder, &n);
+    }
     if let Some(n) = &node.extends {
       builder.push(" extends ");
       IdentifierGenerator::generate(generator, builder, &n);
@@ -58,6 +61,7 @@ mod tests {
   fn basic() {
     test("abstract class A {\n}");
     test("final class A extends B {\n}");
+    test("return new class extends B {\n};");
     test(
       "class A implements C, D, E {
   use Ale;

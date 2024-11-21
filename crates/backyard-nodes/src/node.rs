@@ -475,7 +475,7 @@ new_node!(Argument, ArgumentNode {
 
 new_node!(Class, ClassNode {
   modifier: String,
-  name: Box<Node>,
+  name: Option<Box<Node>>,
   extends: Option<Box<Node>>,
   implements: Vec<Box<Node>>,
   body: Box<Node>,
