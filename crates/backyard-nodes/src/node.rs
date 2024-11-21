@@ -193,6 +193,7 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::Try => { serde_json::from_value(node_data).map(NodeWrapper::Try) }
             NodeType::Type => { serde_json::from_value(node_data).map(NodeWrapper::Type) }
             NodeType::Use => { serde_json::from_value(node_data).map(NodeWrapper::Use) }
+            NodeType::UseItem => { serde_json::from_value(node_data).map(NodeWrapper::UseItem) }
             NodeType::Variable => { serde_json::from_value(node_data).map(NodeWrapper::Variable) }
             NodeType::Variadic => { serde_json::from_value(node_data).map(NodeWrapper::Variadic) }
             NodeType::While => { serde_json::from_value(node_data).map(NodeWrapper::While) }
@@ -300,6 +301,7 @@ pub enum NodeWrapper {
   Try(TryNode),
   Type(TypeNode),
   Use(UseNode),
+  UseItem(UseItemNode),
   Variable(VariableNode),
   Variadic(VariadicNode),
   While(WhileNode),
@@ -394,6 +396,7 @@ pub enum NodeType {
   Try,
   Type,
   Use,
+  UseItem,
   Variable,
   Variadic,
   While,
@@ -834,9 +837,14 @@ new_node!(Type, TypeNode {
 });
 
 new_node!(Use, UseNode {
+  names: Option<Vec<Box<Node>>>,
+  items: Vec<Box<Node>>,
+});
+
+new_node!(UseItem, UseItemNode {
   modifier: String,
   names: Vec<Box<Node>>,
-  items: Vec<Box<Node>>,
+  alias: Option<Box<Node>>,
 });
 
 new_node!(Variable, VariableNode {
