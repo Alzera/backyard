@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
 use backyard_nodes::node::{ Node, NodeType, ArrayItemNode, ArrayNode };
 use utils::guard;
 
@@ -103,11 +103,7 @@ impl ArrayItemParser {
     if let [_] = matched.as_slice() {
       let value = guard!(
         parser.get_statement(
-          &mut LoopArgument::with_tokens(
-            "array_item",
-            &[],
-            &[TokenType::Comma, TokenType::RightSquareBracket]
-          )
+          &mut LoopArgument::with_tokens("array_item", &[], &args.breakers.combine(args.separators))
         )?,
         {
           return Err(ParserError::internal("ArrayItem", args));
