@@ -51,7 +51,8 @@ impl CallParser {
             TokenType::From,
             TokenType::And,
             TokenType::Or,
-            TokenType::Xor
+            TokenType::Xor,
+            TokenType::New
           ]
         ),
         Lookup::Equal(vec![TokenType::LeftParenthesis]),
