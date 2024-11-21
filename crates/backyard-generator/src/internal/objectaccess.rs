@@ -9,7 +9,9 @@ impl ObjectAccessGenerator {
     let node = cast_node!(NodeWrapper::ObjectAccess, &node.node);
     generator.generate_node(builder, &node.object, &mut GeneratorArgument::default());
     builder.push("->");
-    if [NodeType::Identifier, NodeType::Call].contains(&node.property.node_type) {
+    if
+      [NodeType::Identifier, NodeType::Call, NodeType::Variable].contains(&node.property.node_type)
+    {
       generator.generate_node(builder, &node.property, &mut GeneratorArgument::default());
     } else {
       builder.push("{");
@@ -25,6 +27,8 @@ mod tests {
 
   #[test]
   fn basic() {
+    test("$this->from;");
+    test("$this->$from;");
     test("$a->{\"b\"};");
     test("$this->setTimezone(date_default_timezone_get());");
     test(

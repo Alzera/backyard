@@ -41,29 +41,51 @@ impl ObjectAccessParser {
         }).token_type
       {
         TokenType::ObjectAccess | TokenType::NullsafeObjectAccess => {
-          let expr = guard!(
-            parser.get_statement(
-              &mut LoopArgument::safe(
-                "objectaccess",
-                &[],
-                &[
-                  TokenType::Semicolon,
-                  TokenType::ObjectAccess,
-                  TokenType::NullsafeObjectAccess,
-                  TokenType::ObjectAccessBracketOpen,
-                  TokenType::NullsafeObjectAccessBracketOpen,
-                ],
-                &[
-                  (CallParser::class_test, CallParser::parse),
-                  (VariableParser::test, VariableParser::parse),
-                  (IdentifierParser::test, IdentifierParser::parse),
-                ]
-              )
-            )?,
+          let expr: Box<Node> = if
+            let Some(m) = VariableParser::test(&parser.tokens[parser.position..].to_vec(), args)
+          {
+            parser.position += m
+              .iter()
+              .map(|x| x.len())
+              .sum::<usize>();
+            VariableParser::parse(parser, m, args)?
+          } else if
+            let Some(m) = CallParser::class_test(&parser.tokens[parser.position..].to_vec(), args)
+          {
+            parser.position += m
+              .iter()
+              .map(|x| x.len())
+              .sum::<usize>();
+            CallParser::parse(parser, m, args)?
+          } else if let Some(token) = parser.tokens.get(parser.position) {
+            if
+              [
+                TokenType::Identifier,
+                TokenType::Clone,
+                TokenType::Echo,
+                TokenType::For,
+                TokenType::If,
+                TokenType::While,
+                TokenType::Array,
+                TokenType::List,
+                TokenType::Global,
+                TokenType::Print,
+                TokenType::Type,
+                TokenType::From,
+                TokenType::And,
+                TokenType::Or,
+                TokenType::Xor,
+                TokenType::New,
+              ].contains(&token.token_type)
             {
-              return Err(ParserError::internal("ObjectAccess: fail to parse basic", args));
+              parser.position += 1;
+              IdentifierParser::new(token.value.to_owned())
+            } else {
+              return Err(ParserError::internal("ObjectAccess", args));
             }
-          );
+          } else {
+            return Err(ParserError::internal("ObjectAccess", args));
+          };
           return Ok(ObjectAccessNode::new(args.last_expr.to_owned().unwrap(), expr));
         }
         TokenType::ObjectAccessBracketOpen | TokenType::NullsafeObjectAccessBracketOpen => {
