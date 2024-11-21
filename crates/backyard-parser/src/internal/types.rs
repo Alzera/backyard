@@ -21,9 +21,10 @@ impl TypesParser {
           Lookup::Equal(vec![TokenType::QuestionMark]),
           Lookup::Equal(
             vec![
-              TokenType::Type,
-              TokenType::Static,
               TokenType::Identifier,
+              TokenType::Type,
+              TokenType::Callable,
+              TokenType::Static,
               TokenType::SelfKeyword,
               TokenType::Array
             ]
@@ -86,12 +87,10 @@ impl TypesParser {
     if matched.len() == 2 {
       if let [is_nullable, type_name] = matched.as_slice() {
         if let Some(type_name) = type_name.get(0) {
-          if [TokenType::Type, TokenType::Identifier].contains(&type_name.token_type) {
-            let is_nullable =
-              is_nullable.len() > 0 &&
-              is_nullable.get(0).unwrap().token_type == TokenType::QuestionMark;
-            return Ok(TypeNode::new(is_nullable, vec![type_name.value.to_owned()]));
-          }
+          let is_nullable =
+            is_nullable.len() > 0 &&
+            is_nullable.get(0).unwrap().token_type == TokenType::QuestionMark;
+          return Ok(TypeNode::new(is_nullable, vec![type_name.value.to_owned()]));
         }
       }
     } else if matched.len() == 1 {
