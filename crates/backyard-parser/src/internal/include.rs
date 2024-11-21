@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
 use backyard_nodes::node::{ Node, IncludeNode };
 use utils::guard;
 
@@ -24,7 +24,7 @@ impl IncludeParser {
             TokenType::IncludeOnce
           ]
         ),
-        Lookup::Equal(vec![TokenType::LeftParenthesis]),
+        Lookup::Optional(vec![TokenType::LeftParenthesis]),
       ].to_vec()
     )
   }
@@ -34,23 +34,31 @@ impl IncludeParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [keyword, _] = matched.as_slice() {
+    if let [keyword, use_parenthesis] = matched.as_slice() {
       let mut is_require = false;
       let mut is_once = false;
       if let Some(t) = keyword.get(0) {
         is_require = t.token_type == TokenType::Require || t.token_type == TokenType::RequireOnce;
         is_once = t.token_type == TokenType::RequireOnce || t.token_type == TokenType::IncludeOnce;
       }
+      let use_parenthesis = !use_parenthesis.is_empty();
       let argument = guard!(
-        parser.get_statement(
-          &mut LoopArgument::with_tokens("include", &[], &[TokenType::RightParenthesis])
-        )?,
+        if use_parenthesis {
+          let a = parser.get_statement(
+            &mut LoopArgument::with_tokens("include", &[], &[TokenType::RightParenthesis])
+          )?;
+          parser.position += 1;
+          a
+        } else {
+          parser.get_statement(
+            &mut LoopArgument::with_tokens("include", &[], &args.breakers.combine(args.separators))
+          )?
+        },
         {
           return Err(ParserError::internal("Include", args));
         }
       );
-      parser.position += 1;
-      return Ok(IncludeNode::new(is_require, is_once, argument));
+      return Ok(IncludeNode::new(use_parenthesis, is_require, is_once, argument));
     }
     Err(ParserError::internal("Include", args))
   }

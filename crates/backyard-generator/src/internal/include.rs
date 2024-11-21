@@ -15,9 +15,14 @@ impl IncludeGenerator {
     if node.is_once {
       builder.push("_once");
     }
-    builder.push("(");
-    generator.generate_node(builder, &node.argument, &mut GeneratorArgument::default());
-    builder.push(")");
+    if node.use_parenthesis {
+      builder.push("(");
+      generator.generate_node(builder, &node.argument, &mut GeneratorArgument::default());
+      builder.push(")");
+    } else {
+      builder.push(" ");
+      generator.generate_node(builder, &node.argument, &mut GeneratorArgument::default());
+    }
   }
 }
 
@@ -31,5 +36,6 @@ mod tests {
     test("require_once(__DIR__ . \"/something_that_does_not_exist\");");
     test("include(\"something_that_does_not_exist\");");
     test("include_once(\"something_that_does_not_exist\");");
+    test("include_once $a;");
   }
 }

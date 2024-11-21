@@ -594,6 +594,7 @@ new_node!(If, IfNode {
 });
 
 new_node!(Include, IncludeNode {
+  use_parenthesis: bool,
   is_require: bool,
   is_once: bool,
   argument: Box<Node>,
