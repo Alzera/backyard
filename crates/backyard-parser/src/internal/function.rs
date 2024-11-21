@@ -186,8 +186,9 @@ impl FunctionParser {
             &[TokenType::Comma],
             &[TokenType::RightParenthesis],
             &[
-              (TypesParser::test, TypesParser::parse),
               (ConstructorParameterParser::test, ConstructorParameterParser::parse),
+              (TypesParser::test, TypesParser::parse),
+              (ParameterParser::test, ParameterParser::parse),
               (CommentParser::test, CommentParser::parse),
             ]
           )

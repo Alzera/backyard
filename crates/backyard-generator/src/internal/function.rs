@@ -39,7 +39,12 @@ impl FunctionGenerator {
     let mut parameters = if name.name == "__construct" {
       generator.generate_nodes_new(
         &node.parameters,
-        &mut GeneratorArgument::for_parameter(&[(NodeType::Property, PropertyGenerator::generate)])
+        &mut GeneratorArgument::for_parameter(
+          &[
+            (NodeType::Property, PropertyGenerator::generate),
+            (NodeType::Parameter, Self::generate_parameter),
+          ]
+        )
       )
     } else {
       Self::get_parameters(generator, &node.parameters)
@@ -184,10 +189,14 @@ mod tests {
 
   #[test]
   fn basic() {
-    test("class A {
+    test(
+      "class A {
   public function __construct(protected int $x, protected int $y = 0) {
   }
-}");
+  public function __construct(Pattern ...$patterns) {
+  }
+}"
+    );
     test("function &a(?int ...$b = 0, String &$c = [0.01, 0x12], bool $d): ?int {\n}");
     test("$a = fn &(int $x): ?int => null;");
     test("$a = function &(int $x, ?int $y) use ($arg2): static {\n};");
