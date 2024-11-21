@@ -50,5 +50,14 @@ mod tests {
   \"still_another_unneccessary_very_long_string\" => 3
 ];"
     );
+    test(
+      "[
+  // Unit with indexes starting at 1 (other units start at 0) 
+  \"day\",
+  \"week\",
+  \"month\",
+  \"quarter\"
+];"
+    );
   }
 }

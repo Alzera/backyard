@@ -38,7 +38,15 @@ impl ArrayParser {
           if i.node_type == NodeType::ArrayItem {
             i.to_owned()
           } else {
-            ArrayItemNode::new(None, i.to_owned())
+            let mut i = i.to_owned();
+            let leading_comments = i.leading_comments.to_owned();
+            let trailing_comments = i.trailing_comments.to_owned();
+            i.leading_comments = vec![];
+            i.trailing_comments = vec![];
+            let mut a = ArrayItemNode::new(None, i);
+            a.leading_comments = leading_comments;
+            a.trailing_comments = trailing_comments;
+            a
           }
         ))
         .collect::<Vec<Box<Node>>>();
