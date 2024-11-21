@@ -15,41 +15,53 @@ pub struct PropertyParser {}
 
 impl PropertyParser {
   pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    if
-      let Some(first_test) = match_pattern(
-        tokens,
-        [
-          Lookup::Optional(vec![TokenType::Public, TokenType::Private, TokenType::Protected]),
-          Lookup::Optional(vec![TokenType::Static, TokenType::Readonly]),
-        ].to_vec()
-      )
-    {
-      let first_test_count = first_test
-        .iter()
-        .map(|i| i.len())
-        .sum();
-      let tmp_tokens = guard!(tokens.get(first_test_count..), {
-        return None;
-      }).to_vec();
-      let type_test = TypesParser::test(&tmp_tokens, args);
-      let type_test_count: usize = if type_test.is_none() {
-        0
-      } else {
-        type_test
-          .iter()
-          .map(|i| i.len())
-          .sum()
-      };
-      let tmp_tokens_index = type_test_count + first_test_count;
-      let tmp_tokens = guard!(tokens.get(tmp_tokens_index..), {
-        return None;
-      }).to_vec();
-      guard!(match_pattern(&tmp_tokens, [Lookup::Equal(vec![TokenType::Variable])].to_vec()), {
-        return None;
-      });
-      return Some(first_test);
+    let modifiers_rule = [
+      [TokenType::Public, TokenType::Private, TokenType::Protected].to_vec(),
+      [TokenType::Static, TokenType::Readonly].to_vec(),
+    ];
+    let mut modifiers = vec![vec![], vec![]];
+    let mut pos = 0;
+    loop {
+      let token = tokens.get(pos);
+      pos += 1;
+      if pos > 2 || token.is_none() {
+        break;
+      }
+      let token = token.unwrap();
+      for (i, modifier) in modifiers_rule.iter().enumerate() {
+        if modifiers[i].len() > 0 {
+          continue;
+        }
+        if modifier.contains(&token.token_type) {
+          modifiers[i].push(token.clone());
+          break;
+        }
+      }
     }
-    None
+
+    // need to manually check for variable type
+    let first_test_count = modifiers
+      .iter()
+      .map(|i| i.len())
+      .sum();
+    let tmp_tokens = guard!(tokens.get(first_test_count..), {
+      return None;
+    }).to_vec();
+    let type_test = TypesParser::test(&tmp_tokens, args);
+    let type_test_count: usize = if let Some(t) = type_test {
+      t.iter()
+        .map(|i| i.len())
+        .sum()
+    } else {
+      0
+    };
+    let tmp_tokens = guard!(tmp_tokens.get(type_test_count..), {
+      return None;
+    }).to_vec();
+    guard!(match_pattern(&tmp_tokens, [Lookup::Equal(vec![TokenType::Variable])].to_vec()), {
+      return None;
+    });
+    return Some(modifiers);
   }
 
   pub fn parse(

@@ -45,3 +45,18 @@ impl PropertyGenerator {
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::test_utils::test;
+
+  #[test]
+  fn basic() {
+    test(
+      "class A {
+  public static ?A $instance = 4;
+  public readonly A|callable|null $instance2 = 4;
+}"
+    );
+  }
+}
