@@ -429,6 +429,7 @@ macro_rules! new_node {
 }
 
 new_node!(Array, ArrayNode {
+  is_short: bool,
   items: Vec<Box<Node>>,
 });
 

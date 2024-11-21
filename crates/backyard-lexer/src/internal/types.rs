@@ -1,8 +1,8 @@
 pub struct TypeToken;
 
 impl TypeToken {
-  const KEYS: [&str; 11] = [
-    "array",
+  const KEYS: [&str; 10] = [
+    // "array",
     "bool",
     "boolean",
     "real",

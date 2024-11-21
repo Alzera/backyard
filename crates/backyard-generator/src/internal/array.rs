@@ -1,4 +1,4 @@
-use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
+use backyard_nodes::{ cast_node, node::{ ArrayNode, Node, NodeType, NodeWrapper } };
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
 pub struct ArrayGenerator {}
@@ -11,7 +11,23 @@ impl ArrayGenerator {
       &node.items,
       &mut GeneratorArgument::for_parameter(&[(NodeType::ArrayItem, Self::generate_item)])
     );
-    builder.push("[");
+    if node.is_short {
+      builder.push("[");
+      Self::print_values(generator, builder, &mut items, node);
+      builder.push("]");
+    } else {
+      builder.push("array(");
+      Self::print_values(generator, builder, &mut items, node);
+      builder.push(")");
+    }
+  }
+
+  fn print_values(
+    generator: &mut Generator,
+    builder: &mut Builder,
+    items: &mut Builder,
+    node: &ArrayNode
+  ) {
     if
       Generator::check_nodes_has_comments(&node.items) ||
       2 + builder.last_len() + items.total_len_with_separator(" ") > generator.max_length
@@ -22,7 +38,6 @@ impl ArrayGenerator {
     } else {
       builder.push(&items.to_string(" "));
     }
-    builder.push("]");
   }
 
   pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -59,5 +74,6 @@ mod tests {
   \"quarter\"
 ];"
     );
+    test("array(1, 2, 3);");
   }
 }

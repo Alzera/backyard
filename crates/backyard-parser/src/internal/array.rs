@@ -12,26 +12,16 @@ use crate::{
 pub struct ArrayParser {}
 
 impl ArrayParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::LeftSquareBracket])].to_vec())
-  }
-
-  pub fn parse(
+  pub fn get_values(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
-    if let [_] = matched.as_slice() {
-      let mut loop_parsers = DEFAULT_PARSERS.to_vec();
-      loop_parsers.insert(0, (ArrayItemParser::test, ArrayItemParser::parse));
-      let values = parser
+    breaker: TokenType
+  ) -> Result<Vec<Box<Node>>, ParserError> {
+    let mut loop_parsers = DEFAULT_PARSERS.to_vec();
+    loop_parsers.insert(0, (ArrayItemParser::test, ArrayItemParser::parse));
+    Ok(
+      parser
         .get_children(
-          &mut LoopArgument::new(
-            "array",
-            &[TokenType::Comma],
-            &[TokenType::RightSquareBracket],
-            &loop_parsers
-          )
+          &mut LoopArgument::new("array", &[TokenType::Comma], &[breaker], &loop_parsers)
         )?
         .iter()
         .map(|i| (
@@ -49,8 +39,49 @@ impl ArrayParser {
             a
           }
         ))
-        .collect::<Vec<Box<Node>>>();
-      return Ok(ArrayNode::new(values));
+        .collect::<Vec<Box<Node>>>()
+    )
+  }
+
+  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+    if
+      let Some(m) = match_pattern(
+        tokens,
+        [Lookup::Equal(vec![TokenType::LeftSquareBracket])].to_vec()
+      )
+    {
+      return Some(m);
+    }
+    match_pattern(
+      tokens,
+      [
+        Lookup::Equal(vec![TokenType::Array]),
+        Lookup::Equal(vec![TokenType::LeftParenthesis]),
+      ].to_vec()
+    )
+  }
+
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
+    match matched.len() {
+      1 => {
+        if let [_] = matched.as_slice() {
+          return Ok(
+            ArrayNode::new(true, ArrayParser::get_values(parser, TokenType::RightSquareBracket)?)
+          );
+        }
+      }
+      2 => {
+        if let [_, _] = matched.as_slice() {
+          return Ok(
+            ArrayNode::new(false, ArrayParser::get_values(parser, TokenType::RightParenthesis)?)
+          );
+        }
+      }
+      _ => {}
     }
     Err(ParserError::internal("Array", args))
   }
