@@ -3,7 +3,7 @@ use crate::{ error::LexResult, lexer::Lexer, token::{ Token, TokenType } };
 pub struct KeywordToken;
 
 impl KeywordToken {
-  const KEYS: [&str; 72] = [
+  const KEYS: [&str; 73] = [
     "abstract",
     "array",
     "as",
@@ -55,6 +55,7 @@ impl KeywordToken {
     "match",
     "namespace",
     "new",
+    "null",
     "print",
     "private",
     "protected",
@@ -135,6 +136,7 @@ impl KeywordToken {
       "match" => Ok(vec![Token::new(TokenType::Match, input)]),
       "namespace" => Ok(vec![Token::new(TokenType::Namespace, input)]),
       "new" => Ok(vec![Token::new(TokenType::New, input)]),
+      "null" => Ok(vec![Token::new(TokenType::Null, input)]),
       "print" => Ok(vec![Token::new(TokenType::Print, input)]),
       "private" => Ok(vec![Token::new(TokenType::Private, input)]),
       "protected" => Ok(vec![Token::new(TokenType::Protected, input)]),

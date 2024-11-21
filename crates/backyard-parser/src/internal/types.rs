@@ -26,7 +26,8 @@ impl TypesParser {
               TokenType::Callable,
               TokenType::Static,
               TokenType::SelfKeyword,
-              TokenType::Array
+              TokenType::Array,
+              TokenType::Null
             ]
           ),
         ].to_vec()
@@ -53,6 +54,7 @@ impl TypesParser {
             TokenType::Array,
             TokenType::True,
             TokenType::False,
+            TokenType::Null,
           ].contains(&token.token_type)) ||
         (last_token_type.is_some() &&
           [
@@ -64,6 +66,7 @@ impl TypesParser {
             TokenType::Array,
             TokenType::True,
             TokenType::False,
+            TokenType::Null,
           ].contains(&last_token_type.unwrap()) &&
           token.token_type == TokenType::BitwiseOr)
       {

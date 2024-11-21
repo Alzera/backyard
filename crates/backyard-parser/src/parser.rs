@@ -44,7 +44,6 @@ use super::internal::{
   ternary::TernaryParser,
   traits::TraitParser,
   tries::TryParser,
-  types::TypesParser,
   uses::UseParser,
   variable::VariableParser,
   whiles::WhileParser,
@@ -58,7 +57,7 @@ type InternalParserParse = fn(
   &mut LoopArgument
 ) -> Result<Box<Node>, ParserError>;
 type InternalParser = (InternalParserTest, InternalParserParse);
-pub static DEFAULT_PARSERS: [InternalParser; 45] = [
+pub static DEFAULT_PARSERS: [InternalParser; 44] = [
   (CommentParser::test, CommentParser::parse),
   (ListParser::test, ListParser::parse),
   (ArrayLookupParser::test, ArrayLookupParser::parse),
@@ -101,7 +100,7 @@ pub static DEFAULT_PARSERS: [InternalParser; 45] = [
   (WhileParser::test, WhileParser::parse),
   (LabelParser::test, LabelParser::parse),
   (IdentifierParser::test, IdentifierParser::parse),
-  (TypesParser::test, TypesParser::parse),
+  // (TypesParser::test, TypesParser::parse),
   (SinglesParser::test, SinglesParser::parse),
   (ElvisParser::test, ElvisParser::parse),
 ];

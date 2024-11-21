@@ -190,6 +190,7 @@ pub enum TokenType {
   Match,
   Namespace,
   New,
+  Null,
   Print,
   Private,
   Protected,

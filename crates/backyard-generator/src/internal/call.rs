@@ -42,6 +42,7 @@ mod tests {
 
   #[test]
   fn basic() {
+    test("return new static($expression, $fieldFactory);");
     test("floor(((int) $this->rawFormat(\"u\")) / 1000);");
     test("\\call();");
     test("(fn () => 0)();");

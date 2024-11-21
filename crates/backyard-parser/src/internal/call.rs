@@ -62,7 +62,7 @@ impl CallParser {
 
   pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     if let Some(last_expr) = &args.last_expr {
-      if [NodeType::Variable, NodeType::ObjectAccess].contains(&last_expr.node_type) {
+      if [NodeType::Variable, NodeType::Static].contains(&last_expr.node_type) {
         if let Some(next_token) = tokens.get(0) {
           if next_token.token_type == TokenType::LeftParenthesis {
             return Some(vec![vec![next_token.to_owned()]]);

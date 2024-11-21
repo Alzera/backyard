@@ -3,7 +3,7 @@ use utils::guard;
 
 pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Box<Node>);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 69] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 70] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
   (NodeType::Array, super::internal::array::ArrayGenerator::generate),
@@ -57,6 +57,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 69] = [
   (NodeType::Namespace, super::internal::namespace::NamespaceGenerator::generate),
   (NodeType::Negate, super::internal::pre::PreGenerator::generate),
   (NodeType::New, super::internal::singles::SinglesGenerator::generate),
+  (NodeType::Null, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Number, super::internal::number::NumberGenerator::generate),
   (NodeType::ObjectAccess, super::internal::objectaccess::ObjectAccessGenerator::generate),
   // (NodeType::Parameter, ParameterGenerator::generate),

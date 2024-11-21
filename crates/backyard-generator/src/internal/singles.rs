@@ -60,6 +60,10 @@ impl SinglesGenerator {
         builder.push("$this");
         None
       }
+      NodeType::Null => {
+        builder.push("null");
+        None
+      }
       NodeType::SelfKeyword => {
         builder.push("self");
         None

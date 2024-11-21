@@ -8,7 +8,7 @@ use crate::{
   utils::{ match_pattern, Lookup },
 };
 
-use super::call::CallParser;
+use super::{ call::CallParser, types::TypesParser };
 
 #[derive(Debug, Clone)]
 pub struct ParenthesisParser {}
@@ -52,32 +52,38 @@ impl ParenthesisParser {
           );
         }
       }
-      let statement = guard!(
-        parser.get_statement(
-          &mut LoopArgument::with_tokens(
-            "parenthesis",
-            &args.separators,
-            &args.breakers.combine(&[TokenType::RightParenthesis])
-          )
-        )?,
-        {
-          return Err(ParserError::internal("Parenthesis: fail to get statement", args));
-        }
-      );
-      parser.position += 1;
-      if statement.node_type != NodeType::Type {
+      if let Some(m) = TypesParser::test(&parser.tokens[parser.position..].to_vec(), args) {
+        parser.position += m
+          .iter()
+          .map(|x| x.len())
+          .sum::<usize>();
+        let statement = TypesParser::parse(parser, m, args)?;
+        parser.position += 1;
+        let expression = guard!(
+          parser.get_statement(
+            &mut LoopArgument::with_tokens("cast", &args.separators, &args.breakers)
+          )?,
+          {
+            return Err(ParserError::internal("Parenthesis: fail to get expression", args));
+          }
+        );
+        return Ok(CastNode::new(statement, expression));
+      } else {
+        let statement = guard!(
+          parser.get_statement(
+            &mut LoopArgument::with_tokens(
+              "parenthesis",
+              &args.separators,
+              &args.breakers.combine(&[TokenType::RightParenthesis])
+            )
+          )?,
+          {
+            return Err(ParserError::internal("Parenthesis: fail to get statement", args));
+          }
+        );
+        parser.position += 1;
         return Ok(ParenthesisNode::new(statement));
       }
-      let expression = guard!(
-        parser.get_statement(
-          &mut LoopArgument::with_tokens("cast", &args.separators, &args.breakers)
-        )?,
-        {
-          return Err(ParserError::internal("Parenthesis: fail to get expression", args));
-        }
-      );
-
-      return Ok(CastNode::new(statement, expression));
     }
     Err(ParserError::internal("Parenthesis", args))
   }

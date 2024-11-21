@@ -9,6 +9,7 @@ use backyard_nodes::node::{
   GotoNode,
   NewNode,
   Node,
+  NullNode,
   ParentNode,
   PrintNode,
   ReturnNode,
@@ -49,6 +50,7 @@ impl SinglesParser {
             TokenType::This,
             TokenType::True,
             TokenType::False,
+            TokenType::Null,
             TokenType::SelfKeyword
           ]
         ),
@@ -71,6 +73,7 @@ impl SinglesParser {
             TokenType::SelfKeyword,
             TokenType::True,
             TokenType::False,
+            TokenType::Null,
           ].contains(&key.token_type)
         {
           return match key.token_type {
@@ -80,6 +83,7 @@ impl SinglesParser {
             TokenType::SelfKeyword => Ok(SelfNode::new()),
             TokenType::True => Ok(BooleanNode::new(true)),
             TokenType::False => Ok(BooleanNode::new(false)),
+            TokenType::Null => Ok(NullNode::new()),
             _ => Err(ParserError::internal("Single: first group", args)),
           };
         }

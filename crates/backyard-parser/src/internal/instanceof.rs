@@ -8,6 +8,8 @@ use crate::{
   utils::{ match_pattern, Lookup },
 };
 
+use super::types::TypesParser;
+
 #[derive(Debug, Clone)]
 pub struct InstanceOfParser {}
 
@@ -24,10 +26,11 @@ impl InstanceOfParser {
     if let [_] = matched.as_slice() {
       let right = guard!(
         parser.get_statement(
-          &mut LoopArgument::with_tokens(
+          &mut LoopArgument::new(
             "instanceof",
             &args.separators.combine(&[TokenType::Semicolon]),
-            &args.breakers
+            &args.breakers,
+            &[(TypesParser::test, TypesParser::parse)]
           )
         )?,
         {

@@ -1,7 +1,7 @@
 pub struct TypeToken;
 
 impl TypeToken {
-  const KEYS: [&str; 10] = [
+  const KEYS: [&str; 9] = [
     // "array",
     "bool",
     "boolean",
@@ -12,7 +12,7 @@ impl TypeToken {
     "integer",
     "object",
     "String",
-    "null",
+    // "null",
   ];
 
   pub fn is_type(input: &String) -> bool {
