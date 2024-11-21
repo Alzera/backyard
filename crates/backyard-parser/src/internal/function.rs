@@ -44,7 +44,9 @@ impl FunctionParser {
             TokenType::Array,
             TokenType::List,
             TokenType::Global,
-            TokenType::Print
+            TokenType::Print,
+            TokenType::Type,
+            TokenType::From
           ]
         ),
         Lookup::Equal(vec![TokenType::LeftParenthesis]),

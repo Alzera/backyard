@@ -47,7 +47,8 @@ impl CallParser {
             TokenType::List,
             TokenType::Global,
             TokenType::Print,
-            TokenType::Type
+            TokenType::Type,
+            TokenType::From
           ]
         ),
         Lookup::Equal(vec![TokenType::LeftParenthesis]),
