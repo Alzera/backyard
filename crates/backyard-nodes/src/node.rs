@@ -434,7 +434,7 @@ new_node!(Array, ArrayNode {
 });
 
 new_node!(Variadic, VariadicNode {
-  expr: Box<Node>,
+  expr: Option<Box<Node>>,
 });
 
 new_node!(ArrayItem, ArrayItemNode {

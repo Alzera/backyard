@@ -39,21 +39,21 @@ impl PreParser {
       let operator = guard!(operator.get(0), {
         return Err(ParserError::internal("Pre", args));
       });
-      let argument = guard!(
-        parser.get_statement(
-          &mut LoopArgument::with_tokens("pre", args.separators, args.breakers)
-        )?,
-        {
-          return Err(ParserError::internal("Pre", args));
-        }
-      );
+      let argument = parser.get_statement(
+        &mut LoopArgument::with_tokens("pre", args.separators, args.breakers)
+      )?;
+      if operator.token_type == TokenType::Ellipsis {
+        return Ok(VariadicNode::new(argument));
+      }
+      let argument = guard!(argument, {
+        return Err(ParserError::internal("Pre", args));
+      });
       return match operator.token_type {
         TokenType::PreIncrement | TokenType::PreDecrement =>
           Ok(PreNode::new(argument, operator.value.to_owned())),
         TokenType::BooleanNegate => Ok(NegateNode::new(argument)),
         TokenType::AtSign => Ok(SilentNode::new(argument)),
         TokenType::Subtraction => Ok(SilentNode::new(argument)),
-        TokenType::Ellipsis => Ok(VariadicNode::new(argument)),
         _ => Err(ParserError::internal("Pre", args)),
       };
     }

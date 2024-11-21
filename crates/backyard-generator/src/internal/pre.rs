@@ -7,28 +7,30 @@ pub struct PreGenerator {}
 impl PreGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let (operator, expr) = match node.node_type {
+      NodeType::Variadic => {
+        let node = cast_node!(NodeWrapper::Variadic, &node.node);
+        ("...", node.expr.to_owned())
+      }
       NodeType::Negate => {
         let node = cast_node!(NodeWrapper::Negate, &node.node);
-        ("!", &node.variable)
+        ("!", Some(node.variable.to_owned()))
       }
       NodeType::Silent => {
         let node = cast_node!(NodeWrapper::Silent, &node.node);
-        ("@", &node.variable)
-      }
-      NodeType::Variadic => {
-        let node = cast_node!(NodeWrapper::Variadic, &node.node);
-        ("...", &node.expr)
+        ("@", Some(node.variable.to_owned()))
       }
       NodeType::Pre => {
         let node = cast_node!(NodeWrapper::Pre, &node.node);
-        (node.operator.as_str(), &node.variable)
+        (node.operator.as_str(), Some(node.variable.to_owned()))
       }
       _ => {
         return;
       }
     };
     builder.push(operator);
-    generator.generate_node(builder, expr, &mut GeneratorArgument::default());
+    if let Some(expr) = expr {
+      generator.generate_node(builder, &expr, &mut GeneratorArgument::default());
+    }
   }
 }
 
