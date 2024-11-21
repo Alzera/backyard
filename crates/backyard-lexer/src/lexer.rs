@@ -152,12 +152,13 @@ impl Lexer {
         return Ok(vec![Token::new(TokenType::Identifier, t)]);
       }
       '=' => {
-        let t = self.until(current_char, |ch| !['=', '>'].contains(ch));
+        let t = self.until(current_char, |ch| !['=', '>', '&'].contains(ch));
         match t.as_str() {
           "===" => Ok(vec![Token::new(TokenType::IsIdentical, "===")]),
           "==" => Ok(vec![Token::new(TokenType::IsEqual, "==")]),
           "=" => Ok(vec![Token::new(TokenType::Assignment, "=")]),
           "=>" => Ok(vec![Token::new(TokenType::Arrow, "=>")]),
+          "=&" => Ok(vec![Token::new(TokenType::ReferenceAssignment, "=>")]),
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }

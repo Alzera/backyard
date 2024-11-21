@@ -30,6 +30,7 @@ pub enum TokenType {
   BitwiseAndAssignment,
   BitwiseAnd,
   BooleanAnd,
+  ReferenceAssignment,
 
   // #
   Attribute,

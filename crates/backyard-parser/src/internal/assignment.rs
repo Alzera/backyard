@@ -30,7 +30,8 @@ impl AssignmentParser {
             TokenType::SubtractionAssignment,
             TokenType::BitwiseShiftRightAssignment,
             TokenType::BitwiseShiftLeftAssignment,
-            TokenType::AdditionAssignment
+            TokenType::AdditionAssignment,
+            TokenType::ReferenceAssignment
           ]
         ),
       ].to_vec()
