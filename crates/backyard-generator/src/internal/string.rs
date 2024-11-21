@@ -7,16 +7,20 @@ pub struct StringGenerator {}
 impl StringGenerator {
   pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::String, &node.node);
-    builder.push(format!("\"{}\"", node.value).as_str());
+    builder.push(&format!("{}{}{}", node.quote, node.value, node.quote));
   }
 
   pub fn generate_encapsed(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Encapsed, &node.node);
-    let parts = generator.generate_nodes_new(
-      &node.values,
-      &mut GeneratorArgument::generator(&[(NodeType::EncapsedPart, Self::generate_encapsed_part)])
-    );
-    builder.push(format!("\"{}\"", parts.to_string("")).as_str());
+    builder.push(&node.quote);
+    let parts = generator
+      .generate_nodes_new(
+        &node.values,
+        &mut GeneratorArgument::generator(&[(NodeType::EncapsedPart, Self::generate_encapsed_part)])
+      )
+      .to_string("");
+    builder.push(&parts);
+    builder.push(&node.quote);
   }
 
   pub fn generate_encapsed_part(
@@ -46,5 +50,6 @@ mod tests {
   #[test]
   fn basic() {
     test("$a = \"ale\" . \" ini string $ \\\" \\$var $b {${\"ale\" . 5}} {$a}\";");
+    test("'a';");
   }
 }

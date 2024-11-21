@@ -758,10 +758,12 @@ new_node!(StaticLookup, StaticLookupNode {
 });
 
 new_node!(String, StringNode {
+  quote: String,
   value: String,
 });
 
 new_node!(Encapsed, EncapsedNode {
+  quote: String,
   values: Vec<Box<Node>>,
 });
 

@@ -27,9 +27,15 @@ impl StringParser {
     if let [string_type] = matched.as_slice() {
       if let Some(string_type) = string_type.get(0) {
         if string_type.token_type == TokenType::EncapsedStringOpen {
-          return StringParser::parse_encapsed(parser);
+          return StringParser::parse_encapsed(string_type, parser, args);
         } else if string_type.token_type == TokenType::String {
-          return Ok(StringNode::new(string_type.value.to_owned()));
+          let mut value = string_type.value.to_owned();
+          let quote = value.remove(0).to_string();
+          value = value
+            .get(..value.len() - 1)
+            .unwrap_or_default()
+            .to_owned();
+          return Ok(StringNode::new(quote, value));
         }
       }
     }
@@ -38,16 +44,26 @@ impl StringParser {
 }
 
 impl StringParser {
-  fn parse_encapsed(parser: &mut Parser) -> Result<Box<Node>, ParserError> {
+  fn parse_encapsed(
+    open: &Token,
+    parser: &mut Parser,
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
     let mut values: Vec<Box<Node>> = vec![];
+    let quote = open.value.to_owned();
     while let Some(i) = parser.tokens.get(parser.position) {
       parser.position += 1;
       match i.token_type {
         TokenType::EncapsedStringClose => {
+          if quote != i.value {
+            return Err(ParserError::internal("StringEncapsed", args));
+          }
           break;
         }
         TokenType::EncapsedString =>
-          values.push(EncapsedPartNode::new(false, StringNode::new(i.value.to_owned()))),
+          values.push(
+            EncapsedPartNode::new(false, StringNode::new(quote.clone(), i.value.to_owned()))
+          ),
         TokenType::Variable =>
           values.push(EncapsedPartNode::new(false, VariableParser::new(i.value.to_owned(), false))),
         TokenType::AdvanceInterpolationOpen => {
@@ -67,6 +83,6 @@ impl StringParser {
         }
       }
     }
-    return Ok(EncapsedNode::new(values));
+    return Ok(EncapsedNode::new(quote, values));
   }
 }

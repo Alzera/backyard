@@ -81,10 +81,10 @@ impl StringToken {
 
     if result.len() < 3 {
       let t = match result.get(1) {
-        Some(t) => t.value.clone(),
+        Some(t) => t.value.to_owned(),
         _ => String::from(""),
       };
-      return Ok(vec![Token::new(TokenType::String, t)]);
+      return Ok(vec![Token::new(TokenType::String, format!("{}{}{}", breaker, t, breaker))]);
     }
 
     result.push(Token::new(TokenType::EncapsedStringClose, String::from(breaker)));
