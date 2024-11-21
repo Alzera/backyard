@@ -3,7 +3,7 @@ use utils::guard;
 
 pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Box<Node>);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 70] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 68] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
   (NodeType::Array, super::internal::array::ArrayGenerator::generate),
@@ -31,7 +31,6 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 70] = [
   // (NodeType::DeclareArgument, DeclareArgumentGenerator::generate),
   (NodeType::DoWhile, super::internal::dowhile::DoWhileGenerator::generate),
   (NodeType::Echo, super::internal::singles::SinglesGenerator::generate),
-  (NodeType::Elvis, super::internal::elvis::ElvisGenerator::generate),
   (NodeType::Encapsed, super::internal::string::StringGenerator::generate_encapsed),
   // (NodeType::EncapsedPart, StringGenerator::generate_encapsed_part),
   (NodeType::Enum, super::internal::enums::EnumGenerator::generate),
@@ -46,7 +45,6 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 70] = [
   (NodeType::Identifier, super::internal::identifier::IdentifierGenerator::generate),
   (NodeType::If, super::internal::ifs::IfGenerator::generate),
   (NodeType::Include, super::internal::include::IncludeGenerator::generate),
-  (NodeType::InstanceOf, super::internal::instanceof::InstanceOfGenerator::generate),
   (NodeType::Interface, super::internal::interface::InterfaceGenerator::generate),
   (NodeType::Label, super::internal::label::LabelGenerator::generate),
   (NodeType::List, super::internal::list::ListGenerator::generate),

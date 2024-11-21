@@ -46,7 +46,9 @@ impl BinParser {
             TokenType::BooleanOr,
             TokenType::And,
             TokenType::Or,
-            TokenType::Xor
+            TokenType::Xor,
+            TokenType::Elvis,
+            TokenType::InstanceOf
           ]
         ),
       ].to_vec()

@@ -30,6 +30,7 @@ mod tests {
 
   #[test]
   fn basic() {
+    test("$platform instanceof SQLServerPlatform || $platform instanceof SQLitePlatform;");
     test(
       "$this->callDiffAlias($unit, $parameters)
   ?? $this->callHumanDiffAlias($unit, $parameters) ?? $this->callRoundMethod($unit, $parameters)

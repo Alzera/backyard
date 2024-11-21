@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, NodeType };
-use crate::{ error::ParserError, internal::elvis::ElvisParser };
+use crate::error::ParserError;
 
 use super::internal::{
   array::ArrayParser,
@@ -24,7 +24,6 @@ use super::internal::{
   identifier::IdentifierParser,
   ifs::IfParser,
   include::IncludeParser,
-  instanceof::InstanceOfParser,
   interface::InterfaceParser,
   label::LabelParser,
   list::ListParser,
@@ -57,7 +56,7 @@ type InternalParserParse = fn(
   &mut LoopArgument
 ) -> Result<Box<Node>, ParserError>;
 type InternalParser = (InternalParserTest, InternalParserParse);
-pub static DEFAULT_PARSERS: [InternalParser; 44] = [
+pub static DEFAULT_PARSERS: [InternalParser; 42] = [
   (CommentParser::test, CommentParser::parse),
   (ListParser::test, ListParser::parse),
   (ArrayLookupParser::test, ArrayLookupParser::parse),
@@ -65,7 +64,6 @@ pub static DEFAULT_PARSERS: [InternalParser; 44] = [
   (AssignmentParser::test, AssignmentParser::parse),
   (BinParser::test, BinParser::parse),
   (ObjectAccessParser::test, ObjectAccessParser::parse),
-  (InstanceOfParser::test, InstanceOfParser::parse),
   (DeclareParser::test, DeclareParser::parse),
   (DoWhileParser::test, DoWhileParser::parse),
   (NamespaceParser::test, NamespaceParser::parse),
@@ -102,7 +100,6 @@ pub static DEFAULT_PARSERS: [InternalParser; 44] = [
   (IdentifierParser::test, IdentifierParser::parse),
   // (TypesParser::test, TypesParser::parse),
   (SinglesParser::test, SinglesParser::parse),
-  (ElvisParser::test, ElvisParser::parse),
 ];
 
 #[derive(Debug)]
