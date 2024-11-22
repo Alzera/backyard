@@ -1,4 +1,5 @@
 use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
+use utils::guard;
 
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
@@ -41,6 +42,40 @@ impl StringGenerator {
       builder.push(expr.as_str());
     }
   }
+
+  pub fn generate_nowdoc(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+    let node = cast_node!(NodeWrapper::NowDoc, &node.node);
+    builder.push(&format!("<<<'{}'", node.label));
+    builder.push(&node.value);
+    if
+      !guard!(node.value.split('\n').last())
+        .chars()
+        .into_iter()
+        .fold(true, |acc, x| acc && x.is_whitespace())
+    {
+      builder.new_line();
+    }
+    builder.push(&node.label);
+  }
+
+  pub fn generate_heredoc(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+    let node = cast_node!(NodeWrapper::HereDoc, &node.node);
+    builder.push(&format!("<<<{}", node.label));
+    let parts = generator.generate_nodes_new(
+      &node.values,
+      &mut GeneratorArgument::generator(&[(NodeType::EncapsedPart, Self::generate_encapsed_part)])
+    );
+    builder.push(&parts.to_string(""));
+    if
+      !guard!(parts.lines.last())
+        .line.chars()
+        .into_iter()
+        .fold(true, |acc, x| acc && x.is_whitespace())
+    {
+      builder.new_line();
+    }
+    builder.push(&node.label);
+  }
 }
 
 #[cfg(test)]
@@ -51,5 +86,11 @@ mod tests {
   fn basic() {
     test("$a = \"ale\" . \" ini string $ \\\" \\$var $b {${\"ale\" . 5}} {$a}\";");
     test("'a';");
+    test("echo <<<'START'
+a {$a}
+START;");
+    test("echo <<<START
+a {$a}
+START;");
   }
 }

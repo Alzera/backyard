@@ -306,7 +306,7 @@ impl Lexer {
           "<>" => Ok(vec![Token::new(TokenType::IsNotEqual, "<>")]),
           "<=" => Ok(vec![Token::new(TokenType::IsLesserOrEqual, "<=")]),
           "<<=" => Ok(vec![Token::new(TokenType::BitwiseShiftLeftAssignment, "<<=")]),
-          "<<<" => Ok(vec![Token::new(TokenType::HeredocStart, "<<<")]),
+          "<<<" => StringToken::lex_doc(self),
           "<<" => Ok(vec![Token::new(TokenType::BitwiseShiftLeft, "<<")]),
           "<" => Ok(vec![Token::new(TokenType::IsLesser, "<")]),
           _ => Err(self.control.error_unrecognized(&t)),

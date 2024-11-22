@@ -99,7 +99,6 @@ pub enum TokenType {
   OpenTag,
   OpenTagEcho,
   Spaceship,
-  HeredocStart,
 
   // :
   Colon,
@@ -138,6 +137,11 @@ pub enum TokenType {
   Semicolon,
   AtSign,
   // LineBreak,
+
+  NowDocOpen,
+  NowDocClose,
+  HeredocOpen,
+  HeredocClose,
 
   Abstract,
   Array,

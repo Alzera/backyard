@@ -132,6 +132,7 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::Function => { serde_json::from_value(node_data).map(NodeWrapper::Function) }
             NodeType::Global => { serde_json::from_value(node_data).map(NodeWrapper::Global) }
             NodeType::Goto => { serde_json::from_value(node_data).map(NodeWrapper::Goto) }
+            NodeType::HereDoc => { serde_json::from_value(node_data).map(NodeWrapper::HereDoc) }
             NodeType::Identifier => {
               serde_json::from_value(node_data).map(NodeWrapper::Identifier)
             }
@@ -151,6 +152,7 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::Negate => { serde_json::from_value(node_data).map(NodeWrapper::Negate) }
             NodeType::Negative => { serde_json::from_value(node_data).map(NodeWrapper::Negative) }
             NodeType::New => { serde_json::from_value(node_data).map(NodeWrapper::New) }
+            NodeType::NowDoc => { serde_json::from_value(node_data).map(NodeWrapper::NowDoc) }
             NodeType::Null => { serde_json::from_value(node_data).map(NodeWrapper::Null) }
             NodeType::Number => { serde_json::from_value(node_data).map(NodeWrapper::Number) }
             NodeType::ObjectAccess => {
@@ -259,6 +261,7 @@ pub enum NodeWrapper {
   Function(FunctionNode),
   Global(GlobalNode),
   Goto(GotoNode),
+  HereDoc(HereDocNode),
   Identifier(IdentifierNode),
   If(IfNode),
   Include(IncludeNode),
@@ -274,6 +277,7 @@ pub enum NodeWrapper {
   Negate(NegateNode),
   Negative(NegativeNode),
   New(NewNode),
+  NowDoc(NowDocNode),
   Null(NullNode),
   Number(NumberNode),
   ObjectAccess(ObjectAccessNode),
@@ -355,6 +359,7 @@ pub enum NodeType {
   Function,
   Global,
   Goto,
+  HereDoc,
   Identifier,
   If,
   Include,
@@ -370,6 +375,7 @@ pub enum NodeType {
   Negate,
   Negative,
   New,
+  NowDoc,
   Null,
   Number,
   ObjectAccess,
@@ -770,6 +776,16 @@ new_node!(StaticLookup, StaticLookupNode {
 new_node!(String, StringNode {
   quote: String,
   value: String,
+});
+
+new_node!(NowDoc, NowDocNode {
+  label: String,
+  value: String,
+});
+
+new_node!(HereDoc, HereDocNode {
+  label: String,
+  values: Vec<Box<Node>>,
 });
 
 new_node!(Encapsed, EncapsedNode {
