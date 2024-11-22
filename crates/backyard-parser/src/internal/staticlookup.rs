@@ -1,6 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ ClassKeywordNode, Node, StaticLookupNode };
-use utils::guard;
 
 use crate::{
   error::ParserError,
@@ -8,13 +7,16 @@ use crate::{
   utils::{ match_pattern, Lookup },
 };
 
-use super::{ call::CallParser, identifier::IdentifierParser, variable::VariableParser };
+use super::identifier::IdentifierParser;
 
 #[derive(Debug, Clone)]
 pub struct StaticLookupParser {}
 
 impl StaticLookupParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+    if args.last_expr.is_none() {
+      return None;
+    }
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::DoubleColon])].to_vec())
   }
 
@@ -24,36 +26,17 @@ impl StaticLookupParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      let on = guard!(args.last_expr.to_owned(), {
-        return Err(ParserError::internal("StaticLookup", args));
-      });
-      let expr = if
-        guard!(parser.tokens.get(parser.position), {
-          return Err(ParserError::internal("StaticLookup", args));
-        }).token_type == TokenType::Class
-      {
+      let left = args.last_expr.to_owned().unwrap();
+      args.last_expr = None;
+      if let Some(t) = parser.tokens.get(parser.position) {
         parser.position += 1;
-        ClassKeywordNode::new()
-      } else {
-        guard!(
-          parser.get_statement(
-            &mut LoopArgument::safe(
-              "staticlookup",
-              &[],
-              &[TokenType::Semicolon],
-              &[
-                (CallParser::class_test, CallParser::parse),
-                (VariableParser::test, VariableParser::parse),
-                (IdentifierParser::test, IdentifierParser::parse),
-              ]
-            )
-          )?,
-          {
-            return Err(ParserError::internal("StaticLookup: fail to parse basic", args));
-          }
-        )
+        let expr = if t.token_type == TokenType::Class {
+          ClassKeywordNode::new()
+        } else {
+          IdentifierParser::new(t.value.to_owned())
+        };
+        return Ok(StaticLookupNode::new(left, expr));
       };
-      return Ok(StaticLookupNode::new(on, expr));
     }
     Err(ParserError::internal("StaticLookup", args))
   }

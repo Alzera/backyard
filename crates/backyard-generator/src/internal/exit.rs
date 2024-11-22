@@ -8,7 +8,9 @@ impl ExitGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Exit, &node.node);
     builder.push("exit(");
-    generator.generate_node(builder, &node.argument, &mut GeneratorArgument::default());
+    if let Some(argument) = &node.argument {
+      generator.generate_node(builder, &argument, &mut GeneratorArgument::default());
+    }
     builder.push(")");
   }
 }

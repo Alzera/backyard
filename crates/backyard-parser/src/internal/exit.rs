@@ -31,10 +31,7 @@ impl ExitParser {
         &mut LoopArgument::with_tokens("exit", &[], &[TokenType::RightParenthesis])
       )?;
       parser.position += 1;
-      if argument.is_none() {
-        return Err(ParserError::internal("Exit", args));
-      }
-      return Ok(ExitNode::new(argument.unwrap()));
+      return Ok(ExitNode::new(argument));
     }
     Err(ParserError::internal("Exit", args))
   }

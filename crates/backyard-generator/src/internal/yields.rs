@@ -8,12 +8,16 @@ impl YieldGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Yield, &node.node);
 
-    builder.push("yield ");
+    builder.push("yield");
     if let Some(key) = &node.key {
+      builder.push(" ");
       generator.generate_node(builder, &key, &mut GeneratorArgument::default());
-      builder.push(" => ");
+      builder.push(" =>");
     }
-    generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());
+    if let Some(value) = &node.value {
+      builder.push(" ");
+      generator.generate_node(builder, &value, &mut GeneratorArgument::default());
+    }
   }
 
   pub fn generate_from(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -30,8 +34,9 @@ mod tests {
 
   #[test]
   fn basic() {
-    test("yield \"key\" => \"value\";");
+    test("yield;");
     test("yield \"another_value\";");
+    test("yield \"key\" => \"value\";");
     test("yield from [1, 2, 3];");
   }
 }

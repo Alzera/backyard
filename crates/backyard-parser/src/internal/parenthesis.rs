@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
-use backyard_nodes::node::{ CallNode, CastNode, Node, NodeType, NodeWrapper, ParenthesisNode };
+use backyard_nodes::node::{ CastNode, Node, ParenthesisNode, TypeNode };
 use utils::guard;
 
 use crate::{
@@ -8,20 +8,12 @@ use crate::{
   utils::{ match_pattern, Lookup },
 };
 
-use super::{ call::CallParser, types::TypesParser };
-
 #[derive(Debug, Clone)]
 pub struct ParenthesisParser {}
 
 impl ParenthesisParser {
   pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(
-      tokens,
-      [
-        Lookup::Equal(vec![TokenType::LeftParenthesis]),
-        // Lookup::Optional(vec![TokenType::Function, TokenType::Fn]),
-      ].to_vec()
-    )
+    match_pattern(tokens, [Lookup::Equal(vec![TokenType::LeftParenthesis])].to_vec())
   }
 
   pub fn parse(
@@ -30,50 +22,41 @@ impl ParenthesisParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      if let Some(le) = args.last_expr.clone() {
-        if le.node_type == NodeType::Parenthesis {
-          if let NodeWrapper::Parenthesis(le) = le.node {
-            if
-              [NodeType::AnonymousFunction, NodeType::ArrowFunction].contains(
-                &le.statement.node_type
-              )
-            {
+      if let Some(token) = parser.tokens.get(parser.position) {
+        if
+          [
+            "int",
+            "integer",
+            "bool",
+            "boolean",
+            "float",
+            "double",
+            "real",
+            "string",
+            "binary",
+            "array",
+            "object",
+            "unset",
+          ].contains(&token.value.as_str())
+        {
+          let token = token.clone();
+          if let Some(next_token) = parser.tokens.get(parser.position + 1) {
+            if next_token.token_type == TokenType::RightParenthesis {
+              parser.position += 2;
+              let expression = guard!(
+                parser.get_statement(
+                  &mut LoopArgument::with_tokens("cast", &args.separators, &args.breakers)
+                )?,
+                {
+                  return Err(ParserError::internal("Cast", args));
+                }
+              );
               return Ok(
-                CallNode::new(
-                  args.last_expr.to_owned().unwrap(),
-                  CallParser::get_arguments(parser)?
-                )
+                CastNode::new(TypeNode::new(false, vec![token.value.to_owned()]), expression)
               );
             }
           }
-        } else if [NodeType::StaticLookup, NodeType::ObjectAccess].contains(&le.node_type) {
-          return Ok(
-            CallNode::new(args.last_expr.to_owned().unwrap(), CallParser::get_arguments(parser)?)
-          );
         }
-      }
-      if let Some(m) = TypesParser::test(&parser.tokens[parser.position..].to_vec(), args) {
-        let pos = parser.position;
-        parser.position += m
-          .iter()
-          .map(|x| x.len())
-          .sum::<usize>();
-        let statement = TypesParser::parse(parser, m, args)?;
-        if let Some(next) = parser.tokens.get(parser.position) {
-          if next.token_type == TokenType::RightParenthesis {
-            parser.position += 1;
-            let expression = guard!(
-              parser.get_statement(
-                &mut LoopArgument::with_tokens("cast", &args.separators, &args.breakers)
-              )?,
-              {
-                return Err(ParserError::internal("Parenthesis: fail to get expression", args));
-              }
-            );
-            return Ok(CastNode::new(statement, expression));
-          }
-        }
-        parser.position = pos;
       }
       let statement = guard!(
         parser.get_statement(
@@ -84,7 +67,7 @@ impl ParenthesisParser {
           )
         )?,
         {
-          return Err(ParserError::internal("Parenthesis: fail to get statement", args));
+          return Err(ParserError::internal("Parenthesis", args));
         }
       );
       parser.position += 1;

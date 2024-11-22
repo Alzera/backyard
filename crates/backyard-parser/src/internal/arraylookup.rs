@@ -25,7 +25,7 @@ impl ArrayLookupParser {
         NodeType::Match,
         NodeType::Array,
         NodeType::ObjectAccess,
-        // NodeType::Parenthesis
+        NodeType::Parenthesis,
       ].contains(&last_expr.node_type)
     {
       return None;

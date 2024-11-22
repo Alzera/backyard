@@ -30,5 +30,10 @@ mod tests {
     test("$a = (int) $a;");
     test("$a = 5 + 0.5 + (.5 + 0x2e45);");
     test("(fn () => 0)();");
+    test(
+      "$flags = 
+  (RUNKIT_IMPORT_FUNCTIONS | RUNKIT_IMPORT_CLASSES | RUNKIT_IMPORT_CLASS_METHODS
+    | RUNKIT_IMPORT_CLASS_CONSTS | RUNKIT_IMPORT_CLASS_PROPS | RUNKIT_IMPORT_OVERRIDE);"
+    );
   }
 }

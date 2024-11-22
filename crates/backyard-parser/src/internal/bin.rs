@@ -62,6 +62,8 @@ impl BinParser {
   ) -> Result<Box<Node>, ParserError> {
     if let [operator] = matched.as_slice() {
       if let Some(operator) = operator.get(0) {
+        let left = args.last_expr.to_owned().unwrap();
+        args.last_expr = None;
         if
           let Some(right) = parser.get_statement(
             &mut LoopArgument::with_tokens(
@@ -71,9 +73,7 @@ impl BinParser {
             )
           )?
         {
-          return Ok(
-            BinNode::new(args.last_expr.to_owned().unwrap(), operator.value.to_owned(), right)
-          );
+          return Ok(BinNode::new(left, operator.value.to_owned(), right));
         }
       }
     }

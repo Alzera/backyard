@@ -11,7 +11,10 @@ use crate::{
 pub struct AssignmentParser {}
 
 impl AssignmentParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+    if args.last_expr.is_none() {
+      return None;
+    }
     match_pattern(
       tokens,
       [
@@ -45,6 +48,8 @@ impl AssignmentParser {
   ) -> Result<Box<Node>, ParserError> {
     if let [operator] = matched.as_slice() {
       if let Some(operator) = operator.get(0) {
+        let left = args.last_expr.to_owned().unwrap();
+        args.last_expr = None;
         if
           let Some(right) = parser.get_statement(
             &mut LoopArgument::with_tokens(
@@ -54,13 +59,7 @@ impl AssignmentParser {
             )
           )?
         {
-          return Ok(
-            AssignmentNode::new(
-              args.last_expr.to_owned().unwrap(),
-              operator.value.to_owned(),
-              right
-            )
-          );
+          return Ok(AssignmentNode::new(left, operator.value.to_owned(), right));
         }
       }
     }

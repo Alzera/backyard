@@ -12,7 +12,10 @@ use crate::{
 pub struct TernaryParser {}
 
 impl TernaryParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+    if args.last_expr.is_none() {
+      return None;
+    }
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::QuestionMark])].to_vec())
   }
 
@@ -22,9 +25,8 @@ impl TernaryParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      if args.last_expr.is_none() {
-        return Err(ParserError::internal("Ternary", args));
-      }
+      let left = args.last_expr.to_owned().unwrap();
+      args.last_expr = None;
       let valid = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("ternary_valid", &[], &[TokenType::Colon])
@@ -38,15 +40,15 @@ impl TernaryParser {
         parser.get_statement(
           &mut LoopArgument::with_tokens(
             "ternary_invalid",
-            &args.separators.combine(&[TokenType::Semicolon]),
-            &args.breakers
+            &[],
+            &args.breakers.combine(args.separators).combine(&[TokenType::Semicolon])
           )
         )?,
         {
           return Err(ParserError::internal("Ternary", args));
         }
       );
-      return Ok(TernaryNode::new(args.last_expr.to_owned().unwrap(), valid, invalid));
+      return Ok(TernaryNode::new(left, valid, invalid));
     }
     Err(ParserError::internal("Ternary", args))
   }

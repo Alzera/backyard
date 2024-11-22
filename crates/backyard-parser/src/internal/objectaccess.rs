@@ -4,7 +4,7 @@ use utils::guard;
 
 use crate::{
   error::ParserError,
-  internal::{ call::CallParser, identifier::IdentifierParser, variable::VariableParser },
+  internal::{ identifier::IdentifierParser, variable::VariableParser },
   parser::{ LoopArgument, Parser },
   utils::{ match_pattern, Lookup },
 };
@@ -49,40 +49,9 @@ impl ObjectAccessParser {
               .map(|x| x.len())
               .sum::<usize>();
             VariableParser::parse(parser, m, args)?
-          } else if
-            let Some(m) = CallParser::class_test(&parser.tokens[parser.position..].to_vec(), args)
-          {
-            parser.position += m
-              .iter()
-              .map(|x| x.len())
-              .sum::<usize>();
-            CallParser::parse(parser, m, args)?
           } else if let Some(token) = parser.tokens.get(parser.position) {
-            if
-              [
-                TokenType::Identifier,
-                TokenType::Clone,
-                TokenType::Echo,
-                TokenType::For,
-                TokenType::If,
-                TokenType::While,
-                TokenType::Array,
-                TokenType::List,
-                TokenType::Global,
-                TokenType::Print,
-                TokenType::Type,
-                TokenType::From,
-                TokenType::And,
-                TokenType::Or,
-                TokenType::Xor,
-                TokenType::New,
-              ].contains(&token.token_type)
-            {
-              parser.position += 1;
-              IdentifierParser::new(token.value.to_owned())
-            } else {
-              return Err(ParserError::internal("ObjectAccess", args));
-            }
+            parser.position += 1;
+            IdentifierParser::new(token.value.to_owned())
           } else {
             return Err(ParserError::internal("ObjectAccess", args));
           };
@@ -98,7 +67,7 @@ impl ObjectAccessParser {
               )
             )?,
             {
-              return Err(ParserError::internal("ObjectAccess: fail to parse bracket", args));
+              return Err(ParserError::internal("ObjectAccess", args));
             }
           );
           parser.position += 1;

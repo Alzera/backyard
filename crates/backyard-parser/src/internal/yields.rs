@@ -25,20 +25,30 @@ impl YieldParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, has_from] = matched.as_slice() {
-      let mut value = guard!(
-        parser.get_statement(
-          &mut LoopArgument::with_tokens(
-            "singles",
-            &args.separators.combine(&[]),
-            &args.breakers.combine(&[TokenType::Arrow, TokenType::Semicolon])
-          )
-        )?,
-        {
-          return Err(ParserError::internal("Yield", args));
-        }
-      );
       if has_from.len() > 0 {
-        return Ok(YieldFromNode::new(value));
+        let expr = guard!(
+          parser.get_statement(
+            &mut LoopArgument::with_tokens(
+              "yield_from",
+              &[],
+              &args.breakers.combine(args.separators)
+            )
+          )?,
+          {
+            return Err(ParserError::internal("Yield", args));
+          }
+        );
+        return Ok(YieldFromNode::new(expr));
+      }
+      let mut value = parser.get_statement(
+        &mut LoopArgument::with_tokens(
+          "yield",
+          &[],
+          &args.breakers.combine(args.separators).combine(&[TokenType::Arrow])
+        )
+      )?;
+      if value.is_none() {
+        return Ok(YieldNode::new(None, None));
       }
       let mut key = None;
       if
@@ -46,19 +56,21 @@ impl YieldParser {
           return Err(ParserError::internal("Yield", args));
         }).token_type == TokenType::Arrow
       {
-        key = Some(value);
+        key = Some(value.unwrap());
         parser.position += 1;
-        value = guard!(
-          parser.get_statement(
-            &mut LoopArgument::with_tokens(
-              "singles",
-              &args.separators.combine(&[]),
-              &args.breakers.combine(&[TokenType::Semicolon])
-            )
-          )?,
-          {
-            return Err(ParserError::internal("Yield", args));
-          }
+        value = Some(
+          guard!(
+            parser.get_statement(
+              &mut LoopArgument::with_tokens(
+                "singles",
+                &args.separators.combine(&[]),
+                &args.breakers.combine(&[TokenType::Semicolon])
+              )
+            )?,
+            {
+              return Err(ParserError::internal("Yield", args));
+            }
+          )
         );
       }
       return Ok(YieldNode::new(key, value));

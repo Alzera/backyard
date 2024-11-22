@@ -535,7 +535,7 @@ new_node!(Eval, EvalNode {
 });
 
 new_node!(Exit, ExitNode {
-  argument: Box<Node>,
+  argument: Option<Box<Node>>,
 });
 
 new_node!(Foreach, ForeachNode {
@@ -871,5 +871,5 @@ new_node!(YieldFrom, YieldFromNode {
 
 new_node!(Yield, YieldNode {
   key: Option<Box<Node>>,
-  value: Box<Node>,
+  value: Option<Box<Node>>,
 });

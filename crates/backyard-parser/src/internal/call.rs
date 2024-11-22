@@ -30,39 +30,22 @@ impl CallParser {
 }
 
 impl CallParser {
-  pub fn class_test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(
-      tokens,
-      [
-        Lookup::Optional(vec![TokenType::BackSlash]),
-        Lookup::Equal(
-          vec![
-            TokenType::Identifier,
-            TokenType::Clone,
-            TokenType::Echo,
-            TokenType::For,
-            TokenType::If,
-            TokenType::While,
-            TokenType::Array,
-            TokenType::List,
-            TokenType::Global,
-            TokenType::Print,
-            TokenType::Type,
-            TokenType::From,
-            TokenType::And,
-            TokenType::Or,
-            TokenType::Xor,
-            TokenType::New
-          ]
-        ),
-        Lookup::Equal(vec![TokenType::LeftParenthesis]),
-      ].to_vec()
-    )
-  }
-
   pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     if let Some(last_expr) = &args.last_expr {
-      if [NodeType::Variable, NodeType::Static].contains(&last_expr.node_type) {
+      if
+        [
+          NodeType::Variable,
+          NodeType::Static,
+          NodeType::SelfKeyword,
+          NodeType::Parenthesis,
+          NodeType::ObjectAccess,
+          NodeType::StaticLookup,
+          NodeType::ArrayLookup,
+          NodeType::Array,
+          NodeType::Call,
+          NodeType::Identifier,
+        ].contains(&last_expr.node_type)
+      {
         if let Some(next_token) = tokens.get(0) {
           if next_token.token_type == TokenType::LeftParenthesis {
             return Some(vec![vec![next_token.to_owned()]]);
@@ -70,14 +53,15 @@ impl CallParser {
         }
       }
     }
-    match_pattern(
-      tokens,
-      [
-        Lookup::Optional(vec![TokenType::BackSlash]),
-        Lookup::Equal(vec![TokenType::Identifier]),
-        Lookup::Equal(vec![TokenType::LeftParenthesis]),
-      ].to_vec()
-    )
+    None
+    // match_pattern(
+    //   tokens,
+    //   [
+    //     Lookup::Optional(vec![TokenType::BackSlash]),
+    //     Lookup::Equal(vec![TokenType::Identifier]),
+    //     Lookup::Equal(vec![TokenType::LeftParenthesis]),
+    //   ].to_vec()
+    // )
   }
 
   pub fn parse(
@@ -85,31 +69,10 @@ impl CallParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    match matched.len() {
-      1 => {
-        if let [_] = matched.as_slice() {
-          return Ok(
-            CallNode::new(args.last_expr.to_owned().unwrap(), CallParser::get_arguments(parser)?)
-          );
-        }
-      }
-      3 => {
-        if let [backslash, name, _] = matched.as_slice() {
-          if let Some(name) = name.get(0) {
-            let name = if let Some(_) = backslash.get(0) {
-              format!("\\{}", name.value.to_owned())
-            } else {
-              name.value.to_owned()
-            };
-            return Ok(
-              CallNode::new(IdentifierParser::new(name), CallParser::get_arguments(parser)?)
-            );
-          }
-        }
-      }
-      _ => {
-        return Err(ParserError::internal("Call", args));
-      }
+    if let [_] = matched.as_slice() {
+      return Ok(
+        CallNode::new(args.last_expr.to_owned().unwrap(), CallParser::get_arguments(parser)?)
+      );
     }
     Err(ParserError::internal("Call", args))
   }

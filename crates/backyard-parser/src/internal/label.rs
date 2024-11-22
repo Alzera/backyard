@@ -1,5 +1,6 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, LabelNode };
+use backyard_nodes::node::{ LabelNode, Node, NodeType };
+use utils::guard;
 
 use crate::{
   error::ParserError,
@@ -7,18 +8,17 @@ use crate::{
   utils::{ match_pattern, Lookup },
 };
 
-use super::identifier::IdentifierParser;
-
 #[derive(Debug, Clone)]
 pub struct LabelParser {}
 
 impl LabelParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    let grammar = [
-      Lookup::Equal(vec![TokenType::Identifier]),
-      Lookup::Equal(vec![TokenType::Colon]),
-    ].to_vec();
-    match_pattern(tokens, grammar)
+  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+    if let Some(last) = &args.last_expr {
+      if last.node_type != NodeType::Identifier {
+        return None;
+      }
+    }
+    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Colon])].to_vec())
   }
 
   pub fn parse(
@@ -26,8 +26,11 @@ impl LabelParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [name, _] = matched.as_slice() {
-      return Ok(LabelNode::new(IdentifierParser::from_matched(name)));
+    if let [_] = matched.as_slice() {
+      let name = guard!(args.last_expr.to_owned(), {
+        return Err(ParserError::internal("Label", args));
+      });
+      return Ok(LabelNode::new(name));
     }
     Err(ParserError::internal("Label", args))
   }
