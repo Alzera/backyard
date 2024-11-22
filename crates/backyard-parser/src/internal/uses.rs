@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
+use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, UseItemNode, UseNode };
 
 use crate::{
@@ -35,18 +35,17 @@ impl UseParser {
         p += 1;
       }
       if has_bracket {
-        let name = parser.get_children(
-          &mut LoopArgument::new(
-            "uses_name",
-            &[TokenType::BackSlash],
-            &[TokenType::Semicolon, TokenType::LeftCurlyBracket],
-            &[
-              (IdentifierParser::test, IdentifierParser::parse),
-              (CommentParser::test, CommentParser::parse),
-            ]
-          )
-        )?;
-        parser.position -= 1;
+        let mut name = vec![];
+        loop {
+          if let Some(token) = parser.tokens.get(parser.position) {
+            if [TokenType::Identifier, TokenType::Name].contains(&token.token_type) {
+              name.push(IdentifierParser::new(token.value.to_owned()));
+              parser.position += 1;
+              continue;
+            }
+          }
+          break;
+        }
 
         let items = {
           let mut items = vec![];
@@ -103,18 +102,17 @@ impl UseItemParser {
   ) -> Result<Box<Node>, ParserError> {
     if let [modifier] = matched.as_slice() {
       let modifier = some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned());
-      let name = parser.get_children(
-        &mut LoopArgument::new(
-          "uses_item_name",
-          &[TokenType::BackSlash],
-          &args.breakers.combine(args.separators).combine(&[TokenType::As]),
-          &[
-            (IdentifierParser::test, IdentifierParser::parse),
-            (CommentParser::test, CommentParser::parse),
-          ]
-        )
-      )?;
-      parser.position -= 1;
+      let mut name = vec![];
+      loop {
+        if let Some(token) = parser.tokens.get(parser.position) {
+          if [TokenType::Identifier, TokenType::Name].contains(&token.token_type) {
+            name.push(IdentifierParser::new(token.value.to_owned()));
+            parser.position += 1;
+            continue;
+          }
+        }
+        break;
+      }
       let mut alias = None;
       if let Some(last) = parser.tokens.get(parser.position) {
         if last.token_type == TokenType::As {

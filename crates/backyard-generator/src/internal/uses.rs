@@ -21,9 +21,9 @@ impl UseGenerator {
         names,
         &mut GeneratorArgument::new(EndMode::None, &DEFAULT_GENERATORS)
       );
-      builder.push(&names.to_string("\\"));
+      builder.push(&names.to_string(""));
 
-      builder.push("\\{");
+      builder.push("{");
       if
         Generator::check_nodes_has_comments(&node.items) ||
         1 + builder.last_len() + items.total_len_with_separator(" ") > generator.max_length
@@ -57,7 +57,7 @@ impl UseGenerator {
       &node.names,
       &mut GeneratorArgument::new(EndMode::None, &DEFAULT_GENERATORS)
     );
-    builder.push(&names.to_string("\\"));
+    builder.push(&names.to_string(""));
 
     if let Some(alias) = &node.alias {
       builder.push(" as ");

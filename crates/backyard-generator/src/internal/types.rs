@@ -20,13 +20,9 @@ mod tests {
 
   #[test]
   fn basic() {
-    test(
-      "class A {
-  public int $instance = 4;
-  public static ?A $instance = 4;
-  protected function resolveCarbon(DateTimeInterface|string|null $date): self|static|false|null {
+    test("class A {
+  public function __construct(\\Exception $exception) {
   }
-}"
-    );
+}");
   }
 }

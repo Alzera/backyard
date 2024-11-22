@@ -356,7 +356,10 @@ impl Lexer {
       '`' => StringToken::lex(self, '`'),
       '"' => StringToken::lex(self, '"'),
       '\'' => StringToken::lex(self, '\''),
-      '\\' => Ok(vec![Token::new(TokenType::BackSlash, "\\")]),
+      '\\' => {
+        let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_'));
+        Ok(vec![Token::new(TokenType::Name, t)])
+      }
       ',' => Ok(vec![Token::new(TokenType::Comma, ",")]),
       ';' => Ok(vec![Token::new(TokenType::Semicolon, ";")]),
       '~' => Ok(vec![Token::new(TokenType::BooleanNegate, "~")]),

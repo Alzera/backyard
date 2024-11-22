@@ -7,7 +7,7 @@ use crate::{
   utils::{ match_pattern, Lookup },
 };
 
-use super::{ block::BlockParser, comment::CommentParser, identifier::IdentifierParser };
+use super::block::BlockParser;
 
 #[derive(Debug, Clone)]
 pub struct NamespaceParser {}
@@ -23,20 +23,20 @@ impl NamespaceParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      let name = parser.get_children(
-        &mut LoopArgument::new(
-          "namespace",
-          &[TokenType::BackSlash],
-          &[TokenType::Semicolon, TokenType::LeftCurlyBracket],
-          &[
-            (IdentifierParser::test, IdentifierParser::parse),
-            (CommentParser::test, CommentParser::parse),
-          ]
-        )
-      )?;
-      let is_bracket = if let Some(t) = parser.tokens.get(parser.position - 1) {
+      let mut name = String::new();
+      loop {
+        if let Some(token) = parser.tokens.get(parser.position) {
+          if [TokenType::Identifier, TokenType::Name].contains(&token.token_type) {
+            name.push_str(&token.value);
+            parser.position += 1;
+            continue;
+          }
+        }
+        break;
+      }
+      let is_bracket = if let Some(t) = parser.tokens.get(parser.position) {
         let is_bracket = t.token_type == TokenType::LeftCurlyBracket;
-        parser.position -= 1;
+        // parser.position -= 1;
         is_bracket
       } else {
         false

@@ -23,13 +23,7 @@ impl IdentifierParser {
 
 impl IdentifierParser {
   pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(
-      tokens,
-      [
-        Lookup::Optional(vec![TokenType::BackSlash]),
-        Lookup::Equal(vec![TokenType::Identifier]),
-      ].to_vec()
-    )
+    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Identifier, TokenType::Name])].to_vec())
   }
 
   pub fn parse(
@@ -37,12 +31,14 @@ impl IdentifierParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [backlash, identifier] = matched.as_slice() {
-      let id = guard!(identifier.get(0), {
-        return Err(ParserError::internal("Identifier", args));
-      });
-      let name = if backlash.len() > 0 { format!("\\{}", id.value) } else { id.value.to_owned() };
-      return Ok(IdentifierParser::new(name));
+    if let [identifier] = matched.as_slice() {
+      return Ok(
+        IdentifierParser::new(
+          guard!(identifier.get(0), {
+            return Err(ParserError::internal("Identifier", args));
+          }).value.to_owned()
+        )
+      );
     }
     Err(ParserError::internal("Identifier", args))
   }

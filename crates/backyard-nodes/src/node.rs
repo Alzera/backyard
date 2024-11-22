@@ -488,6 +488,7 @@ new_node!(Class, ClassNode {
   extends: Option<Box<Node>>,
   implements: Vec<Box<Node>>,
   body: Box<Node>,
+  is_readonly: bool,
 });
 
 new_node!(CommentBlock, CommentBlockNode {
@@ -616,7 +617,7 @@ new_node!(InstanceOf, InstanceOfNode {
 
 new_node!(Interface, InterfaceNode {
   name: Box<Node>,
-  implements: Vec<Box<Node>>,
+  extends: Vec<Box<Node>>,
   body: Box<Node>,
 });
 
@@ -650,7 +651,7 @@ new_node!(Method, MethodNode {
 });
 
 new_node!(Namespace, NamespaceNode {
-  names: Vec<Box<Node>>, 
+  name: String, 
   body: Box<Node>,
   is_bracket: bool,
 });

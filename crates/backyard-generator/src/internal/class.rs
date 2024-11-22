@@ -16,6 +16,9 @@ pub struct ClassGenerator {}
 impl ClassGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Class, &node.node);
+    if node.is_readonly {
+      builder.push("readonly ");
+    }
     if node.modifier.len() > 0 {
       builder.push(format!("{} ", node.modifier).as_str());
     }
@@ -63,7 +66,7 @@ mod tests {
     test("final class A extends B {\n}");
     test("return new class extends B {\n};");
     test(
-      "class A implements C, D, E {
+      "readonly class A implements C, D, E {
   use Ale;
   use Loggable, Usable {
     log as private alias;

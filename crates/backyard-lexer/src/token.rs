@@ -132,7 +132,7 @@ pub enum TokenType {
   RightCurlyBracket,
   LeftSquareBracket,
   RightSquareBracket,
-  BackSlash,
+  Name,
   Comma,
   Semicolon,
   AtSign,

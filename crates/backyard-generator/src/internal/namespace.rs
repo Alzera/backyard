@@ -1,6 +1,6 @@
 use backyard_nodes::{ cast_node, node::{ Node, NodeWrapper } };
 
-use crate::generator::{ Builder, EndMode, Generator, GeneratorArgument, DEFAULT_GENERATORS };
+use crate::generator::{ Builder, Generator, DEFAULT_GENERATORS };
 
 use super::block::BlockGenerator;
 
@@ -10,11 +10,7 @@ impl NamespaceGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Namespace, &node.node);
     builder.push("namespace ");
-    let names = generator.generate_nodes_new(
-      &node.names,
-      &mut GeneratorArgument::new(EndMode::None, &DEFAULT_GENERATORS)
-    );
-    builder.push(&names.to_string("\\"));
+    builder.push(&node.name);
     if node.is_bracket {
       BlockGenerator::generate(generator, builder, &node.body, None);
     } else {

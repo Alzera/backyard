@@ -54,14 +54,6 @@ impl CallParser {
       }
     }
     None
-    // match_pattern(
-    //   tokens,
-    //   [
-    //     Lookup::Optional(vec![TokenType::BackSlash]),
-    //     Lookup::Equal(vec![TokenType::Identifier]),
-    //     Lookup::Equal(vec![TokenType::LeftParenthesis]),
-    //   ].to_vec()
-    // )
   }
 
   pub fn parse(

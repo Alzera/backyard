@@ -21,17 +21,50 @@ pub struct ClassParser {}
 
 impl ClassParser {
   pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(
-      tokens,
-      [
-        Lookup::Optional(vec![TokenType::Abstract, TokenType::Final]),
-        Lookup::Equal(vec![TokenType::Class]),
-        Lookup::Optional(vec![TokenType::Identifier]),
-        Lookup::Optional(vec![TokenType::Extends]),
-        Lookup::Optional(vec![TokenType::Identifier]),
-        Lookup::Optional(vec![TokenType::Implements]),
-      ].to_vec()
-    )
+    let modifiers_rule = [
+      [TokenType::Readonly].to_vec(),
+      [TokenType::Abstract, TokenType::Final].to_vec(),
+    ];
+    let mut modifiers = vec![vec![], vec![]];
+    let mut pos = 0;
+    loop {
+      let token = tokens.get(pos);
+      pos += 1;
+      if pos > 2 || token.is_none() {
+        break;
+      }
+      let token = token.unwrap();
+      for (i, modifier) in modifiers_rule.iter().enumerate() {
+        if modifiers[i].len() > 0 {
+          continue;
+        }
+        if modifier.contains(&token.token_type) {
+          modifiers[i].push(token.clone());
+          break;
+        }
+      }
+    }
+    let modifier_count = modifiers
+      .iter()
+      .map(|i| i.len())
+      .sum::<usize>();
+    if
+      let Some(next_modifiers) = match_pattern(
+        &tokens[modifier_count..].to_vec(),
+        [
+          Lookup::Equal(vec![TokenType::Class]),
+          Lookup::Optional(vec![TokenType::Identifier]),
+          Lookup::Optional(vec![TokenType::Extends]),
+          Lookup::Optional(vec![TokenType::Identifier, TokenType::Name]),
+          Lookup::Optional(vec![TokenType::Implements]),
+        ].to_vec()
+      )
+    {
+      modifiers.extend(next_modifiers);
+      println!("Ale 1: {:?}", modifiers);
+      return Some(modifiers);
+    }
+    None
   }
 
   pub fn parse(
@@ -39,7 +72,7 @@ impl ClassParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [modifier, _, name, _, extends, _] = matched.as_slice() {
+    if let [readonly, modifier, _, name, _, extends, _] = matched.as_slice() {
       let implements = parser.get_children(
         &mut LoopArgument::new(
           "class_implements",
@@ -76,7 +109,8 @@ impl ClassParser {
           name,
           extends,
           implements,
-          BlockNode::new(body)
+          BlockNode::new(body),
+          readonly.len() > 0
         )
       );
     }
