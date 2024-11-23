@@ -72,7 +72,8 @@ impl FunctionParser {
             TokenType::Finally,
             TokenType::Final,
             TokenType::InsteadOf,
-            TokenType::SelfKeyword
+            TokenType::SelfKeyword,
+            TokenType::Enum
           ]
         ),
         Lookup::Equal(vec![TokenType::LeftParenthesis]),

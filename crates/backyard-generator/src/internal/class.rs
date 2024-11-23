@@ -62,7 +62,9 @@ mod tests {
 
   #[test]
   fn basic() {
-    test("abstract class A {\n}");
+    test("abstract class A {
+  private Extension\\Another $a;
+}");
     test("final class A extends B {\n}");
     test("return new class extends B {\n};");
     test(

@@ -7,7 +7,7 @@ use crate::{
   utils::{ match_pattern, Lookup },
 };
 
-use super::{ comment::CommentParser, identifier::IdentifierParser };
+use super::{ comment::CommentParser, identifier::IdentifierParser, method::MethodParser };
 
 #[derive(Debug, Clone)]
 pub struct EnumParser {}
@@ -19,6 +19,10 @@ impl EnumParser {
       [
         Lookup::Equal(vec![TokenType::Enum]),
         Lookup::Equal(vec![TokenType::Identifier]),
+        Lookup::Optional(vec![TokenType::Colon]),
+        Lookup::Optional(vec![TokenType::Type]),
+        Lookup::Optional(vec![TokenType::Implements]),
+        Lookup::Optional(vec![TokenType::Identifier, TokenType::Name]),
         Lookup::Equal(vec![TokenType::LeftCurlyBracket]),
       ].to_vec()
     )
@@ -29,19 +33,30 @@ impl EnumParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [_, name, _] = matched.as_slice() {
+    if let [_, name, has_type, enum_type, has_implements, implements, _] = matched.as_slice() {
+      let enum_type = if has_type.len() > 0 {
+        Some(IdentifierParser::from_matched(enum_type))
+      } else {
+        None
+      };
+      let implements = if has_implements.len() > 0 {
+        Some(IdentifierParser::from_matched(implements))
+      } else {
+        None
+      };
       let items = parser.get_children(
         &mut LoopArgument::new(
           "enum",
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
           &[
+            (MethodParser::test, MethodParser::parse),
             (EnumItemParser::test, EnumItemParser::parse),
             (CommentParser::test, CommentParser::parse),
           ]
         )
       )?;
-      return Ok(EnumNode::new(IdentifierParser::from_matched(name), items));
+      return Ok(EnumNode::new(IdentifierParser::from_matched(name), enum_type, implements, items));
     }
     Err(ParserError::internal("Enum", args))
   }

@@ -61,7 +61,6 @@ impl ClassParser {
       )
     {
       modifiers.extend(next_modifiers);
-      println!("Ale 1: {:?}", modifiers);
       return Some(modifiers);
     }
     None

@@ -40,7 +40,7 @@ impl TypesParser {
     if [TokenType::Identifier, TokenType::Name].contains(&token.token_type) {
       if next_token.token_type == TokenType::Name {
         let mut name = vec![token.to_owned(), next_token.to_owned()];
-        pos += 1;
+        pos += 2;
         loop {
           if let Some(token) = tokens.get(pos) {
             if [TokenType::Name].contains(&token.token_type) {

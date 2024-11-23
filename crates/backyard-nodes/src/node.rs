@@ -530,6 +530,8 @@ new_node!(DoWhile, DoWhileNode {
 
 new_node!(Enum, EnumNode {
   name: Box<Node>,
+  enum_type: Option<Box<Node>>,
+  implements: Option<Box<Node>>,
   items: Vec<Box<Node>>,
 });
 

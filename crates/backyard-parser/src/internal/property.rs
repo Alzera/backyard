@@ -38,7 +38,6 @@ impl PropertyParser {
         }
       }
     }
-
     // need to manually check for variable type
     let first_test_count = modifiers
       .iter()
