@@ -8,6 +8,7 @@ use crate::{
 };
 
 use super::{
+  attribute::AttributeParser,
   comment::CommentParser,
   consts::ConstPropertyParser,
   identifier::IdentifierParser,
@@ -65,6 +66,7 @@ impl InterfaceParser {
           &[
             (MethodParser::test, MethodParser::parse),
             (ConstPropertyParser::test, ConstPropertyParser::parse),
+            (AttributeParser::test, AttributeParser::parse),
             (CommentParser::test, CommentParser::parse),
           ]
         )

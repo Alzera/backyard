@@ -42,11 +42,11 @@ impl CommentParser {
         &mut LoopArgument::new("comment", args.separators, args.breakers, args.parsers)
       )?;
       if let Some(mut expr) = expr {
-        expr.leading_comments.insert(0, comment);
+        expr.leadings.insert(0, comment);
         return Ok(expr);
       }
       if let Some(mut expr) = args.statements.pop() {
-        expr.trailing_comments.push(comment);
+        expr.trailings.push(comment);
         return Ok(expr);
       }
       return Ok(comment);

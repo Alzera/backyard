@@ -7,7 +7,12 @@ use crate::{
   utils::{ match_pattern, Lookup },
 };
 
-use super::{ comment::CommentParser, identifier::IdentifierParser, method::MethodParser };
+use super::{
+  attribute::AttributeParser,
+  comment::CommentParser,
+  identifier::IdentifierParser,
+  method::MethodParser,
+};
 
 #[derive(Debug, Clone)]
 pub struct EnumParser {}
@@ -52,6 +57,7 @@ impl EnumParser {
           &[
             (MethodParser::test, MethodParser::parse),
             (EnumItemParser::test, EnumItemParser::parse),
+            (AttributeParser::test, AttributeParser::parse),
             (CommentParser::test, CommentParser::parse),
           ]
         )

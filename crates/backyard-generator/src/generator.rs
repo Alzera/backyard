@@ -1,9 +1,11 @@
-use backyard_nodes::node::{ Node, NodeType, NodeWrapper };
+use backyard_nodes::node::{ Node, NodeType };
 use utils::guard;
+
+use crate::internal::{ attribute::AttributeGenerator, comment::CommentGenerator };
 
 pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Box<Node>);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 70] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 71] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
   (NodeType::Array, super::internal::array::ArrayGenerator::generate),
@@ -11,6 +13,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 70] = [
   (NodeType::ArrayLookup, super::internal::arraylookup::ArrayLookupGenerator::generate),
   (NodeType::ArrowFunction, super::internal::function::FunctionGenerator::generate_arrow),
   (NodeType::Assignment, super::internal::assignment::AssignmentGenerator::generate),
+  (NodeType::Attribute, super::internal::attribute::AttributeGenerator::generate),
   (NodeType::Bin, super::internal::bin::BinGenerator::generate),
   // (NodeType::Block, super::internal::block::BlockGenerator::generate),
   (NodeType::Boolean, super::internal::singles::SinglesGenerator::generate),
@@ -335,11 +338,11 @@ impl Generator {
     for (node_type, generator) in args.generators.iter() {
       if *node_type == node.node_type {
         // println!("Generating node: {:?}", node_type);
-        let leading_comments = &node.leading_comments;
-        let trailing_comments = &node.trailing_comments;
-        if leading_comments.len() > 0 || trailing_comments.len() > 0 {
+        let leadings = &node.leadings;
+        let trailings = &node.trailings;
+        if leadings.len() > 0 || trailings.len() > 0 {
           let mut scoped_builder = Builder::new();
-          Self::handle_comments(&mut scoped_builder, &leading_comments);
+          self.handle_comments(&mut scoped_builder, &leadings);
           if scoped_builder.total_len() == 0 {
             scoped_builder.new_line();
           }
@@ -347,7 +350,7 @@ impl Generator {
           if let Some(end) = args.get_end_statement(&node.node_type) {
             scoped_builder.push(end);
           }
-          Self::handle_comments(&mut scoped_builder, &trailing_comments);
+          self.handle_comments(&mut scoped_builder, &trailings);
           if builder.last_len() == 0 {
             builder.extend_first_line(&scoped_builder);
           } else {
@@ -366,64 +369,25 @@ impl Generator {
     println!("No generator for node: {:?}", node.node_type);
   }
 
-  fn handle_comments(builder: &mut Builder, nodes: &Vec<Box<Node>>) {
+  pub fn handle_comments(&mut self, builder: &mut Builder, nodes: &Vec<Box<Node>>) {
     if nodes.len() > 0 {
       for node in nodes.iter() {
-        match &node.node {
-          NodeWrapper::CommentBlock(n) => {
+        match &node.node_type {
+          NodeType::CommentBlock => {
             builder.new_line();
-            builder.push("/*");
-            builder.new_line();
-            println!("Comment block: {:?}", n.comment);
-            let n: Vec<&str> = n.comment
-              .split('\n')
-              .map(|i| i.trim_start())
-              .collect();
-            for i in n
-              .iter()
-              .enumerate()
-              .filter_map(|(index, i)| (
-                if (index == 0 || index == n.len() - 1) && i.is_empty() {
-                  None
-                } else {
-                  let mut i = i.to_string();
-                  i.insert(0, ' ');
-                  Some(i)
-                }
-              )) {
-              builder.push(&i);
-              builder.new_line();
-            }
-            builder.push(" */");
+            CommentGenerator::generate_block(self, builder, node);
           }
-          NodeWrapper::CommentDoc(n) => {
+          NodeType::CommentDoc => {
             builder.new_line();
-            builder.push("/**");
-            builder.new_line();
-            let n: Vec<&str> = n.comment
-              .split('\n')
-              .map(|i| i.trim_start())
-              .collect();
-            for i in n
-              .iter()
-              .enumerate()
-              .filter_map(|(index, i)| (
-                if (index == 0 || index == n.len() - 1) && i.is_empty() {
-                  None
-                } else {
-                  let mut i = i.to_string();
-                  i.insert(0, ' ');
-                  Some(i)
-                }
-              )) {
-              builder.push(&i);
-              builder.new_line();
-            }
-            builder.push(" */");
+            CommentGenerator::generate_doc(self, builder, node);
           }
-          NodeWrapper::CommentLine(n) => {
+          NodeType::CommentLine => {
             builder.new_line();
-            builder.push(&format!("//{}", n.comment));
+            CommentGenerator::generate(self, builder, node);
+          }
+          NodeType::Attribute => {
+            builder.new_line();
+            AttributeGenerator::generate(self, builder, node);
           }
           _ => {
             continue;
@@ -435,8 +399,6 @@ impl Generator {
   }
 
   pub fn check_nodes_has_comments(nodes: &Vec<Box<Node>>) -> bool {
-    nodes
-      .iter()
-      .fold(false, |acc, i| (acc || i.leading_comments.len() > 0 || i.trailing_comments.len() > 0))
+    nodes.iter().fold(false, |acc, i| (acc || i.leadings.len() > 0 || i.trailings.len() > 0))
   }
 }

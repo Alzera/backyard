@@ -195,6 +195,13 @@ mod tests {
   }
   public function __construct(Pattern ...$patterns) {
   }
+  public function __construct(
+    $guard,
+    #[\\SensitiveParameter]
+    $credentials,
+    $remember
+  ) {
+  }
 }"
     );
     test("function &a(?int ...$b = 0, String &$c = [0.01, 0x12], bool $d): ?int {\n}");

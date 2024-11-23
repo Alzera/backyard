@@ -1,6 +1,7 @@
 pub mod array;
 pub mod arraylookup;
 pub mod assignment;
+pub mod attribute;
 pub mod bin;
 pub mod block;
 pub mod call;

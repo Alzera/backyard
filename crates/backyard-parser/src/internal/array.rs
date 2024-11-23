@@ -29,13 +29,13 @@ impl ArrayParser {
             i.to_owned()
           } else {
             let mut i = i.to_owned();
-            let leading_comments = i.leading_comments.to_owned();
-            let trailing_comments = i.trailing_comments.to_owned();
-            i.leading_comments = vec![];
-            i.trailing_comments = vec![];
+            let leadings = i.leadings.to_owned();
+            let trailings = i.trailings.to_owned();
+            i.leadings = vec![];
+            i.trailings = vec![];
             let mut a = ArrayItemNode::new(None, i);
-            a.leading_comments = leading_comments;
-            a.trailing_comments = trailing_comments;
+            a.leadings = leadings;
+            a.trailings = trailings;
             a
           }
         ))

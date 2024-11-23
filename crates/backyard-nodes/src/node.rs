@@ -14,8 +14,8 @@ pub enum BodyType {
 #[derive(Debug, Clone, Serialize, TS)]
 #[ts(export)]
 pub struct Node {
-  pub leading_comments: Vec<Box<Node>>,
-  pub trailing_comments: Vec<Box<Node>>,
+  pub leadings: Vec<Box<Node>>,
+  pub trailings: Vec<Box<Node>>,
   pub node_type: NodeType,
   #[serde(flatten)]
   pub node: NodeWrapper,
@@ -33,18 +33,18 @@ impl<'de> Deserialize<'de> for Node {
       }
 
       fn visit_map<M>(self, mut map: M) -> Result<Self::Value, M::Error> where M: MapAccess<'de> {
-        let mut leading_comments = None;
-        let mut trailing_comments = None;
+        let mut leadings = None;
+        let mut trailings = None;
         let mut node_type = None;
         let mut node_data = None;
 
         while let Some(key) = map.next_key::<String>()? {
           match key.as_str() {
-            "leading_comments" => {
-              leading_comments = Some(map.next_value()?);
+            "leadings" => {
+              leadings = Some(map.next_value()?);
             }
-            "trailing_comments" => {
-              trailing_comments = Some(map.next_value()?);
+            "trailings" => {
+              trailings = Some(map.next_value()?);
             }
             "node_type" => {
               node_type = Some(map.next_value()?);
@@ -63,8 +63,8 @@ impl<'de> Deserialize<'de> for Node {
           }
         }
 
-        let leading_comments = leading_comments.unwrap_or_default();
-        let trailing_comments = trailing_comments.unwrap_or_default();
+        let leadings = leadings.unwrap_or_default();
+        let trailings = trailings.unwrap_or_default();
         let node_type = node_type.ok_or_else(|| de::Error::missing_field("node_type"))?;
         let node_data = node_data.unwrap_or_else(|| serde_json::Value::Object(Default::default()));
 
@@ -84,6 +84,10 @@ impl<'de> Deserialize<'de> for Node {
             }
             NodeType::Assignment => {
               serde_json::from_value(node_data).map(NodeWrapper::Assignment)
+            }
+            NodeType::Attribute => { serde_json::from_value(node_data).map(NodeWrapper::Attribute) }
+            NodeType::AttributeItem => {
+              serde_json::from_value(node_data).map(NodeWrapper::AttributeItem)
             }
             NodeType::Bin => { serde_json::from_value(node_data).map(NodeWrapper::Bin) }
             NodeType::Block => { serde_json::from_value(node_data).map(NodeWrapper::Block) }
@@ -206,8 +210,8 @@ impl<'de> Deserialize<'de> for Node {
         ).map_err(de::Error::custom)?;
 
         Ok(Node {
-          leading_comments,
-          trailing_comments,
+          leadings,
+          trailings,
           node_type,
           node,
         })
@@ -228,6 +232,8 @@ pub enum NodeWrapper {
   ArrayLookup(ArrayLookupNode),
   ArrowFunction(ArrowFunctionNode),
   Assignment(AssignmentNode),
+  Attribute(AttributeNode),
+  AttributeItem(AttributeItemNode),
   Bin(BinNode),
   Block(BlockNode),
   Boolean(BooleanNode),
@@ -326,6 +332,8 @@ pub enum NodeType {
   ArrayLookup,
   ArrowFunction,
   Assignment,
+  Attribute,
+  AttributeItem,
   Bin,
   Block,
   Boolean,
@@ -424,8 +432,8 @@ macro_rules! new_node {
       pub fn new($($field_name: $field_type),*) -> Box<Node> {
         Box::new(
           Node {
-            leading_comments: vec![],
-            trailing_comments: vec![],
+            leadings: vec![],
+            trailings: vec![],
             node_type: NodeType::$node_type,
             node: NodeWrapper::$node_type(
               Self { $($field_name),* }
@@ -436,6 +444,15 @@ macro_rules! new_node {
     }
   };
 }
+
+new_node!(Attribute, AttributeNode {
+  items: Vec<Box<Node>>,
+});
+
+new_node!(AttributeItem, AttributeItemNode {
+  name: String,
+  arguments: Vec<Box<Node>>,
+});
 
 new_node!(Array, ArrayNode {
   is_short: bool,

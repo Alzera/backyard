@@ -16,6 +16,7 @@ use crate::{
 };
 
 use super::{
+  attribute::AttributeParser,
   block::BlockParser,
   comment::CommentParser,
   identifier::IdentifierParser,
@@ -212,6 +213,7 @@ impl FunctionParser {
               (ConstructorParameterParser::test, ConstructorParameterParser::parse),
               (TypesParser::test, TypesParser::parse),
               (ParameterParser::test, ParameterParser::parse),
+              (AttributeParser::test, AttributeParser::parse),
               (CommentParser::test, CommentParser::parse),
             ]
           )
@@ -251,6 +253,7 @@ impl FunctionParser {
         &[
           (TypesParser::test, TypesParser::parse),
           (ParameterParser::test, ParameterParser::parse),
+          (AttributeParser::test, AttributeParser::parse),
           (CommentParser::test, CommentParser::parse),
         ]
       )
@@ -306,6 +309,7 @@ impl ConstructorParameterParser {
             &[],
             &[TokenType::Comma, TokenType::RightParenthesis],
             &[
+              (AttributeParser::test, AttributeParser::parse),
               (CommentParser::test, CommentParser::parse),
               (TypesParser::test, TypesParser::parse),
               (PropertyItemParser::test, PropertyItemParser::parse),

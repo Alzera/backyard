@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, NodeType };
-use crate::error::ParserError;
+use crate::{ error::ParserError, internal::attribute::AttributeParser };
 
 use super::internal::{
   array::ArrayParser,
@@ -56,7 +56,7 @@ type InternalParserParse = fn(
   &mut LoopArgument
 ) -> Result<Box<Node>, ParserError>;
 type InternalParser = (InternalParserTest, InternalParserParse);
-pub static DEFAULT_PARSERS: [InternalParser; 42] = [
+pub static DEFAULT_PARSERS: [InternalParser; 43] = [
   (CommentParser::test, CommentParser::parse),
   (ListParser::test, ListParser::parse),
   (ArrayLookupParser::test, ArrayLookupParser::parse),
@@ -100,6 +100,7 @@ pub static DEFAULT_PARSERS: [InternalParser; 42] = [
   (IdentifierParser::test, IdentifierParser::parse),
   // (TypesParser::test, TypesParser::parse),
   (SinglesParser::test, SinglesParser::parse),
+  (AttributeParser::test, AttributeParser::parse),
 ];
 
 #[derive(Debug)]
