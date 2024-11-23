@@ -23,11 +23,11 @@ impl NamespaceGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("namespace MyApp\\ExampleNamespace {\n}");
-    test("namespace MyApp\\ExampleNamespace;");
+    test_eval("namespace MyApp\\ExampleNamespace {\n}");
+    test_eval("namespace MyApp\\ExampleNamespace;");
   }
 }

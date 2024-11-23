@@ -47,6 +47,10 @@ impl SinglesGenerator {
         builder.push("goto");
         Some(cast_node!(NodeWrapper::Goto, node.node.to_owned()).label)
       }
+      NodeType::Inline => {
+        builder.push(&cast_node!(NodeWrapper::Inline, node.node.to_owned()).text);
+        None
+      }
       NodeType::Boolean => {
         let node = cast_node!(NodeWrapper::Boolean, node.node.to_owned());
         if node.is_true {
@@ -89,25 +93,29 @@ impl SinglesGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::{ test, test_eval };
 
   #[test]
   fn basic() {
-    test("break;");
-    test("break 2;");
-    test("continue;");
-    test("continue 2;");
-    test("return;");
-    test("return 2;");
-    test("global $a;");
-    test("clone $a;");
-    test("echo \"Hello\";");
-    test("new A;");
-    test("print \"Hello\";");
-    test("throw new A;");
-    test("goto jumpHere;");
-    test("$this->a();");
-    test("parent::a();");
-    test("static::a();");
+    test_eval("break;");
+    test_eval("break 2;");
+    test_eval("continue;");
+    test_eval("continue 2;");
+    test_eval("return;");
+    test_eval("return 2;");
+    test_eval("global $a;");
+    test_eval("clone $a;");
+    test_eval("echo \"Hello\";");
+    test_eval("new A;");
+    test_eval("print \"Hello\";");
+    test_eval("throw new A;");
+    test_eval("goto jumpHere;");
+    test_eval("$this->a();");
+    test_eval("parent::a();");
+    test_eval("static::a();");
+    test("<div>this is an inline</div>");
+    test("<div><?php
+echo \"Hello\";
+?> world<?= \"!\"; ?></div>");
   }
 }

@@ -30,13 +30,13 @@ impl YieldGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("yield;");
-    test("yield \"another_value\";");
-    test("yield \"key\" => \"value\";");
-    test("yield from [1, 2, 3];");
+    test_eval("yield;");
+    test_eval("yield \"another_value\";");
+    test_eval("yield \"key\" => \"value\";");
+    test_eval("yield from [1, 2, 3];");
   }
 }

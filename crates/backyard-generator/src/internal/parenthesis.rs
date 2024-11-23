@@ -23,14 +23,14 @@ impl ParenthesisGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("$a = (int) $a;");
-    test("$a = 5 + 0.5 + (.5 + 0x2e45);");
-    test("(fn () => 0)();");
-    test(
+    test_eval("$a = (int) $a;");
+    test_eval("$a = 5 + 0.5 + (.5 + 0x2e45);");
+    test_eval("(fn () => 0)();");
+    test_eval(
       "$flags = 
   (RUNKIT_IMPORT_FUNCTIONS | RUNKIT_IMPORT_CLASSES | RUNKIT_IMPORT_CLASS_METHODS
     | RUNKIT_IMPORT_CLASS_CONSTS | RUNKIT_IMPORT_CLASS_PROPS | RUNKIT_IMPORT_OVERRIDE);"

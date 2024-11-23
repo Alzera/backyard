@@ -3,23 +3,20 @@ mod internal;
 pub mod lexer;
 pub mod error;
 
-use error::{ LexError, LexResult };
+use error::LexResult;
+use internal::inline::InlineToken;
 use lexer::Lexer;
 use token::Token;
 
 pub fn lex(input: &str) -> LexResult {
   let mut lexer = Lexer::new(&input);
   let mut tokens: Vec<Token> = Vec::new();
-  loop {
-    match lexer.next_tokens(true) {
-      Ok(token) => tokens.extend(token),
-      Err(err) => {
-        if err == LexError::Eof {
-          break;
-        }
-        return Err(err);
-      }
-    }
-  }
+  let inline = InlineToken::lex(&mut lexer, None)?;
+  tokens.extend(inline);
+  tokens.extend(lexer.start()?);
   Ok(tokens)
+}
+
+pub fn lex_eval(input: &str) -> LexResult {
+  Lexer::new(&input).start()
 }

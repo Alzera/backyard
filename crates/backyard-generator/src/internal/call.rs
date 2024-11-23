@@ -38,18 +38,18 @@ impl CallGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("$instance = new self();");
-    test("return new static($expression, $fieldFactory);");
-    test("floor(((int) $this->rawFormat(\"u\")) / 1000);");
-    test("\\call();");
-    test("(fn () => 0)();");
-    test("call(true);");
-    test("call(a: 0, b: 0);");
-    test(
+    test_eval("$instance = new self();");
+    test_eval("return new static($expression, $fieldFactory);");
+    test_eval("floor(((int) $this->rawFormat(\"u\")) / 1000);");
+    test_eval("\\call();");
+    test_eval("(fn () => 0)();");
+    test_eval("call(true);");
+    test_eval("call(a: 0, b: 0);");
+    test_eval(
       "call(
   an_unneccessary_very_long_variable_name: 0,
   another_unneccessary_very_long_variable_name: 0,

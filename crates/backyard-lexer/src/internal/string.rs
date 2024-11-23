@@ -2,14 +2,14 @@ use utils::guard;
 
 use crate::internal::variable::VariableToken;
 use crate::error::LexResult;
-use crate::lexer::Lexer;
+use crate::lexer::{ Lexer, SeriesChecker };
 use crate::token::{ Token, TokenType };
 
 pub struct StringToken;
 
 impl StringToken {
   fn get_parts(lexer: &mut Lexer, result: &mut Vec<Token>, breaker: &str) {
-    let mut checker: SeriesChecker<'_> = SeriesChecker::new(breaker);
+    let mut checker = SeriesChecker::new(&[breaker]);
     let mut need_check_condition: Vec<char> = breaker.chars().collect();
     need_check_condition.push('$');
     need_check_condition.push('{');
@@ -17,7 +17,7 @@ impl StringToken {
       let mut t = lexer.control.next_char_until(|control, ch, end_position| {
         checker.push(ch.clone());
         if need_check_condition.contains(ch) {
-          if checker.check() {
+          if checker.check().is_some() {
             return true;
           } else if *ch == '$' {
             if checker.is_last_escaped() {
@@ -45,7 +45,7 @@ impl StringToken {
       let current = guard!(lexer.control.peek_char(None), {
         break;
       });
-      if checker.check() {
+      if checker.check().is_some() {
         t.push(current);
         t = t[..t.len() - breaker.len()].to_string();
         result.push(Token::new(TokenType::EncapsedString, t));
@@ -79,9 +79,7 @@ impl StringToken {
   }
 
   pub fn lex(lexer: &mut Lexer, breaker: char) -> LexResult {
-    let mut result: Vec<Token> = vec![
-      Token::new(TokenType::EncapsedStringOpen, String::from(breaker))
-    ];
+    let mut result = vec![Token::new(TokenType::EncapsedStringOpen, String::from(breaker))];
 
     Self::get_parts(lexer, &mut result, &breaker.to_string());
 
@@ -118,12 +116,12 @@ impl StringToken {
         .get(1..label.len() - 1)
         .unwrap_or_default()
         .to_string();
-      let mut checker = SeriesChecker::new(&clean_label);
+      let mut checker = SeriesChecker::new(&[&clean_label]);
       let mut should_break = false;
       let text = lexer.control.next_char_until(|_, i, _| {
         checker.push(i.clone());
         let t = should_break.clone();
-        should_break = checker.check();
+        should_break = checker.check().is_some();
         t
       });
       let text = text[..text.len() - clean_label.len()].to_string();
@@ -135,51 +133,10 @@ impl StringToken {
         ]
       )
     } else {
-      let mut result: Vec<Token> = vec![Token::new(TokenType::HeredocOpen, &label)];
+      let mut result = vec![Token::new(TokenType::HeredocOpen, &label)];
       Self::get_parts(lexer, &mut result, &label);
       result.push(Token::new(TokenType::HeredocClose, &label));
       Ok(result)
     }
-  }
-}
-
-#[derive(Debug)]
-struct SeriesChecker<'a> {
-  list: Vec<char>,
-  size: usize,
-  against: &'a str,
-}
-
-impl<'a> SeriesChecker<'a> {
-  fn new(against: &'a str) -> Self {
-    Self { list: vec![], size: against.len(), against }
-  }
-
-  fn push(&mut self, ch: char) {
-    if ch.is_whitespace() {
-      self.list.clear();
-    } else {
-      self.list.push(ch);
-    }
-  }
-
-  fn check(&mut self) -> bool {
-    let valid = self.list.clone().into_iter().collect::<String>().ends_with(self.against);
-    if valid {
-      return !self.is_escaped(self.list.len() - self.size);
-    }
-    false
-  }
-
-  fn is_escaped(&self, index: usize) -> bool {
-    self.list[..index]
-      .iter()
-      .rev()
-      .take_while(|x| **x == '\\')
-      .count() % 2 == 1
-  }
-
-  fn is_last_escaped(&self) -> bool {
-    self.is_escaped(self.list.len() - 1)
   }
 }

@@ -5,7 +5,7 @@ use crate::internal::{ attribute::AttributeGenerator, comment::CommentGenerator 
 
 pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Box<Node>);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 71] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 72] = [
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
   (NodeType::Array, super::internal::array::ArrayGenerator::generate),
@@ -49,6 +49,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 71] = [
   (NodeType::Identifier, super::internal::identifier::IdentifierGenerator::generate),
   (NodeType::If, super::internal::ifs::IfGenerator::generate),
   (NodeType::Include, super::internal::include::IncludeGenerator::generate),
+  (NodeType::Inline, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Interface, super::internal::interface::InterfaceGenerator::generate),
   (NodeType::Label, super::internal::label::LabelGenerator::generate),
   (NodeType::List, super::internal::list::ListGenerator::generate),
@@ -317,7 +318,12 @@ impl Generator {
   ) {
     for (i, node) in nodes.iter().enumerate() {
       args.is_last = i == nodes.len() - 1;
-      builder.new_line();
+      if
+        ![NodeType::Inline, NodeType::Program].contains(&node.node_type) ||
+        builder.lines.len() == 0
+      {
+        builder.new_line();
+      }
       self.generate_node(builder, node, args);
     }
   }
@@ -337,7 +343,6 @@ impl Generator {
   ) {
     for (node_type, generator) in args.generators.iter() {
       if *node_type == node.node_type {
-        // println!("Generating node: {:?}", node_type);
         let leadings = &node.leadings;
         let trailings = &node.trailings;
         if leadings.len() > 0 || trailings.len() > 0 {
@@ -359,8 +364,10 @@ impl Generator {
           }
         } else {
           generator(self, builder, node);
-          if let Some(end) = args.get_end_statement(&node.node_type) {
-            builder.push(end);
+          if node.node_type != NodeType::Inline {
+            if let Some(end) = args.get_end_statement(&node.node_type) {
+              builder.push(end);
+            }
           }
         }
         return;

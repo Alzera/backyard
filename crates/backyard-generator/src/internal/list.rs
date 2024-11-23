@@ -28,12 +28,12 @@ impl ListGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("list($a, $b) = [0, 1];");
-    test(
+    test_eval("list($a, $b) = [0, 1];");
+    test_eval(
       "list(
   $an_unneccessary_very_long_variable_name,
   $another_unneccessary_very_long_variable_name,

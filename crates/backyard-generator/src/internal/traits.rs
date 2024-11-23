@@ -35,11 +35,11 @@ impl TraitGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test(
+    test_eval(
       "trait B {
   use Ale;
   use Loggable, Usable {

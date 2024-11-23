@@ -22,12 +22,12 @@ impl ArrayLookupGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("[][0];");
-    test("$a[0];");
-    test("$a[] = 1;");
+    test_eval("[][0];");
+    test_eval("$a[0];");
+    test_eval("$a[] = 1;");
   }
 }

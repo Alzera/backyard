@@ -58,16 +58,16 @@ impl ClassGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("abstract class A {
+    test_eval("abstract class A {
   private Extension\\Another $a;
 }");
-    test("final class A extends B {\n}");
-    test("return new class extends B {\n};");
-    test(
+    test_eval("final class A extends B {\n}");
+    test_eval("return new class extends B {\n};");
+    test_eval(
       "readonly class A implements C, D, E {
   use Ale;
   use Loggable, Usable {

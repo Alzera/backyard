@@ -272,6 +272,8 @@ impl Parser {
             NodeType::Try,
             NodeType::CommentLine,
             NodeType::CommentBlock,
+            NodeType::Inline,
+            NodeType::Program,
           ].contains(&n.node_type);
           args.last_expr = Some(n);
           if force_end_statement {

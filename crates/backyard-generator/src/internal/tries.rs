@@ -36,14 +36,14 @@ impl TryGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("try {
+    test_eval("try {
 } catch (UnknownGetterException | ReflectionException) {
 }");
-    test(
+    test_eval(
       "try {
   throw new Error(\"Custom error occurred\");
 } catch (FooError $err) {

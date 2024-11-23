@@ -26,12 +26,12 @@ impl BinGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("$platform instanceof SQLServerPlatform || $platform instanceof SQLitePlatform;");
-    test(
+    test_eval("$platform instanceof SQLServerPlatform || $platform instanceof SQLitePlatform;");
+    test_eval(
       "$this->callDiffAlias($unit, $parameters)
   ?? $this->callHumanDiffAlias($unit, $parameters) ?? $this->callRoundMethod($unit, $parameters)
     ?? $this->callGetOrSetMethod($method, $parameters) ?? $this->callMacroMethod($method, $parameters);"
@@ -67,9 +67,9 @@ mod tests {
     ]
       .iter()
       .for_each(|i| {
-        test(format!("$a {} 0;", i).as_str());
+        test_eval(format!("$a {} 0;", i).as_str());
       });
-    test(
+    test_eval(
       "$an_unneccessary_very_long_variable_name
   . $another_unnecessary_very_long_variable_name_that_should_be_on_new_line;"
     );

@@ -66,16 +66,17 @@ impl CommentGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test(
+    test_eval(
       "///////////////////////////////////////////////
 /////////////////// Testing ///////////////////
 ///////////////////////////////////////////////"
     );
-    test("/*
+    test_eval(
+      "/*
  testing leading
  */
 function a() {
@@ -83,6 +84,7 @@ function a() {
    * testing inside
    */
 }
-// testing trailing");
+// testing trailing"
+    );
   }
 }

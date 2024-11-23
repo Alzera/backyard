@@ -80,16 +80,16 @@ impl StringGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("$a = \"ale\" . \" ini string $ \\\" \\$var $b {${\"ale\" . 5}} {$a}\";");
-    test("'a';");
-    test("echo <<<'START'
+    test_eval("$a = \"ale\" . \" ini string $ \\\" \\$var $b {${\"ale\" . 5}} {$a}\";");
+    test_eval("'a';");
+    test_eval("echo <<<'START'
 a {$a}
 START;");
-    test("echo <<<START
+    test_eval("echo <<<START
 a {$a}
 START;");
   }

@@ -41,11 +41,11 @@ impl MatchGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("echo match($myVar) {
+    test_eval("echo match($myVar) {
   1 => \"One\",
   2, 3 => \"Two\",
   default => \"Other\"

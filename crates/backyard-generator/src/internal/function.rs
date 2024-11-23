@@ -185,11 +185,11 @@ impl FunctionGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test(
+    test_eval(
       "class A {
   public function __construct(protected int $x, protected int $y = 0) {
   }
@@ -204,8 +204,8 @@ mod tests {
   }
 }"
     );
-    test("function &a(?int ...$b = 0, String &$c = [0.01, 0x12], bool $d): ?int {\n}");
-    test("$a = fn &(int $x): ?int => null;");
-    test("$a = function &(int $x, ?int $y) use ($arg2): static {\n};");
+    test_eval("function &a(?int ...$b = 0, String &$c = [0.01, 0x12], bool $d): ?int {\n}");
+    test_eval("$a = fn &(int $x): ?int => null;");
+    test_eval("$a = function &(int $x, ?int $y) use ($arg2): static {\n};");
   }
 }

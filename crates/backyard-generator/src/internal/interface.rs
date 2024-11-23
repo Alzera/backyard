@@ -41,12 +41,12 @@ impl InterfaceGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("interface A {\n}");
-    test(
+    test_eval("interface A {\n}");
+    test_eval(
       "interface A extends B, C {
   const MY_CONSTANT = \"constant value\";
   public function a(int $x, int $y = 0): int;

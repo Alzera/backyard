@@ -1,19 +1,17 @@
 use utils::guard;
 
 use crate::error::{ LexError, LexResult };
+use crate::internal::inline::InlineToken;
 use crate::token::{ Token, TokenType };
 use crate::internal::{
   comment::CommentToken,
   keywords::KeywordToken,
-  magics::MagicToken,
   number::NumberToken,
-  types::TypeToken,
+  string::StringToken,
   variable::VariableToken,
 };
 
-use super::internal::objectaccess::ObjectAccessToken;
-use super::internal::string::StringToken;
-
+#[derive(Debug)]
 pub struct Control {
   chars: Vec<char>,
   position: usize,
@@ -29,6 +27,10 @@ impl Control {
       line: 1,
       column: 1,
     }
+  }
+
+  pub fn get_len(&self) -> usize {
+    self.chars.len()
   }
 
   pub fn get_position(&self) -> usize {
@@ -113,6 +115,62 @@ impl Control {
   }
 }
 
+#[derive(Debug)]
+pub struct SeriesChecker<'a> {
+  list: Vec<char>,
+  againsts: Vec<&'a str>,
+  escape_check: bool,
+}
+
+impl<'a> SeriesChecker<'a> {
+  pub fn new(againsts: &[&'a str]) -> Self {
+    Self { list: vec![], againsts: againsts.to_vec(), escape_check: true }
+  }
+
+  pub fn safe(againsts: &[&'a str]) -> Self {
+    Self { list: vec![], againsts: againsts.to_vec(), escape_check: false }
+  }
+
+  pub fn push(&mut self, ch: char) {
+    if ch.is_whitespace() {
+      self.list.clear();
+    } else {
+      self.list.push(ch);
+    }
+  }
+
+  pub fn check(&mut self) -> Option<&str> {
+    let text = self.list.clone().into_iter().collect::<String>();
+    let valid = self.againsts
+      .clone()
+      .into_iter()
+      .find(|i| text.ends_with(i));
+    if valid.is_some() {
+      let valid = valid.unwrap();
+      if !self.is_escaped(self.list.len() - valid.len()) {
+        return Some(valid);
+      }
+    }
+    None
+  }
+
+  pub fn is_escaped(&self, index: usize) -> bool {
+    if !self.escape_check {
+      return false;
+    }
+    self.list[..index]
+      .iter()
+      .rev()
+      .take_while(|x| **x == '\\')
+      .count() % 2 == 1
+  }
+
+  pub fn is_last_escaped(&self) -> bool {
+    self.is_escaped(self.list.len() - 1)
+  }
+}
+
+#[derive(Debug)]
 pub struct Lexer {
   pub control: Control,
 }
@@ -122,6 +180,22 @@ impl Lexer {
     Lexer {
       control: Control::new(input),
     }
+  }
+
+  pub fn start(&mut self) -> LexResult {
+    let mut tokens = Vec::new();
+    loop {
+      match self.next_tokens(true) {
+        Ok(token) => tokens.extend(token),
+        Err(err) => {
+          if err == LexError::Eof {
+            break;
+          }
+          return Err(err);
+        }
+      }
+    }
+    Ok(tokens)
   }
 
   pub fn next_tokens(&mut self, skip_whitespace: bool) -> LexResult {
@@ -140,10 +214,35 @@ impl Lexer {
       c if c.is_digit(10) => NumberToken::lex(self, current_char),
       c if c.is_alphabetic() || c == '_' => {
         let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_'));
-        if t.starts_with("__") && t.ends_with("__") && MagicToken::is_magic(&t) {
+        if
+          [
+            "__CLASS__",
+            "__DIR__",
+            "__FILE__",
+            "__FUNCTION__",
+            "__LINE__",
+            "__METHOD__",
+            "__NAMESPACE__",
+            "__TRAIT__",
+          ].contains(&t.as_str())
+        {
           return Ok(vec![Token::new(TokenType::Magic, t)]);
         }
-        if TypeToken::is_type(&t) {
+        if
+          [
+            // "array",
+            "bool",
+            "boolean",
+            "real",
+            "double",
+            "float",
+            "int",
+            "integer",
+            "object",
+            "String",
+            // "null",
+          ].contains(&t.as_str())
+        {
           return Ok(vec![Token::new(TokenType::Type, t)]);
         }
         if KeywordToken::is_keyword(&t) {
@@ -193,7 +292,7 @@ impl Lexer {
         let t = self.until(current_char, |ch| !['?', '>', '=', '-', '{', ':'].contains(ch));
         match t.as_str() {
           "?:" => Ok(vec![Token::new(TokenType::Elvis, "?:")]),
-          "?>" => Ok(vec![Token::new(TokenType::CloseTag, "?>")]),
+          "?>" => InlineToken::lex(self, Some(Token::new(TokenType::CloseTag, "?>"))),
           "?->" => Ok(vec![Token::new(TokenType::NullsafeObjectAccess, "?->")]),
           "?->{" => Ok(vec![Token::new(TokenType::NullsafeObjectAccessBracketOpen, "?->{")]),
           "??=" => Ok(vec![Token::new(TokenType::CoalesceAssignment, "??=")]),
@@ -205,7 +304,7 @@ impl Lexer {
       '%' => {
         let t = self.until(current_char, |ch| !['%', '=', '>'].contains(ch));
         match t.as_str() {
-          "%>" => Ok(vec![Token::new(TokenType::CloseTagShort, "%>")]),
+          "%>" => InlineToken::lex(self, Some(Token::new(TokenType::CloseTagShort, "%>"))),
           "%=" => Ok(vec![Token::new(TokenType::ModulusAssignment, "%=")]),
           "%" => Ok(vec![Token::new(TokenType::Modulus, "%")]),
           _ => Err(self.control.error_unrecognized(&t)),
@@ -270,7 +369,12 @@ impl Lexer {
         let t = self.until(current_char, |ch| !['-', '=', '>', '{'].contains(ch));
         match t.as_str() {
           "-=" => Ok(vec![Token::new(TokenType::SubtractionAssignment, "-=")]),
-          "->{" => ObjectAccessToken::lex(self),
+          "->{" => {
+            let mut tokens = vec![Token::new(TokenType::ObjectAccessBracketOpen, "{")];
+            tokens.extend(self.next_tokens_until_right_bracket());
+            tokens.push(Token::new(TokenType::ObjectAccessBracketClose, "}"));
+            Ok(tokens)
+          }
           "->" => Ok(vec![Token::new(TokenType::ObjectAccess, "->")]),
           "--" => {
             let is_post = match self.control.peek_char(None) {
@@ -297,11 +401,8 @@ impl Lexer {
         }
       }
       '<' => {
-        let t = self.until(current_char, |ch| !['<', '?', '=', '>', 'p', 'h', '%'].contains(ch));
+        let t = self.until(current_char, |ch| !['<', '=', '>'].contains(ch));
         match t.as_str() {
-          "<%" => Ok(vec![Token::new(TokenType::OpenTagShort, "<%")]),
-          "<?php" => Ok(vec![Token::new(TokenType::OpenTag, "<?php")]),
-          "<?=" => Ok(vec![Token::new(TokenType::OpenTagEcho, "<?=")]),
           "<=>" => Ok(vec![Token::new(TokenType::Spaceship, "<=>")]),
           "<>" => Ok(vec![Token::new(TokenType::IsNotEqual, "<>")]),
           "<=" => Ok(vec![Token::new(TokenType::IsLesserOrEqual, "<=")]),

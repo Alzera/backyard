@@ -17,10 +17,10 @@ impl TernaryGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("$a = false ? 1 : 2;");
+    test_eval("$a = false ? 1 : 2;");
   }
 }

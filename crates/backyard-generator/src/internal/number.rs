@@ -13,10 +13,10 @@ impl NumberGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("$a = 0 + 0.5 + .5 + 0x2e45;");
+    test_eval("$a = 0 + 0.5 + .5 + 0x2e45;");
   }
 }

@@ -7,8 +7,30 @@ pub struct ProgramGenerator {}
 impl ProgramGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Program, &node.node);
-    builder.push("<?php");
-    generator.generate_nodes(builder, &node.children, &mut GeneratorArgument::for_block());
+    match node.opentag.as_str() {
+      "<?=" => {
+        builder.push(&node.opentag);
+        builder.push(" ");
+        let expr = generator.generate_nodes_new(
+          &node.children,
+          &mut GeneratorArgument::for_block()
+        );
+        builder.push(&expr.to_string(""));
+        builder.push(" ?>");
+      }
+      "<%" => {
+        builder.push(&node.opentag);
+        generator.generate_nodes(builder, &node.children, &mut GeneratorArgument::for_block());
+        builder.new_line();
+        builder.push("%>");
+      }
+      _ => {
+        builder.push(&node.opentag);
+        generator.generate_nodes(builder, &node.children, &mut GeneratorArgument::for_block());
+        builder.new_line();
+        builder.push("?>");
+      }
+    }
   }
 }
 
@@ -18,6 +40,12 @@ mod tests {
 
   #[test]
   fn basic() {
-    test("<?php\n$a = ++($a++);");
+    test("<?= \"\"; ?>");
+    test("<?php
+$a = ++($a++);
+?>");
+    test("<%
+$a = ++($a++);
+%>");
   }
 }

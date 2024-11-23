@@ -23,15 +23,15 @@ impl ObjectAccessGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("$this->from;");
-    test("$this->$from;");
-    test("$a->{\"b\"};");
-    test("$this->setTimezone(date_default_timezone_get());");
-    test(
+    test_eval("$this->from;");
+    test_eval("$this->$from;");
+    test_eval("$a->{\"b\"};");
+    test_eval("$this->setTimezone(date_default_timezone_get());");
+    test_eval(
       "while ($i <= 10) {\n  $this->subSecond();\n  $value += static::MICROSECONDS_PER_SECOND;\n}"
     );
   }

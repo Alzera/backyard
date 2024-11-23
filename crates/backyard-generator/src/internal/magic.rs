@@ -13,10 +13,10 @@ impl MagicGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("__DIR__ . \"/something_that_does_not_exist\";");
+    test_eval("__DIR__ . \"/something_that_does_not_exist\";");
   }
 }

@@ -19,11 +19,11 @@ impl StaticLookupGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("++A::b();");
-    test("A::class;");
+    test_eval("++A::b();");
+    test_eval("A::class;");
   }
 }

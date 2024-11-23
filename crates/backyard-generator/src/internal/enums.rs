@@ -45,19 +45,19 @@ impl EnumGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("enum Suit {
+    test_eval("enum Suit {
   case Hearts;
   case Spades;
 }");
-    test("enum Suit: int {
+    test_eval("enum Suit: int {
   case Hearts;
   case Spades;
 }");
-    test(
+    test_eval(
       "enum Suit implements SuitInterface {
   case Hearts;
   case Spades;

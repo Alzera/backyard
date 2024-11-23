@@ -20,10 +20,10 @@ impl DoWhileGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("do {\n} while (false);");
+    test_eval("do {\n} while (false);");
   }
 }

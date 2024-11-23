@@ -17,10 +17,10 @@ impl ExitGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("exit(0);");
+    test_eval("exit(0);");
   }
 }

@@ -41,16 +41,16 @@ impl SwitchGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("switch ($a):
+    test_eval("switch ($a):
   case 1:
     echo \"1\";
     break;
 endswitch;");
-    test(
+    test_eval(
       "switch ($a) {
   case 1:
     echo \"1\";

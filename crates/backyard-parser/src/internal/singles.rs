@@ -7,6 +7,7 @@ use backyard_nodes::node::{
   EchoNode,
   GlobalNode,
   GotoNode,
+  InlineNode,
   NewNode,
   Node,
   NullNode,
@@ -51,7 +52,8 @@ impl SinglesParser {
             TokenType::True,
             TokenType::False,
             TokenType::Null,
-            TokenType::SelfKeyword
+            TokenType::SelfKeyword,
+            TokenType::Inline
           ]
         ),
       ].to_vec()
@@ -74,6 +76,7 @@ impl SinglesParser {
             TokenType::True,
             TokenType::False,
             TokenType::Null,
+            TokenType::Inline,
           ].contains(&key.token_type)
         {
           return match key.token_type {
@@ -84,6 +87,7 @@ impl SinglesParser {
             TokenType::True => Ok(BooleanNode::new(true)),
             TokenType::False => Ok(BooleanNode::new(false)),
             TokenType::Null => Ok(NullNode::new()),
+            TokenType::Inline => Ok(InlineNode::new(key.value.to_owned())),
             _ => Err(ParserError::internal("Single: first group", args)),
           };
         }

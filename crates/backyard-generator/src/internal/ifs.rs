@@ -41,11 +41,11 @@ impl IfGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("if (true):\nelseif (false):\nelse:\nendif;");
-    test("if (isset($var1)) {\n} elseif (empty([])) {\n} else {\n}");
+    test_eval("if (true):\nelseif (false):\nelse:\nendif;");
+    test_eval("if (isset($var1)) {\n} elseif (empty([])) {\n} else {\n}");
   }
 }

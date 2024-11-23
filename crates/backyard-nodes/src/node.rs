@@ -142,6 +142,7 @@ impl<'de> Deserialize<'de> for Node {
             }
             NodeType::If => { serde_json::from_value(node_data).map(NodeWrapper::If) }
             NodeType::Include => { serde_json::from_value(node_data).map(NodeWrapper::Include) }
+            NodeType::Inline => { serde_json::from_value(node_data).map(NodeWrapper::Inline) }
             NodeType::InstanceOf => {
               serde_json::from_value(node_data).map(NodeWrapper::InstanceOf)
             }
@@ -271,6 +272,7 @@ pub enum NodeWrapper {
   Identifier(IdentifierNode),
   If(IfNode),
   Include(IncludeNode),
+  Inline(InlineNode),
   InstanceOf(InstanceOfNode),
   Interface(InterfaceNode),
   Label(LabelNode),
@@ -371,6 +373,7 @@ pub enum NodeType {
   Identifier,
   If,
   Include,
+  Inline,
   InstanceOf,
   Interface,
   Label,
@@ -716,6 +719,7 @@ new_node!(Negative, NegativeNode {
 });
 
 new_node!(Program, ProgramNode {
+  opentag: String,
   children: Vec<Box<Node>>,
 });
 
@@ -774,6 +778,10 @@ new_node!(Null, NullNode {});
 
 new_node!(Boolean, BooleanNode {
   is_true: bool,
+});
+
+new_node!(Inline, InlineNode {
+  text: String,
 });
 
 new_node!(Clone, CloneNode {

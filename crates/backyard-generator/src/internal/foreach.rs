@@ -26,12 +26,12 @@ impl ForeachGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("foreach ($A as $x):\nendforeach;");
-    test("foreach ($A as &$x) {\n}");
-    test("foreach ($arr as $key => $value) {\n}");
+    test_eval("foreach ($A as $x):\nendforeach;");
+    test_eval("foreach ($A as &$x) {\n}");
+    test_eval("foreach ($arr as $key => $value) {\n}");
   }
 }

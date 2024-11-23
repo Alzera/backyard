@@ -14,11 +14,11 @@ impl PostGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("$a = ++($a++);");
-    test("$a = --($a--);");
+    test_eval("$a = ++($a++);");
+    test_eval("$a = --($a--);");
   }
 }

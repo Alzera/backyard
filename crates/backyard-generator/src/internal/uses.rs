@@ -68,19 +68,19 @@ impl UseGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("use const App\\Models\\User;");
-    test(
+    test_eval("use const App\\Models\\User;");
+    test_eval(
       "use App\\Models\\{
   const User\\UserTesting as UserTestingA,
   User\\UserTestingB as UserTestingB,
   function UserTestingC
 };"
     );
-    test(
+    test_eval(
       "use Illuminate\\Foundation\\Auth\\User as Authenticatable,
   Illuminate\\Foundation\\Auth\\User as Authenticatable;"
     );

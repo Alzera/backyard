@@ -6,6 +6,7 @@ use ts_rs::TS;
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub enum TokenType {
+  Inline,
   Type,
   Identifier,
   Magic,

@@ -16,11 +16,11 @@ impl TypeGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("class A {
+    test_eval("class A {
   public function __construct(\\Exception $exception) {
   }
 }");

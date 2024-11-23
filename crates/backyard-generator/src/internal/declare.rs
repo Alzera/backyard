@@ -53,12 +53,12 @@ impl DeclareGenerator {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_utils::test;
+  use crate::test_utils::test_eval;
 
   #[test]
   fn basic() {
-    test("declare(strict_types = 1);");
-    test("declare(ticks = 1):\nenddeclare;");
-    test("declare(ticks = 1, ticks = 1) {\n}");
+    test_eval("declare(strict_types = 1);");
+    test_eval("declare(ticks = 1):\nenddeclare;");
+    test_eval("declare(ticks = 1, ticks = 1) {\n}");
   }
 }
