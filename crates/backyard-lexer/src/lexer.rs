@@ -267,17 +267,6 @@ impl Lexer {
         match t.as_str() {
           "&=" => Ok(vec![Token::new(TokenType::BitwiseAndAssignment, "&=")]),
           "&&" => Ok(vec![Token::new(TokenType::BooleanAnd, "&&")]),
-          // "&$" => {
-          //   let last_position = self.control.position;
-          //   if let Ok(tokens) = VariableToken::lex(self) {
-          //     let mut tokens = tokens.clone();
-          //     tokens.insert(0, Token::new(TokenType::Reference, "&"));
-          //     return Ok(tokens);
-          //   } else {
-          //     self.control.position = last_position;
-          //     return Err(self.control.error_unrecognized(&t));
-          //   }
-          // }
           "&" => Ok(vec![Token::new(TokenType::BitwiseAnd, "&")]),
           _ => Err(self.control.error_unrecognized(&t)),
         }
@@ -293,12 +282,17 @@ impl Lexer {
         let t = self.until(current_char, |ch| !['?', '>', '=', '-', '{', ':'].contains(ch));
         match t.as_str() {
           "?:" => Ok(vec![Token::new(TokenType::Elvis, "?:")]),
-          "?>" => InlineToken::lex(self),
           "?->" => Ok(vec![Token::new(TokenType::NullsafeObjectAccess, "?->")]),
           "?->{" => Ok(vec![Token::new(TokenType::NullsafeObjectAccessBracketOpen, "?->{")]),
           "??=" => Ok(vec![Token::new(TokenType::CoalesceAssignment, "??=")]),
           "??" => Ok(vec![Token::new(TokenType::Coalesce, "??")]),
           "?" => Ok(vec![Token::new(TokenType::QuestionMark, "?")]),
+          c if c.starts_with("?>") => {
+            if t.len() > 2 {
+              self.control.position -= t.len() - 2;
+            }
+            InlineToken::lex(self)
+          }
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
@@ -426,7 +420,12 @@ impl Lexer {
         match t.as_str() {
           "!==" => Ok(vec![Token::new(TokenType::IsNotIdentical, "!==")]),
           "!=" => Ok(vec![Token::new(TokenType::IsNotEqual, "!=")]),
-          "!" => Ok(vec![Token::new(TokenType::BooleanNegate, "!")]),
+          c if c.starts_with("!") => {
+            if t.len() > 1 {
+              self.control.position -= t.len() - 1;
+            }
+            Ok(vec![Token::new(TokenType::BooleanNegate, "!")])
+          }
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
