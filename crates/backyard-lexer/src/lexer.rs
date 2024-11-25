@@ -213,7 +213,7 @@ impl Lexer {
         Ok(vec![Token::new(TokenType::Whitespace, current_char.to_string())]),
       c if c.is_digit(10) => NumberToken::lex(self, current_char),
       c if c.is_alphabetic() || c == '_' => {
-        let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_'));
+        let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_' || *ch == '\\'));
         if
           [
             "__CLASS__",
@@ -240,6 +240,7 @@ impl Lexer {
             "integer",
             "object",
             "String",
+            "mixed",
             // "null",
           ].contains(&t.as_str())
         {
@@ -262,21 +263,21 @@ impl Lexer {
         }
       }
       '&' => {
-        let t = self.until(current_char, |ch| !['&', '=', '$'].contains(ch));
+        let t = self.until(current_char, |ch| !['&', '='].contains(ch));
         match t.as_str() {
           "&=" => Ok(vec![Token::new(TokenType::BitwiseAndAssignment, "&=")]),
           "&&" => Ok(vec![Token::new(TokenType::BooleanAnd, "&&")]),
-          "&$" => {
-            let last_position = self.control.position;
-            if let Ok(tokens) = VariableToken::lex(self) {
-              let mut tokens = tokens.clone();
-              tokens.insert(0, Token::new(TokenType::Reference, "&"));
-              return Ok(tokens);
-            } else {
-              self.control.position = last_position;
-              return Err(self.control.error_unrecognized(&t));
-            }
-          }
+          // "&$" => {
+          //   let last_position = self.control.position;
+          //   if let Ok(tokens) = VariableToken::lex(self) {
+          //     let mut tokens = tokens.clone();
+          //     tokens.insert(0, Token::new(TokenType::Reference, "&"));
+          //     return Ok(tokens);
+          //   } else {
+          //     self.control.position = last_position;
+          //     return Err(self.control.error_unrecognized(&t));
+          //   }
+          // }
           "&" => Ok(vec![Token::new(TokenType::BitwiseAnd, "&")]),
           _ => Err(self.control.error_unrecognized(&t)),
         }
@@ -458,7 +459,7 @@ impl Lexer {
       '"' => StringToken::lex(self, '"'),
       '\'' => StringToken::lex(self, '\''),
       '\\' => {
-        let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_'));
+        let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_' || *ch == '\\'));
         Ok(vec![Token::new(TokenType::Name, t)])
       }
       ',' => Ok(vec![Token::new(TokenType::Comma, ",")]),

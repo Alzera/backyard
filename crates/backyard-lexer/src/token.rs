@@ -27,7 +27,7 @@ pub enum TokenType {
   IsIdentical,
 
   // &
-  Reference,
+  // Reference,
   BitwiseAndAssignment,
   BitwiseAnd,
   BooleanAnd,

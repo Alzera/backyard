@@ -19,6 +19,10 @@ impl PreGenerator {
         let node = cast_node!(NodeWrapper::Silent, &node.node);
         ("@", Some(node.variable.to_owned()))
       }
+      NodeType::Reference => {
+        let node = cast_node!(NodeWrapper::Reference, &node.node);
+        ("&", Some(node.expr.to_owned()))
+      }
       NodeType::Pre => {
         let node = cast_node!(NodeWrapper::Pre, &node.node);
         (node.operator.as_str(), Some(node.variable.to_owned()))

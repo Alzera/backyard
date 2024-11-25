@@ -4,6 +4,7 @@ use backyard_lexer::token::{ Token, TokenType };
 pub enum Lookup {
   Equal(Vec<TokenType>),
   Optional(Vec<TokenType>),
+  Any,
 }
 
 pub fn match_pattern(tokens: &Vec<Token>, pattern: Vec<Lookup>) -> Option<Vec<Vec<Token>>> {
@@ -23,6 +24,15 @@ pub fn match_pattern(tokens: &Vec<Token>, pattern: Vec<Lookup>) -> Option<Vec<Ve
         if !contains_tokens.contains(&current_token.token_type) {
           return None;
         }
+      }
+      Lookup::Any => {
+        let cur = tokens.get(check_position);
+        check_position += 1;
+        if cur.is_none() {
+          return None;
+        }
+        let current_token = cur.unwrap();
+        result.push(vec![current_token.to_owned()]);
       }
       Lookup::Optional(contains_tokens) => {
         let cur = tokens.get(check_position);

@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, NodeType };
-use crate::{ error::ParserError, internal::attribute::AttributeParser };
+use crate::{ error::ParserError, internal::{ attribute::AttributeParser, statics::StaticsParser } };
 
 use super::internal::{
   array::ArrayParser,
@@ -56,7 +56,7 @@ type InternalParserParse = fn(
   &mut LoopArgument
 ) -> Result<Box<Node>, ParserError>;
 type InternalParser = (InternalParserTest, InternalParserParse);
-pub static DEFAULT_PARSERS: [InternalParser; 43] = [
+pub static DEFAULT_PARSERS: [InternalParser; 44] = [
   (CommentParser::test, CommentParser::parse),
   (ListParser::test, ListParser::parse),
   (ArrayLookupParser::test, ArrayLookupParser::parse),
@@ -93,6 +93,7 @@ pub static DEFAULT_PARSERS: [InternalParser; 43] = [
   (YieldParser::test, YieldParser::parse),
   (StringParser::test, StringParser::parse),
   (SwitchParser::test, SwitchParser::parse),
+  (StaticsParser::test, StaticsParser::parse),
   (VariableParser::test, VariableParser::parse),
   (TernaryParser::test, TernaryParser::parse),
   (WhileParser::test, WhileParser::parse),
@@ -270,6 +271,8 @@ impl Parser {
             NodeType::Case,
             NodeType::Label,
             NodeType::Try,
+            NodeType::Catch,
+            NodeType::Finally,
             NodeType::CommentLine,
             NodeType::CommentBlock,
             NodeType::Inline,

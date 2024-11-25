@@ -39,10 +39,14 @@ impl CommentParser {
         }
       };
       let expr = parser.get_statement(
-        &mut LoopArgument::new("comment", args.separators, args.breakers, args.parsers)
+        &mut LoopArgument::safe("comment", args.separators, args.breakers, args.parsers)
       )?;
       if let Some(mut expr) = expr {
         expr.leadings.insert(0, comment);
+        return Ok(expr);
+      }
+      if let Some(mut expr) = args.last_expr.to_owned() {
+        expr.trailings.push(comment);
         return Ok(expr);
       }
       if let Some(mut expr) = args.statements.pop() {

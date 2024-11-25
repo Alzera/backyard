@@ -1,4 +1,4 @@
-use backyard_nodes::{ cast_node, node::{ Node, NodeWrapper } };
+use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
@@ -12,11 +12,13 @@ impl TryGenerator {
     builder.push("try");
     BlockGenerator::generate(generator, builder, &node.body, None);
     for catch in &node.catches {
-      Self::generate_catch(generator, builder, catch);
-    }
-    if let Some(finally) = &node.finally {
-      builder.push(" finally");
-      BlockGenerator::generate(generator, builder, &finally, None);
+      if catch.node_type == NodeType::Finally {
+        let node = cast_node!(NodeWrapper::Finally, &catch.node);
+        builder.push(" finally");
+        BlockGenerator::generate(generator, builder, &node.body, None);
+      } else {
+        Self::generate_catch(generator, builder, catch);
+      }
     }
   }
 
@@ -40,6 +42,17 @@ mod tests {
 
   #[test]
   fn basic() {
+    test_eval(
+      "class A {
+  public function assertEquals() {
+    try {
+    } catch (ComparisonFailure $e) {
+    }
+  }
+  protected function toArray() {
+  }
+}"
+    );
     test_eval("try {
 } catch (UnknownGetterException | ReflectionException) {
 }");

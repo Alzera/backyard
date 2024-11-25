@@ -10,8 +10,9 @@ pub struct TypesParser {}
 impl TypesParser {
   #[allow(unused_assignments)]
   pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    const TYPES: [TokenType; 9] = [
+    const TYPES: [TokenType; 10] = [
       TokenType::Identifier,
+      TokenType::Name,
       TokenType::Type,
       TokenType::Callable,
       TokenType::Static,
@@ -37,23 +38,6 @@ impl TypesParser {
     let next_token = guard!(tokens.get(pos + 1), {
       return None;
     });
-    if [TokenType::Identifier, TokenType::Name].contains(&token.token_type) {
-      if next_token.token_type == TokenType::Name {
-        let mut name = vec![token.to_owned(), next_token.to_owned()];
-        pos += 2;
-        loop {
-          if let Some(token) = tokens.get(pos) {
-            if [TokenType::Name].contains(&token.token_type) {
-              name.push(token.to_owned());
-              pos += 1;
-              continue;
-            }
-          }
-          break;
-        }
-        return Some(vec![is_nullable, name]);
-      }
-    }
     if next_token.token_type == TokenType::BitwiseOr {
       let mut matched = vec![];
       let mut index = 0;

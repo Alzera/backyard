@@ -16,7 +16,7 @@ impl ExitParser {
       tokens,
       [
         Lookup::Equal(vec![TokenType::Exit, TokenType::Die]),
-        Lookup::Equal(vec![TokenType::LeftParenthesis]),
+        Lookup::Optional(vec![TokenType::LeftParenthesis]),
       ].to_vec()
     )
   }
@@ -26,10 +26,14 @@ impl ExitParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [_, _] = matched.as_slice() {
-      let argument = parser.get_statement(
-        &mut LoopArgument::with_tokens("exit", &[], &[TokenType::RightParenthesis])
-      )?;
+    if let [_, has_argument] = matched.as_slice() {
+      let argument = if has_argument.len() > 0 {
+        parser.get_statement(
+          &mut LoopArgument::with_tokens("exit", &[], &[TokenType::RightParenthesis])
+        )?
+      } else {
+        None
+      };
       parser.position += 1;
       return Ok(ExitNode::new(argument));
     }

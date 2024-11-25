@@ -5,7 +5,8 @@ use crate::internal::{ attribute::AttributeGenerator, comment::CommentGenerator 
 
 pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Box<Node>);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 72] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 77] = [
+  (NodeType::AnonymousClass, super::internal::class::ClassGenerator::generate_anonymous),
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
   (NodeType::Array, super::internal::array::ArrayGenerator::generate),
@@ -33,7 +34,9 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 72] = [
   (NodeType::Declare, super::internal::declare::DeclareGenerator::generate),
   // (NodeType::DeclareArgument, DeclareArgumentGenerator::generate),
   (NodeType::DoWhile, super::internal::dowhile::DoWhileGenerator::generate),
+  (NodeType::DoWhileCondition, super::internal::dowhile::DoWhileGenerator::generate_condition),
   (NodeType::Echo, super::internal::singles::SinglesGenerator::generate),
+  (NodeType::Else, super::internal::ifs::IfGenerator::generate_else),
   (NodeType::Encapsed, super::internal::string::StringGenerator::generate_encapsed),
   // (NodeType::EncapsedPart, StringGenerator::generate_encapsed_part),
   (NodeType::Enum, super::internal::enums::EnumGenerator::generate),
@@ -73,10 +76,12 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 72] = [
   (NodeType::Program, super::internal::program::ProgramGenerator::generate),
   // (NodeType::Property, super::internal::property::PropertyGenerator::generate),
   // (NodeType::PropertyItem, PropertyItemGenerator::generate),
+  (NodeType::Reference, super::internal::pre::PreGenerator::generate),
   (NodeType::Return, super::internal::singles::SinglesGenerator::generate),
   (NodeType::SelfKeyword, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Silent, super::internal::pre::PreGenerator::generate),
-  (NodeType::Static, super::internal::singles::SinglesGenerator::generate),
+  (NodeType::Static, super::internal::statics::StaticGenerator::generate),
+  (NodeType::StaticKeyword, super::internal::singles::SinglesGenerator::generate),
   (NodeType::StaticLookup, super::internal::staticlookup::StaticLookupGenerator::generate),
   (NodeType::String, super::internal::string::StringGenerator::generate),
   (NodeType::Switch, super::internal::switch::SwitchGenerator::generate),
@@ -359,7 +364,9 @@ impl Generator {
           if builder.last_len() == 0 {
             builder.extend_first_line(&scoped_builder);
           } else {
-            scoped_builder.indent();
+            if ![NodeType::DoWhileCondition, NodeType::Else].contains(&node.node_type) {
+              scoped_builder.indent();
+            }
             builder.extend(&scoped_builder);
           }
         } else {

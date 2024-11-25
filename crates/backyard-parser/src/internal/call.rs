@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ ArgumentNode, CallNode, Node, NodeType };
+use backyard_nodes::node::{ ArgumentNode, CallNode, Node };
 use utils::guard;
 
 use crate::{
@@ -31,25 +31,10 @@ impl CallParser {
 
 impl CallParser {
   pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    if let Some(last_expr) = &args.last_expr {
-      if
-        [
-          NodeType::Variable,
-          NodeType::Static,
-          NodeType::SelfKeyword,
-          NodeType::Parenthesis,
-          NodeType::ObjectAccess,
-          NodeType::StaticLookup,
-          NodeType::ArrayLookup,
-          NodeType::Array,
-          NodeType::Call,
-          NodeType::Identifier,
-        ].contains(&last_expr.node_type)
-      {
-        if let Some(next_token) = tokens.get(0) {
-          if next_token.token_type == TokenType::LeftParenthesis {
-            return Some(vec![vec![next_token.to_owned()]]);
-          }
+    if let Some(_) = &args.last_expr {
+      if let Some(next_token) = tokens.get(0) {
+        if next_token.token_type == TokenType::LeftParenthesis {
+          return Some(vec![vec![next_token.to_owned()]]);
         }
       }
     }
@@ -78,7 +63,7 @@ impl ArgumentParser {
     match_pattern(
       tokens,
       [
-        Lookup::Optional(vec![TokenType::Identifier]),
+        Lookup::Optional(vec![TokenType::Identifier, TokenType::Default]),
         Lookup::Optional(vec![TokenType::Colon]),
       ].to_vec()
     )

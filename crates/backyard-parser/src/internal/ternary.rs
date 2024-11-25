@@ -4,7 +4,7 @@ use utils::guard;
 
 use crate::{
   error::ParserError,
-  parser::{ LoopArgument, Parser },
+  parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
   utils::{ match_pattern, Lookup },
 };
 
@@ -38,10 +38,11 @@ impl TernaryParser {
       parser.position += 1;
       let invalid = guard!(
         parser.get_statement(
-          &mut LoopArgument::with_tokens(
+          &mut LoopArgument::safe(
             "ternary_invalid",
             &[],
-            &args.breakers.combine(args.separators).combine(&[TokenType::Semicolon])
+            &args.breakers.combine(args.separators).combine(&[TokenType::Semicolon]),
+            &DEFAULT_PARSERS
           )
         )?,
         {

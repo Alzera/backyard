@@ -1,6 +1,6 @@
 use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
 
-use crate::generator::{ Builder, EndMode, Generator, GeneratorArgument, DEFAULT_GENERATORS };
+use crate::generator::{ Builder, Generator, GeneratorArgument };
 
 use super::identifier::IdentifierGenerator;
 
@@ -16,12 +16,8 @@ impl UseGenerator {
       &mut GeneratorArgument::for_parameter(&[(NodeType::UseItem, Self::generate_item)])
     );
 
-    if let Some(names) = &node.names {
-      let names = generator.generate_nodes_new(
-        names,
-        &mut GeneratorArgument::new(EndMode::None, &DEFAULT_GENERATORS)
-      );
-      builder.push(&names.to_string(""));
+    if let Some(name) = &node.name {
+      builder.push(&name);
 
       builder.push("{");
       if
@@ -53,11 +49,7 @@ impl UseGenerator {
     if node.modifier.len() > 0 {
       builder.push(format!("{} ", node.modifier).as_str());
     }
-    let names = generator.generate_nodes_new(
-      &node.names,
-      &mut GeneratorArgument::new(EndMode::None, &DEFAULT_GENERATORS)
-    );
-    builder.push(&names.to_string(""));
+    builder.push(&node.name);
 
     if let Some(alias) = &node.alias {
       builder.push(" as ");

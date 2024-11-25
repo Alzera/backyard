@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ NegateNode, Node, PreNode, SilentNode, VariadicNode };
+use backyard_nodes::node::{ NegateNode, Node, PreNode, ReferenceNode, SilentNode, VariadicNode };
 use utils::guard;
 
 use crate::{
@@ -22,8 +22,10 @@ impl PreParser {
             TokenType::PreDecrement,
             TokenType::BooleanNegate,
             TokenType::AtSign,
+            TokenType::Addition,
             TokenType::Subtraction,
-            TokenType::Ellipsis
+            TokenType::Ellipsis,
+            TokenType::BitwiseAnd
           ]
         ),
       ].to_vec()
@@ -49,11 +51,13 @@ impl PreParser {
         return Err(ParserError::internal("Pre", args));
       });
       return match operator.token_type {
-        TokenType::PreIncrement | TokenType::PreDecrement =>
-          Ok(PreNode::new(argument, operator.value.to_owned())),
+        | TokenType::PreIncrement
+        | TokenType::PreDecrement
+        | TokenType::Addition
+        | TokenType::Subtraction => Ok(PreNode::new(argument, operator.value.to_owned())),
         TokenType::BooleanNegate => Ok(NegateNode::new(argument)),
         TokenType::AtSign => Ok(SilentNode::new(argument)),
-        TokenType::Subtraction => Ok(SilentNode::new(argument)),
+        TokenType::BitwiseAnd => Ok(ReferenceNode::new(argument)),
         _ => Err(ParserError::internal("Pre", args)),
       };
     }

@@ -70,6 +70,9 @@ impl<'de> Deserialize<'de> for Node {
 
         let node: NodeWrapper = (
           match node_type {
+            NodeType::AnonymousClass => {
+              serde_json::from_value(node_data).map(NodeWrapper::AnonymousClass)
+            }
             NodeType::AnonymousFunction => {
               serde_json::from_value(node_data).map(NodeWrapper::AnonymousFunction)
             }
@@ -121,8 +124,12 @@ impl<'de> Deserialize<'de> for Node {
               serde_json::from_value(node_data).map(NodeWrapper::DeclareArgument)
             }
             NodeType::DoWhile => { serde_json::from_value(node_data).map(NodeWrapper::DoWhile) }
+            NodeType::DoWhileCondition => {
+              serde_json::from_value(node_data).map(NodeWrapper::DoWhileCondition)
+            }
             NodeType::Echo => { serde_json::from_value(node_data).map(NodeWrapper::Echo) }
             NodeType::Elvis => { serde_json::from_value(node_data).map(NodeWrapper::Elvis) }
+            NodeType::Else => { serde_json::from_value(node_data).map(NodeWrapper::Else) }
             NodeType::Encapsed => { serde_json::from_value(node_data).map(NodeWrapper::Encapsed) }
             NodeType::EncapsedPart => {
               serde_json::from_value(node_data).map(NodeWrapper::EncapsedPart)
@@ -131,6 +138,7 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::EnumItem => { serde_json::from_value(node_data).map(NodeWrapper::EnumItem) }
             NodeType::Eval => { serde_json::from_value(node_data).map(NodeWrapper::Eval) }
             NodeType::Exit => { serde_json::from_value(node_data).map(NodeWrapper::Exit) }
+            NodeType::Finally => { serde_json::from_value(node_data).map(NodeWrapper::Finally) }
             NodeType::For => { serde_json::from_value(node_data).map(NodeWrapper::For) }
             NodeType::Foreach => { serde_json::from_value(node_data).map(NodeWrapper::Foreach) }
             NodeType::Function => { serde_json::from_value(node_data).map(NodeWrapper::Function) }
@@ -155,7 +163,6 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::Method => { serde_json::from_value(node_data).map(NodeWrapper::Method) }
             NodeType::Namespace => { serde_json::from_value(node_data).map(NodeWrapper::Namespace) }
             NodeType::Negate => { serde_json::from_value(node_data).map(NodeWrapper::Negate) }
-            NodeType::Negative => { serde_json::from_value(node_data).map(NodeWrapper::Negative) }
             NodeType::New => { serde_json::from_value(node_data).map(NodeWrapper::New) }
             NodeType::NowDoc => { serde_json::from_value(node_data).map(NodeWrapper::NowDoc) }
             NodeType::Null => { serde_json::from_value(node_data).map(NodeWrapper::Null) }
@@ -176,12 +183,16 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::PropertyItem => {
               serde_json::from_value(node_data).map(NodeWrapper::PropertyItem)
             }
+            NodeType::Reference => { serde_json::from_value(node_data).map(NodeWrapper::Reference) }
             NodeType::Return => { serde_json::from_value(node_data).map(NodeWrapper::Return) }
             NodeType::SelfKeyword => {
               serde_json::from_value(node_data).map(NodeWrapper::SelfKeyword)
             }
             NodeType::Silent => { serde_json::from_value(node_data).map(NodeWrapper::Silent) }
             NodeType::Static => { serde_json::from_value(node_data).map(NodeWrapper::Static) }
+            NodeType::StaticKeyword => {
+              serde_json::from_value(node_data).map(NodeWrapper::StaticKeyword)
+            }
             NodeType::StaticLookup => {
               serde_json::from_value(node_data).map(NodeWrapper::StaticLookup)
             }
@@ -226,6 +237,7 @@ impl<'de> Deserialize<'de> for Node {
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(untagged)]
 pub enum NodeWrapper {
+  AnonymousClass(AnonymousClassNode),
   AnonymousFunction(AnonymousFunctionNode),
   Argument(ArgumentNode),
   Array(ArrayNode),
@@ -255,7 +267,9 @@ pub enum NodeWrapper {
   Declare(DeclareNode),
   DeclareArgument(DeclareArgumentNode),
   DoWhile(DoWhileNode),
+  DoWhileCondition(DoWhileConditionNode),
   Echo(EchoNode),
+  Else(ElseNode),
   Elvis(ElvisNode),
   Encapsed(EncapsedNode),
   EncapsedPart(EncapsedPartNode),
@@ -263,6 +277,7 @@ pub enum NodeWrapper {
   EnumItem(EnumItemNode),
   Eval(EvalNode),
   Exit(ExitNode),
+  Finally(FinallyNode),
   For(ForNode),
   Foreach(ForeachNode),
   Function(FunctionNode),
@@ -283,7 +298,6 @@ pub enum NodeWrapper {
   Method(MethodNode),
   Namespace(NamespaceNode),
   Negate(NegateNode),
-  Negative(NegativeNode),
   New(NewNode),
   NowDoc(NowDocNode),
   Null(NullNode),
@@ -298,10 +312,12 @@ pub enum NodeWrapper {
   Program(ProgramNode),
   Property(PropertyNode),
   PropertyItem(PropertyItemNode),
+  Reference(ReferenceNode),
   Return(ReturnNode),
   SelfKeyword(SelfNode),
   Silent(SilentNode),
   Static(StaticNode),
+  StaticKeyword(StaticKeywordNode),
   StaticLookup(StaticLookupNode),
   String(StringNode),
   Switch(SwitchNode),
@@ -327,6 +343,7 @@ pub enum NodeWrapper {
 #[ts(export)]
 #[serde(rename_all = "snake_case")]
 pub enum NodeType {
+  AnonymousClass,
   AnonymousFunction,
   Argument,
   Array,
@@ -356,7 +373,9 @@ pub enum NodeType {
   Declare,
   DeclareArgument,
   DoWhile,
+  DoWhileCondition,
   Echo,
+  Else,
   Elvis,
   Encapsed,
   EncapsedPart,
@@ -364,6 +383,7 @@ pub enum NodeType {
   EnumItem,
   Eval,
   Exit,
+  Finally,
   For,
   Foreach,
   Function,
@@ -384,7 +404,6 @@ pub enum NodeType {
   Method,
   Namespace,
   Negate,
-  Negative,
   New,
   NowDoc,
   Null,
@@ -399,10 +418,12 @@ pub enum NodeType {
   Program,
   Property,
   PropertyItem,
+  Reference,
   Return,
   SelfKeyword,
   Silent,
   Static,
+  StaticKeyword,
   StaticLookup,
   String,
   Switch,
@@ -511,6 +532,13 @@ new_node!(Class, ClassNode {
   is_readonly: bool,
 });
 
+new_node!(AnonymousClass, AnonymousClassNode {
+  parameters: Vec<Box<Node>>,
+  extends: Option<Box<Node>>,
+  implements: Vec<Box<Node>>,
+  body: Box<Node>,
+});
+
 new_node!(CommentBlock, CommentBlockNode {
   comment: String,
 });
@@ -546,6 +574,10 @@ new_node!(DeclareArgument, DeclareArgumentNode {
 new_node!(DoWhile, DoWhileNode {
   condition: Box<Node>,
   body: Box<Node>,
+});
+
+new_node!(DoWhileCondition, DoWhileConditionNode {
+  condition: Box<Node>,
 });
 
 new_node!(Enum, EnumNode {
@@ -622,6 +654,11 @@ new_node!(If, IfNode {
   condition: Box<Node>,
   valid: Box<Node>,
   invalid: Option<Box<Node>>,
+  is_short: bool,
+});
+
+new_node!(Else, ElseNode {
+  body: Box<Node>,
   is_short: bool,
 });
 
@@ -714,8 +751,8 @@ new_node!(Silent, SilentNode {
   variable: Box<Node>,
 });
 
-new_node!(Negative, NegativeNode {
-  variable: Box<Node>,
+new_node!(Reference, ReferenceNode {
+  expr: Box<Node>,
 });
 
 new_node!(Program, ProgramNode {
@@ -770,7 +807,11 @@ new_node!(Print, PrintNode {
 
 new_node!(Parent, ParentNode {});
 
-new_node!(Static, StaticNode {});
+new_node!(Static, StaticNode {
+  items: Vec<Box<Node>>,
+});
+
+new_node!(StaticKeyword, StaticKeywordNode {});
 
 new_node!(ClassKeyword, ClassKeywordNode {});
 
@@ -860,12 +901,12 @@ new_node!(TraitUse, TraitUseNode {
 new_node!(TraitUseAlias, TraitUseAliasNode {
   trait_name: Option<Box<Node>>,
   method: Box<Node>,
-  alias: Box<Node>,
+  alias: Option<Box<Node>>,
   visibility: String,
 });
 
 new_node!(TraitUsePrecedence, TraitUsePrecedenceNode {
-  trait_name: Box<Node>,
+  trait_name: Option<Box<Node>>,
   method: Box<Node>,
   instead: Box<Node>,
 });
@@ -873,12 +914,15 @@ new_node!(TraitUsePrecedence, TraitUsePrecedenceNode {
 new_node!(Try, TryNode {
   body: Box<Node>,
   catches: Vec<Box<Node>>,
-  finally: Option<Box<Node>>,
 });
 
 new_node!(Catch, CatchNode {
   types: Vec<Box<Node>>,
   variable: Option<Box<Node>>,
+  body: Box<Node>,
+});
+
+new_node!(Finally, FinallyNode {
   body: Box<Node>,
 });
 
@@ -888,18 +932,17 @@ new_node!(Type, TypeNode {
 });
 
 new_node!(Use, UseNode {
-  names: Option<Vec<Box<Node>>>,
+  name: Option<String>,
   items: Vec<Box<Node>>,
 });
 
 new_node!(UseItem, UseItemNode {
   modifier: String,
-  names: Vec<Box<Node>>,
+  name: String,
   alias: Option<Box<Node>>,
 });
 
 new_node!(Variable, VariableNode {
-  is_ref: bool,
   name: Box<Node>,
 });
 

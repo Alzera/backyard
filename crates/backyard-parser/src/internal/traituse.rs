@@ -75,7 +75,7 @@ impl TraitUseAliasParser {
         Lookup::Optional(vec![TokenType::Identifier]),
         Lookup::Equal(vec![TokenType::As]),
         Lookup::Optional(vec![TokenType::Public, TokenType::Private, TokenType::Protected]),
-        Lookup::Equal(vec![TokenType::Identifier]),
+        Lookup::Optional(vec![TokenType::Identifier]),
       ].to_vec()
     )
   }
@@ -93,11 +93,15 @@ impl TraitUseAliasParser {
         Some(t) => Some(IdentifierParser::new(t.value.to_owned())),
         _ => None,
       };
+      let alias = match alias.get(0) {
+        Some(t) => Some(IdentifierParser::new(t.value.to_owned())),
+        _ => None,
+      };
       return Ok(
         TraitUseAliasNode::new(
           trait_name_parsed,
           IdentifierParser::from_matched(name_to_parsed),
-          IdentifierParser::from_matched(alias),
+          alias,
           some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned())
         )
       );
@@ -115,8 +119,8 @@ impl TraitUsePrecedenceParser {
       tokens,
       [
         Lookup::Equal(vec![TokenType::Identifier]),
-        Lookup::Equal(vec![TokenType::DoubleColon]),
-        Lookup::Equal(vec![TokenType::Identifier]),
+        Lookup::Optional(vec![TokenType::DoubleColon]),
+        Lookup::Optional(vec![TokenType::Identifier]),
         Lookup::Equal(vec![TokenType::InsteadOf]),
         Lookup::Equal(vec![TokenType::Identifier]),
       ].to_vec()
@@ -128,11 +132,26 @@ impl TraitUsePrecedenceParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [trait_name, _, name, _, instead] = matched.as_slice() {
+    if let [trait_name, _, method, _, instead] = matched.as_slice() {
+      let mut trait_name_parsed = Some(
+        IdentifierParser::new(
+          guard!(trait_name.get(0), {
+            return Err(ParserError::internal("TraitUsePrecedence", args));
+          }).value.to_owned()
+        )
+      );
+      let method = match method.get(0) {
+        Some(t) => IdentifierParser::new(t.value.to_owned()),
+        _ => {
+          let t = trait_name_parsed.to_owned().unwrap();
+          trait_name_parsed = None;
+          t
+        }
+      };
       return Ok(
         TraitUsePrecedenceNode::new(
-          IdentifierParser::from_matched(trait_name),
-          IdentifierParser::from_matched(name),
+          trait_name_parsed,
+          method,
           IdentifierParser::from_matched(instead)
         )
       );

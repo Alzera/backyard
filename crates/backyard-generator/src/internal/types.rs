@@ -20,9 +20,14 @@ mod tests {
 
   #[test]
   fn basic() {
-    test_eval("class A {
-  public function __construct(\\Exception $exception) {
+    test_eval(
+      "class A {
+  public function __construct(
+    \\Exception\\A|\\Exception\\B $exception,
+    private array|\\Closure $suggestedValues = []
+  ) {
   }
-}");
+}"
+    );
   }
 }

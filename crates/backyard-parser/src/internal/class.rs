@@ -1,5 +1,6 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, BlockNode, ClassNode };
+use backyard_nodes::node::{ AnonymousClassNode, BlockNode, ClassNode, Node };
+use utils::guard;
 
 use crate::{
   error::ParserError,
@@ -54,17 +55,23 @@ impl ClassParser {
         &tokens[modifier_count..].to_vec(),
         [
           Lookup::Equal(vec![TokenType::Class]),
-          Lookup::Optional(vec![TokenType::Identifier]),
+          Lookup::Equal(vec![TokenType::Identifier]),
           Lookup::Optional(vec![TokenType::Extends]),
           Lookup::Optional(vec![TokenType::Identifier, TokenType::Name]),
-          Lookup::Optional(vec![TokenType::Implements]),
         ].to_vec()
       )
     {
       modifiers.extend(next_modifiers);
       return Some(modifiers);
     }
-    None
+    // anonymous class
+    match_pattern(
+      &tokens[modifier_count..].to_vec(),
+      [
+        Lookup::Equal(vec![TokenType::Class]),
+        Lookup::Optional(vec![TokenType::LeftParenthesis]),
+      ].to_vec()
+    )
   }
 
   pub fn parse(
@@ -72,18 +79,111 @@ impl ClassParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [readonly, modifier, _, name, _, extends, _] = matched.as_slice() {
-      let implements = parser.get_children(
+    match matched.len() {
+      6 => Self::parse_basic(parser, matched, args),
+      2 => Self::parse_anonymous(parser, matched, args),
+      _ => {
+        return Err(ParserError::internal("Class", args));
+      }
+    }
+  }
+
+  fn parse_anonymous(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
+    if let [_, has_parameter] = matched.as_slice() {
+      let parameters = if has_parameter.len() > 0 {
+        parser.get_children(
+          &mut LoopArgument::with_tokens(
+            "class_anonymous_parameter",
+            &[TokenType::Comma],
+            &[TokenType::RightParenthesis]
+          )
+        )?
+      } else {
+        vec![]
+      };
+      let mut extends = None;
+      if let Some(t) = parser.tokens.get(parser.position) {
+        if t.token_type == TokenType::Extends {
+          parser.position += 1;
+          let t = guard!(parser.tokens.get(parser.position), {
+            return Err(ParserError::internal("Class: failed to parse", args));
+          }).value.to_owned();
+          parser.position += 1;
+          extends = Some(IdentifierParser::new(t));
+        }
+      }
+      let mut implements = vec![];
+      if let Some(t) = parser.tokens.get(parser.position) {
+        if t.token_type == TokenType::Implements {
+          parser.position += 1;
+          implements = parser.get_children(
+            &mut LoopArgument::new(
+              "class_anonymous_implements",
+              &[TokenType::Comma],
+              &[TokenType::LeftCurlyBracket],
+              &[
+                (IdentifierParser::test, IdentifierParser::parse),
+                (CommentParser::test, CommentParser::parse),
+              ]
+            )
+          )?;
+          parser.position -= 1;
+        }
+      }
+      parser.position += 1;
+      let body = parser.get_children(
         &mut LoopArgument::new(
-          "class_implements",
-          &[TokenType::Comma],
-          &[TokenType::LeftCurlyBracket],
+          "class_anonymous_body",
+          &[TokenType::Semicolon],
+          &[TokenType::RightCurlyBracket],
           &[
-            (IdentifierParser::test, IdentifierParser::parse),
+            (TraitUseParser::test, TraitUseParser::parse),
+            (MethodParser::test, MethodParser::parse),
+            (ConstPropertyParser::test, ConstPropertyParser::parse),
+            (PropertyParser::test, PropertyParser::parse),
+            (AttributeParser::test, AttributeParser::parse),
             (CommentParser::test, CommentParser::parse),
           ]
         )
       )?;
+      return Ok(AnonymousClassNode::new(parameters, extends, implements, BlockNode::new(body)));
+    }
+    Err(ParserError::internal("Class: failed to parse", args))
+  }
+
+  fn parse_basic(
+    parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
+    if let [readonly, modifier, _, name, _, extends] = matched.as_slice() {
+      let extends = match extends.get(0) {
+        Some(t) => Some(IdentifierParser::new(t.value.to_owned())),
+        None => None,
+      };
+      let mut implements = vec![];
+      if let Some(t) = parser.tokens.get(parser.position) {
+        if t.token_type == TokenType::Implements {
+          parser.position += 1;
+          implements = parser.get_children(
+            &mut LoopArgument::new(
+              "class_implements",
+              &[TokenType::Comma],
+              &[TokenType::LeftCurlyBracket],
+              &[
+                (IdentifierParser::test, IdentifierParser::parse),
+                (CommentParser::test, CommentParser::parse),
+              ]
+            )
+          )?;
+          parser.position -= 1;
+        }
+      }
+      parser.position += 1;
       let body = parser.get_children(
         &mut LoopArgument::new(
           "class_body",
@@ -99,10 +199,6 @@ impl ClassParser {
           ]
         )
       )?;
-      let extends = match extends.len() {
-        1 => Some(IdentifierParser::from_matched(extends)),
-        _ => None,
-      };
       let name = if name.len() > 0 { Some(IdentifierParser::from_matched(name)) } else { None };
       return Ok(
         ClassNode::new(
@@ -115,6 +211,6 @@ impl ClassParser {
         )
       );
     }
-    Err(ParserError::internal("Class", args))
+    Err(ParserError::internal("Class: failed to parse", args))
   }
 }

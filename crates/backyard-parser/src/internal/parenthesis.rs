@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
+use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ CastNode, Node, ParenthesisNode, TypeNode };
 use utils::guard;
 
@@ -60,11 +60,7 @@ impl ParenthesisParser {
       }
       let statement = guard!(
         parser.get_statement(
-          &mut LoopArgument::with_tokens(
-            "parenthesis",
-            &args.separators,
-            &args.breakers.combine(&[TokenType::RightParenthesis])
-          )
+          &mut LoopArgument::with_tokens("parenthesis", &[], &[TokenType::RightParenthesis])
         )?,
         {
           return Err(ParserError::internal("Parenthesis", args));

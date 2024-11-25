@@ -95,7 +95,7 @@ impl StringParser {
             EncapsedPartNode::new(false, StringNode::new("'".to_string(), i.value.to_owned()))
           ),
         TokenType::Variable =>
-          values.push(EncapsedPartNode::new(false, VariableParser::new(i.value.to_owned(), false))),
+          values.push(EncapsedPartNode::new(false, VariableParser::new(i.value.to_owned()))),
         TokenType::AdvanceInterpolationOpen => {
           let value = guard!(
             parser.get_statement(

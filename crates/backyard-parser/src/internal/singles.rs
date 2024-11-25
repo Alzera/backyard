@@ -15,7 +15,7 @@ use backyard_nodes::node::{
   PrintNode,
   ReturnNode,
   SelfNode,
-  StaticNode,
+  StaticKeywordNode,
   ThisNode,
   ThrowNode,
 };
@@ -81,7 +81,7 @@ impl SinglesParser {
         {
           return match key.token_type {
             TokenType::Parent => Ok(ParentNode::new()),
-            TokenType::Static => Ok(StaticNode::new()),
+            TokenType::Static => Ok(StaticKeywordNode::new()),
             TokenType::This => Ok(ThisNode::new()),
             TokenType::SelfKeyword => Ok(SelfNode::new()),
             TokenType::True => Ok(BooleanNode::new(true)),

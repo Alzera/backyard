@@ -12,7 +12,14 @@ impl DoWhileGenerator {
 
     builder.push("do");
     BlockGenerator::generate(generator, builder, &node.body, None);
-    builder.push(" while (");
+    builder.push(" ");
+    generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
+  }
+
+  pub fn generate_condition(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+    let node = cast_node!(NodeWrapper::DoWhileCondition, &node.node);
+
+    builder.push("while (");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
     builder.push(");");
   }
@@ -24,6 +31,11 @@ mod tests {
 
   #[test]
   fn basic() {
-    test_eval("do {\n} while (false);");
+    test_eval("do {
+} while (false);");
+    test_eval("do {
+} 
+// this comment
+while (false);");
   }
 }

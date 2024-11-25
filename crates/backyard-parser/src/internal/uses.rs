@@ -1,5 +1,6 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, UseItemNode, UseNode };
+use utils::guard;
 
 use crate::{
   error::ParserError,
@@ -35,17 +36,10 @@ impl UseParser {
         p += 1;
       }
       if has_bracket {
-        let mut name = vec![];
-        loop {
-          if let Some(token) = parser.tokens.get(parser.position) {
-            if [TokenType::Identifier, TokenType::Name].contains(&token.token_type) {
-              name.push(IdentifierParser::new(token.value.to_owned()));
-              parser.position += 1;
-              continue;
-            }
-          }
-          break;
-        }
+        let name = guard!(parser.tokens.get(parser.position), {
+          return Err(ParserError::internal("Use", args));
+        }).value.to_owned();
+        parser.position += 1;
 
         let items = {
           let mut items = vec![];
@@ -92,7 +86,13 @@ pub struct UseItemParser {}
 
 impl UseItemParser {
   pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Optional(vec![TokenType::Function, TokenType::Const])].to_vec())
+    match_pattern(
+      tokens,
+      [
+        Lookup::Optional(vec![TokenType::Function, TokenType::Const]),
+        Lookup::Equal(vec![TokenType::Identifier, TokenType::Name]),
+      ].to_vec()
+    )
   }
 
   pub fn parse(
@@ -100,19 +100,11 @@ impl UseItemParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [modifier] = matched.as_slice() {
+    if let [modifier, name] = matched.as_slice() {
       let modifier = some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned());
-      let mut name = vec![];
-      loop {
-        if let Some(token) = parser.tokens.get(parser.position) {
-          if [TokenType::Identifier, TokenType::Name].contains(&token.token_type) {
-            name.push(IdentifierParser::new(token.value.to_owned()));
-            parser.position += 1;
-            continue;
-          }
-        }
-        break;
-      }
+      let name = guard!(name.get(0), {
+        return Err(ParserError::internal("UseItem", args));
+      }).value.to_owned();
       let mut alias = None;
       if let Some(last) = parser.tokens.get(parser.position) {
         if last.token_type == TokenType::As {

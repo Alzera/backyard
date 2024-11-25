@@ -3,7 +3,7 @@ use backyard_nodes::node::{ Node, BinNode };
 
 use crate::{
   error::ParserError,
-  parser::{ LoopArgument, Parser },
+  parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
   utils::{ match_pattern, Lookup },
 };
 
@@ -66,10 +66,11 @@ impl BinParser {
         args.last_expr = None;
         if
           let Some(right) = parser.get_statement(
-            &mut LoopArgument::with_tokens(
+            &mut LoopArgument::safe(
               "bin",
-              &args.separators.combine(&[TokenType::Semicolon]),
-              &args.breakers
+              &[],
+              &args.breakers.combine(args.separators),
+              &DEFAULT_PARSERS
             )
           )?
         {

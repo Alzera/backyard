@@ -34,49 +34,7 @@ impl FunctionParser {
       [
         Lookup::Equal(vec![TokenType::Function]),
         Lookup::Optional(vec![TokenType::BitwiseAnd]),
-        Lookup::Equal(
-          vec![
-            TokenType::Identifier,
-            TokenType::Clone,
-            TokenType::Echo,
-            TokenType::For,
-            TokenType::If,
-            TokenType::While,
-            TokenType::Array,
-            TokenType::List,
-            TokenType::Global,
-            TokenType::Print,
-            TokenType::Type,
-            TokenType::From,
-            TokenType::And,
-            TokenType::Or,
-            TokenType::Xor,
-            TokenType::New,
-            TokenType::Default,
-            TokenType::Class,
-            TokenType::Callable,
-            TokenType::Throw,
-            TokenType::Use,
-            TokenType::Match,
-            TokenType::Eval,
-            TokenType::Catch,
-            TokenType::Parent,
-            TokenType::Namespace,
-            TokenType::As,
-            TokenType::Static,
-            TokenType::Trait,
-            TokenType::Function,
-            TokenType::Extends,
-            TokenType::Implements,
-            TokenType::Var,
-            TokenType::Else,
-            TokenType::Finally,
-            TokenType::Final,
-            TokenType::InsteadOf,
-            TokenType::SelfKeyword,
-            TokenType::Enum
-          ]
-        ),
+        Lookup::Any,
         Lookup::Equal(vec![TokenType::LeftParenthesis]),
       ].to_vec()
     )
@@ -340,7 +298,8 @@ impl ParameterParser {
     match_pattern(
       tokens,
       [
-        Lookup::Optional(vec![TokenType::Reference, TokenType::Ellipsis]),
+        Lookup::Optional(vec![TokenType::BitwiseAnd]),
+        Lookup::Optional(vec![TokenType::Ellipsis]),
         Lookup::Equal(vec![TokenType::Variable]),
         Lookup::Optional(vec![TokenType::Assignment]),
       ].to_vec()
@@ -352,7 +311,7 @@ impl ParameterParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [is_ref_or_ellipsis, name, has_value] = matched.as_slice() {
+    if let [is_ref, is_ellipsis, name, has_value] = matched.as_slice() {
       let value = if has_value.len() > 0 {
         parser.get_statement(
           &mut LoopArgument::with_tokens(
@@ -364,19 +323,8 @@ impl ParameterParser {
       } else {
         None
       };
-      let mut is_ref = false;
-      let mut is_ellipsis = false;
-      if let Some(t) = is_ref_or_ellipsis.get(0) {
-        match t.token_type {
-          TokenType::Reference => {
-            is_ref = true;
-          }
-          TokenType::Ellipsis => {
-            is_ellipsis = true;
-          }
-          _ => {}
-        }
-      }
+      let is_ref = is_ref.len() > 0;
+      let is_ellipsis = is_ellipsis.len() > 0;
       return Ok(
         ParameterNode::new(
           args.last_expr.to_owned(),

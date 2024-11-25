@@ -56,19 +56,9 @@ impl AttributeItemParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name] = matched.as_slice() {
-      let mut name = guard!(name.get(0), {
+      let name = guard!(name.get(0), {
         return Err(ParserError::internal("ArrayItem", args));
       }).value.to_owned();
-      loop {
-        if let Some(token) = parser.tokens.get(parser.position) {
-          if [TokenType::Name].contains(&token.token_type) {
-            name.push_str(&token.value);
-            parser.position += 1;
-            continue;
-          }
-        }
-        break;
-      }
       let mut arguments = vec![];
       let token = guard!(parser.tokens.get(parser.position), {
         return Err(ParserError::internal("ArrayItem", args));

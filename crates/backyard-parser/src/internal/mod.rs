@@ -34,6 +34,7 @@ pub mod pre;
 pub mod program;
 pub mod property;
 pub mod singles;
+pub mod statics;
 pub mod staticlookup;
 pub mod string;
 pub mod switch;

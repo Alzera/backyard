@@ -76,7 +76,7 @@ impl SinglesGenerator {
         builder.push("parent");
         None
       }
-      NodeType::Static => {
+      NodeType::StaticKeyword => {
         builder.push("static");
         None
       }

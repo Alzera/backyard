@@ -9,9 +9,6 @@ pub struct VariableGenerator {}
 impl VariableGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Variable, &node.node);
-    if node.is_ref {
-      builder.push("&");
-    }
     builder.push("$");
     if let NodeType::Identifier = node.name.node_type {
       IdentifierGenerator::generate(generator, builder, &node.name);

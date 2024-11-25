@@ -70,6 +70,10 @@ mod tests {
 
   #[test]
   fn basic() {
+    test_eval("if (false !== 'getaddrinfo'
+// DNS lookup failed
+ || false !== 'getaddrinfo') {
+}");
     test_eval(
       "///////////////////////////////////////////////
 /////////////////// Testing ///////////////////
