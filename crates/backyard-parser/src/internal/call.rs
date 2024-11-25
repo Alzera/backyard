@@ -63,7 +63,7 @@ impl ArgumentParser {
     match_pattern(
       tokens,
       [
-        Lookup::Optional(vec![TokenType::Identifier, TokenType::Default]),
+        Lookup::Optional(vec![TokenType::Identifier, TokenType::Default, TokenType::Type]),
         Lookup::Optional(vec![TokenType::Colon]),
       ].to_vec()
     )

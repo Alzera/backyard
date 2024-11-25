@@ -30,7 +30,7 @@ mod tests {
   fn basic() {
     test_eval(
       "abstract class A {
-  public function dayOfYear(?int $value = null): static|int {
+  public function dayOfYear(?array &$matches, array|int &$matches = null): static|int {
   }
   public final static function b(int $x, int $y = 0): int;
 }"

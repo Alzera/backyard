@@ -27,10 +27,6 @@ impl SinglesGenerator {
         builder.push("clone");
         Some(cast_node!(NodeWrapper::Clone, node.node.to_owned()).argument)
       }
-      NodeType::Echo => {
-        builder.push("echo");
-        Some(cast_node!(NodeWrapper::Echo, node.node.to_owned()).argument)
-      }
       NodeType::New => {
         builder.push("new");
         Some(cast_node!(NodeWrapper::New, node.node.to_owned()).argument)
@@ -48,7 +44,9 @@ impl SinglesGenerator {
         Some(cast_node!(NodeWrapper::Goto, node.node.to_owned()).label)
       }
       NodeType::Inline => {
+        builder.push(" ?>");
         builder.push(&cast_node!(NodeWrapper::Inline, node.node.to_owned()).text);
+        builder.push("<?php ");
         None
       }
       NodeType::Boolean => {
@@ -105,7 +103,6 @@ mod tests {
     test_eval("return 2;");
     test_eval("global $a;");
     test_eval("clone $a;");
-    test_eval("echo \"Hello\";");
     test_eval("new A;");
     test_eval("print \"Hello\";");
     test_eval("throw new A;");
@@ -114,8 +111,8 @@ mod tests {
     test_eval("parent::a();");
     test_eval("static::a();");
     test("<div>this is an inline</div>");
-    test("<div><?php
-echo \"Hello\";
-?> world<?= \"!\"; ?></div>");
+    test("<div><?php 
+echo \"Hello\"; ?> world<?php 
+echo \"!\"; ?></div>");
   }
 }

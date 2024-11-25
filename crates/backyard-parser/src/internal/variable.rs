@@ -39,7 +39,7 @@ impl VariableParser {
       if let Some(name) = name.get(0) {
         if name.token_type == TokenType::VariableBracketOpen {
           let expr = parser.get_statement(
-            &mut LoopArgument::with_tokens("variable", &[TokenType::VariableBracketClose], &[])
+            &mut LoopArgument::with_tokens("variable", &[], &[TokenType::VariableBracketClose])
           )?;
           parser.position += 1;
           if expr.is_some() {

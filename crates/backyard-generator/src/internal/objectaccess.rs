@@ -1,4 +1,4 @@
-use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
+use backyard_nodes::{ cast_node, node::{ Node, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
@@ -9,14 +9,12 @@ impl ObjectAccessGenerator {
     let node = cast_node!(NodeWrapper::ObjectAccess, &node.node);
     generator.generate_node(builder, &node.object, &mut GeneratorArgument::default());
     builder.push("->");
-    if
-      [NodeType::Identifier, NodeType::Call, NodeType::Variable].contains(&node.property.node_type)
-    {
-      generator.generate_node(builder, &node.property, &mut GeneratorArgument::default());
-    } else {
+    if node.bracket {
       builder.push("{");
       generator.generate_node(builder, &node.property, &mut GeneratorArgument::default());
       builder.push("}");
+    } else {
+      generator.generate_node(builder, &node.property, &mut GeneratorArgument::default());
     }
   }
 }

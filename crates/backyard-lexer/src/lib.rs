@@ -11,7 +11,7 @@ use token::Token;
 pub fn lex(input: &str) -> LexResult {
   let mut lexer = Lexer::new(&input);
   let mut tokens: Vec<Token> = Vec::new();
-  let inline = InlineToken::lex(&mut lexer, None)?;
+  let inline = InlineToken::lex(&mut lexer)?;
   tokens.extend(inline);
   tokens.extend(lexer.start()?);
   Ok(tokens)

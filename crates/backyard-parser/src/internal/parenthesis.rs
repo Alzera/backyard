@@ -1,10 +1,10 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ CastNode, Node, ParenthesisNode, TypeNode };
+use backyard_nodes::node::{ CastNode, Node, ParenthesisNode };
 use utils::guard;
 
 use crate::{
   error::ParserError,
-  parser::{ LoopArgument, Parser },
+  parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
   utils::{ match_pattern, Lookup },
 };
 
@@ -45,15 +45,18 @@ impl ParenthesisParser {
               parser.position += 2;
               let expression = guard!(
                 parser.get_statement(
-                  &mut LoopArgument::with_tokens("cast", &args.separators, &args.breakers)
+                  &mut LoopArgument::safe(
+                    "cast",
+                    &args.separators,
+                    &args.breakers,
+                    &DEFAULT_PARSERS
+                  )
                 )?,
                 {
                   return Err(ParserError::internal("Cast", args));
                 }
               );
-              return Ok(
-                CastNode::new(TypeNode::new(false, vec![token.value.to_owned()]), expression)
-              );
+              return Ok(CastNode::new(token.value.to_owned(), expression));
             }
           }
         }

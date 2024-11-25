@@ -45,8 +45,8 @@ impl MatchParser {
           &[TokenType::Comma],
           &[TokenType::RightCurlyBracket],
           &[
-            (MatchArmParser::test, MatchArmParser::parse),
             (CommentParser::test, CommentParser::parse),
+            (MatchArmParser::test, MatchArmParser::parse),
           ]
         )
       )?;

@@ -5,7 +5,7 @@ use crate::internal::{ attribute::AttributeGenerator, comment::CommentGenerator 
 
 pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Box<Node>);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 77] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 78] = [
   (NodeType::AnonymousClass, super::internal::class::ClassGenerator::generate_anonymous),
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
@@ -35,7 +35,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 77] = [
   // (NodeType::DeclareArgument, DeclareArgumentGenerator::generate),
   (NodeType::DoWhile, super::internal::dowhile::DoWhileGenerator::generate),
   (NodeType::DoWhileCondition, super::internal::dowhile::DoWhileGenerator::generate_condition),
-  (NodeType::Echo, super::internal::singles::SinglesGenerator::generate),
+  (NodeType::Echo, super::internal::echo::EchoGenerator::generate),
   (NodeType::Else, super::internal::ifs::IfGenerator::generate_else),
   (NodeType::Encapsed, super::internal::string::StringGenerator::generate_encapsed),
   // (NodeType::EncapsedPart, StringGenerator::generate_encapsed_part),
@@ -54,6 +54,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 77] = [
   (NodeType::Include, super::internal::include::IncludeGenerator::generate),
   (NodeType::Inline, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Interface, super::internal::interface::InterfaceGenerator::generate),
+  (NodeType::IntersectionType, super::internal::types::TypeGenerator::generate_intersection),
   (NodeType::Label, super::internal::label::LabelGenerator::generate),
   (NodeType::List, super::internal::list::ListGenerator::generate),
   (NodeType::Magic, super::internal::magic::MagicGenerator::generate),
@@ -73,7 +74,6 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 77] = [
   (NodeType::Post, super::internal::post::PostGenerator::generate),
   (NodeType::Pre, super::internal::pre::PreGenerator::generate),
   (NodeType::Print, super::internal::singles::SinglesGenerator::generate),
-  (NodeType::Program, super::internal::program::ProgramGenerator::generate),
   // (NodeType::Property, super::internal::property::PropertyGenerator::generate),
   // (NodeType::PropertyItem, PropertyItemGenerator::generate),
   (NodeType::Reference, super::internal::pre::PreGenerator::generate),
@@ -94,6 +94,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 77] = [
   (NodeType::Throw, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Try, super::internal::tries::TryGenerator::generate),
   (NodeType::Type, super::internal::types::TypeGenerator::generate),
+  (NodeType::UnionType, super::internal::types::TypeGenerator::generate_union),
   (NodeType::Use, super::internal::uses::UseGenerator::generate),
   (NodeType::Variable, super::internal::variable::VariableGenerator::generate),
   (NodeType::Variadic, super::internal::pre::PreGenerator::generate),
@@ -300,9 +301,16 @@ impl Generator {
   }
 
   pub fn start(&mut self) -> String {
-    self
+    let mut result = self
       .generate_nodes_new(&self.nodes.clone(), &mut GeneratorArgument::for_block())
-      .to_string("\n")
+      .to_string("\n");
+    if result.ends_with("<?php ") {
+      result = result[..result.len() - 6].to_string();
+    }
+    if result.starts_with(" ?>") {
+      result = result.replacen(" ?>", "", 1);
+    }
+    result
   }
 
   pub fn generate_nodes_new(
@@ -380,7 +388,7 @@ impl Generator {
         return;
       }
     }
-    println!("No generator for node: {:?}", node.node_type);
+    println!("No generator for node: {:?}, {:?}", node.node_type, args.generators);
   }
 
   pub fn handle_comments(&mut self, builder: &mut Builder, nodes: &Vec<Box<Node>>) {

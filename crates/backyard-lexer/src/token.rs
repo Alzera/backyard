@@ -38,7 +38,7 @@ pub enum TokenType {
   CommentLine,
 
   // ?
-  CloseTag,
+  // CloseTag,
   NullsafeObjectAccess,
   NullsafeObjectAccessBracketOpen,
   CoalesceAssignment,
@@ -47,7 +47,7 @@ pub enum TokenType {
   Elvis,
 
   // %
-  CloseTagShort,
+  // CloseTagShort,
   ModulusAssignment,
   Modulus,
 
@@ -96,9 +96,9 @@ pub enum TokenType {
   IsNotEqual,
   BitwiseShiftLeftAssignment,
   BitwiseShiftLeft,
-  OpenTagShort,
-  OpenTag,
-  OpenTagEcho,
+  // OpenTagShort,
+  // OpenTag,
+  // OpenTagEcho,
   Spaceship,
 
   // :

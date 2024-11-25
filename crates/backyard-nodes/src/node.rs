@@ -155,6 +155,9 @@ impl<'de> Deserialize<'de> for Node {
               serde_json::from_value(node_data).map(NodeWrapper::InstanceOf)
             }
             NodeType::Interface => { serde_json::from_value(node_data).map(NodeWrapper::Interface) }
+            NodeType::IntersectionType => {
+              serde_json::from_value(node_data).map(NodeWrapper::IntersectionType)
+            }
             NodeType::Label => { serde_json::from_value(node_data).map(NodeWrapper::Label) }
             NodeType::List => { serde_json::from_value(node_data).map(NodeWrapper::List) }
             NodeType::Magic => { serde_json::from_value(node_data).map(NodeWrapper::Magic) }
@@ -211,6 +214,7 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::Throw => { serde_json::from_value(node_data).map(NodeWrapper::Throw) }
             NodeType::Try => { serde_json::from_value(node_data).map(NodeWrapper::Try) }
             NodeType::Type => { serde_json::from_value(node_data).map(NodeWrapper::Type) }
+            NodeType::UnionType => { serde_json::from_value(node_data).map(NodeWrapper::UnionType) }
             NodeType::Use => { serde_json::from_value(node_data).map(NodeWrapper::Use) }
             NodeType::UseItem => { serde_json::from_value(node_data).map(NodeWrapper::UseItem) }
             NodeType::Variable => { serde_json::from_value(node_data).map(NodeWrapper::Variable) }
@@ -290,6 +294,7 @@ pub enum NodeWrapper {
   Inline(InlineNode),
   InstanceOf(InstanceOfNode),
   Interface(InterfaceNode),
+  IntersectionType(IntersectionTypeNode),
   Label(LabelNode),
   List(ListNode),
   Magic(MagicNode),
@@ -330,6 +335,7 @@ pub enum NodeWrapper {
   Throw(ThrowNode),
   Try(TryNode),
   Type(TypeNode),
+  UnionType(UnionTypeNode),
   Use(UseNode),
   UseItem(UseItemNode),
   Variable(VariableNode),
@@ -396,6 +402,7 @@ pub enum NodeType {
   Inline,
   InstanceOf,
   Interface,
+  IntersectionType,
   Label,
   List,
   Magic,
@@ -436,6 +443,7 @@ pub enum NodeType {
   Throw,
   Try,
   Type,
+  UnionType,
   Use,
   UseItem,
   Variable,
@@ -722,6 +730,7 @@ new_node!(Number, NumberNode {
 new_node!(ObjectAccess, ObjectAccessNode {
   object: Box<Node>,
   property: Box<Node>,
+  bracket: bool,
 });
 
 new_node!(Parenthesis, ParenthesisNode {
@@ -729,7 +738,7 @@ new_node!(Parenthesis, ParenthesisNode {
 });
 
 new_node!(Cast, CastNode {
-  target: Box<Node>,
+  target: String,
   expression: Box<Node>,
 });
 
@@ -785,7 +794,7 @@ new_node!(Return, ReturnNode {
 });
 
 new_node!(Echo, EchoNode {
-  argument: Box<Node>,
+  arguments: Vec<Box<Node>>,
 });
 
 new_node!(Elvis, ElvisNode {
@@ -928,7 +937,15 @@ new_node!(Finally, FinallyNode {
 
 new_node!(Type, TypeNode {
   is_nullable: bool,
-  name: Vec<String>,
+  name: String,
+});
+
+new_node!(UnionType, UnionTypeNode {
+  types: Vec<String>,
+});
+
+new_node!(IntersectionType, IntersectionTypeNode {
+  types: Vec<String>,
 });
 
 new_node!(Use, UseNode {

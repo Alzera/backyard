@@ -55,7 +55,7 @@ impl ObjectAccessParser {
           } else {
             return Err(ParserError::internal("ObjectAccess", args));
           };
-          return Ok(ObjectAccessNode::new(args.last_expr.to_owned().unwrap(), expr));
+          return Ok(ObjectAccessNode::new(args.last_expr.to_owned().unwrap(), expr, false));
         }
         TokenType::ObjectAccessBracketOpen | TokenType::NullsafeObjectAccessBracketOpen => {
           let expr = guard!(
@@ -71,7 +71,7 @@ impl ObjectAccessParser {
             }
           );
           parser.position += 1;
-          return Ok(ObjectAccessNode::new(args.last_expr.to_owned().unwrap(), expr));
+          return Ok(ObjectAccessNode::new(args.last_expr.to_owned().unwrap(), expr, true));
         }
         _ => {}
       }

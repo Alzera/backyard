@@ -2,7 +2,7 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
 
 use crate::generator::{ Builder, EndMode, Generator, GeneratorArgument };
 
-use super::{ identifier::IdentifierGenerator, method::MethodGenerator };
+use super::{ consts::ConstGenerator, identifier::IdentifierGenerator, method::MethodGenerator };
 
 pub struct EnumGenerator {}
 
@@ -24,6 +24,7 @@ impl EnumGenerator {
       &mut GeneratorArgument::new(
         EndMode::SemicolonDynamic,
         &[
+          (NodeType::ConstProperty, ConstGenerator::generate_property),
           (NodeType::Method, MethodGenerator::generate),
           (NodeType::EnumItem, Self::generate_item),
         ]
@@ -61,6 +62,7 @@ mod tests {
       "enum Suit implements SuitInterface {
   case Hearts;
   case Spades;
+  public const MY_CONST = \"constant\";
   public function color(): string {
     return match($this) {
       Suit::Hearts, Suit::Diamonds => 'Red',

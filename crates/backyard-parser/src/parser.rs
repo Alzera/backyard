@@ -2,7 +2,10 @@ use std::fmt::Debug;
 
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, NodeType };
-use crate::{ error::ParserError, internal::{ attribute::AttributeParser, statics::StaticsParser } };
+use crate::{
+  error::ParserError,
+  internal::{ attribute::AttributeParser, echo::EchoParser, statics::StaticsParser },
+};
 
 use super::internal::{
   array::ArrayParser,
@@ -35,7 +38,6 @@ use super::internal::{
   parenthesis::ParenthesisParser,
   post::PostParser,
   pre::PreParser,
-  program::ProgramParser,
   singles::SinglesParser,
   staticlookup::StaticLookupParser,
   string::StringParser,
@@ -88,7 +90,6 @@ pub static DEFAULT_PARSERS: [InternalParser; 44] = [
   (NumberParser::test, NumberParser::parse),
   (PostParser::test, PostParser::parse),
   (PreParser::test, PreParser::parse),
-  (ProgramParser::test, ProgramParser::parse),
   (StaticLookupParser::test, StaticLookupParser::parse),
   (YieldParser::test, YieldParser::parse),
   (StringParser::test, StringParser::parse),
@@ -101,6 +102,7 @@ pub static DEFAULT_PARSERS: [InternalParser; 44] = [
   (IdentifierParser::test, IdentifierParser::parse),
   // (TypesParser::test, TypesParser::parse),
   (SinglesParser::test, SinglesParser::parse),
+  (EchoParser::test, EchoParser::parse),
   (AttributeParser::test, AttributeParser::parse),
 ];
 
@@ -238,7 +240,11 @@ impl Parser {
     args: &mut LoopArgument
   ) -> Result<Option<Box<Node>>, ParserError> {
     while let Some(token) = self.tokens.get(self.position) {
-      if args.separators.contains(&token.token_type) || args.breakers.contains(&token.token_type) {
+      if
+        args.separators.contains(&token.token_type) ||
+        args.breakers.contains(&token.token_type) ||
+        (token.token_type == TokenType::Inline && args.last_expr.is_some())
+      {
         break;
       }
       match self.find_match(args) {

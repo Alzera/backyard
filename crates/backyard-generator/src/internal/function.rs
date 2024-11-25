@@ -2,7 +2,12 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATORS };
 
-use super::{ block::BlockGenerator, identifier::IdentifierGenerator, property::PropertyGenerator };
+use super::{
+  block::BlockGenerator,
+  identifier::IdentifierGenerator,
+  property::PropertyGenerator,
+  types::TypeGenerator,
+};
 
 pub struct FunctionGenerator {}
 
@@ -41,6 +46,9 @@ impl FunctionGenerator {
         &node.parameters,
         &mut GeneratorArgument::for_parameter(
           &[
+            (NodeType::Type, TypeGenerator::generate),
+            (NodeType::UnionType, TypeGenerator::generate_union),
+            (NodeType::IntersectionType, TypeGenerator::generate_intersection),
             (NodeType::Property, PropertyGenerator::generate),
             (NodeType::Parameter, Self::generate_parameter),
           ]

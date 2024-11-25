@@ -45,10 +45,14 @@ mod tests {
 
   #[test]
   fn basic() {
-    test_eval("echo match($myVar) {
-  1 => \"One\",
-  2, 3 => \"Two\",
-  default => \"Other\"
-};");
+    test_eval(
+      "$this->fixedWidth = 
+  match($charset) {
+    // 16 bits
+    'ucs2', 'utf-16' => 2,
+    // and fallback
+    default => 1
+  };"
+    );
   }
 }

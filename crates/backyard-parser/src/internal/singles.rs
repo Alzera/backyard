@@ -4,7 +4,6 @@ use backyard_nodes::node::{
   BreakNode,
   CloneNode,
   ContinueNode,
-  EchoNode,
   GlobalNode,
   GotoNode,
   InlineNode,
@@ -38,7 +37,6 @@ impl SinglesParser {
           vec![
             TokenType::Break,
             TokenType::Continue,
-            TokenType::Echo,
             TokenType::Goto,
             TokenType::New,
             TokenType::Print,
@@ -65,6 +63,7 @@ impl SinglesParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
+    println!("last expr: {:?}", args.last_expr);
     if let [key] = matched.as_slice() {
       if let Some(key) = key.first() {
         if
@@ -115,7 +114,6 @@ impl SinglesParser {
         }
         let argument = argument.unwrap();
         return match key.token_type {
-          TokenType::Echo => Ok(EchoNode::new(argument)),
           TokenType::New => Ok(NewNode::new(argument)),
           TokenType::Print => Ok(PrintNode::new(argument)),
           TokenType::Throw => Ok(ThrowNode::new(argument)),

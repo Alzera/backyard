@@ -7,7 +7,7 @@ use crate::{
   utils::{ match_pattern, Lookup },
 };
 
-use super::identifier::IdentifierParser;
+use super::{ identifier::IdentifierParser, variable::VariableParser };
 
 #[derive(Debug, Clone)]
 pub struct StaticLookupParser {}
@@ -29,15 +29,23 @@ impl StaticLookupParser {
       let left = args.last_expr.to_owned().unwrap();
       args.last_expr = None;
       if let Some(t) = parser.tokens.get(parser.position) {
-        parser.position += 1;
         let expr = if t.token_type == TokenType::Class {
+          parser.position += 1;
           ClassKeywordNode::new()
+        } else if [TokenType::Variable, TokenType::VariableBracketOpen].contains(&t.token_type) {
+          if let Some(m) = VariableParser::test(&parser.tokens[parser.position..].to_vec(), args) {
+            parser.position += 1;
+            VariableParser::parse(parser, m, args)?
+          } else {
+            return Err(ParserError::internal("StaticLookup 1", args));
+          }
         } else {
+          parser.position += 1;
           IdentifierParser::new(t.value.to_owned())
         };
         return Ok(StaticLookupNode::new(left, expr));
       };
     }
-    Err(ParserError::internal("StaticLookup", args))
+    Err(ParserError::internal("StaticLookup 3", args))
   }
 }

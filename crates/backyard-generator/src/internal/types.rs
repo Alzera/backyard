@@ -10,7 +10,17 @@ impl TypeGenerator {
     if node.is_nullable {
       builder.push("?");
     }
-    builder.push(&node.name.join("|"));
+    builder.push(&node.name);
+  }
+
+  pub fn generate_union(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+    let node = cast_node!(NodeWrapper::UnionType, &node.node);
+    builder.push(&node.types.join("|"));
+  }
+
+  pub fn generate_intersection(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+    let node = cast_node!(NodeWrapper::IntersectionType, &node.node);
+    builder.push(&node.types.join("&"));
   }
 }
 
@@ -24,7 +34,8 @@ mod tests {
       "class A {
   public function __construct(
     \\Exception\\A|\\Exception\\B $exception,
-    private array|\\Closure $suggestedValues = []
+    private array|\\Closure $suggestedValues = [],
+    protected \\A&\\B $currentHandler
   ) {
   }
 }"

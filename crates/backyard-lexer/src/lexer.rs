@@ -293,7 +293,7 @@ impl Lexer {
         let t = self.until(current_char, |ch| !['?', '>', '=', '-', '{', ':'].contains(ch));
         match t.as_str() {
           "?:" => Ok(vec![Token::new(TokenType::Elvis, "?:")]),
-          "?>" => InlineToken::lex(self, Some(Token::new(TokenType::CloseTag, "?>"))),
+          "?>" => InlineToken::lex(self),
           "?->" => Ok(vec![Token::new(TokenType::NullsafeObjectAccess, "?->")]),
           "?->{" => Ok(vec![Token::new(TokenType::NullsafeObjectAccessBracketOpen, "?->{")]),
           "??=" => Ok(vec![Token::new(TokenType::CoalesceAssignment, "??=")]),
@@ -303,9 +303,8 @@ impl Lexer {
         }
       }
       '%' => {
-        let t = self.until(current_char, |ch| !['%', '=', '>'].contains(ch));
+        let t = self.until(current_char, |ch| !['%', '='].contains(ch));
         match t.as_str() {
-          "%>" => InlineToken::lex(self, Some(Token::new(TokenType::CloseTagShort, "%>"))),
           "%=" => Ok(vec![Token::new(TokenType::ModulusAssignment, "%=")]),
           "%" => Ok(vec![Token::new(TokenType::Modulus, "%")]),
           _ => Err(self.control.error_unrecognized(&t)),

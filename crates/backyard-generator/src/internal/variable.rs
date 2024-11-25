@@ -33,6 +33,7 @@ mod tests {
 
   #[test]
   fn basic() {
+    test_eval("self::${$annotation};");
     test_eval("$a = ${$a};");
   }
 }
