@@ -100,13 +100,16 @@ impl StringToken {
     let label = lexer.control.next_char_until(|_, i, _| *i == '\n');
     if
       !label
+        .trim()
         .chars()
         .enumerate()
         .fold(
           true,
           |acc, (i, ch)|
             acc &&
-            (ch.is_alphanumeric() || ch == '_' || ((i == 0 || i == label.len() - 1) && ch == '\''))
+            (ch.is_alphanumeric() ||
+              ch == '_' ||
+              ((i == 0 || i == label.len() - 1) && ['\'', '"'].contains(&ch)))
         )
     {
       return Err(lexer.control.error_unrecognized(&label));
