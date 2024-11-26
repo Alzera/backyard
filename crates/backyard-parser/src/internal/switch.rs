@@ -8,7 +8,7 @@ use crate::{
   utils::{ match_pattern, Lookup },
 };
 
-use super::comment::CommentParser;
+use super::{ block::BlockParser, comment::CommentParser };
 
 #[derive(Debug, Clone)]
 pub struct SwitchParser;
@@ -85,15 +85,30 @@ impl CaseParser {
         }
       };
       parser.position += 1;
-      let statements = parser.get_children(
-        &mut LoopArgument::with_tokens(
-          "switch_case_body",
-          &[TokenType::Semicolon],
-          &[TokenType::Case, TokenType::Default, TokenType::RightCurlyBracket, TokenType::EndSwitch]
-        )
-      )?;
-      parser.position -= 1;
-      return Ok(CaseNode::new(condition, BlockNode::new(statements)));
+      let statements = {
+        let token = guard!(parser.tokens.get(parser.position), {
+          return Err(ParserError::internal("Switch", args));
+        }).token_type;
+        if token == TokenType::LeftCurlyBracket {
+          BlockParser::new(parser)?
+        } else {
+          let s = parser.get_children(
+            &mut LoopArgument::with_tokens(
+              "switch_case_body",
+              &[TokenType::Semicolon],
+              &[
+                TokenType::Case,
+                TokenType::Default,
+                TokenType::RightCurlyBracket,
+                TokenType::EndSwitch,
+              ]
+            )
+          )?;
+          parser.position -= 1;
+          BlockNode::new(s)
+        }
+      };
+      return Ok(CaseNode::new(condition, statements));
     }
     Err(ParserError::internal("Case", args))
   }
