@@ -12,7 +12,7 @@ pub struct EchoParser;
 
 impl EchoParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Echo])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Echo])])
   }
 
   pub fn parse(

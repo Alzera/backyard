@@ -195,15 +195,15 @@ impl<'a> LoopArgument<'a> {
   }
 }
 
-pub struct Parser {
-  pub tokens: Vec<Token>,
+pub struct Parser<'a> {
+  pub tokens: &'a [Token],
   pub position: usize,
 }
 
-impl Parser {
-  pub fn new(tokens: &Vec<Token>) -> Self {
+impl<'a> Parser<'a> {
+  pub fn new(tokens: &'a [Token]) -> Self {
     Parser {
-      tokens: tokens.to_vec(),
+      tokens,
       position: 0,
     }
   }

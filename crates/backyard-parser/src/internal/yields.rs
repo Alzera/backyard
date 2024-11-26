@@ -15,7 +15,7 @@ impl YieldParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [Lookup::Equal(vec![TokenType::Yield]), Lookup::Optional(vec![TokenType::From])].to_vec()
+      &[Lookup::Equal(&[TokenType::Yield]), Lookup::Optional(&[TokenType::From])]
     )
   }
 

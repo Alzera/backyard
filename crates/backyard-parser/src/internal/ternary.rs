@@ -14,7 +14,7 @@ pub struct TernaryParser;
 impl TernaryParser {
   pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     args.last_expr.as_ref()?;
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::QuestionMark])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::QuestionMark])])
   }
 
   pub fn parse(

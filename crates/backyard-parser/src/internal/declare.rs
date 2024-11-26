@@ -16,10 +16,7 @@ impl DeclareParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::Declare]),
-        Lookup::Equal(vec![TokenType::LeftParenthesis]),
-      ].to_vec()
+      &[Lookup::Equal(&[TokenType::Declare]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
@@ -69,10 +66,7 @@ impl DeclareArgumentParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::Identifier]),
-        Lookup::Equal(vec![TokenType::Assignment]),
-      ].to_vec()
+      &[Lookup::Equal(&[TokenType::Identifier]), Lookup::Equal(&[TokenType::Assignment])]
     )
   }
 

@@ -15,7 +15,7 @@ pub struct StaticLookupParser;
 impl StaticLookupParser {
   pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     args.last_expr.as_ref()?;
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::DoubleColon])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::DoubleColon])])
   }
 
   pub fn parse(
@@ -31,7 +31,7 @@ impl StaticLookupParser {
           parser.position += 1;
           ClassKeywordNode::new()
         } else if [TokenType::Variable, TokenType::VariableBracketOpen].contains(&t.token_type) {
-          if let Some(m) = VariableParser::test(&parser.tokens[parser.position..].to_vec(), args) {
+          if let Some(m) = VariableParser::test(&parser.tokens[parser.position..], args) {
             parser.position += 1;
             VariableParser::parse(parser, m, args)?
           } else {
@@ -43,8 +43,8 @@ impl StaticLookupParser {
             &mut LoopArgument::with_tokens("staticlookup", &[], &[TokenType::RightCurlyBracket])
           )?;
           parser.position += 1;
-          if expr.is_some() {
-            return Ok(StaticLookupNode::new(left, expr.unwrap(), true));
+          if let Some(expr) = expr {
+            return Ok(StaticLookupNode::new(left, expr, true));
           } else {
             return Err(ParserError::internal("StaticLookup 2", args));
           }

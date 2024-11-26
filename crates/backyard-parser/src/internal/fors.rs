@@ -16,10 +16,7 @@ impl ForParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::For]),
-        Lookup::Equal(vec![TokenType::LeftParenthesis]),
-      ].to_vec()
+      &[Lookup::Equal(&[TokenType::For]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 

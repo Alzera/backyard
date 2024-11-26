@@ -110,9 +110,9 @@ pub struct Line {
 }
 
 impl Default for Line {
-    fn default() -> Self {
-        Self::new()
-    }
+  fn default() -> Self {
+    Self::new()
+  }
 }
 
 impl Line {
@@ -148,9 +148,9 @@ pub struct Builder {
 }
 
 impl Default for Builder {
-    fn default() -> Self {
-        Self::new()
-    }
+  fn default() -> Self {
+    Self::new()
+  }
 }
 
 impl Builder {
@@ -300,19 +300,19 @@ impl<'a> GeneratorArgument<'a> {
   }
 }
 
-pub struct Generator {
+pub struct Generator<'a> {
   pub max_length: usize,
-  nodes: Vec<Box<Node>>,
+  nodes: &'a [Box<Node>],
 }
 
-impl Generator {
-  pub fn new(nodes: Vec<Box<Node>>) -> Self {
+impl<'a> Generator<'a> {
+  pub fn new(nodes: &'a [Box<Node>]) -> Self {
     Self { nodes, max_length: 100 }
   }
 
   pub fn start(&mut self) -> String {
     let mut result = self
-      .generate_nodes_new(&self.nodes.clone(), &mut GeneratorArgument::for_block())
+      .generate_nodes_new(self.nodes, &mut GeneratorArgument::for_block())
       .to_string("\n");
     if result.ends_with("<?php ") {
       result = result[..result.len() - 6].to_string();
@@ -325,7 +325,7 @@ impl Generator {
 
   pub fn generate_nodes_new(
     &mut self,
-    nodes: &Vec<Box<Node>>,
+    nodes: &[Box<Node>],
     args: &mut GeneratorArgument
   ) -> Builder {
     let mut builder = Builder::new();
@@ -336,7 +336,7 @@ impl Generator {
   pub fn generate_nodes(
     &mut self,
     builder: &mut Builder,
-    nodes: &Vec<Box<Node>>,
+    nodes: &[Box<Node>],
     args: &mut GeneratorArgument
   ) {
     for (i, node) in nodes.iter().enumerate() {
@@ -401,7 +401,7 @@ impl Generator {
     println!("No generator for node: {:?}, {:?}", node.node_type, args.generators);
   }
 
-  pub fn handle_comments(&mut self, builder: &mut Builder, nodes: &Vec<Box<Node>>) {
+  pub fn handle_comments(&mut self, builder: &mut Builder, nodes: &[Box<Node>]) {
     if !nodes.is_empty() {
       for node in nodes.iter() {
         match &node.node_type {
@@ -430,7 +430,7 @@ impl Generator {
     }
   }
 
-  pub fn check_nodes_has_comments(nodes: &Vec<Box<Node>>) -> bool {
+  pub fn check_nodes_has_comments(nodes: &[Box<Node>]) -> bool {
     nodes.iter().fold(false, |acc, i| (acc || !i.leadings.is_empty() || !i.trailings.is_empty()))
   }
 }

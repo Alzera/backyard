@@ -47,7 +47,7 @@ impl Control {
   }
 
   pub(crate) fn peek_char(&mut self, pos: Option<usize>) -> Option<char> {
-    let p = if pos.is_some() { pos.unwrap() } else { self.position };
+    let p = if let Some(pos) = pos { pos } else { self.position };
     self.chars.get(p).copied()
   }
 
@@ -187,7 +187,7 @@ impl Lexer {
     match current_char {
       '$' => VariableToken::lex(self, snapshot),
       c if c.is_whitespace() =>
-        Ok(vec![Token::new(TokenType::Whitespace, &current_char.to_string(), snapshot)]),
+        Ok(vec![Token::new(TokenType::Whitespace, current_char.to_string(), snapshot)]),
       c if c.is_ascii_digit() => NumberToken::lex(self, current_char, snapshot),
       c if c.is_alphabetic() || c == '_' => {
         let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_' || *ch == '\\'));
@@ -336,15 +336,9 @@ impl Lexer {
         }
       }
       '-' => {
-        let t = self.until(current_char, |ch| !['-', '=', '>', '{'].contains(ch));
+        let t = self.until(current_char, |ch| !['-', '=', '>'].contains(ch));
         match t.as_str() {
           "-=" => Ok(vec![Token::new(TokenType::SubtractionAssignment, "-=", snapshot)]),
-          // "->{" => {
-          //   let mut tokens = vec![Token::new(TokenType::ObjectAccessBracketOpen, "{", snapshot)];
-          //   tokens.extend(self.next_tokens_until_right_bracket());
-          //   tokens.push(Token::new(TokenType::ObjectAccessBracketClose, "}", snapshot));
-          //   Ok(tokens)
-          // }
           "->" => Ok(vec![Token::new(TokenType::ObjectAccess, "->", snapshot)]),
           "--" => {
             let is_post = match self.control.peek_char(None) {

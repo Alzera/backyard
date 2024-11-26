@@ -16,14 +16,14 @@ impl IdentifierParser {
     IdentifierNode::new(name)
   }
 
-  pub fn from_matched(name: &Vec<Token>) -> Box<Node> {
+  pub fn from_matched(name: &[Token]) -> Box<Node> {
     Self::new(some_or_default(name.first(), String::from(""), |i| i.value.to_owned()))
   }
 }
 
 impl IdentifierParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Identifier, TokenType::Name])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Identifier, TokenType::Name])])
   }
 
   pub fn parse(

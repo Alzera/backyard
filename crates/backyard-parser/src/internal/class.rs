@@ -52,13 +52,13 @@ impl ClassParser {
       .sum::<usize>();
     if
       let Some(next_modifiers) = match_pattern(
-        &tokens[modifier_count..].to_vec(),
-        [
-          Lookup::Equal(vec![TokenType::Class]),
-          Lookup::Equal(vec![TokenType::Identifier]),
-          Lookup::Optional(vec![TokenType::Extends]),
-          Lookup::Optional(vec![TokenType::Identifier, TokenType::Name]),
-        ].to_vec()
+        &tokens[modifier_count..],
+        &[
+          Lookup::Equal(&[TokenType::Class]),
+          Lookup::Equal(&[TokenType::Identifier]),
+          Lookup::Optional(&[TokenType::Extends]),
+          Lookup::Optional(&[TokenType::Identifier, TokenType::Name]),
+        ]
       )
     {
       modifiers.extend(next_modifiers);
@@ -66,11 +66,8 @@ impl ClassParser {
     }
     // anonymous class
     match_pattern(
-      &tokens[modifier_count..].to_vec(),
-      [
-        Lookup::Equal(vec![TokenType::Class]),
-        Lookup::Optional(vec![TokenType::LeftParenthesis]),
-      ].to_vec()
+      &tokens[modifier_count..],
+      &[Lookup::Equal(&[TokenType::Class]), Lookup::Optional(&[TokenType::LeftParenthesis])]
     )
   }
 

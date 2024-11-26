@@ -22,10 +22,7 @@ impl InterfaceParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::Interface]),
-        Lookup::Equal(vec![TokenType::Identifier]),
-      ].to_vec()
+      &[Lookup::Equal(&[TokenType::Interface]), Lookup::Equal(&[TokenType::Identifier])]
     )
   }
 

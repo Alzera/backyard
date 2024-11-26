@@ -54,10 +54,8 @@ impl<'de> Deserialize<'de> for Node {
               if node_data.is_none() {
                 node_data = Some(serde_json::Value::Object(Default::default()));
               }
-              if let Some(ref mut obj) = node_data {
-                if let serde_json::Value::Object(map_obj) = obj {
-                  map_obj.insert(key, map.next_value()?);
-                }
+              if let Some(serde_json::Value::Object(ref mut map_obj)) = node_data {
+                map_obj.insert(key, map.next_value()?);
               }
             }
           }

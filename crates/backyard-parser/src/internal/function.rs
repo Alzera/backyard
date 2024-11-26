@@ -31,12 +31,12 @@ impl FunctionParser {
   pub fn class_test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::Function]),
-        Lookup::Optional(vec![TokenType::BitwiseAnd]),
+      &[
+        Lookup::Equal(&[TokenType::Function]),
+        Lookup::Optional(&[TokenType::BitwiseAnd]),
         Lookup::Any,
-        Lookup::Equal(vec![TokenType::LeftParenthesis]),
-      ].to_vec()
+        Lookup::Equal(&[TokenType::LeftParenthesis]),
+      ]
     )
   }
 
@@ -44,12 +44,12 @@ impl FunctionParser {
     if
       let Some(m) = match_pattern(
         tokens,
-        [
-          Lookup::Equal(vec![TokenType::Function]),
-          Lookup::Optional(vec![TokenType::BitwiseAnd]),
-          Lookup::Equal(vec![TokenType::Identifier]),
-          Lookup::Equal(vec![TokenType::LeftParenthesis]),
-        ].to_vec()
+        &[
+          Lookup::Equal(&[TokenType::Function]),
+          Lookup::Optional(&[TokenType::BitwiseAnd]),
+          Lookup::Equal(&[TokenType::Identifier]),
+          Lookup::Equal(&[TokenType::LeftParenthesis]),
+        ]
       )
     {
       return Some(m);
@@ -57,22 +57,22 @@ impl FunctionParser {
     if
       let Some(m) = match_pattern(
         tokens,
-        [
-          Lookup::Equal(vec![TokenType::Function]),
-          Lookup::Optional(vec![TokenType::BitwiseAnd]),
-          Lookup::Equal(vec![TokenType::LeftParenthesis]),
-        ].to_vec()
+        &[
+          Lookup::Equal(&[TokenType::Function]),
+          Lookup::Optional(&[TokenType::BitwiseAnd]),
+          Lookup::Equal(&[TokenType::LeftParenthesis]),
+        ]
       )
     {
       return Some(m);
     }
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::Fn]),
-        Lookup::Optional(vec![TokenType::BitwiseAnd]),
-        Lookup::Equal(vec![TokenType::LeftParenthesis]),
-      ].to_vec()
+      &[
+        Lookup::Equal(&[TokenType::Fn]),
+        Lookup::Optional(&[TokenType::BitwiseAnd]),
+        Lookup::Equal(&[TokenType::LeftParenthesis]),
+      ]
     )
   }
 
@@ -297,12 +297,12 @@ impl ParameterParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Optional(vec![TokenType::BitwiseAnd]),
-        Lookup::Optional(vec![TokenType::Ellipsis]),
-        Lookup::Equal(vec![TokenType::Variable]),
-        Lookup::Optional(vec![TokenType::Assignment]),
-      ].to_vec()
+      &[
+        Lookup::Optional(&[TokenType::BitwiseAnd]),
+        Lookup::Optional(&[TokenType::Ellipsis]),
+        Lookup::Equal(&[TokenType::Variable]),
+        Lookup::Optional(&[TokenType::Assignment]),
+      ]
     )
   }
 

@@ -12,7 +12,7 @@ use super::{
 pub struct FunctionGenerator;
 
 impl FunctionGenerator {
-  pub fn get_parameters(generator: &mut Generator, parameters: &Vec<Box<Node>>) -> Builder {
+  pub fn get_parameters(generator: &mut Generator, parameters: &[Box<Node>]) -> Builder {
     generator.generate_nodes_new(
       parameters,
       &mut GeneratorArgument::for_parameter(&[(NodeType::Parameter, Self::generate_parameter)])

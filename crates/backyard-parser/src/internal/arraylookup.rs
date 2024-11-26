@@ -30,7 +30,7 @@ impl ArrayLookupParser {
     {
       return None;
     }
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::LeftSquareBracket])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::LeftSquareBracket])])
   }
 
   pub fn parse(

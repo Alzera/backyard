@@ -32,9 +32,9 @@ impl SinglesParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
+      &[
         Lookup::Equal(
-          vec![
+          &[
             TokenType::Break,
             TokenType::Continue,
             TokenType::Goto,
@@ -51,10 +51,10 @@ impl SinglesParser {
             TokenType::False,
             TokenType::Null,
             TokenType::SelfKeyword,
-            TokenType::Inline
+            TokenType::Inline,
           ]
         ),
-      ].to_vec()
+      ]
     )
   }
 

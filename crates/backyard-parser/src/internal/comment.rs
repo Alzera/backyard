@@ -15,9 +15,7 @@ impl CommentParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::CommentLine, TokenType::CommentBlock, TokenType::CommentDoc]),
-      ].to_vec()
+      &[Lookup::Equal(&[TokenType::CommentLine, TokenType::CommentBlock, TokenType::CommentDoc])]
     )
   }
 

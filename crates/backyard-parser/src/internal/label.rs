@@ -18,7 +18,7 @@ impl LabelParser {
         return None;
       }
     }
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Colon])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Colon])])
   }
 
   pub fn parse(

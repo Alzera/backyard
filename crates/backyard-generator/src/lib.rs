@@ -6,6 +6,6 @@ mod internal;
 mod test_utils;
 
 pub fn generate(nodes: Vec<Box<Node>>) -> String {
-  let mut generator = Generator::new(nodes);
+  let mut generator = Generator::new(&nodes);
   generator.start()
 }

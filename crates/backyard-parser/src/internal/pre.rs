@@ -15,9 +15,9 @@ impl PreParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
+      &[
         Lookup::Equal(
-          vec![
+          &[
             TokenType::PreIncrement,
             TokenType::PreDecrement,
             TokenType::BooleanNegate,
@@ -25,10 +25,10 @@ impl PreParser {
             TokenType::Addition,
             TokenType::Subtraction,
             TokenType::Ellipsis,
-            TokenType::BitwiseAnd
+            TokenType::BitwiseAnd,
           ]
         ),
-      ].to_vec()
+      ]
     )
   }
 

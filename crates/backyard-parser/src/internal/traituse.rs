@@ -15,7 +15,7 @@ pub struct TraitUseParser;
 
 impl TraitUseParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Use])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Use])])
   }
 
   pub fn parse(
@@ -69,14 +69,14 @@ impl TraitUseAliasParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::Identifier]),
-        Lookup::Optional(vec![TokenType::DoubleColon]),
-        Lookup::Optional(vec![TokenType::Identifier]),
-        Lookup::Equal(vec![TokenType::As]),
-        Lookup::Optional(vec![TokenType::Public, TokenType::Private, TokenType::Protected]),
-        Lookup::Optional(vec![TokenType::Identifier]),
-      ].to_vec()
+      &[
+        Lookup::Equal(&[TokenType::Identifier]),
+        Lookup::Optional(&[TokenType::DoubleColon]),
+        Lookup::Optional(&[TokenType::Identifier]),
+        Lookup::Equal(&[TokenType::As]),
+        Lookup::Optional(&[TokenType::Public, TokenType::Private, TokenType::Protected]),
+        Lookup::Optional(&[TokenType::Identifier]),
+      ]
     )
   }
 
@@ -113,13 +113,13 @@ impl TraitUsePrecedenceParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::Identifier]),
-        Lookup::Optional(vec![TokenType::DoubleColon]),
-        Lookup::Optional(vec![TokenType::Identifier]),
-        Lookup::Equal(vec![TokenType::InsteadOf]),
-        Lookup::Equal(vec![TokenType::Identifier]),
-      ].to_vec()
+      &[
+        Lookup::Equal(&[TokenType::Identifier]),
+        Lookup::Optional(&[TokenType::DoubleColon]),
+        Lookup::Optional(&[TokenType::Identifier]),
+        Lookup::Equal(&[TokenType::InsteadOf]),
+        Lookup::Equal(&[TokenType::Identifier]),
+      ]
     )
   }
 

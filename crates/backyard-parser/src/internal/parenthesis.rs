@@ -13,7 +13,7 @@ pub struct ParenthesisParser;
 
 impl ParenthesisParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::LeftParenthesis])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::LeftParenthesis])])
   }
 
   pub fn parse(

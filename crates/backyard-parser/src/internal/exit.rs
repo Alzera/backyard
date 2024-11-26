@@ -14,10 +14,10 @@ impl ExitParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::Exit, TokenType::Die]),
-        Lookup::Optional(vec![TokenType::LeftParenthesis]),
-      ].to_vec()
+      &[
+        Lookup::Equal(&[TokenType::Exit, TokenType::Die]),
+        Lookup::Optional(&[TokenType::LeftParenthesis]),
+      ]
     )
   }
 

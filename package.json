@@ -1,7 +1,8 @@
 {
   "scripts": {
     "prebuild": "cargo test && cd ./crates/backyard && npm run build",
-    "build": "node ./scripts/combine.js"
+    "build": "node ./scripts/combine.js",
+    "clippy": "cargo clippy -- -A clippy::borrowed_box -A clippy::vec_box -A clippy::new_ret_no_self"
   },
   "devDependencies": {
     "fs-extra": "^11.2.0"

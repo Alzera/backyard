@@ -15,17 +15,12 @@ impl IncludeParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
+      &[
         Lookup::Equal(
-          vec![
-            TokenType::Require,
-            TokenType::RequireOnce,
-            TokenType::Include,
-            TokenType::IncludeOnce
-          ]
+          &[TokenType::Require, TokenType::RequireOnce, TokenType::Include, TokenType::IncludeOnce]
         ),
-        Lookup::Optional(vec![TokenType::LeftParenthesis]),
-      ].to_vec()
+        Lookup::Optional(&[TokenType::LeftParenthesis]),
+      ]
     )
   }
 

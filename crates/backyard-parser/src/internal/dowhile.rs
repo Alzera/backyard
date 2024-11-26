@@ -15,7 +15,7 @@ pub struct DoWhileParser;
 
 impl DoWhileParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Do])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Do])])
   }
 
   pub fn parse(
@@ -55,10 +55,7 @@ impl DoWhileConditionParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::While]),
-        Lookup::Equal(vec![TokenType::LeftParenthesis]),
-      ].to_vec()
+      &[Lookup::Equal(&[TokenType::While]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 

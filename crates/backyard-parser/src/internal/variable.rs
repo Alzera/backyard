@@ -24,10 +24,7 @@ impl VariableParser {
 
 impl VariableParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(
-      tokens,
-      [Lookup::Equal(vec![TokenType::Variable, TokenType::VariableBracketOpen])].to_vec()
-    )
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Variable, TokenType::VariableBracketOpen])])
   }
 
   pub fn parse(
@@ -42,8 +39,8 @@ impl VariableParser {
             &mut LoopArgument::with_tokens("variable", &[], &[TokenType::VariableBracketClose])
           )?;
           parser.position += 1;
-          if expr.is_some() {
-            return Ok(VariableParser::new_bracked(expr.unwrap()));
+          if let Some(expr) = expr {
+            return Ok(VariableParser::new_bracked(expr));
           }
         } else {
           return Ok(VariableParser::new(name.value.to_owned()));

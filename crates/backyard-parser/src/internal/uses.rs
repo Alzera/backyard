@@ -15,7 +15,7 @@ pub struct UseParser;
 
 impl UseParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Use])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Use])])
   }
 
   pub fn parse(
@@ -88,10 +88,10 @@ impl UseItemParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Optional(vec![TokenType::Function, TokenType::Const]),
-        Lookup::Equal(vec![TokenType::Identifier, TokenType::Name]),
-      ].to_vec()
+      &[
+        Lookup::Optional(&[TokenType::Function, TokenType::Const]),
+        Lookup::Equal(&[TokenType::Identifier, TokenType::Name]),
+      ]
     )
   }
 

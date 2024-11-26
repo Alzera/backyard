@@ -17,10 +17,7 @@ impl SwitchParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::Switch]),
-        Lookup::Equal(vec![TokenType::LeftParenthesis]),
-      ].to_vec()
+      &[Lookup::Equal(&[TokenType::Switch]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
@@ -66,7 +63,7 @@ pub struct CaseParser;
 
 impl CaseParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Case, TokenType::Default])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Case, TokenType::Default])])
   }
 
   pub fn parse(

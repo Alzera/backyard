@@ -79,8 +79,8 @@ impl KeywordToken {
     "xor",
   ];
 
-  pub fn is_keyword(input: &String) -> bool {
-    Self::KEYS.contains(&input.as_str())
+  pub fn is_keyword(input: &str) -> bool {
+    Self::KEYS.contains(&input)
   }
 
   pub fn lex(lexer: &mut Lexer, input: &String, snapshot: &ControlSnapshot) -> LexResult {

@@ -1,13 +1,13 @@
 use backyard_lexer::token::{ Token, TokenType };
 
 #[derive(Debug, Clone)]
-pub enum Lookup {
-  Equal(Vec<TokenType>),
-  Optional(Vec<TokenType>),
+pub enum Lookup<'a> {
+  Equal(&'a [TokenType]),
+  Optional(&'a [TokenType]),
   Any,
 }
 
-pub fn match_pattern(tokens: &[Token], pattern: Vec<Lookup>) -> Option<Vec<Vec<Token>>> {
+pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<Vec<Token>>> {
   let mut result: Vec<Vec<Token>> = Vec::new();
   let mut check_position = 0;
 

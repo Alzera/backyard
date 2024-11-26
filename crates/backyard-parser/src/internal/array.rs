@@ -44,20 +44,12 @@ impl ArrayParser {
   }
 
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    if
-      let Some(m) = match_pattern(
-        tokens,
-        [Lookup::Equal(vec![TokenType::LeftSquareBracket])].to_vec()
-      )
-    {
+    if let Some(m) = match_pattern(tokens, &[Lookup::Equal(&[TokenType::LeftSquareBracket])]) {
       return Some(m);
     }
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::Array]),
-        Lookup::Equal(vec![TokenType::LeftParenthesis]),
-      ].to_vec()
+      &[Lookup::Equal(&[TokenType::Array]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
@@ -92,7 +84,7 @@ pub struct ArrayItemParser;
 
 impl ArrayItemParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Arrow])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Arrow])])
   }
 
   pub fn parse(

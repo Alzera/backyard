@@ -13,7 +13,7 @@ pub struct AttributeParser;
 
 impl AttributeParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Attribute])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Attribute])])
   }
 
   pub fn parse(
@@ -47,7 +47,7 @@ pub struct AttributeItemParser;
 
 impl AttributeItemParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Identifier, TokenType::Name])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Identifier, TokenType::Name])])
   }
 
   pub fn parse(

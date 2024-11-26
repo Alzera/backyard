@@ -33,7 +33,7 @@ impl ConstParser {
 
 impl ConstParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Const])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Const])])
   }
 
   pub fn parse(
@@ -55,10 +55,10 @@ impl ConstPropertyParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Optional(vec![TokenType::Public, TokenType::Private, TokenType::Protected]),
-        Lookup::Equal(vec![TokenType::Const]),
-      ].to_vec()
+      &[
+        Lookup::Optional(&[TokenType::Public, TokenType::Private, TokenType::Protected]),
+        Lookup::Equal(&[TokenType::Const]),
+      ]
     )
   }
 

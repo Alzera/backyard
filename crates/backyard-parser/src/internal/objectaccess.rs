@@ -16,7 +16,7 @@ impl ObjectAccessParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [Lookup::Equal(vec![TokenType::ObjectAccess, TokenType::NullsafeObjectAccess])].to_vec()
+      &[Lookup::Equal(&[TokenType::ObjectAccess, TokenType::NullsafeObjectAccess])]
     )
   }
 
@@ -47,19 +47,17 @@ impl ObjectAccessParser {
         );
         parser.position += 1;
         t
+      } else if let Some(m) = VariableParser::test(&parser.tokens[parser.position..], args) {
+        parser.position += m
+          .iter()
+          .map(|x| x.len())
+          .sum::<usize>();
+        VariableParser::parse(parser, m, args)?
+      } else if let Some(token) = parser.tokens.get(parser.position) {
+        parser.position += 1;
+        IdentifierParser::new(token.value.to_owned())
       } else {
-        if let Some(m) = VariableParser::test(&parser.tokens[parser.position..].to_vec(), args) {
-          parser.position += m
-            .iter()
-            .map(|x| x.len())
-            .sum::<usize>();
-          VariableParser::parse(parser, m, args)?
-        } else if let Some(token) = parser.tokens.get(parser.position) {
-          parser.position += 1;
-          IdentifierParser::new(token.value.to_owned())
-        } else {
-          return Err(ParserError::internal("ObjectAccess", args));
-        }
+        return Err(ParserError::internal("ObjectAccess", args));
       };
       return Ok(
         ObjectAccessNode::new(args.last_expr.to_owned().unwrap(), expr, is_bracket, is_nullsafe)

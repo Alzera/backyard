@@ -15,9 +15,9 @@ impl AssignmentParser {
     args.last_expr.as_ref()?;
     match_pattern(
       tokens,
-      [
+      &[
         Lookup::Equal(
-          vec![
+          &[
             TokenType::Assignment,
             TokenType::BitwiseAndAssignment,
             TokenType::CoalesceAssignment,
@@ -32,10 +32,10 @@ impl AssignmentParser {
             TokenType::BitwiseShiftRightAssignment,
             TokenType::BitwiseShiftLeftAssignment,
             TokenType::AdditionAssignment,
-            TokenType::ReferenceAssignment
+            TokenType::ReferenceAssignment,
           ]
         ),
-      ].to_vec()
+      ]
     )
   }
 

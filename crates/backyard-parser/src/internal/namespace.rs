@@ -1,5 +1,3 @@
-use std::vec;
-
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, NamespaceNode };
 use utils::guard;
@@ -19,10 +17,10 @@ impl NamespaceParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::Namespace]),
-        Lookup::Equal(vec![TokenType::Identifier, TokenType::Name]),
-      ].to_vec()
+      &[
+        Lookup::Equal(&[TokenType::Namespace]),
+        Lookup::Equal(&[TokenType::Identifier, TokenType::Name]),
+      ]
     )
   }
 

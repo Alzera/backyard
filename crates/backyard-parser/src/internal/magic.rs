@@ -12,7 +12,7 @@ pub struct MagicParser;
 
 impl MagicParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Magic])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Magic])])
   }
 
   pub fn parse(

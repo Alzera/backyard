@@ -22,15 +22,15 @@ impl EnumParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::Enum]),
-        Lookup::Equal(vec![TokenType::Identifier]),
-        Lookup::Optional(vec![TokenType::Colon]),
-        Lookup::Optional(vec![TokenType::Type]),
-        Lookup::Optional(vec![TokenType::Implements]),
-        Lookup::Optional(vec![TokenType::Identifier, TokenType::Name]),
-        Lookup::Equal(vec![TokenType::LeftCurlyBracket]),
-      ].to_vec()
+      &[
+        Lookup::Equal(&[TokenType::Enum]),
+        Lookup::Equal(&[TokenType::Identifier]),
+        Lookup::Optional(&[TokenType::Colon]),
+        Lookup::Optional(&[TokenType::Type]),
+        Lookup::Optional(&[TokenType::Implements]),
+        Lookup::Optional(&[TokenType::Identifier, TokenType::Name]),
+        Lookup::Equal(&[TokenType::LeftCurlyBracket]),
+      ]
     )
   }
 
@@ -75,7 +75,7 @@ pub struct EnumItemParser;
 
 impl EnumItemParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Case])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Case])])
   }
 
   pub fn parse(

@@ -15,9 +15,9 @@ impl BinParser {
     args.last_expr.as_ref()?;
     match_pattern(
       tokens,
-      [
+      &[
         Lookup::Equal(
-          vec![
+          &[
             TokenType::Addition,
             TokenType::Subtraction,
             TokenType::Multiplication,
@@ -46,10 +46,10 @@ impl BinParser {
             TokenType::Or,
             TokenType::Xor,
             TokenType::Elvis,
-            TokenType::InstanceOf
+            TokenType::InstanceOf,
           ]
         ),
-      ].to_vec()
+      ]
     )
   }
 

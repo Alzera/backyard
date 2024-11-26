@@ -13,10 +13,7 @@ pub struct PostParser;
 
 impl PostParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(
-      tokens,
-      [Lookup::Equal(vec![TokenType::PostIncrement, TokenType::PostDecrement])].to_vec()
-    )
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::PostIncrement, TokenType::PostDecrement])])
   }
 
   pub fn parse(

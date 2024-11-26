@@ -17,7 +17,7 @@ impl IfParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [Lookup::Equal(vec![TokenType::If]), Lookup::Equal(vec![TokenType::LeftParenthesis])].to_vec()
+      &[Lookup::Equal(&[TokenType::If]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
@@ -100,7 +100,7 @@ pub struct ElseParser;
 
 impl ElseParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Else, TokenType::ElseIf])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Else, TokenType::ElseIf])])
   }
 
   pub fn parse(

@@ -57,7 +57,7 @@ impl PropertyParser {
     let tmp_tokens = guard!(tmp_tokens.get(type_test_count..), {
       return None;
     }).to_vec();
-    guard!(match_pattern(&tmp_tokens, [Lookup::Equal(vec![TokenType::Variable])].to_vec()), {
+    guard!(match_pattern(&tmp_tokens, &[Lookup::Equal(&[TokenType::Variable])]), {
       return None;
     });
     Some(modifiers)
@@ -100,10 +100,7 @@ impl PropertyItemParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::Variable]),
-        Lookup::Optional(vec![TokenType::Assignment]),
-      ].to_vec()
+      &[Lookup::Equal(&[TokenType::Variable]), Lookup::Optional(&[TokenType::Assignment])]
     )
   }
 

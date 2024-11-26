@@ -19,7 +19,7 @@ pub struct TryParser;
 
 impl TryParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Try])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Try])])
   }
 
   pub fn parse(
@@ -54,10 +54,7 @@ impl CatchParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
-      [
-        Lookup::Equal(vec![TokenType::Catch]),
-        Lookup::Equal(vec![TokenType::LeftParenthesis]),
-      ].to_vec()
+      &[Lookup::Equal(&[TokenType::Catch]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
@@ -108,7 +105,7 @@ pub struct FinallyParser;
 
 impl FinallyParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(tokens, [Lookup::Equal(vec![TokenType::Finally])].to_vec())
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Finally])])
   }
 
   pub fn parse(
