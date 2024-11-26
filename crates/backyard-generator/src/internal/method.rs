@@ -4,15 +4,15 @@ use crate::generator::{ Builder, Generator };
 
 use super::function::FunctionGenerator;
 
-pub struct MethodGenerator {}
+pub struct MethodGenerator;
 
 impl MethodGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Method, &node.node);
-    if node.visibility.len() > 0 {
+    if !node.visibility.is_empty() {
       builder.push(format!("{} ", node.visibility).as_str());
     }
-    if node.modifier.len() > 0 {
+    if !node.modifier.is_empty() {
       builder.push(format!("{} ", node.modifier).as_str());
     }
     if node.is_static {

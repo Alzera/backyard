@@ -4,7 +4,7 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 
 use super::block::BlockGenerator;
 
-pub struct IfGenerator {}
+pub struct IfGenerator;
 
 impl IfGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -17,7 +17,7 @@ impl IfGenerator {
     if node.is_short {
       if let Some(n) = &node.invalid {
         BlockGenerator::generate(generator, builder, &node.valid, Some(""));
-        Self::generate_else(generator, builder, &n);
+        Self::generate_else(generator, builder, n);
       } else {
         BlockGenerator::generate(generator, builder, &node.valid, Some("endif;"));
       }
@@ -44,12 +44,7 @@ impl IfGenerator {
         Self::generate(generator, builder, &node.body);
       }
       NodeType::Block => {
-        BlockGenerator::generate(
-          generator,
-          builder,
-          &node.body,
-          node.is_short.then(|| "endif;")
-        );
+        BlockGenerator::generate(generator, builder, &node.body, node.is_short.then_some("endif;"));
       }
       _ => {
         builder.push(" ");

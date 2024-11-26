@@ -2,7 +2,7 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATORS };
 
-pub struct ConstGenerator {}
+pub struct ConstGenerator;
 
 impl ConstGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -27,7 +27,7 @@ impl ConstGenerator {
   pub fn generate_property(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::ConstProperty, &node.node);
 
-    if node.visibility.len() > 0 {
+    if !node.visibility.is_empty() {
       builder.push(format!("{} ", node.visibility).as_str());
     }
     builder.push("const ");

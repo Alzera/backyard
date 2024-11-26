@@ -247,6 +247,6 @@ impl Token {
 
 impl Clone for Token {
   fn clone(&self) -> Self {
-    Self { token_type: self.token_type.clone(), value: self.value.clone() }
+    Self { token_type: self.token_type, value: self.value.clone() }
   }
 }

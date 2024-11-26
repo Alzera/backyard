@@ -9,10 +9,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct ArrayLookupParser {}
+pub struct ArrayLookupParser;
 
 impl ArrayLookupParser {
-  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     let last_expr = guard!(&args.last_expr, {
       return None;
     });

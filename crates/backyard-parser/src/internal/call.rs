@@ -9,7 +9,7 @@ use crate::{ error::ParserError, parser::{ LoopArgument, Parser } };
 use super::{ comment::CommentParser, identifier::IdentifierParser };
 
 #[derive(Debug, Clone)]
-pub struct CallParser {}
+pub struct CallParser;
 
 impl CallParser {
   pub fn get_arguments(parser: &mut Parser) -> Result<Vec<Box<Node>>, ParserError> {
@@ -28,9 +28,9 @@ impl CallParser {
 }
 
 impl CallParser {
-  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    if let Some(_) = &args.last_expr {
-      if let Some(next_token) = tokens.get(0) {
+  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+    if args.last_expr.is_some() {
+      if let Some(next_token) = tokens.first() {
         if next_token.token_type == TokenType::LeftParenthesis {
           return Some(vec![vec![next_token.to_owned()]]);
         }
@@ -54,13 +54,13 @@ impl CallParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct ArgumentParser {}
+pub struct ArgumentParser;
 
 impl ArgumentParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     if let Some(is_colon) = tokens.get(1) {
       if is_colon.token_type == TokenType::Colon {
-        if let Some(name) = tokens.get(0) {
+        if let Some(name) = tokens.first() {
           return Some(vec![vec![name.to_owned()], vec![is_colon.to_owned()]]);
         }
       }
@@ -74,7 +74,7 @@ impl ArgumentParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name, has_name] = matched.as_slice() {
-      let name = if has_name.len() > 0 {
+      let name = if !has_name.is_empty() {
         Some(IdentifierParser::from_matched(name))
       } else {
         parser.position -= name.len();

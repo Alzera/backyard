@@ -15,7 +15,7 @@ impl StringToken {
     need_check_condition.push('{');
     loop {
       let mut t = lexer.control.next_char_until(|control, ch, end_position| {
-        checker.push(ch.clone());
+        checker.push(*ch);
         if need_check_condition.contains(ch) {
           if checker.check().is_some() {
             return true;
@@ -122,8 +122,8 @@ impl StringToken {
       let mut checker = SeriesChecker::new(&[&clean_label]);
       let mut should_break = false;
       let text = lexer.control.next_char_until(|_, i, _| {
-        checker.push(i.clone());
-        let t = should_break.clone();
+        checker.push(*i);
+        let t = should_break;
         should_break = checker.check().is_some();
         t
       });

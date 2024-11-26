@@ -15,10 +15,10 @@ use super::{
 };
 
 #[derive(Debug, Clone)]
-pub struct TryParser {}
+pub struct TryParser;
 
 impl TryParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Try])].to_vec())
   }
 
@@ -48,10 +48,10 @@ impl TryParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct CatchParser {}
+pub struct CatchParser;
 
 impl CatchParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -104,10 +104,10 @@ impl CatchParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct FinallyParser {}
+pub struct FinallyParser;
 
 impl FinallyParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Finally])].to_vec())
   }
 

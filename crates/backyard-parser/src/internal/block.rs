@@ -4,7 +4,7 @@ use backyard_nodes::node::{ BlockNode, Node };
 use crate::{ error::ParserError, parser::{ LoopArgument, Parser } };
 
 #[derive(Debug, Clone)]
-pub struct BlockParser {}
+pub struct BlockParser;
 
 impl BlockParser {
   pub fn new(parser: &mut Parser) -> Result<Box<Node>, ParserError> {

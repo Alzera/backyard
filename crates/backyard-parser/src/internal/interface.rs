@@ -16,10 +16,10 @@ use super::{
 };
 
 #[derive(Debug, Clone)]
-pub struct InterfaceParser {}
+pub struct InterfaceParser;
 
 impl InterfaceParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [

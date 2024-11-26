@@ -18,10 +18,10 @@ use super::{
 };
 
 #[derive(Debug, Clone)]
-pub struct TraitParser {}
+pub struct TraitParser;
 
 impl TraitParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [Lookup::Equal(vec![TokenType::Trait]), Lookup::Equal(vec![TokenType::Identifier])].to_vec()

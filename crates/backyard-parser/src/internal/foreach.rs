@@ -11,7 +11,7 @@ use crate::{
 use super::block::BlockParser;
 
 #[derive(Debug, Clone)]
-pub struct ForeachParser {}
+pub struct ForeachParser;
 
 impl ForeachParser {
   fn get_key_value(
@@ -53,7 +53,7 @@ impl ForeachParser {
 }
 
 impl ForeachParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [

@@ -4,7 +4,7 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 
 use super::block::BlockGenerator;
 
-pub struct TryGenerator {}
+pub struct TryGenerator;
 
 impl TryGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {

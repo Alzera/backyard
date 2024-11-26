@@ -1,7 +1,7 @@
 use backyard_nodes::{ cast_node, node::{ ArrayNode, Node, NodeType, NodeWrapper } };
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
-pub struct ArrayGenerator {}
+pub struct ArrayGenerator;
 
 impl ArrayGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -33,7 +33,7 @@ impl ArrayGenerator {
       2 + builder.last_len() + items.total_len_with_separator(" ") > generator.max_length
     {
       items.indent();
-      builder.extend(&items);
+      builder.extend(items);
       builder.new_line();
     } else {
       builder.push(&items.to_string(" "));
@@ -43,7 +43,7 @@ impl ArrayGenerator {
   pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::ArrayItem, &node.node);
     if let Some(key) = &node.key {
-      generator.generate_node(builder, &key, &mut GeneratorArgument::default());
+      generator.generate_node(builder, key, &mut GeneratorArgument::default());
       builder.push(" => ");
     }
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());

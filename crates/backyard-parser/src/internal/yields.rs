@@ -9,10 +9,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct YieldParser {}
+pub struct YieldParser;
 
 impl YieldParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [Lookup::Equal(vec![TokenType::Yield]), Lookup::Optional(vec![TokenType::From])].to_vec()
@@ -25,7 +25,7 @@ impl YieldParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, has_from] = matched.as_slice() {
-      if has_from.len() > 0 {
+      if !has_from.is_empty() {
         let expr = guard!(
           parser.get_statement(
             &mut LoopArgument::with_tokens(

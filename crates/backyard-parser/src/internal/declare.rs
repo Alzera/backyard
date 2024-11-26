@@ -10,10 +10,10 @@ use crate::{
 use super::{ block::BlockParser, comment::CommentParser, identifier::IdentifierParser };
 
 #[derive(Debug, Clone)]
-pub struct DeclareParser {}
+pub struct DeclareParser;
 
 impl DeclareParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -63,10 +63,10 @@ impl DeclareParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct DeclareArgumentParser {}
+pub struct DeclareArgumentParser;
 
 impl DeclareArgumentParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [

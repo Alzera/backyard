@@ -4,7 +4,7 @@ use crate::generator::{ Builder, EndMode, Generator, GeneratorArgument };
 
 use super::{ consts::ConstGenerator, identifier::IdentifierGenerator, method::MethodGenerator };
 
-pub struct EnumGenerator {}
+pub struct EnumGenerator;
 
 impl EnumGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -13,11 +13,11 @@ impl EnumGenerator {
     IdentifierGenerator::generate(generator, builder, &node.name);
     if let Some(n) = &node.enum_type {
       builder.push(": ");
-      IdentifierGenerator::generate(generator, builder, &n);
+      IdentifierGenerator::generate(generator, builder, n);
     }
     if let Some(n) = &node.implements {
       builder.push(" implements ");
-      IdentifierGenerator::generate(generator, builder, &n);
+      IdentifierGenerator::generate(generator, builder, n);
     }
     let mut items = generator.generate_nodes_new(
       &node.items,

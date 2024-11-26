@@ -26,10 +26,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct SinglesParser {}
+pub struct SinglesParser;
 
 impl SinglesParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [

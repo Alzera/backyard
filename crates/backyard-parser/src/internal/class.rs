@@ -19,10 +19,10 @@ use super::{
 };
 
 #[derive(Debug, Clone)]
-pub struct ClassParser {}
+pub struct ClassParser;
 
 impl ClassParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     let modifiers_rule = [
       [TokenType::Readonly].to_vec(),
       [TokenType::Abstract, TokenType::Final].to_vec(),
@@ -37,7 +37,7 @@ impl ClassParser {
       }
       let token = token.unwrap();
       for (i, modifier) in modifiers_rule.iter().enumerate() {
-        if modifiers[i].len() > 0 {
+        if !modifiers[i].is_empty() {
           continue;
         }
         if modifier.contains(&token.token_type) {
@@ -82,9 +82,7 @@ impl ClassParser {
     match matched.len() {
       6 => Self::parse_basic(parser, matched, args),
       2 => Self::parse_anonymous(parser, matched, args),
-      _ => {
-        return Err(ParserError::internal("Class", args));
-      }
+      _ => { Err(ParserError::internal("Class", args)) }
     }
   }
 
@@ -94,7 +92,7 @@ impl ClassParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, has_parameter] = matched.as_slice() {
-      let parameters = if has_parameter.len() > 0 {
+      let parameters = if !has_parameter.is_empty() {
         parser.get_children(
           &mut LoopArgument::with_tokens(
             "class_anonymous_parameter",
@@ -161,10 +159,7 @@ impl ClassParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [readonly, modifier, _, name, _, extends] = matched.as_slice() {
-      let extends = match extends.get(0) {
-        Some(t) => Some(IdentifierParser::new(t.value.to_owned())),
-        None => None,
-      };
+      let extends = extends.first().map(|t| IdentifierParser::new(t.value.to_owned()));
       let mut implements = vec![];
       if let Some(t) = parser.tokens.get(parser.position) {
         if t.token_type == TokenType::Implements {
@@ -199,15 +194,15 @@ impl ClassParser {
           ]
         )
       )?;
-      let name = if name.len() > 0 { Some(IdentifierParser::from_matched(name)) } else { None };
+      let name = if !name.is_empty() { Some(IdentifierParser::from_matched(name)) } else { None };
       return Ok(
         ClassNode::new(
-          some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
+          some_or_default(modifier.first(), String::from(""), |i| i.value.to_owned()),
           name,
           extends,
           implements,
           BlockNode::new(body),
-          readonly.len() > 0
+          !readonly.is_empty()
         )
       );
     }

@@ -9,10 +9,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct AttributeParser {}
+pub struct AttributeParser;
 
 impl AttributeParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Attribute])].to_vec())
   }
 
@@ -43,10 +43,10 @@ impl AttributeParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct AttributeItemParser {}
+pub struct AttributeItemParser;
 
 impl AttributeItemParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Identifier, TokenType::Name])].to_vec())
   }
 
@@ -56,7 +56,7 @@ impl AttributeItemParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name] = matched.as_slice() {
-      let name = guard!(name.get(0), {
+      let name = guard!(name.first(), {
         return Err(ParserError::internal("ArrayItem", args));
       }).value.to_owned();
       let mut arguments = vec![];

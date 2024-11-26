@@ -4,7 +4,7 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 
 use super::block::BlockGenerator;
 
-pub struct ForeachGenerator {}
+pub struct ForeachGenerator;
 
 impl ForeachGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -32,7 +32,7 @@ mod tests {
   fn basic() {
     test_eval("foreach ($A as $x):
 endforeach;");
-test_eval("foreach ($data as $k => $value):
+    test_eval("foreach ($data as $k => $value):
 endforeach;");
     test_eval("foreach ($A as &$x) {\n}");
     test_eval("foreach ($arr as $key => $value) {\n}");

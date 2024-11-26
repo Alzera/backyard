@@ -11,7 +11,7 @@ use super::{
   traituse::TraitUseGenerator,
 };
 
-pub struct TraitGenerator {}
+pub struct TraitGenerator;
 
 impl TraitGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {

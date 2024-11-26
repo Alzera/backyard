@@ -51,7 +51,7 @@ use super::internal::{
   yields::YieldParser,
 };
 
-type InternalParserTest = fn(&Vec<Token>, &mut LoopArgument) -> Option<Vec<Vec<Token>>>;
+type InternalParserTest = fn(&[Token], &mut LoopArgument) -> Option<Vec<Vec<Token>>>;
 type InternalParserParse = fn(
   &mut Parser,
   Vec<Vec<Token>>,
@@ -182,12 +182,8 @@ impl<'a> LoopArgument<'a> {
   }
 
   pub fn to_string(&self) -> String {
-    let last_statement = if let Some(last) = self.statements.last() {
-      Some(&last.node_type)
-    } else {
-      None
-    };
-    let last_expr = if let Some(last) = &self.last_expr { Some(&last.node_type) } else { None };
+    let last_statement = self.statements.last().map(|last| &last.node_type);
+    let last_expr = self.last_expr.as_ref().map(|last| &last.node_type);
     format!(
       "LoopArgument {{ context: {}, separators: {:?}, breakers: {:?}, last_expr: {:?}, last_statements: {:?} }}",
       self.context,
@@ -302,10 +298,10 @@ impl Parser {
   }
 
   pub fn find_match(&mut self, args: &mut LoopArgument) -> Result<Option<Box<Node>>, ParserError> {
-    let tokens = self.tokens[self.position..].to_vec();
+    let tokens = &self.tokens[self.position..];
 
     for (test, parse) in args.parsers {
-      if let Some(matched) = test(&tokens, args) {
+      if let Some(matched) = test(tokens, args) {
         self.position += matched
           .iter()
           .map(|x| x.len())

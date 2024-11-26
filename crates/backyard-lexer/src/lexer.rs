@@ -39,11 +39,7 @@ impl Control {
 
   pub fn peek_char(&mut self, pos: Option<usize>) -> Option<char> {
     let p = if pos.is_some() { pos.unwrap() } else { self.position };
-    if let Some(c) = self.chars.get(p) {
-      Some(*c)
-    } else {
-      None
-    }
+    self.chars.get(p).copied()
   }
 
   pub fn prev_char(&mut self) -> Option<char> {
@@ -96,7 +92,7 @@ impl Control {
     let start_position = self.position;
     let mut end_position = self.position;
     while let Some(ch) = self.chars.get(end_position) {
-      let ch = ch.clone();
+      let ch = *ch;
       if until(self, &ch, &mut end_position) {
         break;
       }
@@ -211,7 +207,7 @@ impl Lexer {
       '$' => VariableToken::lex(self),
       c if c.is_whitespace() =>
         Ok(vec![Token::new(TokenType::Whitespace, current_char.to_string())]),
-      c if c.is_digit(10) => NumberToken::lex(self, current_char),
+      c if c.is_ascii_digit() => NumberToken::lex(self, current_char),
       c if c.is_alphabetic() || c == '_' => {
         let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_' || *ch == '\\'));
         if
@@ -249,7 +245,7 @@ impl Lexer {
         if KeywordToken::is_keyword(&t) {
           return KeywordToken::lex(self, &t);
         }
-        return Ok(vec![Token::new(TokenType::Identifier, t)]);
+        Ok(vec![Token::new(TokenType::Identifier, t)])
       }
       '=' => {
         let t = self.until(current_char, |ch| !['=', '>', '&'].contains(ch));
@@ -339,12 +335,12 @@ impl Lexer {
           ".=" => Ok(vec![Token::new(TokenType::ConcatenationAssignment, ".=")]),
           "..." => Ok(vec![Token::new(TokenType::Ellipsis, "...")]),
           "." => {
-            let mut t = self.control.next_char_until(|_, ch, _| !ch.is_digit(10));
-            if t.len() == 0 {
+            let mut t = self.control.next_char_until(|_, ch, _| !ch.is_ascii_digit());
+            if t.is_empty() {
               Ok(vec![Token::new(TokenType::Concatenation, ".")])
             } else {
               t.insert(0, '.');
-              Ok(vec![Token::new(TokenType::Number, t.to_string())])
+              Ok(vec![Token::new(TokenType::Number, &t)])
             }
           }
           _ => Err(self.control.error_unrecognized(&t)),
@@ -378,7 +374,7 @@ impl Lexer {
             if is_post {
               return Ok(vec![Token::new(TokenType::PostDecrement, "--")]);
             }
-            return Ok(vec![Token::new(TokenType::PreDecrement, "--")]);
+            Ok(vec![Token::new(TokenType::PreDecrement, "--")])
           }
           "-" => Ok(vec![Token::new(TokenType::Subtraction, "-")]),
           _ => Err(self.control.error_unrecognized(&t)),
@@ -441,7 +437,7 @@ impl Lexer {
             if is_post {
               return Ok(vec![Token::new(TokenType::PostIncrement, "++")]);
             }
-            return Ok(vec![Token::new(TokenType::PreIncrement, "++")]);
+            Ok(vec![Token::new(TokenType::PreIncrement, "++")])
           }
           "+" => Ok(vec![Token::new(TokenType::Addition, "+")]),
           _ => Err(self.control.error_unrecognized(&t)),
@@ -469,7 +465,7 @@ impl Lexer {
             return Ok(vec![Token::new(TokenType::AtSign, "@")]);
           }
         }
-        Err(self.control.error_unrecognized(&"@".to_string()))
+        Err(self.control.error_unrecognized("@"))
       }
       // '\n' => Ok(vec![Token::new(TokenType::LineBreak, "\n")]),
       _ => Err(self.control.error_unrecognized(&current_char.to_string())),

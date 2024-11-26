@@ -11,10 +11,10 @@ use crate::{
 use super::{ block::BlockParser, comment::CommentParser };
 
 #[derive(Debug, Clone)]
-pub struct IfParser {}
+pub struct IfParser;
 
 impl IfParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [Lookup::Equal(vec![TokenType::If]), Lookup::Equal(vec![TokenType::LeftParenthesis])].to_vec()
@@ -90,16 +90,16 @@ impl IfParser {
         }
       }
     } else {
-      return Err(ParserError::internal("If", args));
+      Err(ParserError::internal("If", args))
     }
   }
 }
 
 #[derive(Debug, Clone)]
-pub struct ElseParser {}
+pub struct ElseParser;
 
 impl ElseParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Else, TokenType::ElseIf])].to_vec())
   }
 
@@ -109,7 +109,7 @@ impl ElseParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [keyword] = matched.as_slice() {
-      if let Some(keyword) = keyword.get(0) {
+      if let Some(keyword) = keyword.first() {
         if keyword.token_type == TokenType::ElseIf {
           parser.position += 1;
           let expr = IfParser::parse(parser, vec![vec![keyword.to_owned()], vec![]], args)?;

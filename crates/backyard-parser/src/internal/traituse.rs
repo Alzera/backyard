@@ -11,10 +11,10 @@ use crate::{
 use super::{ comment::CommentParser, identifier::IdentifierParser };
 
 #[derive(Debug, Clone)]
-pub struct TraitUseParser {}
+pub struct TraitUseParser;
 
 impl TraitUseParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Use])].to_vec())
   }
 
@@ -63,10 +63,10 @@ impl TraitUseParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct TraitUseAliasParser {}
+pub struct TraitUseAliasParser;
 
 impl TraitUseAliasParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -86,23 +86,19 @@ impl TraitUseAliasParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [trait_name, double_colon, name, _, visibility, alias] = matched.as_slice() {
-      let has_trait = double_colon.len() > 0;
+      let has_trait = !double_colon.is_empty();
       let trait_to_parsed = if has_trait { trait_name } else { name };
       let name_to_parsed = if has_trait { name } else { trait_name };
-      let trait_name_parsed = match trait_to_parsed.get(0) {
-        Some(t) => Some(IdentifierParser::new(t.value.to_owned())),
-        _ => None,
-      };
-      let alias = match alias.get(0) {
-        Some(t) => Some(IdentifierParser::new(t.value.to_owned())),
-        _ => None,
-      };
+      let trait_name_parsed = trait_to_parsed
+        .first()
+        .map(|t| IdentifierParser::new(t.value.to_owned()));
+      let alias = alias.first().map(|t| IdentifierParser::new(t.value.to_owned()));
       return Ok(
         TraitUseAliasNode::new(
           trait_name_parsed,
           IdentifierParser::from_matched(name_to_parsed),
           alias,
-          some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned())
+          some_or_default(visibility.first(), String::from(""), |i| i.value.to_owned())
         )
       );
     }
@@ -111,10 +107,10 @@ impl TraitUseAliasParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct TraitUsePrecedenceParser {}
+pub struct TraitUsePrecedenceParser;
 
 impl TraitUsePrecedenceParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -135,12 +131,12 @@ impl TraitUsePrecedenceParser {
     if let [trait_name, _, method, _, instead] = matched.as_slice() {
       let mut trait_name_parsed = Some(
         IdentifierParser::new(
-          guard!(trait_name.get(0), {
+          guard!(trait_name.first(), {
             return Err(ParserError::internal("TraitUsePrecedence", args));
           }).value.to_owned()
         )
       );
-      let method = match method.get(0) {
+      let method = match method.first() {
         Some(t) => IdentifierParser::new(t.value.to_owned()),
         _ => {
           let t = trait_name_parsed.to_owned().unwrap();

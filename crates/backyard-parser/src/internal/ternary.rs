@@ -9,13 +9,11 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct TernaryParser {}
+pub struct TernaryParser;
 
 impl TernaryParser {
-  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    if args.last_expr.is_none() {
-      return None;
-    }
+  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+    args.last_expr.as_ref()?;
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::QuestionMark])].to_vec())
   }
 

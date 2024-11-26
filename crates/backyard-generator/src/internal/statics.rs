@@ -4,7 +4,7 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 
 use super::property::PropertyGenerator;
 
-pub struct StaticGenerator {}
+pub struct StaticGenerator;
 
 impl StaticGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {

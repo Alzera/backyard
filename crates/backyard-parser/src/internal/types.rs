@@ -5,11 +5,11 @@ use utils::guard;
 use crate::{ error::ParserError, parser::{ LoopArgument, Parser } };
 
 #[derive(Debug, Clone)]
-pub struct TypesParser {}
+pub struct TypesParser;
 
 impl TypesParser {
   #[allow(unused_assignments)]
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     const TYPES: [TokenType; 11] = [
       TokenType::Identifier,
       TokenType::Name,
@@ -54,7 +54,7 @@ impl TypesParser {
         });
         index += 1;
         if
-          ((last_token_type == None || last_token_type.unwrap() == separator) &&
+          ((last_token_type.is_none() || last_token_type.unwrap() == separator) &&
             TYPES.contains(&token.token_type)) ||
           (last_token_type.is_some() &&
             TYPES.contains(&last_token_type.unwrap()) &&
@@ -73,7 +73,7 @@ impl TypesParser {
         }
       }
       println!("matched 2: {:?}", matched);
-      if matched.len() == 0 {
+      if matched.is_empty() {
         return None;
       }
       return Some(vec![matched]);
@@ -91,10 +91,10 @@ impl TypesParser {
   ) -> Result<Box<Node>, ParserError> {
     if matched.len() == 2 {
       if let [is_nullable, types] = matched.as_slice() {
-        let name = guard!(types.get(0), {
+        let name = guard!(types.first(), {
           return Err(ParserError::internal("Type", args));
         }).value.to_owned();
-        return Ok(TypeNode::new(is_nullable.len() > 0, name));
+        return Ok(TypeNode::new(!is_nullable.is_empty(), name));
       }
     } else if matched.len() == 1 {
       if let [types] = matched.as_slice() {

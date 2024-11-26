@@ -16,10 +16,10 @@ use super::{
 };
 
 #[derive(Debug, Clone)]
-pub struct EnumParser {}
+pub struct EnumParser;
 
 impl EnumParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -40,12 +40,12 @@ impl EnumParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, name, has_type, enum_type, has_implements, implements, _] = matched.as_slice() {
-      let enum_type = if has_type.len() > 0 {
+      let enum_type = if !has_type.is_empty() {
         Some(IdentifierParser::from_matched(enum_type))
       } else {
         None
       };
-      let implements = if has_implements.len() > 0 {
+      let implements = if !has_implements.is_empty() {
         Some(IdentifierParser::from_matched(implements))
       } else {
         None
@@ -71,10 +71,10 @@ impl EnumParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct EnumItemParser {}
+pub struct EnumItemParser;
 
 impl EnumItemParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Case])].to_vec())
   }
 

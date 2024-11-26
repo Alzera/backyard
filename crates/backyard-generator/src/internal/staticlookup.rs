@@ -2,7 +2,7 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
-pub struct StaticLookupGenerator {}
+pub struct StaticLookupGenerator;
 
 impl StaticLookupGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -11,14 +11,12 @@ impl StaticLookupGenerator {
     builder.push("::");
     if node.on.node_type == NodeType::ClassKeyword {
       builder.push("class");
+    } else if node.bracket {
+      builder.push("{");
+      generator.generate_node(builder, &node.on, &mut GeneratorArgument::default());
+      builder.push("}");
     } else {
-      if node.bracket {
-        builder.push("{");
-        generator.generate_node(builder, &node.on, &mut GeneratorArgument::default());
-        builder.push("}");
-      } else {
-        generator.generate_node(builder, &node.on, &mut GeneratorArgument::default());
-      }
+      generator.generate_node(builder, &node.on, &mut GeneratorArgument::default());
     }
   }
 }

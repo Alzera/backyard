@@ -11,10 +11,10 @@ use crate::{
 use super::block::BlockParser;
 
 #[derive(Debug, Clone)]
-pub struct WhileParser {}
+pub struct WhileParser;
 
 impl WhileParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [

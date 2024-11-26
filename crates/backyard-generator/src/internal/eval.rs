@@ -2,7 +2,7 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
-pub struct EvalGenerator {}
+pub struct EvalGenerator;
 
 impl EvalGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {

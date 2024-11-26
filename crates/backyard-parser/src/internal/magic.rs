@@ -8,10 +8,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct MagicParser {}
+pub struct MagicParser;
 
 impl MagicParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Magic])].to_vec())
   }
 
@@ -22,7 +22,7 @@ impl MagicParser {
   ) -> Result<Box<Node>, ParserError> {
     if let [number] = matched.as_slice() {
       return Ok(
-        MagicNode::new(some_or_default(number.get(0), String::from("0"), |i| i.value.to_owned()))
+        MagicNode::new(some_or_default(number.first(), String::from("0"), |i| i.value.to_owned()))
       );
     }
     Err(ParserError::internal("Magic", args))

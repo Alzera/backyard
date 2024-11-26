@@ -2,7 +2,7 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator };
 
-pub struct MagicGenerator {}
+pub struct MagicGenerator;
 
 impl MagicGenerator {
   pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {

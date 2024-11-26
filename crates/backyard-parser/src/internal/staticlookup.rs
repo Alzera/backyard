@@ -10,13 +10,11 @@ use crate::{
 use super::{ identifier::IdentifierParser, variable::VariableParser };
 
 #[derive(Debug, Clone)]
-pub struct StaticLookupParser {}
+pub struct StaticLookupParser;
 
 impl StaticLookupParser {
-  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    if args.last_expr.is_none() {
-      return None;
-    }
+  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+    args.last_expr.as_ref()?;
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::DoubleColon])].to_vec())
   }
 

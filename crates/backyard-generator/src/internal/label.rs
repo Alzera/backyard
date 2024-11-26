@@ -4,7 +4,7 @@ use crate::generator::{ Builder, Generator };
 
 use super::identifier::IdentifierGenerator;
 
-pub struct LabelGenerator {}
+pub struct LabelGenerator;
 
 impl LabelGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {

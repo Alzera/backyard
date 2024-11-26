@@ -11,10 +11,10 @@ use crate::{
 use super::{ comment::CommentParser, identifier::IdentifierParser, types::TypesParser };
 
 #[derive(Debug, Clone)]
-pub struct PropertyParser {}
+pub struct PropertyParser;
 
 impl PropertyParser {
-  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     let modifiers_rule = [
       [TokenType::Public, TokenType::Private, TokenType::Protected].to_vec(),
       [TokenType::Static, TokenType::Readonly].to_vec(),
@@ -29,7 +29,7 @@ impl PropertyParser {
       }
       let token = token.unwrap();
       for (i, modifier) in modifiers_rule.iter().enumerate() {
-        if modifiers[i].len() > 0 {
+        if !modifiers[i].is_empty() {
           continue;
         }
         if modifier.contains(&token.token_type) {
@@ -60,7 +60,7 @@ impl PropertyParser {
     guard!(match_pattern(&tmp_tokens, [Lookup::Equal(vec![TokenType::Variable])].to_vec()), {
       return None;
     });
-    return Some(modifiers);
+    Some(modifiers)
   }
 
   pub fn parse(
@@ -83,8 +83,8 @@ impl PropertyParser {
       )?;
       return Ok(
         PropertyNode::new(
-          some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
-          some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
+          some_or_default(visibility.first(), String::from(""), |i| i.value.to_owned()),
+          some_or_default(modifier.first(), String::from(""), |i| i.value.to_owned()),
           items
         )
       );
@@ -94,10 +94,10 @@ impl PropertyParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct PropertyItemParser {}
+pub struct PropertyItemParser;
 
 impl PropertyItemParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -113,7 +113,7 @@ impl PropertyItemParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name, has_value] = matched.as_slice() {
-      let value = if has_value.len() > 0 {
+      let value = if !has_value.is_empty() {
         parser.get_statement(
           &mut LoopArgument::with_tokens(
             "property_item",

@@ -9,10 +9,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct CommentParser {}
+pub struct CommentParser;
 
 impl CommentParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -27,7 +27,7 @@ impl CommentParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [comment] = matched.as_slice() {
-      let comment = guard!(comment.get(0), {
+      let comment = guard!(comment.first(), {
         return Err(ParserError::internal("Comment: failed to get type", args));
       });
       let comment: Box<Node> = match comment.token_type {

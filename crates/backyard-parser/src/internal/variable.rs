@@ -10,7 +10,7 @@ use crate::{
 use super::identifier::IdentifierParser;
 
 #[derive(Debug, Clone)]
-pub struct VariableParser {}
+pub struct VariableParser;
 
 impl VariableParser {
   pub fn new(name: String) -> Box<Node> {
@@ -23,7 +23,7 @@ impl VariableParser {
 }
 
 impl VariableParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [Lookup::Equal(vec![TokenType::Variable, TokenType::VariableBracketOpen])].to_vec()
@@ -36,7 +36,7 @@ impl VariableParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name] = matched.as_slice() {
-      if let Some(name) = name.get(0) {
+      if let Some(name) = name.first() {
         if name.token_type == TokenType::VariableBracketOpen {
           let expr = parser.get_statement(
             &mut LoopArgument::with_tokens("variable", &[], &[TokenType::VariableBracketClose])

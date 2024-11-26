@@ -15,7 +15,7 @@ impl NumberToken {
         return Ok(vec![Token::new(TokenType::NumberHex, n)]);
       }
     }
-    let mut t = lexer.control.next_char_until(|_, ch, _| !(ch.is_digit(10) || *ch == '.'));
+    let mut t = lexer.control.next_char_until(|_, ch, _| !(ch.is_ascii_digit() || *ch == '.'));
     t.insert(0, current_char);
     Ok(vec![Token::new(TokenType::Number, t)])
   }

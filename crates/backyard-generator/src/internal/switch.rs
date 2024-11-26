@@ -4,7 +4,7 @@ use crate::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATOR
 
 use super::block::BlockGenerator;
 
-pub struct SwitchGenerator {}
+pub struct SwitchGenerator;
 
 impl SwitchGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -28,7 +28,7 @@ impl SwitchGenerator {
 
     if let Some(n) = &node.condition {
       builder.push("case ");
-      generator.generate_node(builder, &n, &mut GeneratorArgument::default());
+      generator.generate_node(builder, n, &mut GeneratorArgument::default());
       builder.push(":");
     } else {
       builder.push("default:");

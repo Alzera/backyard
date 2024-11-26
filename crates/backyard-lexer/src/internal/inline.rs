@@ -21,12 +21,12 @@ impl InlineToken {
     });
     lexer.control.next_char();
     if no_breaker {
-      if inline.len() > 0 {
+      if !inline.is_empty() {
         result.push(Token::new(TokenType::Inline, inline));
       }
     } else if let Some(breaker) = checker.check() {
       inline = inline[..inline.len() - breaker[..breaker.len() - 1].len()].to_string();
-      if inline.len() > 0 {
+      if !inline.is_empty() {
         result.push(Token::new(TokenType::Inline, inline));
       }
       if breaker == "<?=" {

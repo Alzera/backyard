@@ -11,10 +11,10 @@ use crate::{
 use super::{ block::BlockParser, comment::CommentParser };
 
 #[derive(Debug, Clone)]
-pub struct DoWhileParser {}
+pub struct DoWhileParser;
 
 impl DoWhileParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Do])].to_vec())
   }
 
@@ -49,10 +49,10 @@ impl DoWhileParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct DoWhileConditionParser {}
+pub struct DoWhileConditionParser;
 
 impl DoWhileConditionParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [

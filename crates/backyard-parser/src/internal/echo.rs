@@ -8,10 +8,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct EchoParser {}
+pub struct EchoParser;
 
 impl EchoParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Echo])].to_vec())
   }
 
@@ -26,7 +26,7 @@ impl EchoParser {
           "echo",
           &[TokenType::Comma],
           &args.breakers
-            .combine(&args.separators)
+            .combine(args.separators)
             .combine(&[TokenType::Semicolon, TokenType::Inline])
         )
       )?;

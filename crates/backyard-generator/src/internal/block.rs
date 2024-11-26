@@ -9,7 +9,7 @@ use crate::generator::{
   DEFAULT_GENERATORS,
 };
 
-pub struct BlockGenerator {}
+pub struct BlockGenerator;
 
 impl BlockGenerator {
   pub fn generate(

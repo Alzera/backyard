@@ -11,10 +11,10 @@ use crate::{
 use super::{ comment::CommentParser, identifier::IdentifierParser };
 
 #[derive(Debug, Clone)]
-pub struct UseParser {}
+pub struct UseParser;
 
 impl UseParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Use])].to_vec())
   }
 
@@ -82,10 +82,10 @@ impl UseParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct UseItemParser {}
+pub struct UseItemParser;
 
 impl UseItemParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -101,8 +101,8 @@ impl UseItemParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [modifier, name] = matched.as_slice() {
-      let modifier = some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned());
-      let name = guard!(name.get(0), {
+      let modifier = some_or_default(modifier.first(), String::from(""), |i| i.value.to_owned());
+      let name = guard!(name.first(), {
         return Err(ParserError::internal("UseItem", args));
       }).value.to_owned();
       let mut alias = None;

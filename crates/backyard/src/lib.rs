@@ -21,7 +21,7 @@ extern "C" {
 pub fn lex(input: String) -> Result<TokenArray, Error> {
   match process_lex(&input) {
     Ok(tokens) => serde_wasm_bindgen::to_value(&tokens).map(|v| v.into()),
-    Err(err) => Err(Error::new(&format!("{}", err))),
+    Err(err) => Err(Error::new(format!("{}", err))),
   }
 }
 
@@ -32,7 +32,7 @@ pub fn parse(input: String) -> Result<NodeArray, Error> {
       let serializer = Serializer::new().serialize_maps_as_objects(true);
       nodes.serialize(&serializer).map(|v| v.into())
     }
-    Err(err) => Err(Error::new(&format!("{}", err))),
+    Err(err) => Err(Error::new(format!("{}", err))),
   }
 }
 

@@ -7,11 +7,11 @@ use crate::{ error::ParserError, parser::{ LoopArgument, Parser }, utils::some_o
 use super::{ comment::CommentParser, function::FunctionParser };
 
 #[derive(Debug, Clone)]
-pub struct MethodParser {}
+pub struct MethodParser;
 
 impl MethodParser {
   #[allow(unused_variables)]
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     let modifiers_rule = [
       [TokenType::Public, TokenType::Private, TokenType::Protected].to_vec(),
       [TokenType::Abstract, TokenType::Final].to_vec(),
@@ -32,7 +32,7 @@ impl MethodParser {
       }
       let mut assigned = false;
       for (i, modifier) in modifiers_rule.iter().enumerate() {
-        if modifiers[i].len() > 0 {
+        if !modifiers[i].is_empty() {
           continue;
         }
         if modifier.contains(&token.token_type) {
@@ -45,7 +45,7 @@ impl MethodParser {
         return None;
       }
     }
-    return Some(modifiers);
+    Some(modifiers)
   }
 
   pub fn parse(
@@ -73,9 +73,9 @@ impl MethodParser {
       );
       return Ok(
         MethodNode::new(
-          some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
-          some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
-          is_static.len() > 0,
+          some_or_default(visibility.first(), String::from(""), |i| i.value.to_owned()),
+          some_or_default(modifier.first(), String::from(""), |i| i.value.to_owned()),
+          !is_static.is_empty(),
           function
         )
       );

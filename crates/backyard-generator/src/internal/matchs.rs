@@ -2,7 +2,7 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
 
 use crate::generator::{ Builder, EndMode, Generator, GeneratorArgument, DEFAULT_GENERATORS };
 
-pub struct MatchGenerator {}
+pub struct MatchGenerator;
 
 impl MatchGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -25,7 +25,7 @@ impl MatchGenerator {
 
   pub fn generate_arm(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::MatchArm, &node.node);
-    if node.conditions.len() > 0 {
+    if !node.conditions.is_empty() {
       let conditions = generator.generate_nodes_new(
         &node.conditions,
         &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)

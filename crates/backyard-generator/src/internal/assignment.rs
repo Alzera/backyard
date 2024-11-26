@@ -2,7 +2,7 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
-pub struct AssignmentGenerator {}
+pub struct AssignmentGenerator;
 
 impl AssignmentGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {

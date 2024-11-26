@@ -4,7 +4,7 @@ use crate::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATOR
 
 use super::block::BlockGenerator;
 
-pub struct ForGenerator {}
+pub struct ForGenerator;
 
 impl ForGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -12,7 +12,7 @@ impl ForGenerator {
 
     builder.push("for (");
     let mut inits = Builder::new();
-    if node.inits.len() > 0 {
+    if !node.inits.is_empty() {
       generator.generate_nodes(
         &mut inits,
         &node.inits,
@@ -22,7 +22,7 @@ impl ForGenerator {
     builder.push(&inits.to_string(" "));
     builder.push("; ");
     let mut tests = Builder::new();
-    if node.tests.len() > 0 {
+    if !node.tests.is_empty() {
       generator.generate_nodes(
         &mut tests,
         &node.tests,
@@ -32,7 +32,7 @@ impl ForGenerator {
     builder.push(&tests.to_string(" "));
     builder.push("; ");
     let mut increments = Builder::new();
-    if node.increments.len() > 0 {
+    if !node.increments.is_empty() {
       generator.generate_nodes(
         &mut increments,
         &node.increments,
@@ -44,12 +44,12 @@ impl ForGenerator {
     match node.body_type {
       BodyType::Basic => {
         if let Some(n) = &node.body {
-          BlockGenerator::generate(generator, builder, &n, None);
+          BlockGenerator::generate(generator, builder, n, None);
         }
       }
       BodyType::Short => {
         if let Some(n) = &node.body {
-          BlockGenerator::generate(generator, builder, &n, Some("endfor;"));
+          BlockGenerator::generate(generator, builder, n, Some("endfor;"));
         }
       }
       BodyType::Empty => {

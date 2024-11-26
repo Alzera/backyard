@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct ArrayParser {}
+pub struct ArrayParser;
 
 impl ArrayParser {
   pub fn get_values(
@@ -43,7 +43,7 @@ impl ArrayParser {
     )
   }
 
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     if
       let Some(m) = match_pattern(
         tokens,
@@ -88,10 +88,10 @@ impl ArrayParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct ArrayItemParser {}
+pub struct ArrayItemParser;
 
 impl ArrayItemParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Arrow])].to_vec())
   }
 

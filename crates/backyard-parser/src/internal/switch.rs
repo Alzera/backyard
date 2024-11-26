@@ -11,10 +11,10 @@ use crate::{
 use super::comment::CommentParser;
 
 #[derive(Debug, Clone)]
-pub struct SwitchParser {}
+pub struct SwitchParser;
 
 impl SwitchParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -62,10 +62,10 @@ impl SwitchParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct CaseParser {}
+pub struct CaseParser;
 
 impl CaseParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Case, TokenType::Default])].to_vec())
   }
 
@@ -76,7 +76,7 @@ impl CaseParser {
   ) -> Result<Box<Node>, ParserError> {
     if let [is_default] = matched.as_slice() {
       let condition = match
-        guard!(is_default.get(0), {
+        guard!(is_default.first(), {
           return Err(ParserError::internal("Case", args));
         }).token_type
       {

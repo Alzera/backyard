@@ -3,7 +3,7 @@ use utils::guard;
 
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
-pub struct StringGenerator {}
+pub struct StringGenerator;
 
 impl StringGenerator {
   pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -50,8 +50,7 @@ impl StringGenerator {
     if
       !guard!(node.value.split('\n').last())
         .chars()
-        .into_iter()
-        .fold(true, |acc, x| acc && x.is_whitespace())
+        .all(|x| x.is_whitespace())
     {
       builder.new_line();
     }
@@ -69,8 +68,7 @@ impl StringGenerator {
     if
       !guard!(parts.lines.last())
         .line.chars()
-        .into_iter()
-        .fold(true, |acc, x| acc && x.is_whitespace())
+        .all(|x| x.is_whitespace())
     {
       builder.new_line();
     }

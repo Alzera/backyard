@@ -4,7 +4,7 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 
 use super::{ block::BlockGenerator, identifier::IdentifierGenerator };
 
-pub struct DeclareGenerator {}
+pub struct DeclareGenerator;
 
 impl DeclareGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -29,12 +29,12 @@ impl DeclareGenerator {
     match node.body_type {
       BodyType::Basic => {
         if let Some(n) = &node.body {
-          BlockGenerator::generate(generator, builder, &n, None);
+          BlockGenerator::generate(generator, builder, n, None);
         }
       }
       BodyType::Short => {
         if let Some(n) = &node.body {
-          BlockGenerator::generate(generator, builder, &n, Some("enddeclare;"));
+          BlockGenerator::generate(generator, builder, n, Some("enddeclare;"));
         }
       }
       BodyType::Empty => {

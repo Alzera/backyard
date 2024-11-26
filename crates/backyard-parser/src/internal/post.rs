@@ -9,10 +9,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct PostParser {}
+pub struct PostParser;
 
 impl PostParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [Lookup::Equal(vec![TokenType::PostIncrement, TokenType::PostDecrement])].to_vec()
@@ -28,7 +28,7 @@ impl PostParser {
       if args.last_expr.is_none() {
         return Err(ParserError::internal("Post", args));
       }
-      let operator = guard!(operator.get(0), {
+      let operator = guard!(operator.first(), {
         return Err(ParserError::internal("Post", args));
       });
       return Ok(PostNode::new(args.last_expr.to_owned().unwrap(), operator.value.to_owned()));

@@ -9,10 +9,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct IncludeParser {}
+pub struct IncludeParser;
 
 impl IncludeParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -37,7 +37,7 @@ impl IncludeParser {
     if let [keyword, use_parenthesis] = matched.as_slice() {
       let mut is_require = false;
       let mut is_once = false;
-      if let Some(t) = keyword.get(0) {
+      if let Some(t) = keyword.first() {
         is_require = t.token_type == TokenType::Require || t.token_type == TokenType::RequireOnce;
         is_once = t.token_type == TokenType::RequireOnce || t.token_type == TokenType::IncludeOnce;
       }

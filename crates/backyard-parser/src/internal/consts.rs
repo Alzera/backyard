@@ -10,7 +10,7 @@ use crate::{
 use super::{ assignment::AssignmentParser, comment::CommentParser, identifier::IdentifierParser };
 
 #[derive(Debug, Clone)]
-pub struct ConstParser {}
+pub struct ConstParser;
 
 impl ConstParser {
   pub fn get_consts(parser: &mut Parser) -> Result<Vec<Box<Node>>, ParserError> {
@@ -32,7 +32,7 @@ impl ConstParser {
 }
 
 impl ConstParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Const])].to_vec())
   }
 
@@ -49,10 +49,10 @@ impl ConstParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct ConstPropertyParser {}
+pub struct ConstPropertyParser;
 
 impl ConstPropertyParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -70,7 +70,7 @@ impl ConstPropertyParser {
     if let [visibility, _] = matched.as_slice() {
       return Ok(
         ConstPropertyNode::new(
-          some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
+          some_or_default(visibility.first(), String::from(""), |i| i.value.to_owned()),
           ConstParser::get_consts(parser)?
         )
       );

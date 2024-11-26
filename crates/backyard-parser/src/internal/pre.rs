@@ -9,10 +9,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct PreParser {}
+pub struct PreParser;
 
 impl PreParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -38,7 +38,7 @@ impl PreParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [operator] = matched.as_slice() {
-      let operator = guard!(operator.get(0), {
+      let operator = guard!(operator.first(), {
         return Err(ParserError::internal("Pre", args));
       });
       let argument = parser.get_statement(

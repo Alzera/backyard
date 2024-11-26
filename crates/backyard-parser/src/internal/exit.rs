@@ -8,10 +8,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct ExitParser {}
+pub struct ExitParser;
 
 impl ExitParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -27,7 +27,7 @@ impl ExitParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, has_argument] = matched.as_slice() {
-      let argument = if has_argument.len() > 0 {
+      let argument = if !has_argument.is_empty() {
         parser.get_statement(
           &mut LoopArgument::with_tokens("exit", &[], &[TokenType::RightParenthesis])
         )?

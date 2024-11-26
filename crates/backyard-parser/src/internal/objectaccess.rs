@@ -10,10 +10,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct ObjectAccessParser {}
+pub struct ObjectAccessParser;
 
 impl ObjectAccessParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -36,7 +36,7 @@ impl ObjectAccessParser {
   ) -> Result<Box<Node>, ParserError> {
     if let [access_type] = matched.as_slice() {
       match
-        guard!(access_type.get(0), {
+        guard!(access_type.first(), {
           return Err(ParserError::internal("ObjectAccess", args));
         }).token_type
       {

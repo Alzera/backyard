@@ -8,10 +8,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct EvalParser {}
+pub struct EvalParser;
 
 impl EvalParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [

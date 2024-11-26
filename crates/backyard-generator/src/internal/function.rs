@@ -9,7 +9,7 @@ use super::{
   types::TypeGenerator,
 };
 
-pub struct FunctionGenerator {}
+pub struct FunctionGenerator;
 
 impl FunctionGenerator {
   pub fn get_parameters(generator: &mut Generator, parameters: &Vec<Box<Node>>) -> Builder {
@@ -23,7 +23,7 @@ impl FunctionGenerator {
     generator: &mut Generator,
     node: &Option<Box<Node>>
   ) -> (Option<Builder>, usize) {
-    let return_type = if let Some(n) = &node { Some(generator.generate_node_new(n)) } else { None };
+    let return_type = node.as_ref().map(|n| generator.generate_node_new(n));
     let return_type_len = if let Some(n) = &return_type {
       n.total_len_with_separator(" ")
     } else {
@@ -78,7 +78,7 @@ impl FunctionGenerator {
       builder.extend_first_line(n);
     }
     if let Some(n) = &node.body {
-      BlockGenerator::generate(generator, builder, &n, None);
+      BlockGenerator::generate(generator, builder, n, None);
     } else {
       builder.push(";");
     }

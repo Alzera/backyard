@@ -6,13 +6,13 @@ use crate::{ error::ParserError, parser::{ LoopArgument, Parser } };
 use super::{ comment::CommentParser, property::PropertyItemParser };
 
 #[derive(Debug, Clone)]
-pub struct StaticsParser {}
+pub struct StaticsParser;
 
 impl StaticsParser {
-  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     if let Some(last_expr) = &args.last_expr {
       if last_expr.node_type == NodeType::StaticKeyword {
-        if let Some(token) = tokens.get(0) {
+        if let Some(token) = tokens.first() {
           if [TokenType::Variable, TokenType::VariableBracketOpen].contains(&token.token_type) {
             return Some(vec![vec![]]);
           }

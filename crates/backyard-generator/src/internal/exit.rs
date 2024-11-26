@@ -2,7 +2,7 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
-pub struct ExitGenerator {}
+pub struct ExitGenerator;
 
 impl ExitGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -10,7 +10,7 @@ impl ExitGenerator {
     builder.push("exit");
     if let Some(argument) = &node.argument {
       builder.push("(");
-      generator.generate_node(builder, &argument, &mut GeneratorArgument::default());
+      generator.generate_node(builder, argument, &mut GeneratorArgument::default());
       builder.push(")");
     }
   }

@@ -14,11 +14,11 @@ use crate::{ error::ParserError, parser::{ LoopArgument, Parser } };
 use super::variable::VariableParser;
 
 #[derive(Debug, Clone)]
-pub struct StringParser {}
+pub struct StringParser;
 
 impl StringParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    if let Some(token) = tokens.get(0) {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+    if let Some(token) = tokens.first() {
       if
         [
           TokenType::EncapsedStringOpen,
@@ -39,7 +39,7 @@ impl StringParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [string_type] = matched.as_slice() {
-      if let Some(string_type) = string_type.get(0) {
+      if let Some(string_type) = string_type.first() {
         if string_type.token_type == TokenType::NowDocOpen {
           let label = string_type.value.to_owned();
           let text = guard!(parser.tokens.get(parser.position), {
@@ -113,6 +113,6 @@ impl StringParser {
         }
       }
     }
-    return Ok(values);
+    Ok(values)
   }
 }

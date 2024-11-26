@@ -109,6 +109,12 @@ pub struct Line {
   pub indent: usize,
 }
 
+impl Default for Line {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Line {
   pub fn new() -> Self {
     Self { line: String::new(), indent: 0 }
@@ -139,6 +145,12 @@ impl Line {
 #[derive(Debug, Clone)]
 pub struct Builder {
   pub lines: Vec<Line>,
+}
+
+impl Default for Builder {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Builder {
@@ -281,12 +293,10 @@ impl<'a> GeneratorArgument<'a> {
       {
         return Some(";");
       }
-    } else if self.end == EndMode::CommaWithoutEnd {
-      if !self.is_last {
-        return Some(",");
-      }
+    } else if self.end == EndMode::CommaWithoutEnd && !self.is_last {
+      return Some(",");
     }
-    return None;
+    None
   }
 }
 
@@ -333,7 +343,7 @@ impl Generator {
       args.is_last = i == nodes.len() - 1;
       if
         ![NodeType::Inline, NodeType::Program].contains(&node.node_type) ||
-        builder.lines.len() == 0
+        builder.lines.is_empty()
       {
         builder.new_line();
       }
@@ -358,9 +368,9 @@ impl Generator {
       if *node_type == node.node_type {
         let leadings = &node.leadings;
         let trailings = &node.trailings;
-        if leadings.len() > 0 || trailings.len() > 0 {
+        if !leadings.is_empty() || !trailings.is_empty() {
           let mut scoped_builder = Builder::new();
-          self.handle_comments(&mut scoped_builder, &leadings);
+          self.handle_comments(&mut scoped_builder, leadings);
           if scoped_builder.total_len() == 0 {
             scoped_builder.new_line();
           }
@@ -368,7 +378,7 @@ impl Generator {
           if let Some(end) = args.get_end_statement(&node.node_type) {
             scoped_builder.push(end);
           }
-          self.handle_comments(&mut scoped_builder, &trailings);
+          self.handle_comments(&mut scoped_builder, trailings);
           if builder.last_len() == 0 {
             builder.extend_first_line(&scoped_builder);
           } else {
@@ -392,7 +402,7 @@ impl Generator {
   }
 
   pub fn handle_comments(&mut self, builder: &mut Builder, nodes: &Vec<Box<Node>>) {
-    if nodes.len() > 0 {
+    if !nodes.is_empty() {
       for node in nodes.iter() {
         match &node.node_type {
           NodeType::CommentBlock => {
@@ -421,6 +431,6 @@ impl Generator {
   }
 
   pub fn check_nodes_has_comments(nodes: &Vec<Box<Node>>) -> bool {
-    nodes.iter().fold(false, |acc, i| (acc || i.leadings.len() > 0 || i.trailings.len() > 0))
+    nodes.iter().fold(false, |acc, i| (acc || !i.leadings.is_empty() || !i.trailings.is_empty()))
   }
 }

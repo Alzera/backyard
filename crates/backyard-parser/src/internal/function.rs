@@ -25,10 +25,10 @@ use super::{
 };
 
 #[derive(Debug, Clone)]
-pub struct FunctionParser {}
+pub struct FunctionParser;
 
 impl FunctionParser {
-  pub fn class_test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn class_test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -40,7 +40,7 @@ impl FunctionParser {
     )
   }
 
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     if
       let Some(m) = match_pattern(
         tokens,
@@ -84,8 +84,8 @@ impl FunctionParser {
     match matched.len() {
       4 => FunctionParser::parse_basic(matched, parser, args),
       3 => {
-        if let Some(f) = matched.get(0) {
-          if let Some(f) = f.get(0) {
+        if let Some(f) = matched.first() {
+          if let Some(f) = f.first() {
             if f.token_type == TokenType::Fn {
               return FunctionParser::parse_arrow(matched, parser, args);
             } else if f.token_type == TokenType::Function {
@@ -122,7 +122,7 @@ impl FunctionParser {
           return Err(ParserError::internal("ArrowFunction", args));
         }
       );
-      return Ok(ArrowFunctionNode::new(is_ref.len() > 0, arguments, return_type, body));
+      return Ok(ArrowFunctionNode::new(!is_ref.is_empty(), arguments, return_type, body));
     }
     Err(ParserError::internal("ArrowFunction", args))
   }
@@ -149,7 +149,7 @@ impl FunctionParser {
       }
       let return_type = FunctionParser::get_return_type(parser, args).ok();
       let body = BlockParser::new(parser)?;
-      return Ok(AnonymousFunctionNode::new(is_ref.len() > 0, arguments, uses, return_type, body));
+      return Ok(AnonymousFunctionNode::new(!is_ref.is_empty(), arguments, uses, return_type, body));
     }
     Err(ParserError::internal("AnonymousFunction", args))
   }
@@ -160,7 +160,7 @@ impl FunctionParser {
     args: &LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, is_ref, name, _] = matched.as_slice() {
-      let name = some_or_default(name.get(0), String::from(""), |i| i.value.to_owned());
+      let name = some_or_default(name.first(), String::from(""), |i| i.value.to_owned());
       let arguments = if name == "__construct" {
         parser.get_children(
           &mut LoopArgument::new(
@@ -191,7 +191,7 @@ impl FunctionParser {
       };
       return Ok(
         FunctionNode::new(
-          is_ref.len() > 0,
+          !is_ref.is_empty(),
           IdentifierParser::new(name),
           arguments,
           return_type,
@@ -247,10 +247,10 @@ impl FunctionParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct ConstructorParameterParser {}
+pub struct ConstructorParameterParser;
 
 impl ConstructorParameterParser {
-  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     PropertyParser::test(tokens, args)
   }
 
@@ -280,8 +280,8 @@ impl ConstructorParameterParser {
       );
       return Ok(
         PropertyNode::new(
-          some_or_default(visibility.get(0), String::from(""), |i| i.value.to_owned()),
-          some_or_default(modifier.get(0), String::from(""), |i| i.value.to_owned()),
+          some_or_default(visibility.first(), String::from(""), |i| i.value.to_owned()),
+          some_or_default(modifier.first(), String::from(""), |i| i.value.to_owned()),
           vec![item]
         )
       );
@@ -291,10 +291,10 @@ impl ConstructorParameterParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct ParameterParser {}
+pub struct ParameterParser;
 
 impl ParameterParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -312,7 +312,7 @@ impl ParameterParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [is_ref, is_ellipsis, name, has_value] = matched.as_slice() {
-      let value = if has_value.len() > 0 {
+      let value = if !has_value.is_empty() {
         parser.get_statement(
           &mut LoopArgument::with_tokens(
             "parameter",
@@ -323,8 +323,8 @@ impl ParameterParser {
       } else {
         None
       };
-      let is_ref = is_ref.len() > 0;
-      let is_ellipsis = is_ellipsis.len() > 0;
+      let is_ref = !is_ref.is_empty();
+      let is_ellipsis = !is_ellipsis.is_empty();
       return Ok(
         ParameterNode::new(
           args.last_expr.to_owned(),

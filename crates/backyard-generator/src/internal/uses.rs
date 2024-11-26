@@ -4,7 +4,7 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 
 use super::identifier::IdentifierGenerator;
 
-pub struct UseGenerator {}
+pub struct UseGenerator;
 
 impl UseGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -17,7 +17,7 @@ impl UseGenerator {
     );
 
     if let Some(name) = &node.name {
-      builder.push(&name);
+      builder.push(name);
 
       builder.push("{");
       if
@@ -31,29 +31,27 @@ impl UseGenerator {
         builder.push(&items.to_string(" "));
       }
       builder.push("}");
+    } else if
+      Generator::check_nodes_has_comments(&node.items) ||
+      1 + builder.last_len() + items.total_len_with_separator(" ") > generator.max_length
+    {
+      items.indent();
+      builder.extend_first_line(&items);
     } else {
-      if
-        Generator::check_nodes_has_comments(&node.items) ||
-        1 + builder.last_len() + items.total_len_with_separator(" ") > generator.max_length
-      {
-        items.indent();
-        builder.extend_first_line(&items);
-      } else {
-        builder.push(&items.to_string(" "));
-      }
+      builder.push(&items.to_string(" "));
     }
   }
 
   pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::UseItem, &node.node);
-    if node.modifier.len() > 0 {
+    if !node.modifier.is_empty() {
       builder.push(format!("{} ", node.modifier).as_str());
     }
     builder.push(&node.name);
 
     if let Some(alias) = &node.alias {
       builder.push(" as ");
-      IdentifierGenerator::generate(generator, builder, &alias);
+      IdentifierGenerator::generate(generator, builder, alias);
     }
   }
 }

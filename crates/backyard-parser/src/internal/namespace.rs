@@ -13,10 +13,10 @@ use crate::{
 use super::block::BlockParser;
 
 #[derive(Debug, Clone)]
-pub struct NamespaceParser {}
+pub struct NamespaceParser;
 
 impl NamespaceParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -32,13 +32,12 @@ impl NamespaceParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, name] = matched.as_slice() {
-      let name = guard!(name.get(0), {
+      let name = guard!(name.first(), {
         return Err(ParserError::internal("Namespace", args));
       }).value.to_owned();
       let is_bracket = if let Some(t) = parser.tokens.get(parser.position) {
-        let is_bracket = t.token_type == TokenType::LeftCurlyBracket;
         // parser.position -= 1;
-        is_bracket
+        t.token_type == TokenType::LeftCurlyBracket
       } else {
         false
       };

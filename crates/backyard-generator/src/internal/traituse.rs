@@ -4,7 +4,7 @@ use crate::generator::{ Builder, EndMode, Generator, GeneratorArgument };
 
 use super::identifier::IdentifierGenerator;
 
-pub struct TraitUseGenerator {}
+pub struct TraitUseGenerator;
 
 impl TraitUseGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -25,7 +25,7 @@ impl TraitUseGenerator {
     } else {
       builder.push(&traits.to_string(" "));
     }
-    if node.adaptations.len() > 0 {
+    if !node.adaptations.is_empty() {
       let mut adaptations_builder = generator.generate_nodes_new(
         &node.adaptations,
         &mut GeneratorArgument::new(
@@ -54,7 +54,7 @@ impl TraitUseGenerator {
     }
     IdentifierGenerator::generate(generator, builder, &node.method);
     builder.push(" as");
-    if node.visibility.len() > 0 {
+    if !node.visibility.is_empty() {
       builder.push(" ");
       builder.push(&node.visibility);
     }

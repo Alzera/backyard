@@ -9,10 +9,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct ParenthesisParser {}
+pub struct ParenthesisParser;
 
 impl ParenthesisParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::LeftParenthesis])].to_vec())
   }
 
@@ -45,12 +45,7 @@ impl ParenthesisParser {
               parser.position += 2;
               let expression = guard!(
                 parser.get_statement(
-                  &mut LoopArgument::safe(
-                    "cast",
-                    &args.separators,
-                    &args.breakers,
-                    &DEFAULT_PARSERS
-                  )
+                  &mut LoopArgument::safe("cast", args.separators, args.breakers, &DEFAULT_PARSERS)
                 )?,
                 {
                   return Err(ParserError::internal("Cast", args));

@@ -11,10 +11,10 @@ use crate::{
 use super::comment::CommentParser;
 
 #[derive(Debug, Clone)]
-pub struct MatchParser {}
+pub struct MatchParser;
 
 impl MatchParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(
       tokens,
       [
@@ -57,10 +57,10 @@ impl MatchParser {
 }
 
 #[derive(Debug, Clone)]
-pub struct MatchArmParser {}
+pub struct MatchArmParser;
 
 impl MatchArmParser {
-  pub fn test(_: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(_: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     Some(vec![])
   }
 

@@ -4,7 +4,7 @@ use crate::generator::{ Builder, Generator, DEFAULT_GENERATORS };
 
 use super::block::BlockGenerator;
 
-pub struct NamespaceGenerator {}
+pub struct NamespaceGenerator;
 
 impl NamespaceGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {

@@ -2,7 +2,7 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATORS };
 
-pub struct EchoGenerator {}
+pub struct EchoGenerator;
 
 impl EchoGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {

@@ -9,10 +9,10 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct LabelParser {}
+pub struct LabelParser;
 
 impl LabelParser {
-  pub fn test(tokens: &Vec<Token>, args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     if let Some(last) = &args.last_expr {
       if last.node_type != NodeType::Identifier {
         return None;

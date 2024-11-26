@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct IdentifierParser {}
+pub struct IdentifierParser;
 
 impl IdentifierParser {
   pub fn new(name: String) -> Box<Node> {
@@ -17,12 +17,12 @@ impl IdentifierParser {
   }
 
   pub fn from_matched(name: &Vec<Token>) -> Box<Node> {
-    Self::new(some_or_default(name.get(0), String::from(""), |i| i.value.to_owned()))
+    Self::new(some_or_default(name.first(), String::from(""), |i| i.value.to_owned()))
   }
 }
 
 impl IdentifierParser {
-  pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
     match_pattern(tokens, [Lookup::Equal(vec![TokenType::Identifier, TokenType::Name])].to_vec())
   }
 
@@ -34,7 +34,7 @@ impl IdentifierParser {
     if let [identifier] = matched.as_slice() {
       return Ok(
         IdentifierParser::new(
-          guard!(identifier.get(0), {
+          guard!(identifier.first(), {
             return Err(ParserError::internal("Identifier", args));
           }).value.to_owned()
         )

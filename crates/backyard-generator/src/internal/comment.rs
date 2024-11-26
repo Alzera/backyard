@@ -2,7 +2,7 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator };
 
-pub struct CommentGenerator {}
+pub struct CommentGenerator;
 
 impl CommentGenerator {
   pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {

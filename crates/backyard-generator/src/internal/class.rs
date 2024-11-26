@@ -11,7 +11,7 @@ use super::{
   traituse::TraitUseGenerator,
 };
 
-pub struct ClassGenerator {}
+pub struct ClassGenerator;
 
 impl ClassGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -19,19 +19,19 @@ impl ClassGenerator {
     if node.is_readonly {
       builder.push("readonly ");
     }
-    if node.modifier.len() > 0 {
+    if !node.modifier.is_empty() {
       builder.push(format!("{} ", node.modifier).as_str());
     }
     builder.push("class");
     if let Some(n) = &node.name {
       builder.push(" ");
-      IdentifierGenerator::generate(generator, builder, &n);
+      IdentifierGenerator::generate(generator, builder, n);
     }
     if let Some(n) = &node.extends {
       builder.push(" extends ");
-      IdentifierGenerator::generate(generator, builder, &n);
+      IdentifierGenerator::generate(generator, builder, n);
     }
-    if node.implements.len() > 0 {
+    if !node.implements.is_empty() {
       builder.push(" implements ");
       let implements = generator.generate_nodes_new(
         &node.implements,
@@ -58,7 +58,7 @@ impl ClassGenerator {
   pub fn generate_anonymous(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::AnonymousClass, &node.node);
     builder.push("class");
-    if node.parameters.len() > 0 {
+    if !node.parameters.is_empty() {
       builder.push("(");
       let parameters = generator.generate_nodes_new(
         &node.parameters,
@@ -69,9 +69,9 @@ impl ClassGenerator {
     }
     if let Some(n) = &node.extends {
       builder.push(" extends ");
-      IdentifierGenerator::generate(generator, builder, &n);
+      IdentifierGenerator::generate(generator, builder, n);
     }
-    if node.implements.len() > 0 {
+    if !node.implements.is_empty() {
       builder.push(" implements ");
       let implements = generator.generate_nodes_new(
         &node.implements,

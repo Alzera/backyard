@@ -9,14 +9,14 @@ use super::{
   method::MethodGenerator,
 };
 
-pub struct InterfaceGenerator {}
+pub struct InterfaceGenerator;
 
 impl InterfaceGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Interface, &node.node);
     builder.push("interface ");
     IdentifierGenerator::generate(generator, builder, &node.name);
-    if node.extends.len() > 0 {
+    if !node.extends.is_empty() {
       builder.push(" extends ");
       let implements = generator.generate_nodes_new(
         &node.extends,

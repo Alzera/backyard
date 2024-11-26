@@ -4,15 +4,15 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 
 use super::identifier::IdentifierGenerator;
 
-pub struct PropertyGenerator {}
+pub struct PropertyGenerator;
 
 impl PropertyGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Property, &node.node);
-    if node.visibility.len() > 0 {
+    if !node.visibility.is_empty() {
       builder.push(format!("{} ", node.visibility).as_str());
     }
-    if node.modifier.len() > 0 {
+    if !node.modifier.is_empty() {
       builder.push(format!("{} ", node.modifier).as_str());
     }
 
