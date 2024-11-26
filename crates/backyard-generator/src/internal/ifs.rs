@@ -22,7 +22,12 @@ impl IfGenerator {
         BlockGenerator::generate(generator, builder, &node.valid, Some("endif;"));
       }
     } else {
-      BlockGenerator::generate(generator, builder, &node.valid, None);
+      if node.valid.node_type == NodeType::Block {
+        BlockGenerator::generate(generator, builder, &node.valid, None);
+      } else {
+        builder.push(" ");
+        generator.generate_node(builder, &node.valid, &mut GeneratorArgument::for_block());
+      }
       if let Some(n) = &node.invalid {
         builder.push(" ");
         generator.generate_node(builder, n, &mut GeneratorArgument::default());
@@ -34,15 +39,22 @@ impl IfGenerator {
     let node = cast_node!(NodeWrapper::Else, &node.node);
 
     builder.push("else");
-    if node.body.node_type == NodeType::If {
-      Self::generate(generator, builder, &node.body);
-    } else {
-      BlockGenerator::generate(
-        generator,
-        builder,
-        &node.body,
-        node.is_short.then(|| "endif;")
-      );
+    match node.body.node_type {
+      NodeType::If => {
+        Self::generate(generator, builder, &node.body);
+      }
+      NodeType::Block => {
+        BlockGenerator::generate(
+          generator,
+          builder,
+          &node.body,
+          node.is_short.then(|| "endif;")
+        );
+      }
+      _ => {
+        builder.push(" ");
+        generator.generate_node(builder, &node.body, &mut GeneratorArgument::for_block());
+      }
     }
   }
 }

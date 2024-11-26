@@ -4,7 +4,7 @@ use utils::guard;
 
 use crate::{
   error::ParserError,
-  parser::{ LoopArgument, Parser },
+  parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
   utils::{ match_pattern, Lookup },
 };
 
@@ -36,15 +36,9 @@ impl IfParser {
         }
       );
       parser.position += 1;
-      let (is_short, valid) = BlockParser::new_or_short(
-        parser,
-        &[TokenType::ElseIf, TokenType::Else, TokenType::EndIf], // }
-        &mut LoopArgument::default("if_valid")
-      )?;
-      if let Some(token) = parser.tokens.get(parser.position - 1) {
-        if token.token_type != TokenType::RightCurlyBracket {
-          parser.position -= 1;
-        }
+      let (is_short, valid) = Self::get_body(parser, args)?;
+      if is_short {
+        parser.position -= 1;
       }
       let invalid = if
         let Some(i) = parser.get_statement(
@@ -73,6 +67,38 @@ impl IfParser {
     }
     Err(ParserError::internal("If", args))
   }
+
+  fn get_body(
+    parser: &mut Parser,
+    args: &mut LoopArgument
+  ) -> Result<(bool, Box<Node>), ParserError> {
+    if let Some(start) = parser.tokens.get(parser.position) {
+      match start.token_type {
+        TokenType::Colon =>
+          Ok((
+            true,
+            BlockParser::new_short(
+              parser,
+              &[TokenType::ElseIf, TokenType::Else, TokenType::EndIf]
+            )?,
+          )),
+        TokenType::LeftCurlyBracket => Ok((false, BlockParser::new(parser)?)),
+        _ => {
+          let expr = guard!(
+            parser.get_statement(
+              &mut LoopArgument::safe("if_valid", &[], &[TokenType::Semicolon], &DEFAULT_PARSERS)
+            )?,
+            {
+              return Err(ParserError::internal("If", args));
+            }
+          );
+          Ok((false, expr))
+        }
+      }
+    } else {
+      return Err(ParserError::internal("If", args));
+    }
+  }
 }
 
 #[derive(Debug, Clone)]
@@ -96,12 +122,7 @@ impl ElseParser {
           return Ok(ElseNode::new(expr, false));
         }
       }
-      let (is_short, valid) = BlockParser::new_or_short(
-        parser,
-        &[TokenType::EndIf],
-        &mut LoopArgument::default("else")
-      )?;
-      // parser.position -= 1;
+      let (is_short, valid) = IfParser::get_body(parser, args)?;
       return Ok(ElseNode::new(valid, is_short));
     }
     Err(ParserError::internal("Else", args))
