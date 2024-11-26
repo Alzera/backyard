@@ -3,6 +3,8 @@ use std::collections::HashSet;
 use serde::{ Deserialize, Serialize };
 use ts_rs::TS;
 
+use crate::lexer::ControlSnapshot;
+
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub enum TokenType {
@@ -204,21 +206,26 @@ impl TokenTypeArrayCombine for &[TokenType] {
   }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct Token {
   pub token_type: TokenType,
   pub value: String,
+  pub line: usize,
+  pub column: usize,
 }
 
 impl Token {
-  pub fn new<T: AsRef<str>>(token_type: TokenType, value: T) -> Self {
-    Token { token_type, value: value.as_ref().to_string() }
-  }
-}
-
-impl Clone for Token {
-  fn clone(&self) -> Self {
-    Self { token_type: self.token_type, value: self.value.clone() }
+  pub(crate) fn new<T: AsRef<str>>(
+    token_type: TokenType,
+    value: T,
+    snapshot: &ControlSnapshot
+  ) -> Self {
+    Token {
+      token_type,
+      value: value.as_ref().to_string(),
+      line: snapshot.line,
+      column: snapshot.column,
+    }
   }
 }

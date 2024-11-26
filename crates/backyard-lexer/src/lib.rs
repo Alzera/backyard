@@ -5,13 +5,13 @@ pub mod error;
 
 use error::LexResult;
 use internal::inline::InlineToken;
-use lexer::Lexer;
+use lexer::{ ControlSnapshot, Lexer };
 use token::Token;
 
 pub fn lex(input: &str) -> LexResult {
   let mut lexer = Lexer::new(input);
   let mut tokens: Vec<Token> = Vec::new();
-  let inline = InlineToken::lex(&mut lexer)?;
+  let inline = InlineToken::lex(&mut lexer, &(ControlSnapshot { line: 1, column: 1 }))?;
   tokens.extend(inline);
   tokens.extend(lexer.start()?);
   Ok(tokens)

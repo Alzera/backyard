@@ -61,7 +61,7 @@ mod tests {
     test_eval("[\"a\" => 1, \"b\" => 2, \"c\" => 3];");
     test_eval(
       "...[
-  \"an_unneccessary_very_long_string\" => 1,
+  \"an_unneccessary_very_long_string\" => =>1,
   \"another_unneccessary_very_long_string\" => 2,
   \"still_another_unneccessary_very_long_string\" => 3
 ];"

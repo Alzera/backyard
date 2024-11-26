@@ -1,11 +1,11 @@
 use crate::error::LexResult;
-use crate::lexer::{ Lexer, SeriesChecker };
+use crate::lexer::{ ControlSnapshot, Lexer, SeriesChecker };
 use crate::token::{ Token, TokenType };
 
 pub struct InlineToken;
 
 impl InlineToken {
-  pub fn lex(lexer: &mut Lexer) -> LexResult {
+  pub fn lex(lexer: &mut Lexer, snapshot: &ControlSnapshot) -> LexResult {
     let mut result = vec![];
     let mut checker = SeriesChecker::safe(&["<?php", "<?=", "<%"]);
     let max_index = lexer.control.get_len().saturating_sub(1);
@@ -22,21 +22,16 @@ impl InlineToken {
     lexer.control.next_char();
     if no_breaker {
       if !inline.is_empty() {
-        result.push(Token::new(TokenType::Inline, inline));
+        result.push(Token::new(TokenType::Inline, inline, snapshot));
       }
     } else if let Some(breaker) = checker.check() {
       inline = inline[..inline.len() - breaker[..breaker.len() - 1].len()].to_string();
       if !inline.is_empty() {
-        result.push(Token::new(TokenType::Inline, inline));
+        result.push(Token::new(TokenType::Inline, inline, snapshot));
       }
       if breaker == "<?=" {
-        result.push(Token::new(TokenType::Echo, "echo"));
+        result.push(Token::new(TokenType::Echo, "echo", snapshot));
       }
-      // match breaker {
-      //   "<?php" => result.push(Token::new(TokenType::OpenTag, "<?php")),
-      //   "<?=" => result.push(Token::new(TokenType::OpenTagEcho, "<?=")),
-      //   _ => (),
-      // }
     }
     Ok(result)
   }

@@ -1,5 +1,5 @@
 use crate::error::LexResult;
-use crate::lexer::Lexer;
+use crate::lexer::{ ControlSnapshot, Lexer };
 use crate::token::{ Token, TokenType };
 
 pub struct CommentToken;
@@ -23,24 +23,24 @@ impl CommentToken {
     comment
   }
 
-  pub fn lex_doc(lexer: &mut Lexer, t: &str) -> LexResult {
+  pub fn lex_doc(lexer: &mut Lexer, t: &str, snapshot: &ControlSnapshot) -> LexResult {
     let comment = CommentToken::parse(lexer);
     let mut t = t.to_string();
     t.push_str(&comment);
-    Ok(vec![Token::new(TokenType::CommentDoc, t)])
+    Ok(vec![Token::new(TokenType::CommentDoc, t, snapshot)])
   }
 
-  pub fn lex_block(lexer: &mut Lexer, t: &str) -> LexResult {
+  pub fn lex_block(lexer: &mut Lexer, t: &str, snapshot: &ControlSnapshot) -> LexResult {
     let comment = CommentToken::parse(lexer);
     let mut t = t.to_string();
     t.push_str(&comment);
-    Ok(vec![Token::new(TokenType::CommentBlock, t)])
+    Ok(vec![Token::new(TokenType::CommentBlock, t, snapshot)])
   }
 
-  pub fn lex_line(lexer: &mut Lexer, t: &str) -> LexResult {
+  pub fn lex_line(lexer: &mut Lexer, t: &str, snapshot: &ControlSnapshot) -> LexResult {
     let comment = lexer.control.next_char_until(|_, ch, _| ['\n'].contains(ch));
     let mut t = t.to_string();
     t.push_str(&comment);
-    Ok(vec![Token::new(TokenType::CommentLine, t)])
+    Ok(vec![Token::new(TokenType::CommentLine, t, snapshot)])
   }
 }

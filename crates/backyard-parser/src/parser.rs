@@ -236,6 +236,11 @@ impl Parser {
     args: &mut LoopArgument
   ) -> Result<Option<Box<Node>>, ParserError> {
     while let Some(token) = self.tokens.get(self.position) {
+      println!("");
+      println!("context: {:?}", args.context);
+      println!("token: {:?}", token);
+      println!("last_expr: {:?}", args.last_expr);
+
       if
         args.separators.contains(&token.token_type) ||
         args.breakers.contains(&token.token_type) ||
@@ -311,15 +316,20 @@ impl Parser {
       }
     }
     if args.should_fail {
-      Err(
-        ParserError::Failed(
-          format!(
-            "Failed to find match: {:?}, {:?}",
-            args.to_string(),
-            tokens.iter().take(5).collect::<Vec<&Token>>()
+      if let Some(token) = tokens.first() {
+        Err(
+          ParserError::Failed(
+            format!(
+              "Unexpected character '{}' at line {}, column {}",
+              token.value,
+              token.line,
+              token.column
+            )
           )
         )
-      )
+      } else {
+        Err(ParserError::Failed("Unexpected end of file".to_string()))
+      }
     } else {
       Ok(None)
     }
