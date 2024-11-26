@@ -1,12 +1,10 @@
+use std::vec;
+
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ ArgumentNode, CallNode, Node };
 use utils::guard;
 
-use crate::{
-  error::ParserError,
-  parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
-};
+use crate::{ error::ParserError, parser::{ LoopArgument, Parser } };
 
 use super::{ comment::CommentParser, identifier::IdentifierParser };
 
@@ -21,8 +19,8 @@ impl CallParser {
         &[TokenType::Comma],
         &[TokenType::RightParenthesis],
         &[
-          (ArgumentParser::test, ArgumentParser::parse),
           (CommentParser::test, CommentParser::parse),
+          (ArgumentParser::test, ArgumentParser::parse),
         ]
       )
     )
@@ -60,13 +58,14 @@ pub struct ArgumentParser {}
 
 impl ArgumentParser {
   pub fn test(tokens: &Vec<Token>, _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(
-      tokens,
-      [
-        Lookup::Optional(vec![TokenType::Identifier, TokenType::Default, TokenType::Type]),
-        Lookup::Optional(vec![TokenType::Colon]),
-      ].to_vec()
-    )
+    if let Some(is_colon) = tokens.get(1) {
+      if is_colon.token_type == TokenType::Colon {
+        if let Some(name) = tokens.get(0) {
+          return Some(vec![vec![name.to_owned()], vec![is_colon.to_owned()]]);
+        }
+      }
+    }
+    Some(vec![vec![], vec![]])
   }
 
   pub fn parse(
