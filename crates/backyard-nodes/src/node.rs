@@ -849,6 +849,7 @@ new_node!(Goto, GotoNode {
 new_node!(StaticLookup, StaticLookupNode {
   target: Box<Node>,
   on: Box<Node>,
+  bracket: bool,
 });
 
 new_node!(String, StringNode {

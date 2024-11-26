@@ -12,7 +12,13 @@ impl StaticLookupGenerator {
     if node.on.node_type == NodeType::ClassKeyword {
       builder.push("class");
     } else {
-      generator.generate_node(builder, &node.on, &mut GeneratorArgument::default());
+      if node.bracket {
+        builder.push("{");
+        generator.generate_node(builder, &node.on, &mut GeneratorArgument::default());
+        builder.push("}");
+      } else {
+        generator.generate_node(builder, &node.on, &mut GeneratorArgument::default());
+      }
     }
   }
 }
@@ -25,5 +31,6 @@ mod tests {
   fn basic() {
     test_eval("++A::b();");
     test_eval("A::class;");
+    test_eval("$a = !(static::{'shouldOverflow' . $ucUnit}());");
   }
 }

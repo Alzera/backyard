@@ -39,11 +39,22 @@ impl StaticLookupParser {
           } else {
             return Err(ParserError::internal("StaticLookup 1", args));
           }
+        } else if t.token_type == TokenType::LeftCurlyBracket {
+          parser.position += 1;
+          let expr = parser.get_statement(
+            &mut LoopArgument::with_tokens("staticlookup", &[], &[TokenType::RightCurlyBracket])
+          )?;
+          parser.position += 1;
+          if expr.is_some() {
+            return Ok(StaticLookupNode::new(left, expr.unwrap(), true));
+          } else {
+            return Err(ParserError::internal("StaticLookup 2", args));
+          }
         } else {
           parser.position += 1;
           IdentifierParser::new(t.value.to_owned())
         };
-        return Ok(StaticLookupNode::new(left, expr));
+        return Ok(StaticLookupNode::new(left, expr, false));
       };
     }
     Err(ParserError::internal("StaticLookup 3", args))
