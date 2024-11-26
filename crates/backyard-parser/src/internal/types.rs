@@ -27,7 +27,6 @@ impl TypesParser {
     let mut token = guard!(tokens.get(pos), {
       return None;
     });
-    println!("matched 0: {:?}", token);
     let mut is_nullable = None;
     if token.token_type == TokenType::QuestionMark {
       is_nullable = Some(token.to_owned());
@@ -66,13 +65,11 @@ impl TypesParser {
         }
         break;
       }
-      println!("matched 1: {:?}", matched);
       if let Some(m) = matched.last() {
         if m.token_type == separator {
           matched.pop();
         }
       }
-      println!("matched 2: {:?}", matched);
       if matched.is_empty() {
         return None;
       }

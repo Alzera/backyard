@@ -15,105 +15,78 @@ pub enum TokenType {
   NumberHex,
   Number,
 
-  // $
   Variable,
   VariableBracketOpen,
   VariableBracketClose,
 
-  // =
   Arrow,
   Assignment,
   IsEqual,
   IsIdentical,
 
-  // &
-  // Reference,
   BitwiseAndAssignment,
   BitwiseAnd,
   BooleanAnd,
   ReferenceAssignment,
 
-  // #
   Attribute,
   CommentLine,
 
-  // ?
-  // CloseTag,
   NullsafeObjectAccess,
-  NullsafeObjectAccessBracketOpen,
   CoalesceAssignment,
   Coalesce,
   QuestionMark,
   Elvis,
 
-  // %
-  // CloseTagShort,
   ModulusAssignment,
   Modulus,
 
-  // ^
   BitwiseXorAssignment,
   BitwiseXor,
 
-  // *
   ExponentiationAssignment,
   MultiplicationAssignment,
   Exponentiation,
   Multiplication,
 
-  // /
   DivisionAssignment,
   CommentDoc,
   CommentBlock,
   Division,
 
-  // .
   ConcatenationAssignment,
   Ellipsis,
   Concatenation,
 
-  // |
   BitwiseOrAssignment,
   BooleanOr,
   BitwiseOr,
 
-  // -
   SubtractionAssignment,
-  ObjectAccessBracketOpen,
-  ObjectAccessBracketClose,
   ObjectAccess,
   Subtraction,
 
-  // >
   IsGreaterOrEqual,
   IsGreater,
   BitwiseShiftRightAssignment,
   BitwiseShiftRight,
 
-  // <
   IsLesserOrEqual,
   IsLesser,
   IsNotEqual,
   BitwiseShiftLeftAssignment,
   BitwiseShiftLeft,
-  // OpenTagShort,
-  // OpenTag,
-  // OpenTagEcho,
   Spaceship,
 
-  // :
   Colon,
   DoubleColon,
 
-  // !
   BooleanNegate,
   IsNotIdentical,
 
-  // +
   AdditionAssignment,
   Addition,
 
-  // {
   LeftCurlyBracket,
 
   AdvanceInterpolationOpen,
@@ -137,7 +110,6 @@ pub enum TokenType {
   Comma,
   Semicolon,
   AtSign,
-  // LineBreak,
 
   NowDocOpen,
   NowDocClose,

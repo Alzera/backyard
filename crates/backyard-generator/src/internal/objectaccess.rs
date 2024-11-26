@@ -8,6 +8,9 @@ impl ObjectAccessGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::ObjectAccess, &node.node);
     generator.generate_node(builder, &node.object, &mut GeneratorArgument::default());
+    if node.nullsafe {
+      builder.push("?");
+    }
     builder.push("->");
     if node.bracket {
       builder.push("{");
@@ -27,7 +30,7 @@ mod tests {
   fn basic() {
     test_eval("$this->from;");
     test_eval("$this->$from;");
-    test_eval("$a->{\"b\"};");
+    test_eval("$a?->{\"b\"};");
     test_eval("$this->setTimezone(date_default_timezone_get());");
     test_eval(
       "while ($i <= 10) {\n  $this->subSecond();\n  $value += static::MICROSECONDS_PER_SECOND;\n}"

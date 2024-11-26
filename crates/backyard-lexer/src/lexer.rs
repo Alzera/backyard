@@ -254,7 +254,7 @@ impl Lexer {
           "==" => Ok(vec![Token::new(TokenType::IsEqual, "==")]),
           "=" => Ok(vec![Token::new(TokenType::Assignment, "=")]),
           "=>" => Ok(vec![Token::new(TokenType::Arrow, "=>")]),
-          "=&" => Ok(vec![Token::new(TokenType::ReferenceAssignment, "=>")]),
+          "=&" => Ok(vec![Token::new(TokenType::ReferenceAssignment, "=&")]),
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
@@ -275,11 +275,10 @@ impl Lexer {
         }
       }
       '?' => {
-        let t = self.until(current_char, |ch| !['?', '>', '=', '-', '{', ':'].contains(ch));
+        let t = self.until(current_char, |ch| !['?', '>', '=', '-', ':'].contains(ch));
         match t.as_str() {
           "?:" => Ok(vec![Token::new(TokenType::Elvis, "?:")]),
           "?->" => Ok(vec![Token::new(TokenType::NullsafeObjectAccess, "?->")]),
-          "?->{" => Ok(vec![Token::new(TokenType::NullsafeObjectAccessBracketOpen, "?->{")]),
           "??=" => Ok(vec![Token::new(TokenType::CoalesceAssignment, "??=")]),
           "??" => Ok(vec![Token::new(TokenType::Coalesce, "??")]),
           "?" => Ok(vec![Token::new(TokenType::QuestionMark, "?")]),
@@ -359,12 +358,12 @@ impl Lexer {
         let t = self.until(current_char, |ch| !['-', '=', '>', '{'].contains(ch));
         match t.as_str() {
           "-=" => Ok(vec![Token::new(TokenType::SubtractionAssignment, "-=")]),
-          "->{" => {
-            let mut tokens = vec![Token::new(TokenType::ObjectAccessBracketOpen, "{")];
-            tokens.extend(self.next_tokens_until_right_bracket());
-            tokens.push(Token::new(TokenType::ObjectAccessBracketClose, "}"));
-            Ok(tokens)
-          }
+          // "->{" => {
+          //   let mut tokens = vec![Token::new(TokenType::ObjectAccessBracketOpen, "{")];
+          //   tokens.extend(self.next_tokens_until_right_bracket());
+          //   tokens.push(Token::new(TokenType::ObjectAccessBracketClose, "}"));
+          //   Ok(tokens)
+          // }
           "->" => Ok(vec![Token::new(TokenType::ObjectAccess, "->")]),
           "--" => {
             let is_post = match self.control.peek_char(None) {

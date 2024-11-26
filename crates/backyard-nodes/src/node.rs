@@ -731,6 +731,7 @@ new_node!(ObjectAccess, ObjectAccessNode {
   object: Box<Node>,
   property: Box<Node>,
   bracket: bool,
+  nullsafe: bool,
 });
 
 new_node!(Parenthesis, ParenthesisNode {

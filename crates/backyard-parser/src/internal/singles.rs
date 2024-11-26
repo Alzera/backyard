@@ -63,7 +63,6 @@ impl SinglesParser {
     matched: Vec<Vec<Token>>,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    println!("last expr: {:?}", args.last_expr);
     if let [key] = matched.as_slice() {
       if let Some(key) = key.first() {
         if
