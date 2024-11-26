@@ -10,11 +10,11 @@ impl ConstGenerator {
 
     builder.push("const ");
     let mut consts = generator.generate_nodes_new(
-      &node.consts,
+      &node.items,
       &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
     );
     if
-      Generator::check_nodes_has_comments(&node.consts) ||
+      Generator::check_nodes_has_comments(&node.items) ||
       2 + builder.last_len() + consts.total_len_with_separator(" ") > generator.max_length
     {
       consts.indent();
@@ -32,11 +32,11 @@ impl ConstGenerator {
     }
     builder.push("const ");
     let mut consts = generator.generate_nodes_new(
-      &node.consts,
+      &node.items,
       &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
     );
     if
-      Generator::check_nodes_has_comments(&node.consts) ||
+      Generator::check_nodes_has_comments(&node.items) ||
       2 + builder.last_len() + consts.total_len_with_separator(" ") > generator.max_length
     {
       consts.indent();

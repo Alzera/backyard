@@ -9,23 +9,23 @@ impl PreGenerator {
     let (operator, expr) = match node.node_type {
       NodeType::Variadic => {
         let node = cast_node!(NodeWrapper::Variadic, &node.node);
-        ("...", node.expr.to_owned())
+        ("...", node.statement.to_owned())
       }
       NodeType::Negate => {
         let node = cast_node!(NodeWrapper::Negate, &node.node);
-        ("!", Some(node.variable.to_owned()))
+        ("!", Some(node.statement.to_owned()))
       }
       NodeType::Silent => {
         let node = cast_node!(NodeWrapper::Silent, &node.node);
-        ("@", Some(node.variable.to_owned()))
+        ("@", Some(node.statement.to_owned()))
       }
       NodeType::Reference => {
         let node = cast_node!(NodeWrapper::Reference, &node.node);
-        ("&", Some(node.expr.to_owned()))
+        ("&", Some(node.statement.to_owned()))
       }
       NodeType::Pre => {
         let node = cast_node!(NodeWrapper::Pre, &node.node);
-        (node.operator.as_str(), Some(node.variable.to_owned()))
+        (node.operator.as_str(), Some(node.statement.to_owned()))
       }
       _ => {
         return;

@@ -15,7 +15,7 @@ impl ParenthesisGenerator {
   pub fn generate_cast(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Cast, &node.node);
     builder.push("(");
-    builder.push(&node.target);
+    builder.push(&node.cast_type);
     builder.push(") ");
     generator.generate_node(builder, &node.expression, &mut GeneratorArgument::default());
   }

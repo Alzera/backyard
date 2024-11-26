@@ -74,7 +74,9 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::AnonymousFunction => {
               serde_json::from_value(node_data).map(NodeWrapper::AnonymousFunction)
             }
-            NodeType::Argument => { serde_json::from_value(node_data).map(NodeWrapper::Argument) }
+            NodeType::CallArgument => {
+              serde_json::from_value(node_data).map(NodeWrapper::CallArgument)
+            }
             NodeType::Array => { serde_json::from_value(node_data).map(NodeWrapper::Array) }
             NodeType::ArrayItem => { serde_json::from_value(node_data).map(NodeWrapper::ArrayItem) }
             NodeType::ArrayLookup => {
@@ -241,7 +243,7 @@ impl<'de> Deserialize<'de> for Node {
 pub enum NodeWrapper {
   AnonymousClass(AnonymousClassNode),
   AnonymousFunction(AnonymousFunctionNode),
-  Argument(ArgumentNode),
+  CallArgument(CallArgumentNode),
   Array(ArrayNode),
   ArrayItem(ArrayItemNode),
   ArrayLookup(ArrayLookupNode),
@@ -349,7 +351,7 @@ pub enum NodeWrapper {
 pub enum NodeType {
   AnonymousClass,
   AnonymousFunction,
-  Argument,
+  CallArgument,
   Array,
   ArrayItem,
   ArrayLookup,
@@ -475,60 +477,84 @@ macro_rules! new_node {
   };
 }
 
-new_node!(Attribute, AttributeNode {
-  items: Vec<Box<Node>>,
+new_node!(AnonymousClass, AnonymousClassNode {
+  parameters: Vec<Box<Node>>,
+  extends: Option<Box<Node>>,
+  implements: Vec<Box<Node>>,
+  body: Box<Node>,
 });
-
-new_node!(AttributeItem, AttributeItemNode {
-  name: String,
-  arguments: Vec<Box<Node>>,
+new_node!(AnonymousFunction, AnonymousFunctionNode {
+  is_ref: bool,
+  parameters: Vec<Box<Node>>,
+  uses: Vec<Box<Node>>,
+  return_type: Option<Box<Node>>,
+  body: Box<Node>,
 });
-
+new_node!(CallArgument, CallArgumentNode {
+  name: Option<Box<Node>>,
+  value: Box<Node>,
+});
 new_node!(Array, ArrayNode {
   is_short: bool,
   items: Vec<Box<Node>>,
 });
-
-new_node!(Variadic, VariadicNode {
-  expr: Option<Box<Node>>,
-});
-
 new_node!(ArrayItem, ArrayItemNode {
   key: Option<Box<Node>>,
   value: Box<Node>,
 });
-
 new_node!(ArrayLookup, ArrayLookupNode {
-  target: Box<Node>,
-  on: Option<Box<Node>>,
+  left: Box<Node>,
+  right: Option<Box<Node>>,
 });
-
+new_node!(ArrowFunction, ArrowFunctionNode {
+  is_ref: bool,
+  parameters: Vec<Box<Node>>,
+  return_type: Option<Box<Node>>,
+  body: Box<Node>,
+});
 new_node!(Assignment, AssignmentNode {
   left: Box<Node>,
   operator: String,
   right: Box<Node>,
 });
-
+new_node!(Attribute, AttributeNode {
+  items: Vec<Box<Node>>,
+});
+new_node!(AttributeItem, AttributeItemNode {
+  name: String,
+  arguments: Vec<Box<Node>>,
+});
 new_node!(Bin, BinNode {
   left: Box<Node>,
   operator: String,
   right: Box<Node>,
 });
-
 new_node!(Block, BlockNode {
   statements: Vec<Box<Node>>,
 });
-
+new_node!(Boolean, BooleanNode {
+  is_true: bool,
+});
+new_node!(Break, BreakNode {
+  statement: Option<Box<Node>>,
+});
 new_node!(Call, CallNode {
   name: Box<Node>,
   arguments: Vec<Box<Node>>,
 });
-
-new_node!(Argument, ArgumentNode {
-  name: Option<Box<Node>>,
-  value: Box<Node>,
+new_node!(Case, CaseNode {
+  condition: Option<Box<Node>>,
+  body: Box<Node>,
 });
-
+new_node!(Cast, CastNode {
+  cast_type: String,
+  expression: Box<Node>,
+});
+new_node!(Catch, CatchNode {
+  types: Vec<Box<Node>>,
+  variable: Option<Box<Node>>,
+  body: Box<Node>,
+});
 new_node!(Class, ClassNode {
   modifier: String,
   name: Option<Box<Node>>,
@@ -537,82 +563,82 @@ new_node!(Class, ClassNode {
   body: Box<Node>,
   is_readonly: bool,
 });
-
-new_node!(AnonymousClass, AnonymousClassNode {
-  parameters: Vec<Box<Node>>,
-  extends: Option<Box<Node>>,
-  implements: Vec<Box<Node>>,
-  body: Box<Node>,
+new_node!(ClassKeyword, ClassKeywordNode {});
+new_node!(Clone, CloneNode {
+  statement: Box<Node>,
 });
-
 new_node!(CommentBlock, CommentBlockNode {
   comment: String,
 });
-
 new_node!(CommentDoc, CommentDocNode {
   comment: String,
 });
-
 new_node!(CommentLine, CommentLineNode {
   comment: String,
 });
-
 new_node!(Const, ConstNode {
-  consts: Vec<Box<Node>>,
+  items: Vec<Box<Node>>,
 });
-
 new_node!(ConstProperty, ConstPropertyNode {
   visibility: String,
-  consts: Vec<Box<Node>>,
+  items: Vec<Box<Node>>,
 });
-
+new_node!(Continue, ContinueNode {
+  statement: Option<Box<Node>>,
+});
 new_node!(Declare, DeclareNode {
   arguments: Vec<Box<Node>>,
   body: Option<Box<Node>>,
   body_type: BodyType,
 });
-
 new_node!(DeclareArgument, DeclareArgumentNode {
   name: Box<Node>,
   value: Box<Node>,
 });
-
 new_node!(DoWhile, DoWhileNode {
   condition: Box<Node>,
   body: Box<Node>,
 });
-
 new_node!(DoWhileCondition, DoWhileConditionNode {
   condition: Box<Node>,
 });
-
+new_node!(Echo, EchoNode {
+  items: Vec<Box<Node>>,
+});
+new_node!(Else, ElseNode {
+  body: Box<Node>,
+  is_short: bool,
+});
+new_node!(Elvis, ElvisNode {
+  left: Box<Node>,
+  right: Box<Node>,
+});
+new_node!(Encapsed, EncapsedNode {
+  quote: String,
+  values: Vec<Box<Node>>,
+});
+new_node!(EncapsedPart, EncapsedPartNode {
+  is_advanced: bool,
+  value: Box<Node>,
+});
 new_node!(Enum, EnumNode {
   name: Box<Node>,
   enum_type: Option<Box<Node>>,
   implements: Option<Box<Node>>,
   items: Vec<Box<Node>>,
 });
-
 new_node!(EnumItem, EnumItemNode {
   value: Box<Node>,
 });
-
 new_node!(Eval, EvalNode {
-  argument: Box<Node>,
+  statement: Box<Node>,
 });
-
 new_node!(Exit, ExitNode {
-  argument: Option<Box<Node>>,
+  statement: Option<Box<Node>>,
 });
-
-new_node!(Foreach, ForeachNode {
-  source: Box<Node>,
-  key: Option<Box<Node>>,
-  value: Box<Node>,
+new_node!(Finally, FinallyNode {
   body: Box<Node>,
-  is_short: bool,
 });
-
 new_node!(For, ForNode {
   inits: Vec<Box<Node>>,
   tests: Vec<Box<Node>>,
@@ -620,7 +646,13 @@ new_node!(For, ForNode {
   body: Option<Box<Node>>,
   body_type: BodyType,
 });
-
+new_node!(Foreach, ForeachNode {
+  source: Box<Node>,
+  key: Option<Box<Node>>,
+  value: Box<Node>,
+  body: Box<Node>,
+  is_short: bool,
+});
 new_node!(Function, FunctionNode {
   is_ref: bool,
   name: Box<Node>,
@@ -628,22 +660,94 @@ new_node!(Function, FunctionNode {
   return_type: Option<Box<Node>>,
   body: Option<Box<Node>>,
 });
-
-new_node!(ArrowFunction, ArrowFunctionNode {
-  is_ref: bool,
-  parameters: Vec<Box<Node>>,
-  return_type: Option<Box<Node>>,
+new_node!(Global, GlobalNode {
+  statement: Box<Node>,
+});
+new_node!(Goto, GotoNode {
+  label: Box<Node>,
+});
+new_node!(HereDoc, HereDocNode {
+  label: String,
+  values: Vec<Box<Node>>,
+});
+new_node!(Identifier, IdentifierNode {
+  name: String,
+});
+new_node!(If, IfNode {
+  condition: Box<Node>,
+  valid: Box<Node>,
+  invalid: Option<Box<Node>>,
+  is_short: bool,
+});
+new_node!(Include, IncludeNode {
+  use_parenthesis: bool,
+  is_require: bool,
+  is_once: bool,
+  argument: Box<Node>,
+});
+new_node!(Inline, InlineNode {
+  text: String,
+});
+new_node!(InstanceOf, InstanceOfNode {
+  left: Box<Node>,
+  right: Box<Node>,
+});
+new_node!(Interface, InterfaceNode {
+  name: Box<Node>,
+  extends: Vec<Box<Node>>,
   body: Box<Node>,
 });
-
-new_node!(AnonymousFunction, AnonymousFunctionNode {
-  is_ref: bool,
-  parameters: Vec<Box<Node>>,
-  uses: Vec<Box<Node>>,
-  return_type: Option<Box<Node>>,
+new_node!(IntersectionType, IntersectionTypeNode {
+  types: Vec<String>,
+});
+new_node!(Label, LabelNode {
+  label: Box<Node>,
+});
+new_node!(List, ListNode {
+  items: Vec<Box<Node>>,
+});
+new_node!(Magic, MagicNode {
+  name: String,
+});
+new_node!(Match, MatchNode {
+  condition: Box<Node>,
+  arms: Vec<Box<Node>>,
+});
+new_node!(MatchArm, MatchArmNode {
+  conditions: Vec<Box<Node>>,
   body: Box<Node>,
 });
-
+new_node!(Method, MethodNode {
+  visibility: String,
+  modifier: String,
+  is_static: bool,
+  function: Box<Node>,
+});
+new_node!(Namespace, NamespaceNode {
+  name: String,
+  body: Box<Node>,
+  is_bracket: bool,
+});
+new_node!(Negate, NegateNode {
+  statement: Box<Node>,
+});
+new_node!(New, NewNode {
+  statement: Box<Node>,
+});
+new_node!(NowDoc, NowDocNode {
+  label: String,
+  value: String,
+});
+new_node!(Null, NullNode {});
+new_node!(Number, NumberNode {
+  value: String,
+});
+new_node!(ObjectAccess, ObjectAccessNode {
+  object: Box<Node>,
+  property: Box<Node>,
+  use_bracket: bool,
+  is_nullsafe: bool,
+});
 new_node!(Parameter, ParameterNode {
   variable_type: Option<Box<Node>>,
   is_ref: bool,
@@ -651,329 +755,126 @@ new_node!(Parameter, ParameterNode {
   name: Box<Node>,
   value: Option<Box<Node>>,
 });
-
-new_node!(Identifier, IdentifierNode {
-  name: String,
-});
-
-new_node!(If, IfNode {
-  condition: Box<Node>,
-  valid: Box<Node>,
-  invalid: Option<Box<Node>>,
-  is_short: bool,
-});
-
-new_node!(Else, ElseNode {
-  body: Box<Node>,
-  is_short: bool,
-});
-
-new_node!(Include, IncludeNode {
-  use_parenthesis: bool,
-  is_require: bool,
-  is_once: bool,
-  argument: Box<Node>,
-});
-
-new_node!(InstanceOf, InstanceOfNode {
-  left: Box<Node>,
-  right: Box<Node>,
-});
-
-new_node!(Interface, InterfaceNode {
-  name: Box<Node>,
-  extends: Vec<Box<Node>>,
-  body: Box<Node>,
-});
-
-new_node!(Label, LabelNode {
-  label: Box<Node>,
-});
-
-new_node!(List, ListNode {
-  values: Vec<Box<Node>>,
-});
-
-new_node!(Magic, MagicNode {
-  name: String,
-});
-
-new_node!(MatchArm, MatchArmNode {
-  conditions: Vec<Box<Node>>,
-  body: Box<Node>,
-});
-
-new_node!(Match, MatchNode {
-  condition: Box<Node>,
-  arms: Vec<Box<Node>>,
-});
-
-new_node!(Method, MethodNode {
-  visibility: String,
-  modifier: String,
-  is_static: bool,
-  function: Box<Node>,
-});
-
-new_node!(Namespace, NamespaceNode {
-  name: String, 
-  body: Box<Node>,
-  is_bracket: bool,
-});
-
-new_node!(Number, NumberNode {
-  value: String,
-});
-
-new_node!(ObjectAccess, ObjectAccessNode {
-  object: Box<Node>,
-  property: Box<Node>,
-  bracket: bool,
-  nullsafe: bool,
-});
-
+new_node!(Parent, ParentNode {});
 new_node!(Parenthesis, ParenthesisNode {
   statement: Box<Node>,
 });
-
-new_node!(Cast, CastNode {
-  target: String,
-  expression: Box<Node>,
-});
-
 new_node!(Post, PostNode {
-  variable: Box<Node>,
+  statement: Box<Node>,
   operator: String,
 });
-
 new_node!(Pre, PreNode {
-  variable: Box<Node>,
+  statement: Box<Node>,
   operator: String,
 });
-
-new_node!(Negate, NegateNode {
-  variable: Box<Node>,
+new_node!(Print, PrintNode {
+  statement: Box<Node>,
 });
-
-new_node!(Silent, SilentNode {
-  variable: Box<Node>,
-});
-
-new_node!(Reference, ReferenceNode {
-  expr: Box<Node>,
-});
-
 new_node!(Program, ProgramNode {
   opentag: String,
   children: Vec<Box<Node>>,
 });
-
-new_node!(PropertyItem, PropertyItemNode {
-  name: Box<Node>,
-  variable_type: Option<Box<Node>>,
-  value: Option<Box<Node>>,
-});
-
 new_node!(Property, PropertyNode {
   visibility: String,
   modifier: String,
   items: Vec<Box<Node>>,
 });
-
-new_node!(Break, BreakNode {
-  argument: Option<Box<Node>>,
+new_node!(PropertyItem, PropertyItemNode {
+  name: Box<Node>,
+  variable_type: Option<Box<Node>>,
+  value: Option<Box<Node>>,
 });
-
-new_node!(Continue, ContinueNode {
-  argument: Option<Box<Node>>,
+new_node!(Reference, ReferenceNode {
+  statement: Box<Node>,
 });
-
 new_node!(Return, ReturnNode {
-  argument: Option<Box<Node>>,
+  statement: Option<Box<Node>>,
 });
-
-new_node!(Echo, EchoNode {
-  arguments: Vec<Box<Node>>,
+new_node!(SelfKeyword, SelfNode {});
+new_node!(Silent, SilentNode {
+  statement: Box<Node>,
 });
-
-new_node!(Elvis, ElvisNode {
-  left: Box<Node>,
-  right: Box<Node>,
-});
-
-new_node!(New, NewNode {
-  argument: Box<Node>,
-});
-
-new_node!(Throw, ThrowNode {
-  argument: Box<Node>,
-});
-
-new_node!(Print, PrintNode {
-  argument: Box<Node>,
-});
-
-new_node!(Parent, ParentNode {});
-
 new_node!(Static, StaticNode {
   items: Vec<Box<Node>>,
 });
-
 new_node!(StaticKeyword, StaticKeywordNode {});
-
-new_node!(ClassKeyword, ClassKeywordNode {});
-
-new_node!(Null, NullNode {});
-
-new_node!(Boolean, BooleanNode {
-  is_true: bool,
-});
-
-new_node!(Inline, InlineNode {
-  text: String,
-});
-
-new_node!(Clone, CloneNode {
-  argument: Box<Node>,
-});
-
-new_node!(Global, GlobalNode {
-  argument: Box<Node>,
-});
-
-new_node!(Goto, GotoNode {
-  label: Box<Node>,
-});
-
 new_node!(StaticLookup, StaticLookupNode {
-  target: Box<Node>,
-  on: Box<Node>,
-  bracket: bool,
+  left: Box<Node>,
+  right: Box<Node>,
+  use_bracket: bool,
 });
-
 new_node!(String, StringNode {
   quote: String,
   value: String,
 });
-
-new_node!(NowDoc, NowDocNode {
-  label: String,
-  value: String,
-});
-
-new_node!(HereDoc, HereDocNode {
-  label: String,
-  values: Vec<Box<Node>>,
-});
-
-new_node!(Encapsed, EncapsedNode {
-  quote: String,
-  values: Vec<Box<Node>>,
-});
-
-new_node!(EncapsedPart, EncapsedPartNode {
-  is_advanced: bool,
-  value: Box<Node>,
-});
-
 new_node!(Switch, SwitchNode {
   condition: Box<Node>,
   body: Box<Node>,
   is_short: bool,
 });
-
-new_node!(Case, CaseNode {
-  condition: Option<Box<Node>>,
-  body: Box<Node>,
-});
-
 new_node!(Ternary, TernaryNode {
   condition: Box<Node>,
   valid: Box<Node>,
   invalid: Box<Node>,
 });
-
 new_node!(This, ThisNode {});
-
-new_node!(SelfKeyword, SelfNode {});
-
+new_node!(Throw, ThrowNode {
+  statement: Box<Node>,
+});
 new_node!(Trait, TraitNode {
   name: Box<Node>,
   body: Box<Node>,
 });
-
 new_node!(TraitUse, TraitUseNode {
   traits: Vec<Box<Node>>,
   adaptations: Vec<Box<Node>>,
 });
-
 new_node!(TraitUseAlias, TraitUseAliasNode {
   trait_name: Option<Box<Node>>,
   method: Box<Node>,
   alias: Option<Box<Node>>,
   visibility: String,
 });
-
 new_node!(TraitUsePrecedence, TraitUsePrecedenceNode {
   trait_name: Option<Box<Node>>,
   method: Box<Node>,
   instead: Box<Node>,
 });
-
 new_node!(Try, TryNode {
   body: Box<Node>,
   catches: Vec<Box<Node>>,
 });
-
-new_node!(Catch, CatchNode {
-  types: Vec<Box<Node>>,
-  variable: Option<Box<Node>>,
-  body: Box<Node>,
-});
-
-new_node!(Finally, FinallyNode {
-  body: Box<Node>,
-});
-
 new_node!(Type, TypeNode {
   is_nullable: bool,
   name: String,
 });
-
 new_node!(UnionType, UnionTypeNode {
   types: Vec<String>,
 });
-
-new_node!(IntersectionType, IntersectionTypeNode {
-  types: Vec<String>,
-});
-
 new_node!(Use, UseNode {
   name: Option<String>,
   items: Vec<Box<Node>>,
 });
-
 new_node!(UseItem, UseItemNode {
   modifier: String,
   name: String,
   alias: Option<Box<Node>>,
 });
-
 new_node!(Variable, VariableNode {
   name: Box<Node>,
 });
-
+new_node!(Variadic, VariadicNode {
+  statement: Option<Box<Node>>,
+});
 new_node!(While, WhileNode {
   condition: Box<Node>,
   body: Box<Node>,
   is_short: bool,
 });
-
-new_node!(YieldFrom, YieldFromNode {
-  value: Box<Node>,
-});
-
 new_node!(Yield, YieldNode {
   key: Option<Box<Node>>,
   value: Option<Box<Node>>,
+});
+new_node!(YieldFrom, YieldFromNode {
+  statement: Box<Node>,
 });

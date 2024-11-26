@@ -10,11 +10,11 @@ impl EchoGenerator {
 
     builder.push("echo ");
     let mut items = generator.generate_nodes_new(
-      &node.arguments,
+      &node.items,
       &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
     );
     if
-      Generator::check_nodes_has_comments(&node.arguments) ||
+      Generator::check_nodes_has_comments(&node.items) ||
       2 + builder.last_len() + items.total_len_with_separator(" ") > generator.max_length
     {
       items.indent();

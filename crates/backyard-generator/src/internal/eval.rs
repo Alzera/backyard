@@ -8,7 +8,7 @@ impl EvalGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Eval, &node.node);
     builder.push("eval(");
-    generator.generate_node(builder, &node.argument, &mut GeneratorArgument::default());
+    generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
     builder.push(")");
   }
 }

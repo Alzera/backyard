@@ -1,7 +1,7 @@
 use std::vec;
 
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ ArgumentNode, CallNode, Node };
+use backyard_nodes::node::{ CallArgumentNode, CallNode, Node };
 use utils::guard;
 
 use crate::{ error::ParserError, parser::{ LoopArgument, Parser } };
@@ -92,7 +92,7 @@ impl ArgumentParser {
           return Err(ParserError::internal("Argument: failed to get value", args));
         }
       );
-      return Ok(ArgumentNode::new(name, value));
+      return Ok(CallArgumentNode::new(name, value));
     }
     Err(ParserError::internal("Argument", args))
   }

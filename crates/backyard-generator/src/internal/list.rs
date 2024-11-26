@@ -9,11 +9,11 @@ impl ListGenerator {
     let node = cast_node!(NodeWrapper::List, &node.node);
     builder.push("list(");
     let mut values = generator.generate_nodes_new(
-      &node.values,
+      &node.items,
       &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
     );
     if
-      Generator::check_nodes_has_comments(&node.values) ||
+      Generator::check_nodes_has_comments(&node.items) ||
       2 + builder.last_len() + values.total_len_with_separator(" ") > generator.max_length
     {
       values.indent();

@@ -24,7 +24,7 @@ impl YieldGenerator {
     let node = cast_node!(NodeWrapper::YieldFrom, &node.node);
 
     builder.push("yield from ");
-    generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());
+    generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
   }
 }
 
