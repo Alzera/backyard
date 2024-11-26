@@ -56,6 +56,7 @@ mod tests {
 
   #[test]
   fn basic() {
+    test_eval("$a = [$key = (is_int($key) ? $value : $key) => $value === true ? $key : $value];");
     test_eval("[1, 2, 3];");
     test_eval("[\"a\" => 1, \"b\" => 2, \"c\" => 3];");
     test_eval(

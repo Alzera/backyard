@@ -3,7 +3,7 @@ use backyard_nodes::node::{ Node, AssignmentNode };
 
 use crate::{
   error::ParserError,
-  parser::{ LoopArgument, Parser },
+  parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
   utils::{ match_pattern, Lookup },
 };
 
@@ -52,10 +52,13 @@ impl AssignmentParser {
         args.last_expr = None;
         if
           let Some(right) = parser.get_statement(
-            &mut LoopArgument::with_tokens(
+            &mut LoopArgument::safe(
               "assignment",
-              &args.separators.combine(&[TokenType::Semicolon, TokenType::Comma]),
+              &[],
               &args.breakers
+                .combine(&args.separators)
+                .combine(&[TokenType::Semicolon, TokenType::Comma]),
+              &DEFAULT_PARSERS
             )
           )?
         {

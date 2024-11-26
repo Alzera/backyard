@@ -23,18 +23,20 @@ impl EchoParser {
     if let [_] = matched.as_slice() {
       let items = parser.get_children(
         &mut LoopArgument::with_tokens(
-          "static",
+          "echo",
           &[TokenType::Comma],
-          &args.breakers.combine(&args.separators).combine(&[TokenType::Semicolon])
+          &args.breakers
+            .combine(&args.separators)
+            .combine(&[TokenType::Semicolon, TokenType::Inline])
         )
       )?;
       if let Some(last_token) = parser.tokens.get(parser.position - 1) {
-        if last_token.token_type == TokenType::Semicolon {
+        if [TokenType::Semicolon, TokenType::Inline].contains(&last_token.token_type) {
           parser.position -= 1;
         }
       }
       return Ok(EchoNode::new(items));
     }
-    Err(ParserError::internal("StaticLookup", args))
+    Err(ParserError::internal("Echo", args))
   }
 }

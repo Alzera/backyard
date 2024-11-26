@@ -40,29 +40,23 @@ impl IfParser {
       if is_short {
         parser.position -= 1;
       }
-      let invalid = if
-        let Some(i) = parser.get_statement(
-          &mut LoopArgument::safe(
-            "if_invalid",
-            &[],
-            &[TokenType::RightCurlyBracket, TokenType::EndIf],
-            &[
-              // (IfParser::test, IfParser::parse),
-              (ElseParser::test, ElseParser::parse),
-              (CommentParser::test, CommentParser::parse),
-            ]
-          )
-        )?
-      {
-        if let Some(token) = parser.tokens.get(parser.position) {
-          if [TokenType::EndIf].contains(&token.token_type) {
-            parser.position += 1;
-          }
+      let invalid = parser.get_statement(
+        &mut LoopArgument::safe(
+          "if_invalid",
+          &[],
+          &[TokenType::RightCurlyBracket, TokenType::EndIf],
+          &[
+            // (IfParser::test, IfParser::parse),
+            (ElseParser::test, ElseParser::parse),
+            (CommentParser::test, CommentParser::parse),
+          ]
+        )
+      )?;
+      if let Some(token) = parser.tokens.get(parser.position) {
+        if [TokenType::EndIf].contains(&token.token_type) {
+          parser.position += 1;
         }
-        Some(i)
-      } else {
-        None
-      };
+      }
       return Ok(IfNode::new(condition, valid, invalid, is_short));
     }
     Err(ParserError::internal("If", args))

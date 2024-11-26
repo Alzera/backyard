@@ -30,7 +30,10 @@ mod tests {
 
   #[test]
   fn basic() {
-    test_eval("foreach ($A as $x):\nendforeach;");
+    test_eval("foreach ($A as $x):
+endforeach;");
+test_eval("foreach ($data as $k => $value):
+endforeach;");
     test_eval("foreach ($A as &$x) {\n}");
     test_eval("foreach ($arr as $key => $value) {\n}");
   }
