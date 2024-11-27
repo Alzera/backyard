@@ -3,7 +3,6 @@ use backyard_nodes::node::{ IdentifierNode, Location, Node, RangeLocation };
 
 use crate::{
   error::ParserError,
-  guard,
   parser::{ LocationHelper, LoopArgument, Parser },
   utils::{ match_pattern, Lookup },
 };
@@ -14,8 +13,11 @@ pub struct IdentifierParser;
 impl IdentifierParser {
   pub fn from_token(id: &Token) -> Box<Node> {
     let start_loc = id.get_location().unwrap();
+    let id_len = id.value.len();
     let mut end_loc = start_loc.clone();
-    end_loc.column += id.value.len();
+    end_loc.column += id_len;
+    end_loc.offset += id_len;
+    println!("id: {:?}, {:?}, {:?}", id, start_loc, end_loc);
     IdentifierNode::new(
       id.value.to_owned(),
       Some(RangeLocation {
@@ -36,20 +38,13 @@ impl IdentifierParser {
   }
 
   pub fn parse(
-    parser: &mut Parser,
+    _: &mut Parser,
     matched: Vec<Vec<Token>>,
-    start_loc: Location,
+    _: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [identifier] = matched.as_slice() {
-      return Ok(
-        IdentifierNode::new(
-          guard!(identifier.first(), {
-            return Err(ParserError::internal("Identifier", args));
-          }).value.to_owned(),
-          parser.gen_loc(start_loc)
-        )
-      );
+      return Ok(Self::from_matched(&identifier));
     }
     Err(ParserError::internal("Identifier", args))
   }
