@@ -213,6 +213,7 @@ pub struct Token {
   pub value: String,
   pub line: usize,
   pub column: usize,
+  pub offset: usize,
 }
 
 impl Token {
@@ -226,6 +227,7 @@ impl Token {
       value: value.as_ref().to_string(),
       line: snapshot.line,
       column: snapshot.column,
+      offset: snapshot.offset,
     }
   }
 }

@@ -11,9 +11,11 @@ use crate::internal::{
   variable::VariableToken,
 };
 
+#[derive(Debug)]
 pub(crate) struct ControlSnapshot {
   pub(crate) line: usize,
   pub(crate) column: usize,
+  pub(crate) offset: usize,
 }
 
 #[derive(Debug)]
@@ -22,6 +24,7 @@ pub(crate) struct Control {
   position: usize,
   pub(crate) line: usize,
   pub(crate) column: usize,
+  pub(crate) last_snapshot: ControlSnapshot,
 }
 
 impl Control {
@@ -30,7 +33,8 @@ impl Control {
       chars: input.chars().collect(),
       position: 0,
       line: 1,
-      column: 1,
+      column: 0,
+      last_snapshot: ControlSnapshot { line: 1, column: 0, offset: 0 },
     }
   }
 
@@ -43,7 +47,11 @@ impl Control {
   }
 
   pub(crate) fn get_snapshot(&self) -> ControlSnapshot {
-    ControlSnapshot { line: self.line, column: self.column }
+    ControlSnapshot { line: self.line, column: self.column, offset: self.position }
+  }
+
+  pub(crate) fn get_last_snapshot(&self) -> &ControlSnapshot {
+    &self.last_snapshot
   }
 
   pub(crate) fn peek_char(&mut self, pos: Option<usize>) -> Option<char> {
@@ -53,10 +61,11 @@ impl Control {
 
   pub(crate) fn next_char(&mut self) -> Option<char> {
     if let Some(c) = self.chars.get(self.position) {
+      self.last_snapshot = self.get_snapshot();
       self.position += 1;
       if *c == '\n' {
         self.line += 1;
-        self.column = 1;
+        self.column = 0;
       } else {
         self.column += 1;
       }
@@ -179,10 +188,10 @@ impl Lexer {
       self.control.next_char_until(|_, ch, _| !ch.is_whitespace());
     }
 
+    let snapshot = &self.control.get_snapshot();
     let current_char = guard!(self.control.next_char(), {
       return Err(LexError::Eof);
     });
-    let snapshot = &self.control.get_snapshot();
 
     match current_char {
       '$' => VariableToken::lex(self, snapshot),
