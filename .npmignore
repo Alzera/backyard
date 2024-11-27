@@ -11,3 +11,9 @@ yarn.lock
 .yarn
 __test__
 renovate.json
+
+crates
+scripts
+test-run
+.prettierrc
+Cargo.toml

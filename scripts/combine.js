@@ -84,7 +84,7 @@ async function updatePackageJson() {
     const packageJson = JSON.parse(await fs.readFile(packageJsonPath, "utf8"));
 
     const updatedPackageJson = {
-      name: packageJson.name,
+      name: "@alzera/" + packageJson.name,
       version: packageJson.version,
       main: "index.js",
     };
@@ -130,4 +130,7 @@ module.exports = {
   builder,
 };`
 );
-updatePackageJson();
+// updatePackageJson();
+// fs.copyFileSync("README.md", "./dist/README.md");
+fs.removeSync("./dist/package.json");
+fs.removeSync("./dist/.gitignore");

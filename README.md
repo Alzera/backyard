@@ -16,11 +16,15 @@ PHP parser for NodeJs written with rust.
 - [ ] Benchmarking
 - [ ] Split base code, so it can be ported to another environtment _(if anyone can help me with this, reference link or something, I would be gratefull)_
 
+## installation
+
+    npm i @alzera/backyard
+
 ## usage
 
 ### lex
 
-    const { lex } = require("../dist");
+    import { lex } from "@alzera/backyard";
 
     const code = `<?php
     function hello_world($foo) {
@@ -121,7 +125,7 @@ Resulting this json:
 
 ### parse
 
-    const { parse } = require("../dist");
+    import { parse } from "@alzera/backyard";
 
     const code = `<?php
     function hello_world($foo) {
@@ -201,7 +205,7 @@ Resulting this json:
 
 ### generate
 
-    const { parse, generate } = require("../dist");
+    import { parse, generate } from "@alzera/backyard";
 
     const code = `<?php
     function hello_world($foo) {

@@ -1,4 +1,7 @@
 {
+  "name": "@alzera/backyard",
+  "version": "0.1.3",
+  "main": "dist/index.js",
   "scripts": {
     "prebuild": "cargo test && cd ./crates/backyard && npm run build",
     "build": "node ./scripts/combine.js",
