@@ -1,5 +1,5 @@
-use backyard_lexer::lex as process_lex;
-use backyard_parser::parse as process_parse;
+use backyard_lexer::{ lex as process_lex, lex_eval as process_lex_eval };
+use backyard_parser::{ parse as process_parse, parse_eval as process_parse_eval };
 use backyard_generator::generate as process_generate;
 use serde::Serialize;
 use serde_wasm_bindgen::{ Error, Serializer };
@@ -26,8 +26,27 @@ pub fn lex(input: String) -> Result<TokenArray, Error> {
 }
 
 #[wasm_bindgen]
+pub fn lex_eval(input: String) -> Result<TokenArray, Error> {
+  match process_lex_eval(&input) {
+    Ok(tokens) => serde_wasm_bindgen::to_value(&tokens).map(|v| v.into()),
+    Err(err) => Err(Error::new(format!("{}", err))),
+  }
+}
+
+#[wasm_bindgen]
 pub fn parse(input: String) -> Result<NodeArray, Error> {
   match process_parse(&input) {
+    Ok(nodes) => {
+      let serializer = Serializer::new().serialize_maps_as_objects(true);
+      nodes.serialize(&serializer).map(|v| v.into())
+    }
+    Err(err) => Err(Error::new(format!("{}", err))),
+  }
+}
+
+#[wasm_bindgen]
+pub fn parse_eval(input: String) -> Result<NodeArray, Error> {
+  match process_parse_eval(&input) {
     Ok(nodes) => {
       let serializer = Serializer::new().serialize_maps_as_objects(true);
       nodes.serialize(&serializer).map(|v| v.into())
