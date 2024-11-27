@@ -4,26 +4,32 @@ mod utils;
 mod guards;
 pub mod error;
 
-use backyard_lexer::{ lex, lex_eval };
-use backyard_nodes::node::Node;
+use backyard_lexer::{ error::LexResult, lex, lex_eval };
+use backyard_nodes::node::{ Location, Node, ProgramNode, RangeLocation };
 use error::ParserError;
-use parser::{ LoopArgument, Parser };
+use parser::{ LocationHelper, LoopArgument, Parser };
 
-pub fn parse(input: &str) -> Result<Vec<Box<Node>>, ParserError> {
-  match lex(input) {
-    Ok(tokens) => {
-      let mut parser = Parser::new(&tokens);
-      parser.get_children(&mut LoopArgument::default("main"))
-    }
-    Err(err) => Err(ParserError::LexError(err)),
-  }
+pub fn parse(input: &str) -> Result<Box<Node>, ParserError> {
+  parse_base(lex(input))
 }
 
-pub fn parse_eval(input: &str) -> Result<Vec<Box<Node>>, ParserError> {
-  match lex_eval(input) {
+pub fn parse_eval(input: &str) -> Result<Box<Node>, ParserError> {
+  parse_base(lex_eval(input))
+}
+
+fn parse_base(tokens: LexResult) -> Result<Box<Node>, ParserError> {
+  match tokens {
     Ok(tokens) => {
       let mut parser = Parser::new(&tokens);
-      parser.get_children(&mut LoopArgument::default("main"))
+      let parsed = parser.get_children(&mut LoopArgument::default("main"))?;
+      let wrapped = ProgramNode::new(
+        parsed,
+        Some(RangeLocation {
+          start: Location { line: 1, column: 0, offset: 0 },
+          end: tokens.last().unwrap().get_location().unwrap(),
+        })
+      );
+      Ok(wrapped)
     }
     Err(err) => Err(ParserError::LexError(err)),
   }

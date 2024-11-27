@@ -792,7 +792,6 @@ new_node!(Print, PrintNode {
   statement: Box<Node>,
 });
 new_node!(Program, ProgramNode {
-  opentag: String,
   children: Vec<Box<Node>>,
 });
 new_node!(Property, PropertyNode {

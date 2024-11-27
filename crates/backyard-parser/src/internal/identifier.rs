@@ -17,7 +17,6 @@ impl IdentifierParser {
     let mut end_loc = start_loc.clone();
     end_loc.column += id_len;
     end_loc.offset += id_len;
-    println!("id: {:?}, {:?}, {:?}", id, start_loc, end_loc);
     IdentifierNode::new(
       id.value.to_owned(),
       Some(RangeLocation {

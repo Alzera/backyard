@@ -3,7 +3,7 @@ use backyard_parser::{ parse as process_parse, parse_eval as process_parse_eval 
 use backyard_generator::generate as process_generate;
 use serde::Serialize;
 use serde_wasm_bindgen::{ Error, Serializer };
-use wasm_bindgen::{ prelude::wasm_bindgen, JsValue };
+use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
 extern "C" {
@@ -56,9 +56,13 @@ pub fn parse_eval(input: String) -> Result<NodeArray, Error> {
 }
 
 #[wasm_bindgen]
-pub fn generate(input: NodeArray) -> Result<String, JsValue> {
+pub fn generate(input: NodeArray) -> Result<String, Error> {
   let nodes = serde_wasm_bindgen::from_value(input.obj)?;
 
-  let ok = process_generate(nodes);
-  Ok(ok)
+  match process_generate(nodes) {
+    Ok(nodes) => {
+      return Ok(nodes);
+    }
+    Err(err) => Err(Error::new(format!("{}", err))),
+  }
 }
