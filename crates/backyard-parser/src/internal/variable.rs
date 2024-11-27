@@ -1,9 +1,9 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, VariableNode };
+use backyard_nodes::node::{ Location, Node, RangeLocation, VariableNode };
 
 use crate::{
   error::ParserError,
-  parser::{ LoopArgument, Parser },
+  parser::{ LocationHelper, LoopArgument, Parser },
   utils::{ match_pattern, Lookup },
 };
 
@@ -13,12 +13,14 @@ use super::identifier::IdentifierParser;
 pub struct VariableParser;
 
 impl VariableParser {
-  pub fn new(name: String) -> Box<Node> {
-    VariableParser::new_bracked(IdentifierParser::new(name))
+  pub fn from_token(name: &Token) -> Box<Node> {
+    let id = IdentifierParser::from_token(name);
+    let loc = id.loc.clone();
+    VariableParser::new_bracked(id, loc)
   }
 
-  pub fn new_bracked(name: Box<Node>) -> Box<Node> {
-    VariableNode::new(name)
+  pub fn new_bracked(name: Box<Node>, loc: Option<RangeLocation>) -> Box<Node> {
+    VariableNode::new(name, loc)
   }
 }
 
@@ -30,6 +32,7 @@ impl VariableParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name] = matched.as_slice() {
@@ -40,10 +43,16 @@ impl VariableParser {
           )?;
           parser.position += 1;
           if let Some(expr) = expr {
-            return Ok(VariableParser::new_bracked(expr));
+            let end_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
+            return Ok(
+              VariableParser::new_bracked(
+                expr,
+                Some(RangeLocation { start: start_loc, end: end_loc })
+              )
+            );
           }
         } else {
-          return Ok(VariableParser::new(name.value.to_owned()));
+          return Ok(VariableParser::from_token(name));
         }
       }
     }

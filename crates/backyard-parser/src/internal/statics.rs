@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, NodeType, StaticNode };
+use backyard_nodes::node::{ Location, Node, NodeType, StaticNode };
 
 use crate::{ error::ParserError, parser::{ LoopArgument, Parser } };
 
@@ -25,6 +25,7 @@ impl StaticsParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
@@ -39,7 +40,7 @@ impl StaticsParser {
           ]
         )
       )?;
-      return Ok(StaticNode::new(items));
+      return Ok(StaticNode::new(items, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("StaticLookup", args))
   }

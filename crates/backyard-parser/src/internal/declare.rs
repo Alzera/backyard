@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ BodyType, Node, DeclareArgumentNode, DeclareNode };
+use backyard_nodes::node::{ BodyType, Location, Node, DeclareArgumentNode, DeclareNode };
 
 use crate::{
   error::ParserError,
@@ -23,6 +23,7 @@ impl DeclareParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
@@ -53,7 +54,7 @@ impl DeclareParser {
         BodyType::Basic => Some(BlockParser::new(parser)?),
         BodyType::Short => Some(BlockParser::new_short(parser, &[TokenType::EndDeclare])?),
       };
-      return Ok(DeclareNode::new(arguments, body, body_type));
+      return Ok(DeclareNode::new(arguments, body, body_type, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Declare", args))
   }
@@ -73,6 +74,7 @@ impl DeclareArgumentParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name, _] = matched.as_slice() {
@@ -85,7 +87,13 @@ impl DeclareArgumentParser {
           )
         )?
       {
-        return Ok(DeclareArgumentNode::new(IdentifierParser::from_matched(name), value));
+        return Ok(
+          DeclareArgumentNode::new(
+            IdentifierParser::from_matched(name),
+            value,
+            parser.gen_loc(start_loc)
+          )
+        );
       }
     }
     Err(ParserError::internal("DeclareArgument", args))

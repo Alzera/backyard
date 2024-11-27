@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, ListNode };
+use backyard_nodes::node::{ Location, Node, ListNode };
 
 use crate::{
   error::ParserError,
@@ -21,13 +21,14 @@ impl ListParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let values = parser.get_children(
         &mut LoopArgument::with_tokens("list", &[TokenType::Comma], &[TokenType::RightParenthesis])
       )?;
-      return Ok(ListNode::new(values));
+      return Ok(ListNode::new(values, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("List", args))
   }

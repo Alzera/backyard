@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
-use backyard_nodes::node::{ Node, NodeType, ArrayItemNode, ArrayNode };
+use backyard_nodes::node::{ ArrayItemNode, ArrayNode, Location, Node, NodeType };
 
 use crate::{
   error::ParserError,
@@ -31,9 +31,10 @@ impl ArrayParser {
             let mut i = i.to_owned();
             let leadings = i.leadings.to_owned();
             let trailings = i.trailings.to_owned();
+            let loc = i.loc.to_owned();
             i.leadings = vec![];
             i.trailings = vec![];
-            let mut a = ArrayItemNode::new(None, i);
+            let mut a = ArrayItemNode::new(None, i, loc);
             a.leadings = leadings;
             a.trailings = trailings;
             a
@@ -56,20 +57,29 @@ impl ArrayParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     match matched.len() {
       1 => {
         if let [_] = matched.as_slice() {
           return Ok(
-            ArrayNode::new(true, ArrayParser::get_values(parser, TokenType::RightSquareBracket)?)
+            ArrayNode::new(
+              true,
+              ArrayParser::get_values(parser, TokenType::RightSquareBracket)?,
+              parser.gen_loc(start_loc)
+            )
           );
         }
       }
       2 => {
         if let [_, _] = matched.as_slice() {
           return Ok(
-            ArrayNode::new(false, ArrayParser::get_values(parser, TokenType::RightParenthesis)?)
+            ArrayNode::new(
+              false,
+              ArrayParser::get_values(parser, TokenType::RightParenthesis)?,
+              parser.gen_loc(start_loc)
+            )
           );
         }
       }
@@ -90,6 +100,7 @@ impl ArrayItemParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
@@ -102,7 +113,7 @@ impl ArrayItemParser {
         }
       );
       let key = args.last_expr.to_owned();
-      return Ok(ArrayItemNode::new(key, value));
+      return Ok(ArrayItemNode::new(key, value, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("ArrayItem", args))
   }

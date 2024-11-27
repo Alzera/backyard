@@ -1,7 +1,7 @@
 use std::vec;
 
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ CallArgumentNode, CallNode, Node };
+use backyard_nodes::node::{ CallArgumentNode, CallNode, Location, Node };
 
 use crate::{ error::ParserError, guard, parser::{ LoopArgument, Parser } };
 
@@ -41,11 +41,16 @@ impl CallParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       return Ok(
-        CallNode::new(args.last_expr.to_owned().unwrap(), CallParser::get_arguments(parser)?)
+        CallNode::new(
+          args.last_expr.to_owned().unwrap(),
+          CallParser::get_arguments(parser)?,
+          parser.gen_loc(start_loc)
+        )
       );
     }
     Err(ParserError::internal("Call", args))
@@ -70,6 +75,7 @@ impl ArgumentParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name, has_name] = matched.as_slice() {
@@ -91,7 +97,7 @@ impl ArgumentParser {
           return Err(ParserError::internal("Argument: failed to get value", args));
         }
       );
-      return Ok(CallArgumentNode::new(name, value));
+      return Ok(CallArgumentNode::new(name, value, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Argument", args))
   }

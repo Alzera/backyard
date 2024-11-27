@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ LabelNode, Node, NodeType };
+use backyard_nodes::node::{ LabelNode, Location, Node, NodeType };
 
 use crate::{
   error::ParserError,
@@ -22,15 +22,16 @@ impl LabelParser {
   }
 
   pub fn parse(
-    _: &mut Parser,
+    parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       let name = guard!(args.last_expr.to_owned(), {
         return Err(ParserError::internal("Label", args));
       });
-      return Ok(LabelNode::new(name));
+      return Ok(LabelNode::new(name, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Label", args))
   }

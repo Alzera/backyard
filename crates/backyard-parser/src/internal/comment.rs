@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, CommentBlockNode, CommentDocNode, CommentLineNode };
+use backyard_nodes::node::{ Location, Node, CommentBlockNode, CommentDocNode, CommentLineNode };
 
 use crate::{
   error::ParserError,
@@ -22,6 +22,7 @@ impl CommentParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [comment] = matched.as_slice() {
@@ -29,9 +30,12 @@ impl CommentParser {
         return Err(ParserError::internal("Comment: failed to get type", args));
       });
       let comment: Box<Node> = match comment.token_type {
-        TokenType::CommentLine => CommentLineNode::new(comment.value.to_owned()),
-        TokenType::CommentBlock => CommentBlockNode::new(comment.value.to_owned()),
-        TokenType::CommentDoc => CommentDocNode::new(comment.value.to_owned()),
+        TokenType::CommentLine =>
+          CommentLineNode::new(comment.value.to_owned(), parser.gen_loc(start_loc)),
+        TokenType::CommentBlock =>
+          CommentBlockNode::new(comment.value.to_owned(), parser.gen_loc(start_loc)),
+        TokenType::CommentDoc =>
+          CommentDocNode::new(comment.value.to_owned(), parser.gen_loc(start_loc)),
         _ => {
           return Err(ParserError::internal("Comment: failed creating node", args));
         }

@@ -1,23 +1,32 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, IdentifierNode };
+use backyard_nodes::node::{ IdentifierNode, Location, Node, RangeLocation };
 
 use crate::{
   error::ParserError,
   guard,
-  parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, some_or_default, Lookup },
+  parser::{ LocationHelper, LoopArgument, Parser },
+  utils::{ match_pattern, Lookup },
 };
 
 #[derive(Debug, Clone)]
 pub struct IdentifierParser;
 
 impl IdentifierParser {
-  pub fn new(name: String) -> Box<Node> {
-    IdentifierNode::new(name)
+  pub fn from_token(id: &Token) -> Box<Node> {
+    let start_loc = id.get_location().unwrap();
+    let mut end_loc = start_loc.clone();
+    end_loc.column += id.value.len();
+    IdentifierNode::new(
+      id.value.to_owned(),
+      Some(RangeLocation {
+        start: start_loc,
+        end: end_loc,
+      })
+    )
   }
 
   pub fn from_matched(name: &[Token]) -> Box<Node> {
-    Self::new(some_or_default(name.first(), String::from(""), |i| i.value.to_owned()))
+    Self::from_token(name.first().unwrap())
   }
 }
 
@@ -27,16 +36,18 @@ impl IdentifierParser {
   }
 
   pub fn parse(
-    _: &mut Parser,
+    parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [identifier] = matched.as_slice() {
       return Ok(
-        IdentifierParser::new(
+        IdentifierNode::new(
           guard!(identifier.first(), {
             return Err(ParserError::internal("Identifier", args));
-          }).value.to_owned()
+          }).value.to_owned(),
+          parser.gen_loc(start_loc)
         )
       );
     }

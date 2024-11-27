@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ AttributeItemNode, AttributeNode, Node };
+use backyard_nodes::node::{ AttributeItemNode, AttributeNode, Location, Node };
 
 use crate::{
   error::ParserError,
@@ -19,6 +19,7 @@ impl AttributeParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
@@ -34,7 +35,7 @@ impl AttributeParser {
         &mut LoopArgument::new("attribute", args.separators, args.breakers, args.parsers)
       )?;
       if let Some(mut expr) = expr {
-        expr.leadings.insert(0, AttributeNode::new(items));
+        expr.leadings.insert(0, AttributeNode::new(items, parser.gen_loc(start_loc)));
         return Ok(expr);
       }
     }
@@ -53,6 +54,7 @@ impl AttributeItemParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name] = matched.as_slice() {
@@ -73,7 +75,7 @@ impl AttributeItemParser {
           )
         )?;
       }
-      return Ok(AttributeItemNode::new(name, arguments));
+      return Ok(AttributeItemNode::new(name, arguments, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("ArrayItem", args))
   }

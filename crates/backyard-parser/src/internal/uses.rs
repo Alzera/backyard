@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, UseItemNode, UseNode };
+use backyard_nodes::node::{ Location, Node, UseItemNode, UseNode };
 
 use crate::{
   error::ParserError,
@@ -21,6 +21,7 @@ impl UseParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
@@ -61,7 +62,7 @@ impl UseParser {
           }
           items
         };
-        return Ok(UseNode::new(Some(name), items));
+        return Ok(UseNode::new(Some(name), items, parser.gen_loc(start_loc)));
       } else {
         let items = parser.get_children(
           &mut LoopArgument::new(
@@ -74,7 +75,7 @@ impl UseParser {
             ]
           )
         )?;
-        return Ok(UseNode::new(None, items));
+        return Ok(UseNode::new(None, items, parser.gen_loc(start_loc)));
       }
     }
     Err(ParserError::internal("Use", args))
@@ -98,6 +99,7 @@ impl UseItemParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [modifier, name] = matched.as_slice() {
@@ -109,14 +111,14 @@ impl UseItemParser {
       if let Some(last) = parser.tokens.get(parser.position) {
         if last.token_type == TokenType::As {
           if let Some(id) = parser.tokens.get(parser.position + 1) {
-            alias = Some(IdentifierParser::new(id.value.to_owned()));
+            alias = Some(IdentifierParser::from_token(id));
             parser.position += 2;
           } else {
             return Err(ParserError::internal("UseItem", args));
           }
         }
       }
-      return Ok(UseItemNode::new(modifier, name, alias));
+      return Ok(UseItemNode::new(modifier, name, alias, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("UseItem", args))
   }

@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
-use backyard_nodes::node::{ Node, TernaryNode };
+use backyard_nodes::node::{ Location, Node, TernaryNode };
 
 use crate::{
   error::ParserError,
@@ -20,6 +20,7 @@ impl TernaryParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
@@ -47,7 +48,7 @@ impl TernaryParser {
           return Err(ParserError::internal("Ternary", args));
         }
       );
-      return Ok(TernaryNode::new(left, valid, invalid));
+      return Ok(TernaryNode::new(left, valid, invalid, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Ternary", args))
   }

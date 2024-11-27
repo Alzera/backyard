@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
-use backyard_nodes::node::{ Node, BinNode };
+use backyard_nodes::node::{ Location, Node, BinNode };
 
 use crate::{
   error::ParserError,
@@ -56,6 +56,7 @@ impl BinParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [operator] = matched.as_slice() {
@@ -72,7 +73,9 @@ impl BinParser {
             )
           )?
         {
-          return Ok(BinNode::new(left, operator.value.to_owned(), right));
+          return Ok(
+            BinNode::new(left, operator.value.to_owned(), right, parser.gen_loc(start_loc))
+          );
         }
       }
     }

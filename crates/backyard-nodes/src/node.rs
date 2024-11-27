@@ -11,6 +11,19 @@ pub enum BodyType {
   Empty,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+pub struct RangeLocation {
+  pub start: Location,
+  pub end: Location,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+pub struct Location {
+  pub line: usize,
+  pub column: usize,
+  pub offset: usize,
+}
+
 #[derive(Debug, Clone, Serialize, TS)]
 #[ts(export)]
 pub struct Node {
@@ -19,6 +32,7 @@ pub struct Node {
   pub node_type: NodeType,
   #[serde(flatten)]
   pub node: NodeWrapper,
+  pub loc: Option<RangeLocation>,
 }
 
 impl<'de> Deserialize<'de> for Node {
@@ -37,6 +51,7 @@ impl<'de> Deserialize<'de> for Node {
         let mut trailings = None;
         let mut node_type = None;
         let mut node_data = None;
+        let mut loc = None;
 
         while let Some(key) = map.next_key::<String>()? {
           match key.as_str() {
@@ -48,6 +63,9 @@ impl<'de> Deserialize<'de> for Node {
             }
             "node_type" => {
               node_type = Some(map.next_value()?);
+            }
+            "loc" => {
+              loc = Some(map.next_value()?);
             }
             _ => {
               // Assuming `#[serde(flatten)]` attributes allow arbitrary extra fields
@@ -65,6 +83,7 @@ impl<'de> Deserialize<'de> for Node {
         let trailings = trailings.unwrap_or_default();
         let node_type = node_type.ok_or_else(|| de::Error::missing_field("node_type"))?;
         let node_data = node_data.unwrap_or_else(|| serde_json::Value::Object(Default::default()));
+        let loc = loc.unwrap_or_default();
 
         let node: NodeWrapper = (
           match node_type {
@@ -230,6 +249,7 @@ impl<'de> Deserialize<'de> for Node {
           trailings,
           node_type,
           node,
+          loc,
         })
       }
     }
@@ -461,7 +481,7 @@ macro_rules! new_node {
       $(pub $field_name: $field_type),*
     }
     impl $struct_name {
-      pub fn new($($field_name: $field_type),*) -> Box<Node> {
+      pub fn new($($field_name: $field_type,)* loc: Option<RangeLocation>) -> Box<Node> {
         Box::new(
           Node {
             leadings: vec![],
@@ -469,7 +489,8 @@ macro_rules! new_node {
             node_type: NodeType::$node_type,
             node: NodeWrapper::$node_type(
               Self { $($field_name),* }
-            )
+            ),
+            loc
           }
         )
       }

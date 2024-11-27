@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, NodeType, ArrayLookupNode };
+use backyard_nodes::node::{ ArrayLookupNode, Location, Node, NodeType };
 
 use crate::{
   error::ParserError,
@@ -36,6 +36,7 @@ impl ArrayLookupParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
@@ -46,7 +47,7 @@ impl ArrayLookupParser {
         &mut LoopArgument::with_tokens("arraylookup", &[], &[TokenType::RightSquareBracket])
       )?;
       parser.position += 1;
-      return Ok(ArrayLookupNode::new(on, target));
+      return Ok(ArrayLookupNode::new(on, target, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("ArrayLookup", args))
   }

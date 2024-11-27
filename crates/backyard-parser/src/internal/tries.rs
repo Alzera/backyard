@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ CatchNode, FinallyNode, Node, TryNode };
+use backyard_nodes::node::{ CatchNode, FinallyNode, Location, Node, TryNode };
 
 use crate::{
   error::ParserError,
@@ -25,6 +25,7 @@ impl TryParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
@@ -41,7 +42,7 @@ impl TryParser {
           ]
         )
       )?;
-      return Ok(TryNode::new(body, catches));
+      return Ok(TryNode::new(body, catches, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Try", args))
   }
@@ -61,6 +62,7 @@ impl CatchParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
@@ -94,7 +96,7 @@ impl CatchParser {
       }
       parser.position += 1;
       let body = BlockParser::new(parser)?;
-      return Ok(CatchNode::new(types, variable, body));
+      return Ok(CatchNode::new(types, variable, body, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("DoWhileCondition", args))
   }
@@ -111,11 +113,12 @@ impl FinallyParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       let body = BlockParser::new(parser)?;
-      return Ok(FinallyNode::new(body));
+      return Ok(FinallyNode::new(body, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Finally", args))
   }

@@ -1,11 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, ObjectAccessNode };
+use backyard_nodes::node::{ Location, Node, ObjectAccessNode };
 
 use crate::{
   error::ParserError,
   guard,
   internal::{ identifier::IdentifierParser, variable::VariableParser },
-  parser::{ LoopArgument, Parser },
+  parser::{ LocationHelper, LoopArgument, Parser },
   utils::{ match_pattern, Lookup },
 };
 
@@ -23,6 +23,7 @@ impl ObjectAccessParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [access_type] = matched.as_slice() {
@@ -48,19 +49,26 @@ impl ObjectAccessParser {
         parser.position += 1;
         t
       } else if let Some(m) = VariableParser::test(&parser.tokens[parser.position..], args) {
+        let loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
         parser.position += m
           .iter()
           .map(|x| x.len())
           .sum::<usize>();
-        VariableParser::parse(parser, m, args)?
+        VariableParser::parse(parser, m, loc, args)?
       } else if let Some(token) = parser.tokens.get(parser.position) {
         parser.position += 1;
-        IdentifierParser::new(token.value.to_owned())
+        IdentifierParser::from_token(token)
       } else {
         return Err(ParserError::internal("ObjectAccess", args));
       };
       return Ok(
-        ObjectAccessNode::new(args.last_expr.to_owned().unwrap(), expr, is_bracket, is_nullsafe)
+        ObjectAccessNode::new(
+          args.last_expr.to_owned().unwrap(),
+          expr,
+          is_bracket,
+          is_nullsafe,
+          parser.gen_loc(start_loc)
+        )
       );
     }
     Err(ParserError::internal("ObjectAccess", args))

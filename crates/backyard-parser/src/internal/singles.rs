@@ -8,6 +8,7 @@ use backyard_nodes::node::{
   GotoNode,
   InlineNode,
   NewNode,
+  Location,
   Node,
   NullNode,
   ParentNode,
@@ -61,6 +62,7 @@ impl SinglesParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [key] = matched.as_slice() {
@@ -78,14 +80,15 @@ impl SinglesParser {
           ].contains(&key.token_type)
         {
           return match key.token_type {
-            TokenType::Parent => Ok(ParentNode::new()),
-            TokenType::Static => Ok(StaticKeywordNode::new()),
-            TokenType::This => Ok(ThisNode::new()),
-            TokenType::SelfKeyword => Ok(SelfNode::new()),
-            TokenType::True => Ok(BooleanNode::new(true)),
-            TokenType::False => Ok(BooleanNode::new(false)),
-            TokenType::Null => Ok(NullNode::new()),
-            TokenType::Inline => Ok(InlineNode::new(key.value.to_owned())),
+            TokenType::Parent => Ok(ParentNode::new(parser.gen_loc(start_loc))),
+            TokenType::Static => Ok(StaticKeywordNode::new(parser.gen_loc(start_loc))),
+            TokenType::This => Ok(ThisNode::new(parser.gen_loc(start_loc))),
+            TokenType::SelfKeyword => Ok(SelfNode::new(parser.gen_loc(start_loc))),
+            TokenType::True => Ok(BooleanNode::new(true, parser.gen_loc(start_loc))),
+            TokenType::False => Ok(BooleanNode::new(false, parser.gen_loc(start_loc))),
+            TokenType::Null => Ok(NullNode::new(parser.gen_loc(start_loc))),
+            TokenType::Inline =>
+              Ok(InlineNode::new(key.value.to_owned(), parser.gen_loc(start_loc))),
             _ => Err(ParserError::internal("Single: first group", args)),
           };
         }
@@ -98,13 +101,13 @@ impl SinglesParser {
         )?;
         match key.token_type {
           TokenType::Break => {
-            return Ok(BreakNode::new(argument.to_owned()));
+            return Ok(BreakNode::new(argument.to_owned(), parser.gen_loc(start_loc)));
           }
           TokenType::Continue => {
-            return Ok(ContinueNode::new(argument.to_owned()));
+            return Ok(ContinueNode::new(argument.to_owned(), parser.gen_loc(start_loc)));
           }
           TokenType::Return => {
-            return Ok(ReturnNode::new(argument.to_owned()));
+            return Ok(ReturnNode::new(argument.to_owned(), parser.gen_loc(start_loc)));
           }
           _ => {}
         }
@@ -113,12 +116,12 @@ impl SinglesParser {
         }
         let argument = argument.unwrap();
         return match key.token_type {
-          TokenType::New => Ok(NewNode::new(argument)),
-          TokenType::Print => Ok(PrintNode::new(argument)),
-          TokenType::Throw => Ok(ThrowNode::new(argument)),
-          TokenType::Clone => Ok(CloneNode::new(argument)),
-          TokenType::Global => Ok(GlobalNode::new(argument)),
-          TokenType::Goto => Ok(GotoNode::new(argument)),
+          TokenType::New => Ok(NewNode::new(argument, parser.gen_loc(start_loc))),
+          TokenType::Print => Ok(PrintNode::new(argument, parser.gen_loc(start_loc))),
+          TokenType::Throw => Ok(ThrowNode::new(argument, parser.gen_loc(start_loc))),
+          TokenType::Clone => Ok(CloneNode::new(argument, parser.gen_loc(start_loc))),
+          TokenType::Global => Ok(GlobalNode::new(argument, parser.gen_loc(start_loc))),
+          TokenType::Goto => Ok(GotoNode::new(argument, parser.gen_loc(start_loc))),
           _ => Err(ParserError::internal("Single: third group", args)),
         };
       }

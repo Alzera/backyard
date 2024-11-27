@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, WhileNode };
+use backyard_nodes::node::{ Location, Node, WhileNode };
 
 use crate::{
   error::ParserError,
@@ -24,6 +24,7 @@ impl WhileParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
@@ -37,7 +38,7 @@ impl WhileParser {
       );
       parser.position += 1;
       let (is_short, body) = BlockParser::new_or_short(parser, &[TokenType::EndWhile], args)?;
-      return Ok(WhileNode::new(condition, body, is_short));
+      return Ok(WhileNode::new(condition, body, is_short, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("While", args))
   }

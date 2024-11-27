@@ -1,5 +1,13 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ NegateNode, Node, PreNode, ReferenceNode, SilentNode, VariadicNode };
+use backyard_nodes::node::{
+  NegateNode,
+  Location,
+  Node,
+  PreNode,
+  ReferenceNode,
+  SilentNode,
+  VariadicNode,
+};
 
 use crate::{
   error::ParserError,
@@ -35,6 +43,7 @@ impl PreParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [operator] = matched.as_slice() {
@@ -45,7 +54,7 @@ impl PreParser {
         &mut LoopArgument::with_tokens("pre", args.separators, args.breakers)
       )?;
       if operator.token_type == TokenType::Ellipsis {
-        return Ok(VariadicNode::new(argument));
+        return Ok(VariadicNode::new(argument, parser.gen_loc(start_loc)));
       }
       let argument = guard!(argument, {
         return Err(ParserError::internal("Pre", args));
@@ -54,10 +63,11 @@ impl PreParser {
         | TokenType::PreIncrement
         | TokenType::PreDecrement
         | TokenType::Addition
-        | TokenType::Subtraction => Ok(PreNode::new(argument, operator.value.to_owned())),
-        TokenType::BooleanNegate => Ok(NegateNode::new(argument)),
-        TokenType::AtSign => Ok(SilentNode::new(argument)),
-        TokenType::BitwiseAnd => Ok(ReferenceNode::new(argument)),
+        | TokenType::Subtraction =>
+          Ok(PreNode::new(argument, operator.value.to_owned(), parser.gen_loc(start_loc))),
+        TokenType::BooleanNegate => Ok(NegateNode::new(argument, parser.gen_loc(start_loc))),
+        TokenType::AtSign => Ok(SilentNode::new(argument, parser.gen_loc(start_loc))),
+        TokenType::BitwiseAnd => Ok(ReferenceNode::new(argument, parser.gen_loc(start_loc))),
         _ => Err(ParserError::internal("Pre", args)),
       };
     }

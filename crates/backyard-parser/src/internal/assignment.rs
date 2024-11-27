@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
-use backyard_nodes::node::{ Node, AssignmentNode };
+use backyard_nodes::node::{ Location, Node, AssignmentNode };
 
 use crate::{
   error::ParserError,
@@ -42,6 +42,7 @@ impl AssignmentParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [operator] = matched.as_slice() {
@@ -60,7 +61,9 @@ impl AssignmentParser {
             )
           )?
         {
-          return Ok(AssignmentNode::new(left, operator.value.to_owned(), right));
+          return Ok(
+            AssignmentNode::new(left, operator.value.to_owned(), right, parser.gen_loc(start_loc))
+          );
         }
       }
     }

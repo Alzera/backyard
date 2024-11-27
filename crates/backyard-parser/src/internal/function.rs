@@ -1,5 +1,6 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
 use backyard_nodes::node::{
+  Location,
   Node,
   AnonymousFunctionNode,
   ArrowFunctionNode,
@@ -79,17 +80,18 @@ impl FunctionParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     match matched.len() {
-      4 => FunctionParser::parse_basic(matched, parser, args),
+      4 => FunctionParser::parse_basic(parser, matched, start_loc, args),
       3 => {
         if let Some(f) = matched.first() {
           if let Some(f) = f.first() {
             if f.token_type == TokenType::Fn {
-              return FunctionParser::parse_arrow(matched, parser, args);
+              return FunctionParser::parse_arrow(parser, matched, start_loc, args);
             } else if f.token_type == TokenType::Function {
-              return FunctionParser::parse_anonymous(matched, parser, args);
+              return FunctionParser::parse_anonymous(parser, matched, start_loc, args);
             }
           }
         }
@@ -102,8 +104,9 @@ impl FunctionParser {
 
 impl FunctionParser {
   pub fn parse_arrow(
-    matched: Vec<Vec<Token>>,
     parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, is_ref, _] = matched.as_slice() {
@@ -122,14 +125,23 @@ impl FunctionParser {
           return Err(ParserError::internal("ArrowFunction", args));
         }
       );
-      return Ok(ArrowFunctionNode::new(!is_ref.is_empty(), arguments, return_type, body));
+      return Ok(
+        ArrowFunctionNode::new(
+          !is_ref.is_empty(),
+          arguments,
+          return_type,
+          body,
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::internal("ArrowFunction", args))
   }
 
   pub fn parse_anonymous(
-    matched: Vec<Vec<Token>>,
     parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, is_ref, _] = matched.as_slice() {
@@ -149,19 +161,29 @@ impl FunctionParser {
       }
       let return_type = FunctionParser::get_return_type(parser, args).ok();
       let body = BlockParser::new(parser)?;
-      return Ok(AnonymousFunctionNode::new(!is_ref.is_empty(), arguments, uses, return_type, body));
+      return Ok(
+        AnonymousFunctionNode::new(
+          !is_ref.is_empty(),
+          arguments,
+          uses,
+          return_type,
+          body,
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::internal("AnonymousFunction", args))
   }
 
   pub fn parse_basic(
-    matched: Vec<Vec<Token>>,
     parser: &mut Parser,
+    matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, is_ref, name, _] = matched.as_slice() {
-      let name = some_or_default(name.first(), String::from(""), |i| i.value.to_owned());
-      let arguments = if name == "__construct" {
+      let name_parsed = some_or_default(name.first(), String::from(""), |i| i.value.to_owned());
+      let arguments = if name_parsed == "__construct" {
         parser.get_children(
           &mut LoopArgument::new(
             "function_construct_parameters",
@@ -192,10 +214,11 @@ impl FunctionParser {
       return Ok(
         FunctionNode::new(
           !is_ref.is_empty(),
-          IdentifierParser::new(name),
+          IdentifierParser::from_matched(name),
           arguments,
           return_type,
-          body
+          body,
+          parser.gen_loc(start_loc)
         )
       );
     }
@@ -257,6 +280,7 @@ impl ConstructorParameterParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [visibility, modifier] = matched.as_slice() {
@@ -282,7 +306,8 @@ impl ConstructorParameterParser {
         PropertyNode::new(
           some_or_default(visibility.first(), String::from(""), |i| i.value.to_owned()),
           some_or_default(modifier.first(), String::from(""), |i| i.value.to_owned()),
-          vec![item]
+          vec![item],
+          parser.gen_loc(start_loc)
         )
       );
     }
@@ -309,6 +334,7 @@ impl ParameterParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [is_ref, is_ellipsis, name, has_value] = matched.as_slice() {
@@ -331,7 +357,8 @@ impl ParameterParser {
           is_ref,
           is_ellipsis,
           IdentifierParser::from_matched(name),
-          value
+          value,
+          parser.gen_loc(start_loc)
         )
       );
     }

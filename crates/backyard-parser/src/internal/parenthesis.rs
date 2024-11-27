@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ CastNode, Node, ParenthesisNode };
+use backyard_nodes::node::{ CastNode, Location, Node, ParenthesisNode };
 
 use crate::{
   error::ParserError,
@@ -19,6 +19,7 @@ impl ParenthesisParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
@@ -51,7 +52,9 @@ impl ParenthesisParser {
                   return Err(ParserError::internal("Cast", args));
                 }
               );
-              return Ok(CastNode::new(token.value.to_owned(), expression));
+              return Ok(
+                CastNode::new(token.value.to_owned(), expression, parser.gen_loc(start_loc))
+              );
             }
           }
         }
@@ -65,7 +68,7 @@ impl ParenthesisParser {
         }
       );
       parser.position += 1;
-      return Ok(ParenthesisNode::new(statement));
+      return Ok(ParenthesisNode::new(statement, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Parenthesis", args))
   }

@@ -1,10 +1,10 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ ElseNode, IfNode, Node };
+use backyard_nodes::node::{ ElseNode, IfNode, Location, Node };
 
 use crate::{
   error::ParserError,
   guard,
-  parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
+  parser::{ LocationHelper, LoopArgument, Parser, DEFAULT_PARSERS },
   utils::{ match_pattern, Lookup },
 };
 
@@ -24,6 +24,7 @@ impl IfParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
@@ -57,7 +58,7 @@ impl IfParser {
           parser.position += 1;
         }
       }
-      return Ok(IfNode::new(condition, valid, invalid, is_short));
+      return Ok(IfNode::new(condition, valid, invalid, is_short, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("If", args))
   }
@@ -106,18 +107,20 @@ impl ElseParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [keyword] = matched.as_slice() {
       if let Some(keyword) = keyword.first() {
         if keyword.token_type == TokenType::ElseIf {
           parser.position += 1;
-          let expr = IfParser::parse(parser, vec![vec![keyword.to_owned()], vec![]], args)?;
-          return Ok(ElseNode::new(expr, false));
+          let loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
+          let expr = IfParser::parse(parser, vec![vec![keyword.to_owned()], vec![]], loc, args)?;
+          return Ok(ElseNode::new(expr, false, parser.gen_loc(start_loc)));
         }
       }
       let (is_short, valid) = IfParser::get_body(parser, args)?;
-      return Ok(ElseNode::new(valid, is_short));
+      return Ok(ElseNode::new(valid, is_short, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Else", args))
   }

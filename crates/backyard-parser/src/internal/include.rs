@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
-use backyard_nodes::node::{ Node, IncludeNode };
+use backyard_nodes::node::{ Location, Node, IncludeNode };
 
 use crate::{
   error::ParserError,
@@ -27,6 +27,7 @@ impl IncludeParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [keyword, use_parenthesis] = matched.as_slice() {
@@ -53,7 +54,9 @@ impl IncludeParser {
           return Err(ParserError::internal("Include", args));
         }
       );
-      return Ok(IncludeNode::new(use_parenthesis, is_require, is_once, argument));
+      return Ok(
+        IncludeNode::new(use_parenthesis, is_require, is_once, argument, parser.gen_loc(start_loc))
+      );
     }
     Err(ParserError::internal("Include", args))
   }

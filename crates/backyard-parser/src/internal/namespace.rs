@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, NamespaceNode };
+use backyard_nodes::node::{ Location, Node, NamespaceNode };
 
 use crate::{
   error::ParserError,
@@ -27,6 +27,7 @@ impl NamespaceParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, name] = matched.as_slice() {
@@ -40,7 +41,7 @@ impl NamespaceParser {
         false
       };
       let body = BlockParser::new(parser)?;
-      return Ok(NamespaceNode::new(name, body, is_bracket));
+      return Ok(NamespaceNode::new(name, body, is_bracket, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Namespace", args))
   }

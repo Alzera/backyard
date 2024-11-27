@@ -1,9 +1,9 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ ClassKeywordNode, Node, StaticLookupNode };
+use backyard_nodes::node::{ ClassKeywordNode, Location, Node, StaticLookupNode };
 
 use crate::{
   error::ParserError,
-  parser::{ LoopArgument, Parser },
+  parser::{ LocationHelper, LoopArgument, Parser },
   utils::{ match_pattern, Lookup },
 };
 
@@ -21,6 +21,7 @@ impl StaticLookupParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
@@ -29,11 +30,11 @@ impl StaticLookupParser {
       if let Some(t) = parser.tokens.get(parser.position) {
         let expr = if t.token_type == TokenType::Class {
           parser.position += 1;
-          ClassKeywordNode::new()
+          ClassKeywordNode::new(parser.gen_loc_helper(t))
         } else if [TokenType::Variable, TokenType::VariableBracketOpen].contains(&t.token_type) {
           if let Some(m) = VariableParser::test(&parser.tokens[parser.position..], args) {
             parser.position += 1;
-            VariableParser::parse(parser, m, args)?
+            VariableParser::parse(parser, m, t.get_location().unwrap(), args)?
           } else {
             return Err(ParserError::internal("StaticLookup 1", args));
           }
@@ -44,15 +45,15 @@ impl StaticLookupParser {
           )?;
           parser.position += 1;
           if let Some(expr) = expr {
-            return Ok(StaticLookupNode::new(left, expr, true));
+            return Ok(StaticLookupNode::new(left, expr, true, parser.gen_loc(start_loc)));
           } else {
             return Err(ParserError::internal("StaticLookup 2", args));
           }
         } else {
           parser.position += 1;
-          IdentifierParser::new(t.value.to_owned())
+          IdentifierParser::from_token(t)
         };
-        return Ok(StaticLookupNode::new(left, expr, false));
+        return Ok(StaticLookupNode::new(left, expr, false, parser.gen_loc(start_loc)));
       };
     }
     Err(ParserError::internal("StaticLookup 3", args))

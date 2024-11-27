@@ -1,24 +1,32 @@
 use backyard_lexer::token::TokenType;
 use backyard_nodes::node::{ BlockNode, Node };
 
-use crate::{ error::ParserError, parser::{ LoopArgument, Parser } };
+use crate::{ error::ParserError, parser::{ LocationHelper, LoopArgument, Parser } };
 
 #[derive(Debug, Clone)]
 pub struct BlockParser;
 
 impl BlockParser {
   pub fn new(parser: &mut Parser) -> Result<Box<Node>, ParserError> {
+    let start_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
     parser.position += 1;
-    Ok(BlockNode::new(parser.get_children(&mut LoopArgument::default("block"))?))
+    Ok(
+      BlockNode::new(
+        parser.get_children(&mut LoopArgument::default("block"))?,
+        parser.gen_loc(start_loc)
+      )
+    )
   }
 
   pub fn new_short(parser: &mut Parser, breakers: &[TokenType]) -> Result<Box<Node>, ParserError> {
+    let start_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
     parser.position += 1;
     Ok(
       BlockNode::new(
         parser.get_children(
           &mut LoopArgument::with_tokens("block_short", &[TokenType::Semicolon], breakers)
-        )?
+        )?,
+        parser.gen_loc(start_loc)
       )
     )
   }

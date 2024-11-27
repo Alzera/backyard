@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, ExitNode };
+use backyard_nodes::node::{ Location, Node, ExitNode };
 
 use crate::{
   error::ParserError,
@@ -24,6 +24,7 @@ impl ExitParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, has_argument] = matched.as_slice() {
@@ -35,7 +36,7 @@ impl ExitParser {
         None
       };
       parser.position += 1;
-      return Ok(ExitNode::new(argument));
+      return Ok(ExitNode::new(argument, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Exit", args))
   }

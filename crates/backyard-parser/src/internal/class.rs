@@ -1,10 +1,10 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ AnonymousClassNode, BlockNode, ClassNode, Node };
+use backyard_nodes::node::{ AnonymousClassNode, BlockNode, ClassNode, Location, Node };
 
 use crate::{
   error::ParserError,
   guard,
-  parser::{ LoopArgument, Parser },
+  parser::{ LocationHelper, LoopArgument, Parser },
   utils::{ match_pattern, some_or_default, Lookup },
 };
 
@@ -74,11 +74,12 @@ impl ClassParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     match matched.len() {
-      6 => Self::parse_basic(parser, matched, args),
-      2 => Self::parse_anonymous(parser, matched, args),
+      6 => Self::parse_basic(parser, matched, start_loc, args),
+      2 => Self::parse_anonymous(parser, matched, start_loc, args),
       _ => { Err(ParserError::internal("Class", args)) }
     }
   }
@@ -86,6 +87,7 @@ impl ClassParser {
   fn parse_anonymous(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, has_parameter] = matched.as_slice() {
@@ -104,11 +106,14 @@ impl ClassParser {
       if let Some(t) = parser.tokens.get(parser.position) {
         if t.token_type == TokenType::Extends {
           parser.position += 1;
-          let t = guard!(parser.tokens.get(parser.position), {
-            return Err(ParserError::internal("Class: failed to parse", args));
-          }).value.to_owned();
+          extends = Some(
+            IdentifierParser::from_token(
+              guard!(parser.tokens.get(parser.position), {
+                return Err(ParserError::internal("Class: failed to parse", args));
+              })
+            )
+          );
           parser.position += 1;
-          extends = Some(IdentifierParser::new(t));
         }
       }
       let mut implements = vec![];
@@ -129,6 +134,7 @@ impl ClassParser {
           parser.position -= 1;
         }
       }
+      let body_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
       parser.position += 1;
       let body = parser.get_children(
         &mut LoopArgument::new(
@@ -145,7 +151,15 @@ impl ClassParser {
           ]
         )
       )?;
-      return Ok(AnonymousClassNode::new(parameters, extends, implements, BlockNode::new(body)));
+      return Ok(
+        AnonymousClassNode::new(
+          parameters,
+          extends,
+          implements,
+          BlockNode::new(body, parser.gen_loc(body_loc)),
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::internal("Class: failed to parse", args))
   }
@@ -153,10 +167,11 @@ impl ClassParser {
   fn parse_basic(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [readonly, modifier, _, name, _, extends] = matched.as_slice() {
-      let extends = extends.first().map(|t| IdentifierParser::new(t.value.to_owned()));
+      let extends = extends.first().map(|t| IdentifierParser::from_token(t));
       let mut implements = vec![];
       if let Some(t) = parser.tokens.get(parser.position) {
         if t.token_type == TokenType::Implements {
@@ -175,6 +190,7 @@ impl ClassParser {
           parser.position -= 1;
         }
       }
+      let body_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
       parser.position += 1;
       let body = parser.get_children(
         &mut LoopArgument::new(
@@ -198,8 +214,9 @@ impl ClassParser {
           name,
           extends,
           implements,
-          BlockNode::new(body),
-          !readonly.is_empty()
+          BlockNode::new(body, parser.gen_loc(body_loc)),
+          !readonly.is_empty(),
+          parser.gen_loc(start_loc)
         )
       );
     }

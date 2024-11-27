@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
-use backyard_nodes::node::{ Node, YieldFromNode, YieldNode };
+use backyard_nodes::node::{ Location, Node, YieldFromNode, YieldNode };
 
 use crate::{
   error::ParserError,
@@ -22,6 +22,7 @@ impl YieldParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, has_from] = matched.as_slice() {
@@ -38,7 +39,7 @@ impl YieldParser {
             return Err(ParserError::internal("Yield", args));
           }
         );
-        return Ok(YieldFromNode::new(expr));
+        return Ok(YieldFromNode::new(expr, parser.gen_loc(start_loc)));
       }
       let mut value = parser.get_statement(
         &mut LoopArgument::with_tokens(
@@ -48,7 +49,7 @@ impl YieldParser {
         )
       )?;
       if value.is_none() {
-        return Ok(YieldNode::new(None, None));
+        return Ok(YieldNode::new(None, None, parser.gen_loc(start_loc)));
       }
       let mut key = None;
       if
@@ -73,7 +74,7 @@ impl YieldParser {
           )
         );
       }
-      return Ok(YieldNode::new(key, value));
+      return Ok(YieldNode::new(key, value, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Yield", args))
   }

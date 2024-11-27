@@ -1,9 +1,9 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ BlockNode, Node, TraitNode };
+use backyard_nodes::node::{ BlockNode, Location, Node, TraitNode };
 
 use crate::{
   error::ParserError,
-  parser::{ LoopArgument, Parser },
+  parser::{ LocationHelper, LoopArgument, Parser },
   utils::{ match_pattern, Lookup },
 };
 
@@ -31,9 +31,11 @@ impl TraitParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, name] = matched.as_slice() {
+      let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
       parser.position += 1;
       let body = parser.get_children(
         &mut LoopArgument::new(
@@ -50,7 +52,13 @@ impl TraitParser {
           ]
         )
       )?;
-      return Ok(TraitNode::new(IdentifierParser::from_matched(name), BlockNode::new(body)));
+      return Ok(
+        TraitNode::new(
+          IdentifierParser::from_matched(name),
+          BlockNode::new(body, parser.gen_loc(block_loc)),
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::internal("Trait", args))
   }

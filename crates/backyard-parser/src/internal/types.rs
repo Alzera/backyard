@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ IntersectionTypeNode, Node, TypeNode, UnionTypeNode };
+use backyard_nodes::node::{ IntersectionTypeNode, Location, Node, TypeNode, UnionTypeNode };
 
 use crate::{ error::ParserError, guard, parser::{ LoopArgument, Parser } };
 
@@ -81,8 +81,9 @@ impl TypesParser {
   }
 
   pub fn parse(
-    _: &mut Parser,
+    parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if matched.len() == 2 {
@@ -90,7 +91,7 @@ impl TypesParser {
         let name = guard!(types.first(), {
           return Err(ParserError::internal("Type", args));
         }).value.to_owned();
-        return Ok(TypeNode::new(!is_nullable.is_empty(), name));
+        return Ok(TypeNode::new(!is_nullable.is_empty(), name, parser.gen_loc(start_loc)));
       }
     } else if matched.len() == 1 {
       if let [types] = matched.as_slice() {
@@ -107,12 +108,14 @@ impl TypesParser {
           .collect();
         if let Some(separator) = separator {
           if separator == TokenType::BitwiseOr {
-            return Ok(UnionTypeNode::new(types));
+            return Ok(UnionTypeNode::new(types, parser.gen_loc(start_loc)));
           } else if separator == TokenType::BitwiseAnd {
-            return Ok(IntersectionTypeNode::new(types));
+            return Ok(IntersectionTypeNode::new(types, parser.gen_loc(start_loc)));
           }
         } else if types.len() == 1 {
-          return Ok(TypeNode::new(false, types.last().unwrap().to_owned()));
+          return Ok(
+            TypeNode::new(false, types.last().unwrap().to_owned(), parser.gen_loc(start_loc))
+          );
         }
       }
     }

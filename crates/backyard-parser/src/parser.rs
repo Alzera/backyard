@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, NodeType };
+use backyard_nodes::node::{ Location, Node, NodeType, RangeLocation };
 use crate::{
   error::ParserError,
   internal::{ attribute::AttributeParser, echo::EchoParser, statics::StaticsParser },
@@ -55,6 +55,7 @@ type InternalParserTest = fn(&[Token], &mut LoopArgument) -> Option<Vec<Vec<Toke
 type InternalParserParse = fn(
   &mut Parser,
   Vec<Vec<Token>>,
+  Location,
   &mut LoopArgument
 ) -> Result<Box<Node>, ParserError>;
 type InternalParser = (InternalParserTest, InternalParserParse);
@@ -307,11 +308,12 @@ impl<'a> Parser<'a> {
 
     for (test, parse) in args.parsers {
       if let Some(matched) = test(tokens, args) {
+        let start_loc = tokens.first().unwrap().get_location().unwrap();
         self.position += matched
           .iter()
           .map(|x| x.len())
           .sum::<usize>();
-        let parsed = parse(self, matched, args)?;
+        let parsed = parse(self, matched, start_loc, args)?;
         return Ok(Some(parsed));
       }
     }
@@ -334,4 +336,55 @@ impl<'a> Parser<'a> {
       Ok(None)
     }
   }
+
+  pub fn gen_loc(&self, start: Location) -> Option<RangeLocation> {
+    let end = self.tokens.get(self.position - 1);
+    if let Some(end) = end.and_then(|x| x.get_location()) {
+      return Some(RangeLocation { start, end });
+    } else {
+      None
+    }
+  }
+
+  pub fn gen_loc_helper<T>(&self, start: T) -> Option<RangeLocation> where T: LocationHelper {
+    let start = start.get_location();
+    if let Some(start) = start {
+      self.gen_loc(start)
+    } else {
+      None
+    }
+  }
 }
+
+pub trait LocationHelper {
+  fn get_location(&self) -> Option<Location>;
+}
+
+impl LocationHelper for &Node {
+  fn get_location(&self) -> Option<Location> {
+    if let Some(loc) = &self.loc { Some(loc.start.clone()) } else { None }
+  }
+}
+
+impl LocationHelper for &Token {
+  fn get_location(&self) -> Option<Location> {
+    Some(Location { line: self.line, column: self.column, offset: self.offset })
+  }
+}
+
+// pub struct LocationUtils;
+
+// impl LocationUtils {
+
+//   // pub fn gen<T>(start: Option<&T>, end: Option<&T>) -> Option<RangeLocation> where T: LocationHelper {
+//   //   let start = start.and_then(|x| x.get_location());
+//   //   let end = end.and_then(|x| x.get_location());
+//   //   if start.is_none() || end.is_none() {
+//   //     return None;
+//   //   }
+//   //   Some(RangeLocation {
+//   //     start: start.unwrap(),
+//   //     end: end.unwrap(),
+//   //   })
+//   // }
+// }

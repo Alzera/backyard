@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, ConstNode, ConstPropertyNode };
+use backyard_nodes::node::{ Location, Node, ConstNode, ConstPropertyNode };
 
 use crate::{
   error::ParserError,
@@ -39,10 +39,11 @@ impl ConstParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      return Ok(ConstNode::new(ConstParser::get_consts(parser)?));
+      return Ok(ConstNode::new(ConstParser::get_consts(parser)?, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Const", args))
   }
@@ -65,13 +66,15 @@ impl ConstPropertyParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [visibility, _] = matched.as_slice() {
       return Ok(
         ConstPropertyNode::new(
           some_or_default(visibility.first(), String::from(""), |i| i.value.to_owned()),
-          ConstParser::get_consts(parser)?
+          ConstParser::get_consts(parser)?,
+          parser.gen_loc(start_loc)
         )
       );
     }

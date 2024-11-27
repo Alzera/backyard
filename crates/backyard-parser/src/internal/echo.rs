@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
-use backyard_nodes::node::{ EchoNode, Node };
+use backyard_nodes::node::{ EchoNode, Location, Node };
 
 use crate::{
   error::ParserError,
@@ -18,6 +18,7 @@ impl EchoParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
@@ -35,7 +36,7 @@ impl EchoParser {
           parser.position -= 1;
         }
       }
-      return Ok(EchoNode::new(items));
+      return Ok(EchoNode::new(items, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Echo", args))
   }

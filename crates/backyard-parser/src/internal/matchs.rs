@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ MatchArmNode, MatchNode, Node };
+use backyard_nodes::node::{ Location, MatchArmNode, MatchNode, Node };
 
 use crate::{
   error::ParserError,
@@ -24,6 +24,7 @@ impl MatchParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
@@ -47,7 +48,7 @@ impl MatchParser {
           ]
         )
       )?;
-      return Ok(MatchNode::new(condition, arms));
+      return Ok(MatchNode::new(condition, arms, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Match", args))
   }
@@ -64,6 +65,7 @@ impl MatchArmParser {
   pub fn parse(
     parser: &mut Parser,
     _: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     let conditions = match
@@ -101,6 +103,6 @@ impl MatchArmParser {
         parser.position += 1;
       }
     }
-    Ok(MatchArmNode::new(conditions, body))
+    Ok(MatchArmNode::new(conditions, body, parser.gen_loc(start_loc)))
   }
 }

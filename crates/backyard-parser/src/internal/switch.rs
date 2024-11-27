@@ -1,10 +1,10 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ BlockNode, CaseNode, Node, SwitchNode };
+use backyard_nodes::node::{ BlockNode, CaseNode, Location, Node, SwitchNode };
 
 use crate::{
   error::ParserError,
   guard,
-  parser::{ LoopArgument, Parser },
+  parser::{ LocationHelper, LoopArgument, Parser },
   utils::{ match_pattern, Lookup },
 };
 
@@ -24,6 +24,7 @@ impl SwitchParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
@@ -40,6 +41,7 @@ impl SwitchParser {
         guard!(parser.tokens.get(parser.position), {
           return Err(ParserError::internal("Switch", args));
         }).token_type == TokenType::Colon;
+      let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
       parser.position += 1;
       let statements = parser.get_children(
         &mut LoopArgument::new(
@@ -52,7 +54,14 @@ impl SwitchParser {
           ]
         )
       )?;
-      return Ok(SwitchNode::new(condition, BlockNode::new(statements), is_short));
+      return Ok(
+        SwitchNode::new(
+          condition,
+          BlockNode::new(statements, parser.gen_loc(block_loc)),
+          is_short,
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::internal("Switch", args))
   }
@@ -69,6 +78,7 @@ impl CaseParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [is_default] = matched.as_slice() {
@@ -92,6 +102,7 @@ impl CaseParser {
         if token == TokenType::LeftCurlyBracket {
           BlockParser::new(parser)?
         } else {
+          let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
           let s = parser.get_children(
             &mut LoopArgument::with_tokens(
               "switch_case_body",
@@ -105,10 +116,10 @@ impl CaseParser {
             )
           )?;
           parser.position -= 1;
-          BlockNode::new(s)
+          BlockNode::new(s, parser.gen_loc(block_loc))
         }
       };
-      return Ok(CaseNode::new(condition, statements));
+      return Ok(CaseNode::new(condition, statements, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Case", args))
   }

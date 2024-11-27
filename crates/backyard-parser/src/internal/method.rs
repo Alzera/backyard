@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, MethodNode };
+use backyard_nodes::node::{ Location, Node, MethodNode };
 
 use crate::{ error::ParserError, guard, parser::{ LoopArgument, Parser }, utils::some_or_default };
 
@@ -50,6 +50,7 @@ impl MethodParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [visibility, modifier, is_static, _] = matched.as_slice() {
@@ -75,7 +76,8 @@ impl MethodParser {
           some_or_default(visibility.first(), String::from(""), |i| i.value.to_owned()),
           some_or_default(modifier.first(), String::from(""), |i| i.value.to_owned()),
           !is_static.is_empty(),
-          function
+          function,
+          parser.gen_loc(start_loc)
         )
       );
     }

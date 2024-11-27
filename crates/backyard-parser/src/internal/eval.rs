@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Node, EvalNode };
+use backyard_nodes::node::{ Location, Node, EvalNode };
 
 use crate::{
   error::ParserError,
@@ -21,6 +21,7 @@ impl EvalParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
@@ -31,7 +32,7 @@ impl EvalParser {
       if argument.is_none() {
         return Err(ParserError::internal("Eval", args));
       }
-      return Ok(EvalNode::new(argument.unwrap()));
+      return Ok(EvalNode::new(argument.unwrap(), parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Eval", args))
   }

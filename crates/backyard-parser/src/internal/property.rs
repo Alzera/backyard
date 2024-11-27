@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
-use backyard_nodes::node::{ Node, PropertyItemNode, PropertyNode };
+use backyard_nodes::node::{ Location, Node, PropertyItemNode, PropertyNode };
 
 use crate::{
   error::ParserError,
@@ -66,6 +66,7 @@ impl PropertyParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [visibility, modifier] = matched.as_slice() {
@@ -85,7 +86,8 @@ impl PropertyParser {
         PropertyNode::new(
           some_or_default(visibility.first(), String::from(""), |i| i.value.to_owned()),
           some_or_default(modifier.first(), String::from(""), |i| i.value.to_owned()),
-          items
+          items,
+          parser.gen_loc(start_loc)
         )
       );
     }
@@ -107,6 +109,7 @@ impl PropertyItemParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name, has_value] = matched.as_slice() {
@@ -125,7 +128,8 @@ impl PropertyItemParser {
         PropertyItemNode::new(
           IdentifierParser::from_matched(name),
           args.last_expr.to_owned(),
-          value
+          value,
+          parser.gen_loc(start_loc)
         )
       );
     }

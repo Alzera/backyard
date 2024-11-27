@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ DoWhileConditionNode, DoWhileNode, Node };
+use backyard_nodes::node::{ DoWhileConditionNode, DoWhileNode, Location, Node };
 
 use crate::{
   error::ParserError,
@@ -21,6 +21,7 @@ impl DoWhileParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
@@ -42,7 +43,7 @@ impl DoWhileParser {
         }
       );
       parser.position += 1;
-      return Ok(DoWhileNode::new(condition, body));
+      return Ok(DoWhileNode::new(condition, body, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("DoWhile", args))
   }
@@ -62,6 +63,7 @@ impl DoWhileConditionParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
@@ -73,7 +75,7 @@ impl DoWhileConditionParser {
           return Err(ParserError::internal("DoWhileCondition", args));
         }
       );
-      return Ok(DoWhileConditionNode::new(condition));
+      return Ok(DoWhileConditionNode::new(condition, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("DoWhileCondition", args))
   }

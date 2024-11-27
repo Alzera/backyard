@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ EnumItemNode, EnumNode, Node };
+use backyard_nodes::node::{ EnumItemNode, EnumNode, Location, Node };
 
 use crate::{
   error::ParserError,
@@ -37,6 +37,7 @@ impl EnumParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, name, has_type, enum_type, has_implements, implements, _] = matched.as_slice() {
@@ -64,7 +65,15 @@ impl EnumParser {
           ]
         )
       )?;
-      return Ok(EnumNode::new(IdentifierParser::from_matched(name), enum_type, implements, items));
+      return Ok(
+        EnumNode::new(
+          IdentifierParser::from_matched(name),
+          enum_type,
+          implements,
+          items,
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::internal("Enum", args))
   }
@@ -81,6 +90,7 @@ impl EnumItemParser {
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<Vec<Token>>,
+    start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
@@ -93,7 +103,7 @@ impl EnumItemParser {
           )
         )?
       {
-        return Ok(EnumItemNode::new(value));
+        return Ok(EnumItemNode::new(value, parser.gen_loc(start_loc)));
       }
     }
     Err(ParserError::internal("EnumItem", args))
