@@ -1,9 +1,9 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ BlockNode, CaseNode, Node, SwitchNode };
-use utils::guard;
 
 use crate::{
   error::ParserError,
+  guard,
   parser::{ LoopArgument, Parser },
   utils::{ match_pattern, Lookup },
 };

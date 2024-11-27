@@ -1,5 +1,4 @@
 use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
-use utils::guard;
 
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
@@ -47,12 +46,10 @@ impl StringGenerator {
     let node = cast_node!(NodeWrapper::NowDoc, &node.node);
     builder.push(&format!("<<<'{}'", node.label));
     builder.push(&node.value);
-    if
-      !guard!(node.value.split('\n').last())
-        .chars()
-        .all(|x| x.is_whitespace())
-    {
-      builder.new_line();
+    if let Some(last) = node.value.split('\n').last() {
+      if !last.chars().all(|x| x.is_whitespace()) {
+        builder.new_line();
+      }
     }
     builder.push(&node.label);
   }
@@ -65,12 +62,10 @@ impl StringGenerator {
       &mut GeneratorArgument::generator(&[(NodeType::EncapsedPart, Self::generate_encapsed_part)])
     );
     builder.push(&parts.to_string(""));
-    if
-      !guard!(parts.lines.last())
-        .line.chars()
-        .all(|x| x.is_whitespace())
-    {
-      builder.new_line();
+    if let Some(last) = parts.lines.last() {
+      if !last.line.chars().all(|x| x.is_whitespace()) {
+        builder.new_line();
+      }
     }
     builder.push(&node.label);
   }

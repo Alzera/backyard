@@ -2,9 +2,8 @@ use std::vec;
 
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ CallArgumentNode, CallNode, Node };
-use utils::guard;
 
-use crate::{ error::ParserError, parser::{ LoopArgument, Parser } };
+use crate::{ error::ParserError, guard, parser::{ LoopArgument, Parser } };
 
 use super::{ comment::CommentParser, identifier::IdentifierParser };
 

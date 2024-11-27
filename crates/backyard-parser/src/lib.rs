@@ -1,6 +1,7 @@
 mod internal;
 mod parser;
 mod utils;
+mod guards;
 pub mod error;
 
 use backyard_lexer::{ lex, lex_eval };

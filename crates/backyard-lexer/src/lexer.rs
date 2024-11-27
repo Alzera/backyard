@@ -1,5 +1,3 @@
-use utils::guard;
-
 use crate::error::{ LexError, LexResult };
 use crate::internal::inline::InlineToken;
 use crate::token::{ Token, TokenType };
@@ -189,9 +187,11 @@ impl Lexer {
     }
 
     let snapshot = &self.control.get_snapshot();
-    let current_char = guard!(self.control.next_char(), {
+    let current_char = if let Some(current_char) = self.control.next_char() {
+      current_char
+    } else {
       return Err(LexError::Eof);
-    });
+    };
 
     match current_char {
       '$' => VariableToken::lex(self, snapshot),

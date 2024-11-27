@@ -1,7 +1,7 @@
 use backyard_nodes::node::Node;
 use generator::Generator;
 
-pub mod generator;
+mod generator;
 mod internal;
 mod test_utils;
 

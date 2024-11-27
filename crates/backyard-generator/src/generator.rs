@@ -1,5 +1,4 @@
 use backyard_nodes::node::{ Node, NodeType };
-use utils::guard;
 
 use crate::internal::{ attribute::AttributeGenerator, comment::CommentGenerator };
 
@@ -120,10 +119,6 @@ impl Line {
     Self { line: String::new(), indent: 0 }
   }
 
-  pub fn shift(&mut self, line: &str) {
-    self.line.insert_str(0, line);
-  }
-
   pub fn push(&mut self, line: &str) {
     self.line.push_str(line);
   }
@@ -162,12 +157,10 @@ impl Builder {
     self.lines.push(Line::new());
   }
 
-  pub fn shift(&mut self, line: &str) {
-    guard!(self.lines.last_mut()).shift(line);
-  }
-
   pub fn push(&mut self, line: &str) {
-    guard!(self.lines.last_mut()).push(line);
+    if let Some(last) = self.lines.last_mut() {
+      last.push(line);
+    }
   }
 
   pub fn total_len(&self) -> usize {
@@ -203,7 +196,9 @@ impl Builder {
     }
     let mut lines = builder.lines.clone();
     let first = lines.remove(0);
-    guard!(self.lines.last_mut()).push(&first.line);
+    if let Some(last) = self.lines.last_mut() {
+      last.push(&first.line);
+    }
     self.lines.extend(lines);
   }
 

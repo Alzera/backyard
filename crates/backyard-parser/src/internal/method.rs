@@ -1,8 +1,7 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Node, MethodNode };
-use utils::guard;
 
-use crate::{ error::ParserError, parser::{ LoopArgument, Parser }, utils::some_or_default };
+use crate::{ error::ParserError, guard, parser::{ LoopArgument, Parser }, utils::some_or_default };
 
 use super::{ comment::CommentParser, function::FunctionParser };
 

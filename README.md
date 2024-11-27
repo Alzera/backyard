@@ -226,3 +226,7 @@ Resulting this string:
 
 - [nikic/PHP-Parser](https://github.com/nikic/PHP-Parser)
 - [glayzzle/php-parser](https://github.com/glayzzle/php-parser)
+
+## license
+
+[MIT](https://github.com/Alzera/backyard/blob/main/LICENSE)

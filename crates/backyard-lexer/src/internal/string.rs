@@ -1,5 +1,3 @@
-use utils::guard;
-
 use crate::internal::variable::VariableToken;
 use crate::error::LexResult;
 use crate::lexer::{ ControlSnapshot, Lexer, SeriesChecker };
@@ -43,9 +41,11 @@ impl StringToken {
         false
       });
 
-      let current = guard!(lexer.control.peek_char(None), {
+      let current = if let Some(current) = lexer.control.peek_char(None) {
+        current
+      } else {
         break;
-      });
+      };
       if checker.check().is_some() {
         t.push(current);
         t = t[..t.len() - breaker.len()].to_string();

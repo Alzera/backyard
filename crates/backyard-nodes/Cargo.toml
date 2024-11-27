@@ -1,7 +1,11 @@
 [package]
 name = "backyard-nodes"
+description = "Nodes representing PHP code AST."
+authors.workspace = true
 edition.workspace = true
 version.workspace = true
+repository.workspace = true
+license.workspace = true
 
 [dependencies]
 ts-rs = { workspace = true }

@@ -1,10 +1,12 @@
 [package]
 name = "backyard-generator"
+description = "Convert AST node back to PHP code."
+authors.workspace = true
 edition.workspace = true
 version.workspace = true
+repository.workspace = true
+license.workspace = true
 
 [dependencies]
 backyard-nodes = { workspace = true }
 backyard-parser = { workspace = true }
-
-utils = { workspace = true }

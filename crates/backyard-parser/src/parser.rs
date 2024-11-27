@@ -236,10 +236,10 @@ impl<'a> Parser<'a> {
     args: &mut LoopArgument
   ) -> Result<Option<Box<Node>>, ParserError> {
     while let Some(token) = self.tokens.get(self.position) {
-      println!("");
-      println!("context: {:?}", args.context);
-      println!("token: {:?}", token);
-      println!("last_expr: {:?}", args.last_expr);
+      // println!("");
+      // println!("context: {:?}", args.context);
+      // println!("token: {:?}", token);
+      // println!("last_expr: {:?}", args.last_expr);
 
       if
         args.separators.contains(&token.token_type) ||

@@ -7,10 +7,10 @@ use backyard_nodes::node::{
   ParameterNode,
   PropertyNode,
 };
-use utils::guard;
 
 use crate::{
   error::ParserError,
+  guard,
   parser::{ LoopArgument, Parser },
   utils::{ match_pattern, some_or_default, Lookup },
 };

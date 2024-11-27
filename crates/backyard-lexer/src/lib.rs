@@ -1,6 +1,6 @@
 pub mod token;
 mod internal;
-pub mod lexer;
+mod lexer;
 pub mod error;
 
 use error::LexResult;
