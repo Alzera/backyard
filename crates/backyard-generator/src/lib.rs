@@ -7,7 +7,7 @@ mod generator;
 mod internal;
 mod test_utils;
 
-pub fn generate(node: Node) -> Result<String, GeneratorError> {
+pub fn generate(node: Box<Node>) -> Result<String, GeneratorError> {
   if let NodeWrapper::Program(program) = node.node {
     let mut generator = Generator::new(&program.children);
     Ok(generator.start())
