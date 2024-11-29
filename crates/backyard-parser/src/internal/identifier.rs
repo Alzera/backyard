@@ -43,7 +43,7 @@ impl IdentifierParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [identifier] = matched.as_slice() {
-      return Ok(Self::from_matched(&identifier));
+      return Ok(Self::from_matched(identifier));
     }
     Err(ParserError::internal("Identifier", args))
   }

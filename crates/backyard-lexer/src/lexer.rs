@@ -399,7 +399,7 @@ impl Lexer {
         match t.as_str() {
           "!==" => Ok(vec![Token::new(TokenType::IsNotIdentical, "!==", snapshot)]),
           "!=" => Ok(vec![Token::new(TokenType::IsNotEqual, "!=", snapshot)]),
-          c if c.starts_with("!") => {
+          c if c.starts_with('!') => {
             if t.len() > 1 {
               self.control.position -= t.len() - 1;
             }
@@ -437,7 +437,7 @@ impl Lexer {
       '\'' => StringToken::lex(self, '\'', snapshot),
       '\\' => {
         let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_' || *ch == '\\'));
-        Ok(vec![Token::new(TokenType::Name, &t, snapshot)])
+        Ok(vec![Token::new(TokenType::Name, t, snapshot)])
       }
       ',' => Ok(vec![Token::new(TokenType::Comma, ",", snapshot)]),
       ';' => Ok(vec![Token::new(TokenType::Semicolon, ";", snapshot)]),

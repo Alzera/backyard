@@ -125,7 +125,7 @@ impl StringToken {
     {
       return Err(lexer.control.error_unrecognized(&label));
     }
-    if label.starts_with("'") && label.ends_with("'") {
+    if label.starts_with('\'') && label.ends_with('\'') {
       let clean_label = label
         .get(1..label.len() - 1)
         .unwrap_or_default()

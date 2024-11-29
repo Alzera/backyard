@@ -171,7 +171,7 @@ impl ClassParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [readonly, modifier, _, name, _, extends] = matched.as_slice() {
-      let extends = extends.first().map(|t| IdentifierParser::from_token(t));
+      let extends = extends.first().map(IdentifierParser::from_token);
       let mut implements = vec![];
       if let Some(t) = parser.tokens.get(parser.position) {
         if t.token_type == TokenType::Implements {

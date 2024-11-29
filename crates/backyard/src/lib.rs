@@ -61,7 +61,7 @@ pub fn generate(input: NodeArray) -> Result<String, Error> {
 
   match process_generate(nodes) {
     Ok(nodes) => {
-      return Ok(nodes);
+      Ok(nodes)
     }
     Err(err) => Err(Error::new(format!("{}", err))),
   }

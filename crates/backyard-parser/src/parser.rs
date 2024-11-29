@@ -339,11 +339,7 @@ impl<'a> Parser<'a> {
 
   pub fn gen_loc(&self, start: Location) -> Option<RangeLocation> {
     let end = self.tokens.get(self.position - 1);
-    if let Some(end) = end.and_then(|x| x.get_location()) {
-      return Some(RangeLocation { start, end });
-    } else {
-      None
-    }
+    end.and_then(|x| x.get_location()).map(|end| RangeLocation { start, end })
   }
 
   pub fn gen_loc_helper<T>(&self, start: T) -> Option<RangeLocation> where T: LocationHelper {
@@ -362,7 +358,7 @@ pub trait LocationHelper {
 
 impl LocationHelper for &Node {
   fn get_location(&self) -> Option<Location> {
-    if let Some(loc) = &self.loc { Some(loc.start.clone()) } else { None }
+    self.loc.as_ref().map(|loc| loc.start.clone())
   }
 }
 

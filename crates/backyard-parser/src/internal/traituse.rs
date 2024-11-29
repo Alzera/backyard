@@ -98,8 +98,8 @@ impl TraitUseAliasParser {
       let has_trait = !double_colon.is_empty();
       let trait_to_parsed = if has_trait { trait_name } else { name };
       let name_to_parsed = if has_trait { name } else { trait_name };
-      let trait_name_parsed = trait_to_parsed.first().map(|t| IdentifierParser::from_token(t));
-      let alias = alias.first().map(|t| IdentifierParser::from_token(t));
+      let trait_name_parsed = trait_to_parsed.first().map(IdentifierParser::from_token);
+      let alias = alias.first().map(IdentifierParser::from_token);
       return Ok(
         TraitUseAliasNode::new(
           trait_name_parsed,

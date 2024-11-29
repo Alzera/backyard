@@ -25,10 +25,8 @@ impl MagicParser {
       return Ok(
         MagicNode::new(
           number
-            .first()
-            .and_then(|i| Some(i.value.to_owned()))
-            .or(Some("0".to_string()))
-            .unwrap(),
+            .first().map(|i| i.value.to_owned())
+            .unwrap_or("0".to_string()),
           parser.gen_loc(start_loc)
         )
       );
