@@ -1,7 +1,143 @@
-use std::fmt;
+use std::fmt::{ self, Display, Formatter };
 
 use serde::{ de::{ self, MapAccess, Visitor }, Deserialize, Deserializer, Serialize };
 use ts_rs::TS;
+
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+pub enum UseItemModifier {
+  Function,
+  Const,
+}
+
+impl UseItemModifier {
+  pub fn from_str(s: &str) -> Option<Self> {
+    match s {
+      "function" => Some(UseItemModifier::Function),
+      "const" => Some(UseItemModifier::Const),
+      _ => None,
+    }
+  }
+}
+
+impl Display for UseItemModifier {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      UseItemModifier::Function => "function",
+      UseItemModifier::Const => "const",
+    })
+  }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+pub enum Modifier {
+  Static,
+  Readonly,
+}
+
+impl Modifier {
+  pub fn from_str(s: &str) -> Option<Self> {
+    match s {
+      "static" => Some(Modifier::Static),
+      "readonly" => Some(Modifier::Readonly),
+      _ => None,
+    }
+  }
+}
+
+impl Display for Modifier {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      Modifier::Static => "static",
+      Modifier::Readonly => "readonly",
+    })
+  }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+pub enum Quote {
+  Single,
+  Double,
+  Backtick,
+}
+
+impl Quote {
+  pub fn from_str(s: &str) -> Option<Self> {
+    match s {
+      "'" => Some(Quote::Single),
+      "\"" => Some(Quote::Double),
+      "`" => Some(Quote::Backtick),
+      _ => None,
+    }
+  }
+}
+
+impl Display for Quote {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      Quote::Single => "'",
+      Quote::Double => "\"",
+      Quote::Backtick => "`",
+    })
+  }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+pub enum Inheritance {
+  Abstract,
+  Final,
+}
+
+impl Inheritance {
+  pub fn from_str(s: &str) -> Option<Self> {
+    match s {
+      "abstract" => Some(Inheritance::Abstract),
+      "final" => Some(Inheritance::Final),
+      _ => None,
+    }
+  }
+}
+
+impl Display for Inheritance {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      Inheritance::Abstract => "abstract",
+      Inheritance::Final => "final",
+    })
+  }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+pub enum Visibility {
+  Public,
+  Private,
+  Protected,
+}
+
+impl Visibility {
+  pub fn from_str(s: &str) -> Option<Self> {
+    match s {
+      "public" => Some(Visibility::Public),
+      "private" => Some(Visibility::Private),
+      "protected" => Some(Visibility::Protected),
+      _ => None,
+    }
+  }
+}
+
+impl Display for Visibility {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      Visibility::Public => "public",
+      Visibility::Private => "private",
+      Visibility::Protected => "protected",
+    })
+  }
+}
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
@@ -42,7 +178,7 @@ impl<'de> Deserialize<'de> for Node {
     impl<'de> Visitor<'de> for NodeVisitor {
       type Value = Node;
 
-      fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+      fn expecting(&self, formatter: &mut Formatter) -> fmt::Result {
         formatter.write_str("a valid Node structure")
       }
 
@@ -577,7 +713,7 @@ new_node!(Catch, CatchNode {
   body: Box<Node>,
 });
 new_node!(Class, ClassNode {
-  modifier: String,
+  inheritance: Option<Inheritance>,
   name: Option<Box<Node>>,
   extends: Option<Box<Node>>,
   implements: Vec<Box<Node>>,
@@ -601,7 +737,7 @@ new_node!(Const, ConstNode {
   items: Vec<Box<Node>>,
 });
 new_node!(ConstProperty, ConstPropertyNode {
-  visibility: String,
+  visibility: Option<Visibility>,
   items: Vec<Box<Node>>,
 });
 new_node!(Continue, ContinueNode {
@@ -635,7 +771,7 @@ new_node!(Elvis, ElvisNode {
   right: Box<Node>,
 });
 new_node!(Encapsed, EncapsedNode {
-  quote: String,
+  quote: Quote,
   values: Vec<Box<Node>>,
 });
 new_node!(EncapsedPart, EncapsedPartNode {
@@ -739,8 +875,8 @@ new_node!(MatchArm, MatchArmNode {
   body: Box<Node>,
 });
 new_node!(Method, MethodNode {
-  visibility: String,
-  modifier: String,
+  visibility: Option<Visibility>,
+  inheritance: Option<Inheritance>,
   is_static: bool,
   function: Box<Node>,
 });
@@ -795,8 +931,8 @@ new_node!(Program, ProgramNode {
   children: Vec<Box<Node>>,
 });
 new_node!(Property, PropertyNode {
-  visibility: String,
-  modifier: String,
+  visibility: Option<Visibility>,
+  modifier: Option<Modifier>,
   items: Vec<Box<Node>>,
 });
 new_node!(PropertyItem, PropertyItemNode {
@@ -824,7 +960,7 @@ new_node!(StaticLookup, StaticLookupNode {
   use_bracket: bool,
 });
 new_node!(String, StringNode {
-  quote: String,
+  quote: Quote,
   value: String,
 });
 new_node!(Switch, SwitchNode {
@@ -853,7 +989,7 @@ new_node!(TraitUseAlias, TraitUseAliasNode {
   trait_name: Option<Box<Node>>,
   method: Box<Node>,
   alias: Option<Box<Node>>,
-  visibility: String,
+  visibility: Option<Visibility>,
 });
 new_node!(TraitUsePrecedence, TraitUsePrecedenceNode {
   trait_name: Option<Box<Node>>,
@@ -876,7 +1012,7 @@ new_node!(Use, UseNode {
   items: Vec<Box<Node>>,
 });
 new_node!(UseItem, UseItemNode {
-  modifier: String,
+  modifier: Option<UseItemModifier>,
   name: String,
   alias: Option<Box<Node>>,
 });

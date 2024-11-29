@@ -12,7 +12,8 @@ impl StringGenerator {
 
   pub fn generate_encapsed(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Encapsed, &node.node);
-    builder.push(&node.quote);
+    let quote = format!("{}", node.quote);
+    builder.push(&quote);
     let parts = generator
       .generate_nodes_new(
         &node.values,
@@ -20,7 +21,7 @@ impl StringGenerator {
       )
       .to_string("");
     builder.push(&parts);
-    builder.push(&node.quote);
+    builder.push(&quote);
   }
 
   pub fn generate_encapsed_part(

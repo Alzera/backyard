@@ -54,9 +54,9 @@ impl TraitUseGenerator {
     }
     IdentifierGenerator::generate(generator, builder, &node.method);
     builder.push(" as");
-    if !node.visibility.is_empty() {
+    if let Some(n) = &node.visibility {
       builder.push(" ");
-      builder.push(&node.visibility);
+      builder.push(format!("{}", n).as_str());
     }
     if let Some(alias) = &node.alias {
       builder.push(" ");

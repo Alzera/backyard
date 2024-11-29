@@ -49,10 +49,3 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<Vec<Tok
 
   Some(result)
 }
-
-pub fn some_or_default<T, U, F>(opt: Option<T>, default: U, access: F) -> U where F: Fn(T) -> U {
-  match opt {
-    Some(value) => access(value),
-    None => default,
-  }
-}

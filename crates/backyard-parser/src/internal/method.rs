@@ -1,7 +1,7 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, MethodNode };
+use backyard_nodes::node::{ Inheritance, Location, MethodNode, Node, Visibility };
 
-use crate::{ error::ParserError, guard, parser::{ LoopArgument, Parser }, utils::some_or_default };
+use crate::{ error::ParserError, guard, parser::{ LoopArgument, Parser } };
 
 use super::{ comment::CommentParser, function::FunctionParser };
 
@@ -73,8 +73,18 @@ impl MethodParser {
       );
       return Ok(
         MethodNode::new(
-          some_or_default(visibility.first(), String::from(""), |i| i.value.to_owned()),
-          some_or_default(modifier.first(), String::from(""), |i| i.value.to_owned()),
+          Visibility::from_str(
+            &visibility
+              .first()
+              .map(|i| i.value.to_owned())
+              .unwrap_or_default()
+          ),
+          Inheritance::from_str(
+            &modifier
+              .first()
+              .map(|i| i.value.to_owned())
+              .unwrap_or_default()
+          ),
           !is_static.is_empty(),
           function,
           parser.gen_loc(start_loc)

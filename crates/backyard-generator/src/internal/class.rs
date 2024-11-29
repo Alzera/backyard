@@ -19,8 +19,8 @@ impl ClassGenerator {
     if node.is_readonly {
       builder.push("readonly ");
     }
-    if !node.modifier.is_empty() {
-      builder.push(format!("{} ", node.modifier).as_str());
+    if let Some(n) = &node.inheritance {
+      builder.push(format!("{} ", n).as_str());
     }
     builder.push("class");
     if let Some(n) = &node.name {

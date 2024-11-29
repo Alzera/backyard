@@ -1,7 +1,7 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Location, Node, NumberNode };
 
-use crate::{ error::ParserError, parser::{ LoopArgument, Parser }, utils::some_or_default };
+use crate::{ error::ParserError, parser::{ LoopArgument, Parser } };
 
 #[derive(Debug, Clone)]
 pub struct NumberParser;
@@ -24,7 +24,11 @@ impl NumberParser {
     if let [number] = matched.as_slice() {
       return Ok(
         NumberNode::new(
-          some_or_default(number.first(), String::from("0"), |i| i.value.to_owned()),
+          number
+            .first()
+            .and_then(|i| Some(i.value.to_owned()))
+            .or(Some("0".to_string()))
+            .unwrap(),
           parser.gen_loc(start_loc)
         )
       );

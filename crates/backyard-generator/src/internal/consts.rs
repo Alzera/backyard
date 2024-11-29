@@ -27,8 +27,8 @@ impl ConstGenerator {
   pub fn generate_property(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::ConstProperty, &node.node);
 
-    if !node.visibility.is_empty() {
-      builder.push(format!("{} ", node.visibility).as_str());
+    if let Some(n) = &node.visibility {
+      builder.push(format!("{} ", n).as_str());
     }
     builder.push("const ");
     let mut consts = generator.generate_nodes_new(

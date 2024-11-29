@@ -1,11 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
-use backyard_nodes::node::{ Location, Node, PropertyItemNode, PropertyNode };
+use backyard_nodes::node::{ Location, Modifier, Node, PropertyItemNode, PropertyNode, Visibility };
 
 use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, some_or_default, Lookup },
+  utils::{ match_pattern, Lookup },
 };
 
 use super::{ comment::CommentParser, identifier::IdentifierParser, types::TypesParser };
@@ -84,8 +84,18 @@ impl PropertyParser {
       )?;
       return Ok(
         PropertyNode::new(
-          some_or_default(visibility.first(), String::from(""), |i| i.value.to_owned()),
-          some_or_default(modifier.first(), String::from(""), |i| i.value.to_owned()),
+          Visibility::from_str(
+            &visibility
+              .first()
+              .map(|i| i.value.to_owned())
+              .unwrap_or_default()
+          ),
+          Modifier::from_str(
+            &modifier
+              .first()
+              .map(|i| i.value.to_owned())
+              .unwrap_or_default()
+          ),
           items,
           parser.gen_loc(start_loc)
         )

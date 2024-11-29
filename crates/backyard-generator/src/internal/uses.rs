@@ -44,8 +44,8 @@ impl UseGenerator {
 
   pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::UseItem, &node.node);
-    if !node.modifier.is_empty() {
-      builder.push(format!("{} ", node.modifier).as_str());
+    if let Some(n) = &node.modifier {
+      builder.push(format!("{} ", n).as_str());
     }
     builder.push(&node.name);
 

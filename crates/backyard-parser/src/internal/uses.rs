@@ -1,11 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, UseItemNode, UseNode };
+use backyard_nodes::node::{ Location, Node, UseItemModifier, UseItemNode, UseNode };
 
 use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, some_or_default, Lookup },
+  utils::{ match_pattern, Lookup },
 };
 
 use super::{ comment::CommentParser, identifier::IdentifierParser };
@@ -103,7 +103,12 @@ impl UseItemParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [modifier, name] = matched.as_slice() {
-      let modifier = some_or_default(modifier.first(), String::from(""), |i| i.value.to_owned());
+      let modifier = UseItemModifier::from_str(
+        &modifier
+          .first()
+          .map(|i| i.value.to_owned())
+          .unwrap_or_default()
+      );
       let name = guard!(name.first(), {
         return Err(ParserError::internal("UseItem", args));
       }).value.to_owned();

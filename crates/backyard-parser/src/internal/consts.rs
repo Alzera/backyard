@@ -1,10 +1,10 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, ConstNode, ConstPropertyNode };
+use backyard_nodes::node::{ ConstNode, ConstPropertyNode, Location, Node, Visibility };
 
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, some_or_default, Lookup },
+  utils::{ match_pattern, Lookup },
 };
 
 use super::{ assignment::AssignmentParser, comment::CommentParser, identifier::IdentifierParser };
@@ -72,7 +72,12 @@ impl ConstPropertyParser {
     if let [visibility, _] = matched.as_slice() {
       return Ok(
         ConstPropertyNode::new(
-          some_or_default(visibility.first(), String::from(""), |i| i.value.to_owned()),
+          Visibility::from_str(
+            &visibility
+              .first()
+              .map(|i| i.value.to_owned())
+              .unwrap_or_default()
+          ),
           ConstParser::get_consts(parser)?,
           parser.gen_loc(start_loc)
         )

@@ -3,7 +3,7 @@ use crate::{ error::LexResult, lexer::{ ControlSnapshot, Lexer }, token::{ Token
 pub struct KeywordToken;
 
 impl KeywordToken {
-  const KEYS: [&str; 73] = [
+  const KEYS: [&'static str; 73] = [
     "abstract",
     "array",
     "as",

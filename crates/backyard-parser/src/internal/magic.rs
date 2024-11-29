@@ -4,7 +4,7 @@ use backyard_nodes::node::{ Location, Node, MagicNode };
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, some_or_default, Lookup },
+  utils::{ match_pattern, Lookup },
 };
 
 #[derive(Debug, Clone)]
@@ -24,7 +24,11 @@ impl MagicParser {
     if let [number] = matched.as_slice() {
       return Ok(
         MagicNode::new(
-          some_or_default(number.first(), String::from("0"), |i| i.value.to_owned()),
+          number
+            .first()
+            .and_then(|i| Some(i.value.to_owned()))
+            .or(Some("0".to_string()))
+            .unwrap(),
           parser.gen_loc(start_loc)
         )
       );

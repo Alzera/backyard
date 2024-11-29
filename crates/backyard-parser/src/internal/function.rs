@@ -1,19 +1,21 @@
 use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
 use backyard_nodes::node::{
-  Location,
-  Node,
   AnonymousFunctionNode,
   ArrowFunctionNode,
   FunctionNode,
+  Location,
+  Modifier,
+  Node,
   ParameterNode,
   PropertyNode,
+  Visibility,
 };
 
 use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, some_or_default, Lookup },
+  utils::{ match_pattern, Lookup },
 };
 
 use super::{
@@ -182,7 +184,10 @@ impl FunctionParser {
     args: &LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, is_ref, name, _] = matched.as_slice() {
-      let name_parsed = some_or_default(name.first(), String::from(""), |i| i.value.to_owned());
+      let name_parsed = name
+        .first()
+        .map(|i| i.value.to_owned())
+        .unwrap_or_default();
       let arguments = if name_parsed == "__construct" {
         parser.get_children(
           &mut LoopArgument::new(
@@ -304,8 +309,18 @@ impl ConstructorParameterParser {
       );
       return Ok(
         PropertyNode::new(
-          some_or_default(visibility.first(), String::from(""), |i| i.value.to_owned()),
-          some_or_default(modifier.first(), String::from(""), |i| i.value.to_owned()),
+          Visibility::from_str(
+            &visibility
+              .first()
+              .map(|i| i.value.to_owned())
+              .unwrap_or_default()
+          ),
+          Modifier::from_str(
+            &modifier
+              .first()
+              .map(|i| i.value.to_owned())
+              .unwrap_or_default()
+          ),
           vec![item],
           parser.gen_loc(start_loc)
         )

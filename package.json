@@ -5,6 +5,7 @@
   "scripts": {
     "prebuild": "cargo test && cd ./crates/backyard && npm run build",
     "build": "node ./scripts/combine.js",
+    "publish:rust": "cargo publish -p backyard-lexer --allow-dirty && cargo publish -p backyard-nodes --allow-dirty && cargo publish -p backyard-parser --allow-dirty && cargo publish -p backyard-generator --allow-dirty",
     "clippy": "cargo clippy -- -A clippy::borrowed_box -A clippy::vec_box -A clippy::new_ret_no_self"
   },
   "devDependencies": {

@@ -6,6 +6,7 @@ use backyard_nodes::node::{
   Location,
   Node,
   NowDocNode,
+  Quote,
   StringNode,
 };
 
@@ -59,7 +60,9 @@ impl StringParser {
         } else if string_type.token_type == TokenType::EncapsedStringOpen {
           let values = StringParser::parse_encapsed(parser, args, TokenType::EncapsedStringClose)?;
           let quote = string_type.value.to_owned();
-          return Ok(EncapsedNode::new(quote, values, parser.gen_loc(start_loc)));
+          return Ok(
+            EncapsedNode::new(Quote::from_str(&quote).unwrap(), values, parser.gen_loc(start_loc))
+          );
         } else if string_type.token_type == TokenType::String {
           let mut value = string_type.value.to_owned();
           let quote = value.remove(0).to_string();
@@ -67,7 +70,9 @@ impl StringParser {
             .get(..value.len() - 1)
             .unwrap_or_default()
             .to_owned();
-          return Ok(StringNode::new(quote, value, parser.gen_loc(start_loc)));
+          return Ok(
+            StringNode::new(Quote::from_str(&quote).unwrap(), value, parser.gen_loc(start_loc))
+          );
         }
       }
     }
@@ -96,11 +101,7 @@ impl StringParser {
           values.push(
             EncapsedPartNode::new(
               false,
-              StringNode::new(
-                "'".to_string(),
-                i.value.to_owned(),
-                parser.gen_loc(start_loc.clone())
-              ),
+              StringNode::new(Quote::Single, i.value.to_owned(), parser.gen_loc(start_loc.clone())),
               parser.gen_loc(start_loc)
             )
           ),

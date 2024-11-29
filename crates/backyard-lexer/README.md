@@ -18,7 +18,7 @@ Generating tokens representation of PHP code.
         println!("{:?}", parsed);
     }
 
-Resulting this json:
+Resulting this result:
 
     Ok([
       Token { token_type: Function, value: "function", line: 2, column: 4, offset: 10 },

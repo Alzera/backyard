@@ -1,11 +1,11 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ AnonymousClassNode, BlockNode, ClassNode, Location, Node };
+use backyard_nodes::node::{ AnonymousClassNode, BlockNode, ClassNode, Inheritance, Location, Node };
 
 use crate::{
   error::ParserError,
   guard,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, some_or_default, Lookup },
+  utils::{ match_pattern, Lookup },
 };
 
 use super::{
@@ -210,7 +210,12 @@ impl ClassParser {
       let name = if !name.is_empty() { Some(IdentifierParser::from_matched(name)) } else { None };
       return Ok(
         ClassNode::new(
-          some_or_default(modifier.first(), String::from(""), |i| i.value.to_owned()),
+          Inheritance::from_str(
+            &modifier
+              .first()
+              .map(|i| i.value.to_owned())
+              .unwrap_or_default()
+          ),
           name,
           extends,
           implements,

@@ -5,13 +5,14 @@ use backyard_nodes::node::{
   TraitUseAliasNode,
   TraitUseNode,
   TraitUsePrecedenceNode,
+  Visibility,
 };
 
 use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, some_or_default, Lookup },
+  utils::{ match_pattern, Lookup },
 };
 
 use super::{ comment::CommentParser, identifier::IdentifierParser };
@@ -104,7 +105,12 @@ impl TraitUseAliasParser {
           trait_name_parsed,
           IdentifierParser::from_matched(name_to_parsed),
           alias,
-          some_or_default(visibility.first(), String::from(""), |i| i.value.to_owned()),
+          Visibility::from_str(
+            &visibility
+              .first()
+              .map(|i| i.value.to_owned())
+              .unwrap_or_default()
+          ),
           parser.gen_loc(start_loc)
         )
       );
