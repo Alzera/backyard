@@ -35,7 +35,7 @@ impl MatchGenerator {
       builder.push("default");
     }
     builder.push(" => ");
-    generator.generate_node(builder, &node.body, &mut GeneratorArgument::default());
+    generator.generate_node(builder, &node.expr, &mut GeneratorArgument::default());
   }
 }
 

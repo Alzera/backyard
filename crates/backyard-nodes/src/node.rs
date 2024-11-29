@@ -782,7 +782,7 @@ new_node!(Enum, EnumNode {
   name: Box<Node>,
   enum_type: Option<Box<Node>>,
   implements: Option<Box<Node>>,
-  items: Vec<Box<Node>>,
+  body: Vec<Box<Node>>,
 });
 new_node!(EnumItem, EnumItemNode {
   value: Box<Node>,
@@ -872,7 +872,7 @@ new_node!(Match, MatchNode {
 });
 new_node!(MatchArm, MatchArmNode {
   conditions: Vec<Box<Node>>,
-  body: Box<Node>,
+  expr: Box<Node>,
 });
 new_node!(Method, MethodNode {
   visibility: Option<Visibility>,

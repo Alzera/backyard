@@ -19,8 +19,8 @@ impl EnumGenerator {
       builder.push(" implements ");
       IdentifierGenerator::generate(generator, builder, n);
     }
-    let mut items = generator.generate_nodes_new(
-      &node.items,
+    let mut body = generator.generate_nodes_new(
+      &node.body,
       &mut GeneratorArgument::new(
         EndMode::SemicolonDynamic,
         &[
@@ -31,8 +31,8 @@ impl EnumGenerator {
       )
     );
     builder.push(" {");
-    items.indent();
-    builder.extend(&items);
+    body.indent();
+    builder.extend(&body);
     builder.new_line();
     builder.push("}");
   }
