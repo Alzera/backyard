@@ -2,12 +2,12 @@ use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
 use backyard_nodes::node::{
   AnonymousFunctionNode,
   ArrowFunctionNode,
+  ConstructorParameterNode,
   FunctionNode,
   Location,
   Modifier,
   Node,
   ParameterNode,
-  PropertyNode,
   Visibility,
 };
 
@@ -23,7 +23,6 @@ use super::{
   block::BlockParser,
   comment::CommentParser,
   identifier::IdentifierParser,
-  property::{ PropertyItemParser, PropertyParser },
   types::TypesParser,
 };
 
@@ -279,7 +278,85 @@ pub struct ConstructorParameterParser;
 
 impl ConstructorParameterParser {
   pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    PropertyParser::test(tokens, args)
+    let modifiers_rule = [
+      [TokenType::Public, TokenType::Private, TokenType::Protected].to_vec(),
+      [TokenType::Static, TokenType::Readonly].to_vec(),
+    ];
+    let mut modifiers = vec![vec![], vec![]];
+    let mut pos = 0;
+    loop {
+      let token = tokens.get(pos);
+      token?;
+      pos += 1;
+      if pos > 2 {
+        break;
+      }
+      let mut assigned = false;
+      let token = token.unwrap();
+      for (i, modifier) in modifiers_rule.iter().enumerate() {
+        if !modifiers[i].is_empty() {
+          continue;
+        }
+        if modifier.contains(&token.token_type) {
+          modifiers[i].push(token.clone());
+          assigned = true;
+          break;
+        }
+      }
+      if !assigned {
+        break;
+      }
+    }
+    let first_test_count = modifiers
+      .iter()
+      .map(|i| i.len())
+      .sum();
+    if
+      let Some(has_var) = match_pattern(
+        &tokens[first_test_count..],
+        &[Lookup::Equal(&[TokenType::Var])]
+      )
+    {
+      if let Some(has_var) = has_var.first() {
+        modifiers.push(has_var.to_owned());
+      }
+    } else {
+      modifiers.push(vec![]);
+    }
+    // need to manually check for variable type
+    let first_test_count = modifiers
+      .iter()
+      .map(|i| i.len())
+      .sum();
+    let tmp_tokens = guard!(tokens.get(first_test_count..), {
+      return None;
+    }).to_vec();
+    let type_test = TypesParser::test(&tmp_tokens, args);
+    let type_test_count: usize = if let Some(t) = type_test {
+      t.iter()
+        .map(|i| i.len())
+        .sum()
+    } else {
+      0
+    };
+    let tmp_tokens = guard!(tmp_tokens.get(type_test_count..), {
+      return None;
+    }).to_vec();
+    guard!(
+      match_pattern(
+        &tmp_tokens,
+        &[
+          Lookup::Optional(&[TokenType::BitwiseAnd]),
+          Lookup::Optional(&[TokenType::Ellipsis]),
+          Lookup::Equal(&[TokenType::Variable]),
+          Lookup::Optional(&[TokenType::Assignment]),
+        ]
+      ),
+      {
+        return None;
+      }
+    );
+    Some(modifiers)
   }
 
   pub fn parse(
@@ -299,7 +376,7 @@ impl ConstructorParameterParser {
               (AttributeParser::test, AttributeParser::parse),
               (CommentParser::test, CommentParser::parse),
               (TypesParser::test, TypesParser::parse),
-              (PropertyItemParser::test, PropertyItemParser::parse),
+              (ParameterParser::test, ParameterParser::parse),
             ]
           )
         )?,
@@ -317,7 +394,7 @@ impl ConstructorParameterParser {
         visibility = Some(Visibility::Public);
       }
       return Ok(
-        PropertyNode::new(
+        ConstructorParameterNode::new(
           visibility,
           Modifier::try_parse(
             &modifier
@@ -325,7 +402,7 @@ impl ConstructorParameterParser {
               .map(|i| i.value.to_owned())
               .unwrap_or_default()
           ),
-          vec![item],
+          item,
           parser.gen_loc(start_loc)
         )
       );

@@ -2,12 +2,7 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATORS };
 
-use super::{
-  block::BlockGenerator,
-  identifier::IdentifierGenerator,
-  property::PropertyGenerator,
-  types::TypeGenerator,
-};
+use super::{ block::BlockGenerator, identifier::IdentifierGenerator };
 
 pub struct FunctionGenerator;
 
@@ -45,13 +40,7 @@ impl FunctionGenerator {
       generator.generate_nodes_new(
         &node.parameters,
         &mut GeneratorArgument::for_parameter(
-          &[
-            (NodeType::Type, TypeGenerator::generate),
-            (NodeType::UnionType, TypeGenerator::generate_union),
-            (NodeType::IntersectionType, TypeGenerator::generate_intersection),
-            (NodeType::Property, PropertyGenerator::generate),
-            (NodeType::Parameter, Self::generate_parameter),
-          ]
+          &[(NodeType::ConstructorParameter, Self::generate_constructor_parameter)]
         )
       )
     } else {
@@ -170,6 +159,21 @@ impl FunctionGenerator {
     generator.generate_node(builder, &node.body, &mut GeneratorArgument::default());
   }
 
+  pub fn generate_constructor_parameter(
+    generator: &mut Generator,
+    builder: &mut Builder,
+    node: &Box<Node>
+  ) {
+    let node = cast_node!(NodeWrapper::ConstructorParameter, &node.node);
+    if let Some(visibility) = &node.visibility {
+      builder.push(&format!("{} ", visibility));
+    }
+    if let Some(modifier) = &node.modifier {
+      builder.push(&format!("{} ", modifier));
+    }
+    Self::generate_parameter(generator, builder, &node.parameter);
+  }
+
   pub fn generate_parameter(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Parameter, &node.node);
     if let Some(n) = &node.variable_type {
@@ -199,7 +203,7 @@ mod tests {
   fn basic() {
     test_eval(
       "class A {
-  public function __construct(protected int $x, protected int $y = 0) {
+  public function __construct(protected int $x, protected int &$y = 0) {
   }
   public function __construct(Pattern ...$patterns) {
   }

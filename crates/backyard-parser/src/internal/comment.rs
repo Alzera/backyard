@@ -40,9 +40,7 @@ impl CommentParser {
           return Err(ParserError::internal("Comment: failed creating node", args));
         }
       };
-      let expr = parser.get_statement(
-        &mut LoopArgument::safe("comment", args.separators, args.breakers, args.parsers)
-      )?;
+      let expr = parser.get_statement(args)?;
       if let Some(mut expr) = expr {
         expr.leadings.insert(0, comment);
         return Ok(expr);
@@ -51,8 +49,7 @@ impl CommentParser {
         expr.trailings.push(comment);
         return Ok(expr);
       }
-      if let Some(mut expr) = args.statements.pop() {
-        expr.trailings.push(comment);
+      if let Some(expr) = args.statements.pop() {
         return Ok(expr);
       }
       return Ok(comment);

@@ -12,7 +12,7 @@ use backyard_nodes::node::{
 use crate::{
   error::ParserError,
   guard,
-  parser::{ LoopArgument, Parser },
+  parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
   utils::{ match_pattern, Lookup },
 };
 
@@ -51,7 +51,7 @@ impl PreParser {
         return Err(ParserError::internal("Pre", args));
       });
       let argument = parser.get_statement(
-        &mut LoopArgument::with_tokens("pre", args.separators, args.breakers)
+        &mut LoopArgument::safe("pre", args.separators, args.breakers, &DEFAULT_PARSERS)
       )?;
       if operator.token_type == TokenType::Ellipsis {
         return Ok(VariadicNode::new(argument, parser.gen_loc(start_loc)));

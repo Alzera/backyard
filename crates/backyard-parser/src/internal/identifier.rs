@@ -27,7 +27,6 @@ impl IdentifierParser {
   }
 
   pub fn from_matched(name: &[Token]) -> Box<Node> {
-    println!("name: {:?}", name);
     Self::from_token(name.first().unwrap())
   }
 }

@@ -273,6 +273,9 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::ConstProperty => {
               serde_json::from_value(node_data).map(NodeWrapper::ConstProperty)
             }
+            NodeType::ConstructorParameter => {
+              serde_json::from_value(node_data).map(NodeWrapper::ConstructorParameter)
+            }
             NodeType::Continue => { serde_json::from_value(node_data).map(NodeWrapper::Continue) }
             NodeType::Declare => { serde_json::from_value(node_data).map(NodeWrapper::Declare) }
             NodeType::DeclareArgument => {
@@ -423,6 +426,7 @@ pub enum NodeWrapper {
   CommentLine(CommentLineNode),
   Const(ConstNode),
   ConstProperty(ConstPropertyNode),
+  ConstructorParameter(ConstructorParameterNode),
   Continue(ContinueNode),
   Declare(DeclareNode),
   DeclareArgument(DeclareArgumentNode),
@@ -531,6 +535,7 @@ pub enum NodeType {
   CommentLine,
   Const,
   ConstProperty,
+  ConstructorParameter,
   Continue,
   Declare,
   DeclareArgument,
@@ -739,6 +744,11 @@ new_node!(Const, ConstNode {
 new_node!(ConstProperty, ConstPropertyNode {
   visibility: Option<Visibility>,
   items: Vec<Box<Node>>,
+});
+new_node!(ConstructorParameter, ConstructorParameterNode {
+  visibility: Option<Visibility>,
+  modifier: Option<Modifier>,
+  parameter: Box<Node>,
 });
 new_node!(Continue, ContinueNode {
   statement: Option<Box<Node>>,

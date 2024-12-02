@@ -33,14 +33,17 @@ impl StringToken {
             }
             if let Some(next) = control.peek_char(Some(*end_position + 1)) {
               if next == '$' {
-                return true;
+                if let Some(next) = control.peek_char(Some(*end_position + 1)) {
+                  if next == '_' || next.is_alphabetic() {
+                    return true;
+                  }
+                }
               }
             }
           }
         }
         false
       });
-
       let current = if let Some(current) = lexer.control.peek_char(None) {
         current
       } else {
