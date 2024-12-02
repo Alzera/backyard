@@ -36,7 +36,7 @@ impl ArrayGenerator {
       builder.extend(items);
       builder.new_line();
     } else {
-      builder.push(&items.to_string(" "));
+      builder.push(&items.print(" "));
     }
   }
 

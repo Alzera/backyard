@@ -20,7 +20,7 @@ impl EchoGenerator {
       items.indent();
       builder.extend_first_line(&items);
     } else {
-      builder.push(&items.to_string(" "));
+      builder.push(&items.print(" "));
     }
   }
 }

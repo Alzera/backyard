@@ -21,7 +21,7 @@ impl CallGenerator {
       builder.extend(&arguments);
       builder.new_line();
     } else {
-      builder.push(&arguments.to_string(" "));
+      builder.push(&arguments.print(" "));
     }
     builder.push(")");
   }

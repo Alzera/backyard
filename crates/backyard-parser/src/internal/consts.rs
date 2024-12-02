@@ -72,7 +72,7 @@ impl ConstPropertyParser {
     if let [visibility, _] = matched.as_slice() {
       return Ok(
         ConstPropertyNode::new(
-          Visibility::from_str(
+          Visibility::try_parse(
             &visibility
               .first()
               .map(|i| i.value.to_owned())

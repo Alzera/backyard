@@ -73,13 +73,13 @@ impl MethodParser {
       );
       return Ok(
         MethodNode::new(
-          Visibility::from_str(
+          Visibility::try_parse(
             &visibility
               .first()
               .map(|i| i.value.to_owned())
               .unwrap_or_default()
           ),
-          Inheritance::from_str(
+          Inheritance::try_parse(
             &modifier
               .first()
               .map(|i| i.value.to_owned())

@@ -28,7 +28,7 @@ impl UseGenerator {
         builder.extend(&items);
         builder.new_line();
       } else {
-        builder.push(&items.to_string(" "));
+        builder.push(&items.print(" "));
       }
       builder.push("}");
     } else if
@@ -38,7 +38,7 @@ impl UseGenerator {
       items.indent();
       builder.extend_first_line(&items);
     } else {
-      builder.push(&items.to_string(" "));
+      builder.push(&items.print(" "));
     }
   }
 

@@ -23,7 +23,7 @@ impl TraitUseGenerator {
       traits.indent();
       builder.extend_first_line(&traits);
     } else {
-      builder.push(&traits.to_string(" "));
+      builder.push(&traits.print(" "));
     }
     if !node.adaptations.is_empty() {
       let mut adaptations_builder = generator.generate_nodes_new(

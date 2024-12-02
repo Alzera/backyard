@@ -39,7 +39,7 @@ impl ClassGenerator {
           &[(NodeType::Identifier, IdentifierGenerator::generate)]
         )
       );
-      builder.push(&implements.to_string(" "));
+      builder.push(&implements.print(" "));
     }
     BlockGenerator::generate_specific(
       generator,
@@ -64,7 +64,7 @@ impl ClassGenerator {
         &node.parameters,
         &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
       );
-      builder.push(&parameters.to_string(" "));
+      builder.push(&parameters.print(" "));
       builder.push(")");
     }
     if let Some(n) = &node.extends {
@@ -79,7 +79,7 @@ impl ClassGenerator {
           &[(NodeType::Identifier, IdentifierGenerator::generate)]
         )
       );
-      builder.push(&implements.to_string(" "));
+      builder.push(&implements.print(" "));
     }
     BlockGenerator::generate_specific(
       generator,

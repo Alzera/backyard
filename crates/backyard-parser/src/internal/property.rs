@@ -104,7 +104,7 @@ impl PropertyParser {
           ]
         )
       )?;
-      let mut visibility = Visibility::from_str(
+      let mut visibility = Visibility::try_parse(
         &visibility
           .first()
           .map(|i| i.value.to_owned())
@@ -116,7 +116,7 @@ impl PropertyParser {
       return Ok(
         PropertyNode::new(
           visibility,
-          Modifier::from_str(
+          Modifier::try_parse(
             &modifier
               .first()
               .map(|i| i.value.to_owned())

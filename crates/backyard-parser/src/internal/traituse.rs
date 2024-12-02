@@ -105,7 +105,7 @@ impl TraitUseAliasParser {
           trait_name_parsed,
           IdentifierParser::from_matched(name_to_parsed),
           alias,
-          Visibility::from_str(
+          Visibility::try_parse(
             &visibility
               .first()
               .map(|i| i.value.to_owned())

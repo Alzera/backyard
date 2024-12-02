@@ -103,7 +103,7 @@ impl UseItemParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [modifier, name] = matched.as_slice() {
-      let modifier = UseItemModifier::from_str(
+      let modifier = UseItemModifier::try_parse(
         &modifier
           .first()
           .map(|i| i.value.to_owned())

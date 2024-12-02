@@ -20,7 +20,7 @@ impl ConstGenerator {
       consts.indent();
       builder.extend_first_line(&consts);
     } else {
-      builder.push(&consts.to_string(" "));
+      builder.push(&consts.print(" "));
     }
   }
 
@@ -42,7 +42,7 @@ impl ConstGenerator {
       consts.indent();
       builder.extend_first_line(&consts);
     } else {
-      builder.push(&consts.to_string(" "));
+      builder.push(&consts.print(" "));
     }
   }
 }

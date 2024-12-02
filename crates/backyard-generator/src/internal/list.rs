@@ -20,7 +20,7 @@ impl ListGenerator {
       builder.extend(&values);
       builder.new_line();
     } else {
-      builder.push(&values.to_string(" "));
+      builder.push(&values.print(" "));
     }
     builder.push(")");
   }

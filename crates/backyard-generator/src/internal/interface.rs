@@ -24,7 +24,7 @@ impl InterfaceGenerator {
           &[(NodeType::Identifier, IdentifierGenerator::generate)]
         )
       );
-      builder.push(&implements.to_string(" "));
+      builder.push(&implements.print(" "));
     }
     BlockGenerator::generate_specific(
       generator,

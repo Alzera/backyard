@@ -19,7 +19,7 @@ impl ForGenerator {
         &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
       );
     }
-    builder.push(&inits.to_string(" "));
+    builder.push(&inits.print(" "));
     builder.push("; ");
     let mut tests = Builder::new();
     if !node.tests.is_empty() {
@@ -29,7 +29,7 @@ impl ForGenerator {
         &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
       );
     }
-    builder.push(&tests.to_string(" "));
+    builder.push(&tests.print(" "));
     builder.push("; ");
     let mut increments = Builder::new();
     if !node.increments.is_empty() {
@@ -39,7 +39,7 @@ impl ForGenerator {
         &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
       );
     }
-    builder.push(&increments.to_string(" "));
+    builder.push(&increments.print(" "));
     builder.push(")");
     match node.body_type {
       BodyType::Basic => {

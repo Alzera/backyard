@@ -123,7 +123,7 @@ impl Line {
     self.line.push_str(line);
   }
 
-  pub fn to_string(&self) -> String {
+  pub fn print(&self) -> String {
     let indent = Self::get_indent(self.indent);
     format!("{indent}{}", self.line)
   }
@@ -206,14 +206,14 @@ impl Builder {
     self.lines.extend(builder.lines.clone());
   }
 
-  pub fn to_string(&self, separator: &str) -> String {
+  pub fn print(&self, separator: &str) -> String {
     let mut lines = self.lines.clone();
     if self.last_len() == 0 {
       lines.pop();
     }
     lines
       .iter()
-      .map(|i| i.to_string())
+      .map(|i| i.print())
       .collect::<Vec<String>>()
       .join(separator)
   }
@@ -309,7 +309,7 @@ impl<'a> Generator<'a> {
   pub fn start(&mut self) -> String {
     let mut result = self
       .generate_nodes_new(self.nodes, &mut GeneratorArgument::for_block())
-      .to_string("\n");
+      .print("\n");
     if result.ends_with("<?php ") {
       result = result[..result.len() - 6].to_string();
     }

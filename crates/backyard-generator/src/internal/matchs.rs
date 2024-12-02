@@ -30,7 +30,7 @@ impl MatchGenerator {
         &node.conditions,
         &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
       );
-      builder.push(&conditions.to_string(" "));
+      builder.push(&conditions.print(" "));
     } else {
       builder.push("default");
     }

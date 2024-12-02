@@ -11,7 +11,7 @@ pub enum UseItemModifier {
 }
 
 impl UseItemModifier {
-  pub fn from_str(s: &str) -> Option<Self> {
+  pub fn try_parse(s: &str) -> Option<Self> {
     match s {
       "function" => Some(UseItemModifier::Function),
       "const" => Some(UseItemModifier::Const),
@@ -37,7 +37,7 @@ pub enum Modifier {
 }
 
 impl Modifier {
-  pub fn from_str(s: &str) -> Option<Self> {
+  pub fn try_parse(s: &str) -> Option<Self> {
     match s {
       "static" => Some(Modifier::Static),
       "readonly" => Some(Modifier::Readonly),
@@ -64,7 +64,7 @@ pub enum Quote {
 }
 
 impl Quote {
-  pub fn from_str(s: &str) -> Option<Self> {
+  pub fn try_parse(s: &str) -> Option<Self> {
     match s {
       "'" => Some(Quote::Single),
       "\"" => Some(Quote::Double),
@@ -92,7 +92,7 @@ pub enum Inheritance {
 }
 
 impl Inheritance {
-  pub fn from_str(s: &str) -> Option<Self> {
+  pub fn try_parse(s: &str) -> Option<Self> {
     match s {
       "abstract" => Some(Inheritance::Abstract),
       "final" => Some(Inheritance::Final),
@@ -119,7 +119,7 @@ pub enum Visibility {
 }
 
 impl Visibility {
-  pub fn from_str(s: &str) -> Option<Self> {
+  pub fn try_parse(s: &str) -> Option<Self> {
     match s {
       "public" => Some(Visibility::Public),
       "private" => Some(Visibility::Private),

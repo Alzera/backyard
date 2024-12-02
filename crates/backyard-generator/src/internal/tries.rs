@@ -26,7 +26,7 @@ impl TryGenerator {
     let node = cast_node!(NodeWrapper::Catch, &node.node);
     builder.push(" catch (");
     let types = generator.generate_nodes_new(&node.types, &mut GeneratorArgument::default());
-    builder.push(&types.to_string(" | "));
+    builder.push(&types.print(" | "));
     if let Some(variable) = &node.variable {
       builder.push(" ");
       generator.generate_node(builder, variable, &mut GeneratorArgument::default());

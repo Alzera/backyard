@@ -210,7 +210,7 @@ impl ClassParser {
       let name = if !name.is_empty() { Some(IdentifierParser::from_matched(name)) } else { None };
       return Ok(
         ClassNode::new(
-          Inheritance::from_str(
+          Inheritance::try_parse(
             &modifier
               .first()
               .map(|i| i.value.to_owned())

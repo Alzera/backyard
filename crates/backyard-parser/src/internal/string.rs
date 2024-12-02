@@ -61,7 +61,7 @@ impl StringParser {
           let values = StringParser::parse_encapsed(parser, args, TokenType::EncapsedStringClose)?;
           let quote = string_type.value.to_owned();
           return Ok(
-            EncapsedNode::new(Quote::from_str(&quote).unwrap(), values, parser.gen_loc(start_loc))
+            EncapsedNode::new(Quote::try_parse(&quote).unwrap(), values, parser.gen_loc(start_loc))
           );
         } else if string_type.token_type == TokenType::String {
           let mut value = string_type.value.to_owned();
@@ -71,7 +71,7 @@ impl StringParser {
             .unwrap_or_default()
             .to_owned();
           return Ok(
-            StringNode::new(Quote::from_str(&quote).unwrap(), value, parser.gen_loc(start_loc))
+            StringNode::new(Quote::try_parse(&quote).unwrap(), value, parser.gen_loc(start_loc))
           );
         }
       }

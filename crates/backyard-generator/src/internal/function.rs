@@ -69,7 +69,7 @@ impl FunctionGenerator {
       builder.extend(&parameters);
       builder.new_line();
     } else {
-      builder.push(&parameters.to_string(" "));
+      builder.push(&parameters.print(" "));
     }
     builder.push(")");
 
@@ -111,7 +111,7 @@ impl FunctionGenerator {
       builder.extend(&parameters);
       builder.new_line();
     } else {
-      builder.push(&parameters.to_string(" "));
+      builder.push(&parameters.print(" "));
     }
     builder.push(")");
 
@@ -125,7 +125,7 @@ impl FunctionGenerator {
         builder.extend(&uses);
         builder.new_line();
       } else {
-        builder.push(&uses.to_string(" "));
+        builder.push(&uses.print(" "));
       }
       builder.push(")");
     }
@@ -157,7 +157,7 @@ impl FunctionGenerator {
       builder.extend(&parameters);
       builder.new_line();
     } else {
-      builder.push(&parameters.to_string(" "));
+      builder.push(&parameters.print(" "));
     }
     builder.push(")");
 

@@ -12,7 +12,7 @@ impl AttributeGenerator {
       &node.items,
       &mut GeneratorArgument::for_parameter(&[(NodeType::AttributeItem, Self::generate_item)])
     );
-    builder.push(&items.to_string(" "));
+    builder.push(&items.print(" "));
     builder.push("]");
   }
 
@@ -25,7 +25,7 @@ impl AttributeGenerator {
         &node.arguments,
         &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
       );
-      builder.push(&arguments.to_string(" "));
+      builder.push(&arguments.print(" "));
       builder.push(")");
     }
   }

@@ -19,7 +19,7 @@ impl StringGenerator {
         &node.values,
         &mut GeneratorArgument::generator(&[(NodeType::EncapsedPart, Self::generate_encapsed_part)])
       )
-      .to_string("");
+      .print("");
     builder.push(&parts);
     builder.push(&quote);
   }
@@ -35,7 +35,7 @@ impl StringGenerator {
       builder.push(&value.value);
       return;
     }
-    let expr = generator.generate_node_new(&node.value).to_string("");
+    let expr = generator.generate_node_new(&node.value).print("");
     if node.is_advanced {
       builder.push(format!("{{{}}}", expr).as_str());
     } else {
@@ -62,7 +62,7 @@ impl StringGenerator {
       &node.values,
       &mut GeneratorArgument::generator(&[(NodeType::EncapsedPart, Self::generate_encapsed_part)])
     );
-    builder.push(&parts.to_string(""));
+    builder.push(&parts.print(""));
     if let Some(last) = parts.lines.last() {
       if let Some(last) = last.line.split('\n').last() {
         if !last.chars().all(|x| x.is_whitespace()) {

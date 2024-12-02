@@ -188,7 +188,7 @@ impl<'a> LoopArgument<'a> {
     }
   }
 
-  pub fn to_string(&self) -> String {
+  pub fn print(&self) -> String {
     let last_statement = self.statements.last().map(|last| &last.node_type);
     let last_expr = self.last_expr.as_ref().map(|last| &last.node_type);
     format!(

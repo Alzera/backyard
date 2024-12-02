@@ -16,7 +16,7 @@ pub enum ParserError {
 
 impl ParserError {
   pub fn internal(parser: &str, args: &LoopArgument) -> Self {
-    ParserError::Internal { parser: parser.to_string(), args: args.to_string() }
+    ParserError::Internal { parser: parser.to_string(), args: args.print() }
   }
 }
 
