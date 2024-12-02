@@ -16,13 +16,11 @@ impl WhileGenerator {
     if node.is_short {
       let end = if node.is_short { Some("endwhile;") } else { None };
       BlockGenerator::generate(generator, builder, &node.body, end);
+    } else if node.body.node_type == NodeType::Block {
+      BlockGenerator::generate(generator, builder, &node.body, None);
     } else {
-      if node.body.node_type == NodeType::Block {
-        BlockGenerator::generate(generator, builder, &node.body, None);
-      } else {
-        builder.push(" ");
-        generator.generate_node(builder, &node.body, &mut GeneratorArgument::for_block());
-      }
+      builder.push(" ");
+      generator.generate_node(builder, &node.body, &mut GeneratorArgument::for_block());
     }
   }
 }

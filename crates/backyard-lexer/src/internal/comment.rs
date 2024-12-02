@@ -48,7 +48,7 @@ impl CommentToken {
             return true;
           }
         }
-        return false;
+        false
       })
     };
     let mut t = t.to_string();

@@ -23,9 +23,7 @@ impl PropertyParser {
     let mut pos = 0;
     loop {
       let token = tokens.get(pos);
-      if token.is_none() {
-        return None;
-      }
+      token?;
       pos += 1;
       if pos > 2 {
         break;
