@@ -33,8 +33,8 @@ impl StringToken {
             }
             if let Some(next) = control.peek_char(Some(*end_position + 1)) {
               if next == '$' {
-                if let Some(next) = control.peek_char(Some(*end_position + 1)) {
-                  if next == '_' || next.is_alphabetic() {
+                if let Some(next) = control.peek_char(Some(*end_position + 2)) {
+                  if next == '_' || next == '{' || next.is_alphabetic() {
                     return true;
                   }
                 }

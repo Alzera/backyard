@@ -1,5 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, CommentBlockNode, CommentDocNode, CommentLineNode };
+use backyard_nodes::node::{
+  CommentBlockNode,
+  CommentDocNode,
+  CommentLineNode,
+  Location,
+  Node,
+  NodeType,
+};
 
 use crate::{
   error::ParserError,
@@ -40,17 +47,51 @@ impl CommentParser {
           return Err(ParserError::internal("Comment: failed creating node", args));
         }
       };
-      let expr = parser.get_statement(args)?;
-      if let Some(mut expr) = expr {
-        expr.leadings.insert(0, comment);
-        return Ok(expr);
+      let expr = parser.get_statement(
+        &mut LoopArgument::safe("comment", args.separators, args.breakers, args.parsers)
+      )?;
+      if let Some(expr) = &expr {
+        if
+          ![NodeType::CommentBlock, NodeType::CommentDoc, NodeType::CommentLine].contains(
+            &expr.node_type
+          )
+        {
+          let mut expr = expr.to_owned();
+          if expr.loc.clone().unwrap().start.offset < comment.loc.clone().unwrap().start.offset {
+            expr.trailings.push(comment);
+          } else {
+            expr.leadings.insert(0, comment);
+          }
+          return Ok(expr);
+        }
       }
-      if let Some(mut expr) = args.last_expr.to_owned() {
-        expr.trailings.push(comment);
-        return Ok(expr);
+      if let Some(mut last_expr) = args.last_expr.to_owned() {
+        if
+          ![NodeType::CommentBlock, NodeType::CommentDoc, NodeType::CommentLine].contains(
+            &last_expr.node_type
+          )
+        {
+          last_expr.trailings.push(comment);
+          if let Some(next_expr) = expr {
+            if
+              [NodeType::CommentBlock, NodeType::CommentDoc, NodeType::CommentLine].contains(
+                &next_expr.node_type
+              )
+            {
+              last_expr.trailings.push(next_expr);
+            }
+          }
+          return Ok(last_expr);
+        }
       }
       if let Some(expr) = args.statements.pop() {
-        return Ok(expr);
+        if
+          ![NodeType::CommentBlock, NodeType::CommentDoc, NodeType::CommentLine].contains(
+            &expr.node_type
+          )
+        {
+          return Ok(expr);
+        }
       }
       return Ok(comment);
     }

@@ -113,10 +113,10 @@ pub static DEFAULT_PARSERS: [InternalParser; 45] = [
   (AttributeParser::test, AttributeParser::parse),
 ];
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LoopArgument<'a> {
   #[allow(dead_code)]
-  context: &'a str,
+  pub context: &'a str,
   pub parsers: &'a [InternalParser],
   pub separators: &'a [TokenType],
   pub breakers: &'a [TokenType],
