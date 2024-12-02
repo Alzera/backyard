@@ -29,7 +29,11 @@ impl IfGenerator {
         generator.generate_node(builder, &node.valid, &mut GeneratorArgument::for_block());
       }
       if let Some(n) = &node.invalid {
-        builder.push(" ");
+        if node.valid.node_type == NodeType::Block {
+          builder.push(" ");
+        } else {
+          builder.new_line();
+        }
         generator.generate_node(builder, n, &mut GeneratorArgument::default());
       }
     }
@@ -60,6 +64,8 @@ mod tests {
 
   #[test]
   fn basic() {
+    test_eval("if (false) $v_stored_filename++;
+else $v_stored_filename++;");
     test_eval(
       "try {
   if (1) {

@@ -12,7 +12,9 @@ impl DoWhileGenerator {
 
     builder.push("do");
     BlockGenerator::generate(generator, builder, &node.body, None);
-    builder.push(" ");
+    if node.body.trailings.is_empty() {
+      builder.push(" ");
+    }
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
   }
 
@@ -34,7 +36,7 @@ mod tests {
     test_eval("do {
 } while (false);");
     test_eval("do {
-} 
+}
 // this comment
 while (false);");
   }

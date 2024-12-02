@@ -19,10 +19,6 @@ impl SinglesGenerator {
         builder.push("return");
         cast_node!(NodeWrapper::Return, node.node.to_owned()).statement
       }
-      NodeType::Global => {
-        builder.push("global");
-        Some(cast_node!(NodeWrapper::Global, node.node.to_owned()).statement)
-      }
       NodeType::Clone => {
         builder.push("clone");
         Some(cast_node!(NodeWrapper::Clone, node.node.to_owned()).statement)
@@ -101,7 +97,6 @@ mod tests {
     test_eval("continue 2;");
     test_eval("return;");
     test_eval("return 2;");
-    test_eval("global $a;");
     test_eval("clone $a;");
     test_eval("new A;");
     test_eval("print \"Hello\";");
@@ -114,5 +109,10 @@ mod tests {
     test("<div><?php 
 echo \"Hello\"; ?> world<?php 
 echo \"!\"; ?></div>");
+    test(
+      "<ul class=\"customize-outer-pane-parent\"><?php 
+  // Outer panel and sections are not implemented, but its here as a placeholder to avoid any side-effect in api.Section. 
+   ?></ul>"
+    );
   }
 }

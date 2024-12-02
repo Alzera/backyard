@@ -38,7 +38,19 @@ impl CommentToken {
   }
 
   pub fn lex_line(lexer: &mut Lexer, t: &str, snapshot: &ControlSnapshot) -> LexResult {
-    let comment = lexer.control.next_char_until(|_, ch, _| ['\n'].contains(ch));
+    let comment = {
+      lexer.control.next_char_until(|control, ch, i| {
+        if *ch == '\n' {
+          return true;
+        }
+        if let Some(next_char) = control.peek_char(Some(*i + 1)) {
+          if *ch == '?' && next_char == '>' {
+            return true;
+          }
+        }
+        return false;
+      })
+    };
     let mut t = t.to_string();
     t.push_str(&comment);
     Ok(vec![Token::new(TokenType::CommentLine, t, snapshot)])

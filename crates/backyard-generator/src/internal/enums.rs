@@ -55,8 +55,8 @@ mod tests {
   case Spades;
 }");
     test_eval("enum Suit: int {
-  case Hearts;
-  case Spades;
+  case Hearts = 5;
+  case Spades = 6;
 }");
     test_eval(
       "enum Suit implements SuitInterface {

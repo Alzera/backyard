@@ -49,7 +49,7 @@ impl StringGenerator {
     builder.push(&node.value);
     if let Some(last) = node.value.split('\n').last() {
       if !last.chars().all(|x| x.is_whitespace()) {
-        builder.new_line();
+        builder.push("\n");
       }
     }
     builder.push(&node.label);
@@ -64,8 +64,10 @@ impl StringGenerator {
     );
     builder.push(&parts.to_string(""));
     if let Some(last) = parts.lines.last() {
-      if !last.line.chars().all(|x| x.is_whitespace()) {
-        builder.new_line();
+      if let Some(last) = last.line.split('\n').last() {
+        if !last.chars().all(|x| x.is_whitespace()) {
+          builder.push("\n");
+        }
       }
     }
     builder.push(&node.label);

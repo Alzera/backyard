@@ -1,5 +1,5 @@
 use crate::error::LexResult;
-use crate::lexer::{ ControlSnapshot, Lexer, SeriesChecker };
+use crate::lexer::{ ControlSnapshot, Lexer, SeriesChecker, SeriesCheckerMode };
 use crate::token::{ Token, TokenType };
 
 pub struct InlineToken;
@@ -7,7 +7,7 @@ pub struct InlineToken;
 impl InlineToken {
   pub fn lex(lexer: &mut Lexer, snapshot: &ControlSnapshot) -> LexResult {
     let mut result = vec![];
-    let mut checker = SeriesChecker::safe(&["<?php", "<?=", "<%"]);
+    let mut checker = SeriesChecker::new(&["<?php", "<?=", "<%"], SeriesCheckerMode::Inline);
     let max_index = lexer.control.get_len().saturating_sub(1);
     let mut no_breaker = false;
     let mut inline = lexer.control.next_char_until(|_, ch, i| {

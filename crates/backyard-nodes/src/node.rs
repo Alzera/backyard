@@ -818,7 +818,7 @@ new_node!(Function, FunctionNode {
   body: Option<Box<Node>>,
 });
 new_node!(Global, GlobalNode {
-  statement: Box<Node>,
+  items: Vec<Box<Node>>,
 });
 new_node!(Goto, GotoNode {
   label: Box<Node>,

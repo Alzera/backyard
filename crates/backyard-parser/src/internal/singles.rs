@@ -4,7 +4,6 @@ use backyard_nodes::node::{
   BreakNode,
   CloneNode,
   ContinueNode,
-  GlobalNode,
   GotoNode,
   InlineNode,
   NewNode,
@@ -46,7 +45,6 @@ impl SinglesParser {
             TokenType::Parent,
             TokenType::Static,
             TokenType::Clone,
-            TokenType::Global,
             TokenType::This,
             TokenType::True,
             TokenType::False,
@@ -120,7 +118,6 @@ impl SinglesParser {
           TokenType::Print => Ok(PrintNode::new(argument, parser.gen_loc(start_loc))),
           TokenType::Throw => Ok(ThrowNode::new(argument, parser.gen_loc(start_loc))),
           TokenType::Clone => Ok(CloneNode::new(argument, parser.gen_loc(start_loc))),
-          TokenType::Global => Ok(GlobalNode::new(argument, parser.gen_loc(start_loc))),
           TokenType::Goto => Ok(GotoNode::new(argument, parser.gen_loc(start_loc))),
           _ => Err(ParserError::internal("Single: third group", args)),
         };

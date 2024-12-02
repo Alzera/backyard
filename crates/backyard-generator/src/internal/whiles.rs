@@ -1,4 +1,4 @@
-use backyard_nodes::{ cast_node, node::{ Node, NodeWrapper } };
+use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
@@ -13,8 +13,17 @@ impl WhileGenerator {
     builder.push("while (");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
     builder.push(")");
-    let end = if node.is_short { Some("endwhile;") } else { None };
-    BlockGenerator::generate(generator, builder, &node.body, end);
+    if node.is_short {
+      let end = if node.is_short { Some("endwhile;") } else { None };
+      BlockGenerator::generate(generator, builder, &node.body, end);
+    } else {
+      if node.body.node_type == NodeType::Block {
+        BlockGenerator::generate(generator, builder, &node.body, None);
+      } else {
+        builder.push(" ");
+        generator.generate_node(builder, &node.body, &mut GeneratorArgument::for_block());
+      }
+    }
   }
 }
 
@@ -24,6 +33,7 @@ mod tests {
 
   #[test]
   fn basic() {
+    test_eval("while (true) $pattern = 4;");
     test_eval("while ($i <= 10) {\n}");
     test_eval("while ($i <= 10):\nendwhile;");
   }

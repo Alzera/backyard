@@ -1,4 +1,4 @@
-use backyard_nodes::{ cast_node, node::{ Node, NodeWrapper } };
+use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
@@ -19,8 +19,17 @@ impl ForeachGenerator {
     }
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());
     builder.push(")");
-    let end = if node.is_short { Some("endforeach;") } else { None };
-    BlockGenerator::generate(generator, builder, &node.body, end);
+    if node.is_short {
+      let end = if node.is_short { Some("endforeach;") } else { None };
+      BlockGenerator::generate(generator, builder, &node.body, end);
+    } else {
+      if node.body.node_type == NodeType::Block {
+        BlockGenerator::generate(generator, builder, &node.body, None);
+      } else {
+        builder.push(" ");
+        generator.generate_node(builder, &node.body, &mut GeneratorArgument::for_block());
+      }
+    }
   }
 }
 
@@ -30,6 +39,7 @@ mod tests {
 
   #[test]
   fn basic() {
+    test_eval("foreach ($escape as $probe) $pattern = 5;");
     test_eval("foreach ($A as $x):
 endforeach;");
     test_eval("foreach ($data as $k => $value):

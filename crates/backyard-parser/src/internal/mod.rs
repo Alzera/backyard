@@ -17,6 +17,7 @@ pub mod exit;
 pub mod foreach;
 pub mod fors;
 pub mod function;
+pub mod globals;
 pub mod identifier;
 pub mod ifs;
 pub mod include;

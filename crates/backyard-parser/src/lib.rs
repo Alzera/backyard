@@ -20,6 +20,7 @@ pub fn parse_eval(input: &str) -> Result<Box<Node>, ParserError> {
 fn parse_base(tokens: LexResult) -> Result<Box<Node>, ParserError> {
   match tokens {
     Ok(tokens) => {
+      println!("tokens: {:?}", tokens);
       let mut parser = Parser::new(&tokens);
       let parsed = parser.get_children(&mut LoopArgument::default("main"))?;
       let wrapped = ProgramNode::new(

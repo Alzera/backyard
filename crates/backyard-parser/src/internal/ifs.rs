@@ -4,7 +4,7 @@ use backyard_nodes::node::{ ElseNode, IfNode, Location, Node };
 use crate::{
   error::ParserError,
   guard,
-  parser::{ LocationHelper, LoopArgument, Parser, DEFAULT_PARSERS },
+  parser::{ LocationHelper, LoopArgument, Parser },
   utils::{ match_pattern, Lookup },
 };
 
@@ -37,7 +37,11 @@ impl IfParser {
         }
       );
       parser.position += 1;
-      let (is_short, valid) = Self::get_body(parser, args)?;
+      let (is_short, valid) = BlockParser::new_or_short_or_single(
+        parser,
+        &[TokenType::ElseIf, TokenType::Else, TokenType::EndIf],
+        args
+      )?;
       if is_short {
         parser.position -= 1;
       }
@@ -53,46 +57,16 @@ impl IfParser {
           ]
         )
       )?;
-      if let Some(token) = parser.tokens.get(parser.position) {
-        if [TokenType::EndIf].contains(&token.token_type) {
-          parser.position += 1;
+      if is_short {
+        if let Some(token) = parser.tokens.get(parser.position) {
+          if [TokenType::EndIf].contains(&token.token_type) {
+            parser.position += 1;
+          }
         }
       }
       return Ok(IfNode::new(condition, valid, invalid, is_short, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("If", args))
-  }
-
-  fn get_body(
-    parser: &mut Parser,
-    args: &mut LoopArgument
-  ) -> Result<(bool, Box<Node>), ParserError> {
-    if let Some(start) = parser.tokens.get(parser.position) {
-      match start.token_type {
-        TokenType::Colon =>
-          Ok((
-            true,
-            BlockParser::new_short(
-              parser,
-              &[TokenType::ElseIf, TokenType::Else, TokenType::EndIf]
-            )?,
-          )),
-        TokenType::LeftCurlyBracket => Ok((false, BlockParser::new(parser)?)),
-        _ => {
-          let expr = guard!(
-            parser.get_statement(
-              &mut LoopArgument::safe("if_valid", &[], &[TokenType::Semicolon], &DEFAULT_PARSERS)
-            )?,
-            {
-              return Err(ParserError::internal("If", args));
-            }
-          );
-          Ok((false, expr))
-        }
-      }
-    } else {
-      Err(ParserError::internal("If", args))
-    }
   }
 }
 
@@ -119,7 +93,19 @@ impl ElseParser {
           return Ok(ElseNode::new(expr, false, parser.gen_loc(start_loc)));
         }
       }
-      let (is_short, valid) = IfParser::get_body(parser, args)?;
+      if let Some(next_token) = parser.tokens.get(parser.position) {
+        if next_token.token_type == TokenType::If {
+          parser.position += 2;
+          let loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
+          let expr = IfParser::parse(parser, vec![vec![next_token.to_owned()], vec![]], loc, args)?;
+          return Ok(ElseNode::new(expr, false, parser.gen_loc(start_loc)));
+        }
+      }
+      let (is_short, valid) = BlockParser::new_or_short_or_single(
+        parser,
+        &[TokenType::ElseIf, TokenType::Else, TokenType::EndIf],
+        args
+      )?;
       return Ok(ElseNode::new(valid, is_short, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Else", args))

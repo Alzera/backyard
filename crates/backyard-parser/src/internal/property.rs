@@ -23,10 +23,14 @@ impl PropertyParser {
     let mut pos = 0;
     loop {
       let token = tokens.get(pos);
+      if token.is_none() {
+        return None;
+      }
       pos += 1;
-      if pos > 2 || token.is_none() {
+      if pos > 2 {
         break;
       }
+      let mut assigned = false;
       let token = token.unwrap();
       for (i, modifier) in modifiers_rule.iter().enumerate() {
         if !modifiers[i].is_empty() {
@@ -34,9 +38,29 @@ impl PropertyParser {
         }
         if modifier.contains(&token.token_type) {
           modifiers[i].push(token.clone());
+          assigned = true;
           break;
         }
       }
+      if !assigned {
+        break;
+      }
+    }
+    let first_test_count = modifiers
+      .iter()
+      .map(|i| i.len())
+      .sum();
+    if
+      let Some(has_var) = match_pattern(
+        &tokens[first_test_count..],
+        &[Lookup::Equal(&[TokenType::Var])]
+      )
+    {
+      if let Some(has_var) = has_var.first() {
+        modifiers.push(has_var.to_owned());
+      }
+    } else {
+      modifiers.push(vec![]);
     }
     // need to manually check for variable type
     let first_test_count = modifiers
@@ -69,7 +93,7 @@ impl PropertyParser {
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [visibility, modifier] = matched.as_slice() {
+    if let [visibility, modifier, has_var] = matched.as_slice() {
       let items = parser.get_children(
         &mut LoopArgument::new(
           "property",
@@ -82,14 +106,18 @@ impl PropertyParser {
           ]
         )
       )?;
+      let mut visibility = Visibility::from_str(
+        &visibility
+          .first()
+          .map(|i| i.value.to_owned())
+          .unwrap_or_default()
+      );
+      if visibility.is_none() && !has_var.is_empty() {
+        visibility = Some(Visibility::Public);
+      }
       return Ok(
         PropertyNode::new(
-          Visibility::from_str(
-            &visibility
-              .first()
-              .map(|i| i.value.to_owned())
-              .unwrap_or_default()
-          ),
+          visibility,
           Modifier::from_str(
             &modifier
               .first()

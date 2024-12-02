@@ -1,13 +1,13 @@
 use crate::internal::variable::VariableToken;
 use crate::error::LexResult;
-use crate::lexer::{ ControlSnapshot, Lexer, SeriesChecker };
+use crate::lexer::{ ControlSnapshot, Lexer, SeriesChecker, SeriesCheckerMode };
 use crate::token::{ Token, TokenType };
 
 pub struct StringToken;
 
 impl StringToken {
-  fn get_parts(lexer: &mut Lexer, result: &mut Vec<Token>, breaker: &str) {
-    let mut checker = SeriesChecker::new(&[breaker]);
+  fn get_parts(lexer: &mut Lexer, result: &mut Vec<Token>, breaker: &str, mode: SeriesCheckerMode) {
+    let mut checker = SeriesChecker::new(&[breaker], mode);
     let mut need_check_condition: Vec<char> = breaker.chars().collect();
     need_check_condition.push('$');
     need_check_condition.push('{');
@@ -87,7 +87,7 @@ impl StringToken {
       Token::new(TokenType::EncapsedStringOpen, String::from(breaker), snapshot)
     ];
 
-    Self::get_parts(lexer, &mut result, &breaker.to_string());
+    Self::get_parts(lexer, &mut result, &breaker.to_string(), SeriesCheckerMode::String);
 
     if result.len() < 3 {
       let t = if let Some(t) = result.get(1) { t.value.to_owned() } else { String::from("") };
@@ -130,7 +130,7 @@ impl StringToken {
         .get(1..label.len() - 1)
         .unwrap_or_default()
         .to_string();
-      let mut checker = SeriesChecker::new(&[&clean_label]);
+      let mut checker = SeriesChecker::new(&[&clean_label], SeriesCheckerMode::Heredoc);
       let mut should_break = false;
       let content_snapshot = lexer.control.get_snapshot();
       let text = lexer.control.next_char_until(|_, i, _| {
@@ -139,7 +139,7 @@ impl StringToken {
         should_break = checker.check().is_some();
         t
       });
-      let text = text[..text.len() - clean_label.len()].to_string();
+      let text = text[..text.len() - clean_label.len() - 1].to_string();
       Ok(
         vec![
           Token::new(TokenType::NowDocOpen, &clean_label, snapshot),
@@ -149,7 +149,7 @@ impl StringToken {
       )
     } else {
       let mut result = vec![Token::new(TokenType::HeredocOpen, &label, snapshot)];
-      Self::get_parts(lexer, &mut result, &label);
+      Self::get_parts(lexer, &mut result, &label, SeriesCheckerMode::Heredoc);
       result.push(Token::new(TokenType::HeredocClose, &label, lexer.control.get_last_snapshot()));
       Ok(result)
     }

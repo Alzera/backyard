@@ -77,7 +77,11 @@ impl ForeachParser {
       );
       parser.position += 1;
       let (key, value) = ForeachParser::get_key_value(parser, args)?;
-      let (is_short, body) = BlockParser::new_or_short(parser, &[TokenType::EndForeach], args)?;
+      let (is_short, body) = BlockParser::new_or_short_or_single(
+        parser,
+        &[TokenType::EndForeach],
+        args
+      )?;
       return Ok(ForeachNode::new(source, key, value, body, is_short, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Foreach", args))

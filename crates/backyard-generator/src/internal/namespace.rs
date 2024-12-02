@@ -27,7 +27,7 @@ mod tests {
 
   #[test]
   fn basic() {
-    test_eval("namespace MyApp\\ExampleNamespace {\n}");
-    test_eval("namespace MyApp\\ExampleNamespace;");
+    test_eval("namespace MyApp\\A {\n}");
+    test_eval("namespace MyApp\\B;");
   }
 }

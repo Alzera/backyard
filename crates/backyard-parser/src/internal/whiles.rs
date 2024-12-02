@@ -37,7 +37,11 @@ impl WhileParser {
         }
       );
       parser.position += 1;
-      let (is_short, body) = BlockParser::new_or_short(parser, &[TokenType::EndWhile], args)?;
+      let (is_short, body) = BlockParser::new_or_short_or_single(
+        parser,
+        &[TokenType::EndWhile],
+        args
+      )?;
       return Ok(WhileNode::new(condition, body, is_short, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("While", args))

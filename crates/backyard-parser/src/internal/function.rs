@@ -50,7 +50,7 @@ impl FunctionParser {
         &[
           Lookup::Equal(&[TokenType::Function]),
           Lookup::Optional(&[TokenType::BitwiseAnd]),
-          Lookup::Equal(&[TokenType::Identifier]),
+          Lookup::Equal(&[TokenType::Identifier, TokenType::Readonly]),
           Lookup::Equal(&[TokenType::LeftParenthesis]),
         ]
       )
@@ -288,7 +288,7 @@ impl ConstructorParameterParser {
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [visibility, modifier] = matched.as_slice() {
+    if let [visibility, modifier, has_var] = matched.as_slice() {
       let item = guard!(
         parser.get_statement(
           &mut LoopArgument::new(
@@ -307,14 +307,18 @@ impl ConstructorParameterParser {
           return Err(ParserError::internal("ConstructorParameter", args));
         }
       );
+      let mut visibility = Visibility::from_str(
+        &visibility
+          .first()
+          .map(|i| i.value.to_owned())
+          .unwrap_or_default()
+      );
+      if visibility.is_none() && !has_var.is_empty() {
+        visibility = Some(Visibility::Public);
+      }
       return Ok(
         PropertyNode::new(
-          Visibility::from_str(
-            &visibility
-              .first()
-              .map(|i| i.value.to_owned())
-              .unwrap_or_default()
-          ),
+          visibility,
           Modifier::from_str(
             &modifier
               .first()

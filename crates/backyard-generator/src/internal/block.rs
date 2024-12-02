@@ -28,16 +28,41 @@ impl BlockGenerator {
     short_close: Option<&str>,
     generators: &[(NodeType, InternalGenerator)]
   ) {
+    let leadings = &node.leadings;
+    let trailings = &node.trailings;
+    if !leadings.is_empty() || !trailings.is_empty() {
+      let mut scoped_builder = Builder::new();
+      generator.handle_comments(&mut scoped_builder, leadings);
+      if scoped_builder.total_len() == 0 {
+        scoped_builder.new_line();
+      }
+      Self::print_block(generator, &mut scoped_builder, node, short_close, generators);
+      generator.handle_comments(&mut scoped_builder, trailings);
+      builder.extend_first_line(&scoped_builder);
+    } else {
+      Self::print_block(generator, builder, node, short_close, generators);
+    }
+  }
+
+  fn print_block(
+    generator: &mut Generator,
+    builder: &mut Builder,
+    node: &Node,
+    short_close: Option<&str>,
+    generators: &[(NodeType, InternalGenerator)]
+  ) {
     let mut block = Self::generate_base(generator, node, generators);
     block.indent();
-
     if let Some(close) = short_close {
       builder.push(":");
       builder.extend(&block);
       builder.new_line();
       builder.push(close);
     } else {
-      builder.push(" {");
+      if node.leadings.is_empty() {
+        builder.push(" ");
+      }
+      builder.push("{");
       builder.extend(&block);
       builder.new_line();
       builder.push("}");

@@ -1,14 +1,12 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, NamespaceNode };
+use backyard_nodes::node::{ BlockNode, Location, NamespaceNode, Node };
 
 use crate::{
   error::ParserError,
   guard,
-  parser::{ LoopArgument, Parser },
+  parser::{ LocationHelper, LoopArgument, Parser },
   utils::{ match_pattern, Lookup },
 };
-
-use super::block::BlockParser;
 
 #[derive(Debug, Clone)]
 pub struct NamespaceParser;
@@ -35,12 +33,18 @@ impl NamespaceParser {
         return Err(ParserError::internal("Namespace", args));
       }).value.to_owned();
       let is_bracket = if let Some(t) = parser.tokens.get(parser.position) {
-        // parser.position -= 1;
         t.token_type == TokenType::LeftCurlyBracket
       } else {
         false
       };
-      let body = BlockParser::new(parser)?;
+      let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
+      if is_bracket {
+        parser.position += 1;
+      }
+      let body = BlockNode::new(
+        parser.get_children(&mut LoopArgument::default("block_parser"))?,
+        parser.gen_loc(block_loc)
+      );
       return Ok(NamespaceNode::new(name, body, is_bracket, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Namespace", args))

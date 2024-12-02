@@ -98,23 +98,34 @@ impl Control {
   }
 }
 
+#[derive(Debug, PartialEq)]
+pub enum SeriesCheckerMode {
+  String,
+  Inline,
+  Heredoc,
+}
+
 #[derive(Debug)]
 pub struct SeriesChecker<'a> {
   list: Vec<char>,
   againsts: Vec<&'a str>,
-  escape_check: bool,
+  mode: SeriesCheckerMode,
 }
 
 impl<'a> SeriesChecker<'a> {
-  pub fn new(againsts: &[&'a str]) -> Self {
-    Self { list: vec![], againsts: againsts.to_vec(), escape_check: true }
-  }
-
-  pub fn safe(againsts: &[&'a str]) -> Self {
-    Self { list: vec![], againsts: againsts.to_vec(), escape_check: false }
+  pub fn new(againsts: &[&'a str], mode: SeriesCheckerMode) -> Self {
+    Self { list: vec![], againsts: againsts.to_vec(), mode }
   }
 
   pub fn push(&mut self, ch: char) {
+    if self.mode == SeriesCheckerMode::Heredoc {
+      if ch == '\n' {
+        self.list.clear();
+      } else {
+        self.list.push(ch);
+      }
+      return;
+    }
     if ch.is_whitespace() {
       self.list.clear();
     } else {
@@ -124,6 +135,10 @@ impl<'a> SeriesChecker<'a> {
 
   pub fn check(&mut self) -> Option<&str> {
     let text = self.list.clone().into_iter().collect::<String>();
+    if self.mode == SeriesCheckerMode::Heredoc {
+      let label = *self.againsts.first().unwrap();
+      return if text.trim() == label { Some(label) } else { None };
+    }
     let valid = self.againsts
       .clone()
       .into_iter()
@@ -138,7 +153,7 @@ impl<'a> SeriesChecker<'a> {
   }
 
   pub fn is_escaped(&self, index: usize) -> bool {
-    if !self.escape_check {
+    if self.mode != SeriesCheckerMode::String {
       return false;
     }
     self.list[..index]
@@ -226,7 +241,9 @@ impl Lexer {
             "integer",
             "object",
             "String",
+            "string",
             "mixed",
+            "void",
             // "null",
           ].contains(&t.as_str())
         {
@@ -442,14 +459,7 @@ impl Lexer {
       ',' => Ok(vec![Token::new(TokenType::Comma, ",", snapshot)]),
       ';' => Ok(vec![Token::new(TokenType::Semicolon, ";", snapshot)]),
       '~' => Ok(vec![Token::new(TokenType::BooleanNegate, "~", snapshot)]),
-      '@' => {
-        if let Some(next) = self.control.peek_char(None) {
-          if !next.is_whitespace() {
-            return Ok(vec![Token::new(TokenType::AtSign, "@", snapshot)]);
-          }
-        }
-        Err(self.control.error_unrecognized("@"))
-      }
+      '@' => Ok(vec![Token::new(TokenType::AtSign, "@", snapshot)]),
       // '\n' => Ok(vec![Token::new(TokenType::LineBreak, "\n", snapshot)]),
       _ => Err(self.control.error_unrecognized(&current_char.to_string())),
     }

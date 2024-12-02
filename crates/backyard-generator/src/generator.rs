@@ -45,7 +45,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 78] = [
   (NodeType::For, super::internal::fors::ForGenerator::generate),
   (NodeType::Foreach, super::internal::foreach::ForeachGenerator::generate),
   (NodeType::Function, super::internal::function::FunctionGenerator::generate),
-  (NodeType::Global, super::internal::singles::SinglesGenerator::generate),
+  (NodeType::Global, super::internal::globals::GlobalGenerator::generate),
   (NodeType::Goto, super::internal::singles::SinglesGenerator::generate),
   (NodeType::HereDoc, super::internal::string::StringGenerator::generate_heredoc),
   (NodeType::Identifier, super::internal::identifier::IdentifierGenerator::generate),
@@ -284,6 +284,7 @@ impl<'a> GeneratorArgument<'a> {
           NodeType::CommentBlock,
           NodeType::CommentDoc,
           NodeType::CommentLine,
+          NodeType::Inline,
         ].contains(node_type)
       {
         return Some(";");
