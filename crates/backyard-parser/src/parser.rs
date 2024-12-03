@@ -10,6 +10,7 @@ use crate::{
     globals::GlobalParser,
     statics::StaticsParser,
   },
+  utils::LookupResult,
 };
 
 use super::internal::{
@@ -56,10 +57,10 @@ use super::internal::{
   yields::YieldParser,
 };
 
-type InternalParserTest = fn(&[Token], &mut LoopArgument) -> Option<Vec<Vec<Token>>>;
+type InternalParserTest = fn(&[Token], &mut LoopArgument) -> Option<Vec<LookupResult>>;
 type InternalParserParse = fn(
   &mut Parser,
-  Vec<Vec<Token>>,
+  Vec<LookupResult>,
   Location,
   &mut LoopArgument
 ) -> Result<Box<Node>, ParserError>;
@@ -317,7 +318,7 @@ impl<'a> Parser<'a> {
         let start_loc = tokens.first().unwrap().get_location().unwrap();
         self.position += matched
           .iter()
-          .map(|x| x.len())
+          .map(|x| x.size)
           .sum::<usize>();
         let parsed = parse(self, matched, start_loc, args)?;
         return Ok(Some(parsed));
@@ -365,6 +366,12 @@ pub trait LocationHelper {
 impl LocationHelper for &Node {
   fn get_location(&self) -> Option<Location> {
     self.loc.as_ref().map(|loc| loc.start.clone())
+  }
+}
+
+impl LocationHelper for Token {
+  fn get_location(&self) -> Option<Location> {
+    Some(Location { line: self.line, column: self.column, offset: self.offset })
   }
 }
 

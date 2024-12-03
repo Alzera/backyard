@@ -5,7 +5,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 use super::{ block::BlockParser, comment::CommentParser };
@@ -14,7 +14,7 @@ use super::{ block::BlockParser, comment::CommentParser };
 pub struct SwitchParser;
 
 impl SwitchParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[Lookup::Equal(&[TokenType::Switch]), Lookup::Equal(&[TokenType::LeftParenthesis])]
@@ -23,7 +23,7 @@ impl SwitchParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
@@ -71,28 +71,27 @@ impl SwitchParser {
 pub struct CaseParser;
 
 impl CaseParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(tokens, &[Lookup::Equal(&[TokenType::Case, TokenType::Default])])
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [is_default] = matched.as_slice() {
-      let condition = match
-        guard!(is_default.first(), {
-          return Err(ParserError::internal("Case", args));
-        }).token_type
-      {
-        TokenType::Default => None,
-        _ => {
+      let condition = if let LookupResultWrapper::Equal(is_default) = &is_default.wrapper {
+        if is_default.token_type == TokenType::Default {
+          None
+        } else {
           parser.get_statement(
             &mut LoopArgument::with_tokens("switch_case_condition", &[], &[TokenType::Colon])
           )?
         }
+      } else {
+        return Err(ParserError::internal("TraitUseAlias", args));
       };
       parser.position += 1;
       let statements = {

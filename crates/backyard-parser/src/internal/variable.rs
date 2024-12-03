@@ -4,7 +4,7 @@ use backyard_nodes::node::{ Location, Node, RangeLocation, VariableNode };
 use crate::{
   error::ParserError,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 use super::identifier::IdentifierParser;
@@ -25,18 +25,18 @@ impl VariableParser {
 }
 
 impl VariableParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(tokens, &[Lookup::Equal(&[TokenType::Variable, TokenType::VariableBracketOpen])])
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name] = matched.as_slice() {
-      if let Some(name) = name.first() {
+      if let LookupResultWrapper::Equal(name) = &name.wrapper {
         if name.token_type == TokenType::VariableBracketOpen {
           let expr = parser.get_statement(
             &mut LoopArgument::with_tokens("variable", &[], &[TokenType::VariableBracketClose])

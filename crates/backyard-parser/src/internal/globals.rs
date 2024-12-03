@@ -4,7 +4,7 @@ use backyard_nodes::node::{ GlobalNode, Location, Node };
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 use super::{ comment::CommentParser, property::PropertyItemParser };
@@ -13,13 +13,13 @@ use super::{ comment::CommentParser, property::PropertyItemParser };
 pub struct GlobalParser;
 
 impl GlobalParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(tokens, &[Lookup::Equal(&[TokenType::Global])])
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {

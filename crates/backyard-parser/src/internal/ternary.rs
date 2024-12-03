@@ -5,21 +5,21 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 #[derive(Debug, Clone)]
 pub struct TernaryParser;
 
 impl TernaryParser {
-  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     args.last_expr.as_ref()?;
     match_pattern(tokens, &[Lookup::Equal(&[TokenType::QuestionMark])])
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {

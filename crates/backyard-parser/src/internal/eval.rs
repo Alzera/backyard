@@ -4,14 +4,14 @@ use backyard_nodes::node::{ Location, Node, EvalNode };
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 #[derive(Debug, Clone)]
 pub struct EvalParser;
 
 impl EvalParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[Lookup::Equal(&[TokenType::Eval]), Lookup::Equal(&[TokenType::LeftParenthesis])]
@@ -20,7 +20,7 @@ impl EvalParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {

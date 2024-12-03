@@ -3,9 +3,8 @@ use backyard_nodes::node::{ Location, Modifier, Node, PropertyItemNode, Property
 
 use crate::{
   error::ParserError,
-  guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 use super::{ comment::CommentParser, identifier::IdentifierParser, types::TypesParser };
@@ -14,84 +13,35 @@ use super::{ comment::CommentParser, identifier::IdentifierParser, types::TypesP
 pub struct PropertyParser;
 
 impl PropertyParser {
-  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    let modifiers_rule = [
-      [TokenType::Public, TokenType::Private, TokenType::Protected].to_vec(),
-      [TokenType::Static, TokenType::Readonly].to_vec(),
-    ];
-    let mut modifiers = vec![vec![], vec![]];
-    let mut pos = 0;
-    loop {
-      let token = tokens.get(pos);
-      token?;
-      pos += 1;
-      if pos > 2 {
-        break;
-      }
-      let mut assigned = false;
-      let token = token.unwrap();
-      for (i, modifier) in modifiers_rule.iter().enumerate() {
-        if !modifiers[i].is_empty() {
-          continue;
-        }
-        if modifier.contains(&token.token_type) {
-          modifiers[i].push(token.clone());
-          assigned = true;
-          break;
-        }
-      }
-      if !assigned {
-        break;
-      }
-    }
-    let first_test_count = modifiers
-      .iter()
-      .map(|i| i.len())
-      .sum();
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     if
-      let Some(has_var) = match_pattern(
-        &tokens[first_test_count..],
-        &[Lookup::Equal(&[TokenType::Var])]
+      let Some(m) = match_pattern(
+        tokens,
+        &[
+          Lookup::Modifiers(
+            &[
+              &[TokenType::Public, TokenType::Private, TokenType::Protected],
+              &[TokenType::Static, TokenType::Readonly],
+            ]
+          ),
+          Lookup::Optional(&[TokenType::Var]),
+          Lookup::OptionalType,
+          Lookup::Equal(&[TokenType::Variable]),
+        ]
       )
     {
-      if let Some(has_var) = has_var.first() {
-        modifiers.push(has_var.to_owned());
-      }
-    } else {
-      modifiers.push(vec![]);
+      return Some(m[..2].to_vec());
     }
-    // need to manually check for variable type
-    let first_test_count = modifiers
-      .iter()
-      .map(|i| i.len())
-      .sum();
-    let tmp_tokens = guard!(tokens.get(first_test_count..), {
-      return None;
-    }).to_vec();
-    let type_test = TypesParser::test(&tmp_tokens, args);
-    let type_test_count: usize = if let Some(t) = type_test {
-      t.iter()
-        .map(|i| i.len())
-        .sum()
-    } else {
-      0
-    };
-    let tmp_tokens = guard!(tmp_tokens.get(type_test_count..), {
-      return None;
-    }).to_vec();
-    guard!(match_pattern(&tmp_tokens, &[Lookup::Equal(&[TokenType::Variable])]), {
-      return None;
-    });
-    Some(modifiers)
+    None
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [visibility, modifier, has_var] = matched.as_slice() {
+    if let [modifiers, has_var] = matched.as_slice() {
       let items = parser.get_children(
         &mut LoopArgument::new(
           "property",
@@ -104,28 +54,28 @@ impl PropertyParser {
           ]
         )
       )?;
-      let mut visibility = Visibility::try_parse(
-        &visibility
-          .first()
-          .map(|i| i.value.to_owned())
-          .unwrap_or_default()
-      );
+      let mut visibility = None;
+      let mut modifier = None;
+      if let LookupResultWrapper::Modifier(modifiers) = &modifiers.wrapper {
+        if let [visibility_modifier, modifier_modifier] = modifiers.as_slice() {
+          visibility = Visibility::try_parse(
+            &visibility_modifier
+              .as_ref()
+              .map(|i| i.value.to_owned())
+              .unwrap_or_default()
+          );
+          modifier = Modifier::try_parse(
+            &modifier_modifier
+              .as_ref()
+              .map(|i| i.value.to_owned())
+              .unwrap_or_default()
+          );
+        }
+      }
       if visibility.is_none() && !has_var.is_empty() {
         visibility = Some(Visibility::Public);
       }
-      return Ok(
-        PropertyNode::new(
-          visibility,
-          Modifier::try_parse(
-            &modifier
-              .first()
-              .map(|i| i.value.to_owned())
-              .unwrap_or_default()
-          ),
-          items,
-          parser.gen_loc(start_loc)
-        )
-      );
+      return Ok(PropertyNode::new(visibility, modifier, items, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Property", args))
   }
@@ -135,7 +85,7 @@ impl PropertyParser {
 pub struct PropertyItemParser;
 
 impl PropertyItemParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[Lookup::Equal(&[TokenType::Variable]), Lookup::Optional(&[TokenType::Assignment])]
@@ -144,11 +94,16 @@ impl PropertyItemParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name, has_value] = matched.as_slice() {
+      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
+        IdentifierParser::from_token(name)
+      } else {
+        return Err(ParserError::internal("PropertyItem", args));
+      };
       let value = if !has_value.is_empty() {
         parser.get_statement(
           &mut LoopArgument::with_tokens(
@@ -161,12 +116,7 @@ impl PropertyItemParser {
         None
       };
       return Ok(
-        PropertyItemNode::new(
-          IdentifierParser::from_matched(name),
-          args.last_expr.to_owned(),
-          value,
-          parser.gen_loc(start_loc)
-        )
+        PropertyItemNode::new(name, args.last_expr.to_owned(), value, parser.gen_loc(start_loc))
       );
     }
     Err(ParserError::internal("PropertyItem", args))

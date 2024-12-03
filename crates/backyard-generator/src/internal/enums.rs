@@ -2,7 +2,12 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
 
 use crate::generator::{ Builder, EndMode, Generator, GeneratorArgument };
 
-use super::{ consts::ConstGenerator, identifier::IdentifierGenerator, method::MethodGenerator };
+use super::{
+  consts::ConstGenerator,
+  identifier::IdentifierGenerator,
+  method::MethodGenerator,
+  types::TypeGenerator,
+};
 
 pub struct EnumGenerator;
 
@@ -13,7 +18,7 @@ impl EnumGenerator {
     IdentifierGenerator::generate(generator, builder, &node.name);
     if let Some(n) = &node.enum_type {
       builder.push(": ");
-      IdentifierGenerator::generate(generator, builder, n);
+      TypeGenerator::generate(generator, builder, n);
     }
     if let Some(n) = &node.implements {
       builder.push(" implements ");

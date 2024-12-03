@@ -5,14 +5,14 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 #[derive(Debug, Clone)]
 pub struct LabelParser;
 
 impl LabelParser {
-  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     if let Some(last) = &args.last_expr {
       if last.node_type != NodeType::Identifier {
         return None;
@@ -23,7 +23,7 @@ impl LabelParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {

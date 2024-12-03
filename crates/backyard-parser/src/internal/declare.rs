@@ -4,7 +4,7 @@ use backyard_nodes::node::{ BodyType, Location, Node, DeclareArgumentNode, Decla
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 use super::{ block::BlockParser, comment::CommentParser, identifier::IdentifierParser };
@@ -13,7 +13,7 @@ use super::{ block::BlockParser, comment::CommentParser, identifier::IdentifierP
 pub struct DeclareParser;
 
 impl DeclareParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[Lookup::Equal(&[TokenType::Declare]), Lookup::Equal(&[TokenType::LeftParenthesis])]
@@ -22,7 +22,7 @@ impl DeclareParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
@@ -64,7 +64,7 @@ impl DeclareParser {
 pub struct DeclareArgumentParser;
 
 impl DeclareArgumentParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[Lookup::Equal(&[TokenType::Identifier]), Lookup::Equal(&[TokenType::Assignment])]
@@ -73,11 +73,16 @@ impl DeclareArgumentParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name, _] = matched.as_slice() {
+      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
+        IdentifierParser::from_token(name)
+      } else {
+        return Err(ParserError::internal("DeclareArgument", args));
+      };
       if
         let Some(value) = parser.get_statement(
           &mut LoopArgument::with_tokens(
@@ -87,13 +92,7 @@ impl DeclareArgumentParser {
           )
         )?
       {
-        return Ok(
-          DeclareArgumentNode::new(
-            IdentifierParser::from_matched(name),
-            value,
-            parser.gen_loc(start_loc)
-          )
-        );
+        return Ok(DeclareArgumentNode::new(name, value, parser.gen_loc(start_loc)));
       }
     }
     Err(ParserError::internal("DeclareArgument", args))

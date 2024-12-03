@@ -4,7 +4,7 @@ use backyard_nodes::node::{ ConstNode, ConstPropertyNode, Location, Node, Visibi
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 use super::{ assignment::AssignmentParser, comment::CommentParser, identifier::IdentifierParser };
@@ -32,13 +32,13 @@ impl ConstParser {
 }
 
 impl ConstParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(tokens, &[Lookup::Equal(&[TokenType::Const])])
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
@@ -53,11 +53,11 @@ impl ConstParser {
 pub struct ConstPropertyParser;
 
 impl ConstPropertyParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[
-        Lookup::Optional(&[TokenType::Public, TokenType::Private, TokenType::Protected]),
+        Lookup::Modifiers(&[&[TokenType::Public, TokenType::Private, TokenType::Protected]]),
         Lookup::Equal(&[TokenType::Const]),
       ]
     )
@@ -65,19 +65,25 @@ impl ConstPropertyParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [visibility, _] = matched.as_slice() {
-      return Ok(
-        ConstPropertyNode::new(
-          Visibility::try_parse(
-            &visibility
-              .first()
+    if let [modifiers, _] = matched.as_slice() {
+      let mut visibility = None;
+      if let LookupResultWrapper::Modifier(modifiers) = &modifiers.wrapper {
+        if let [visibility_modifier] = modifiers.as_slice() {
+          visibility = Visibility::try_parse(
+            &visibility_modifier
+              .as_ref()
               .map(|i| i.value.to_owned())
               .unwrap_or_default()
-          ),
+          );
+        }
+      }
+      return Ok(
+        ConstPropertyNode::new(
+          visibility,
           ConstParser::get_consts(parser)?,
           parser.gen_loc(start_loc)
         )

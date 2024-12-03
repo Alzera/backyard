@@ -203,10 +203,16 @@ mod tests {
   fn basic() {
     test_eval(
       "class A {
-  public function __construct(protected int $x, protected int &$y = 0) {
+  public function __construct(protected int $x, protected string &$y = 0) {
   }
+}"
+    );
+    test_eval("class A {
   public function __construct(Pattern ...$patterns) {
   }
+}");
+    test_eval(
+      "class A {
   public function __construct(
     $guard,
     #[\\SensitiveParameter]

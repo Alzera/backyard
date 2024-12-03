@@ -1,124 +1,111 @@
-use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ IntersectionTypeNode, Location, Node, TypeNode, UnionTypeNode };
+use backyard_lexer::token::Token;
+use backyard_nodes::node::{
+  IntersectionTypeNode,
+  Location,
+  Node,
+  RangeLocation,
+  TypeNode,
+  UnionTypeNode,
+};
 
-use crate::{ error::ParserError, guard, parser::{ LoopArgument, Parser } };
+use crate::{
+  error::ParserError,
+  parser::{ LoopArgument, Parser, LocationHelper },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper, OptionalTypeResult },
+};
 
 #[derive(Debug, Clone)]
 pub struct TypesParser;
 
 impl TypesParser {
   #[allow(unused_assignments)]
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    const TYPES: [TokenType; 11] = [
-      TokenType::Identifier,
-      TokenType::Name,
-      TokenType::Type,
-      TokenType::Callable,
-      TokenType::Static,
-      TokenType::SelfKeyword,
-      TokenType::Array,
-      TokenType::True,
-      TokenType::False,
-      TokenType::Null,
-      TokenType::Parent,
-    ];
-    let mut pos = 0;
-    let mut token = guard!(tokens.get(pos), {
-      return None;
-    });
-    let mut is_nullable = None;
-    if token.token_type == TokenType::QuestionMark {
-      is_nullable = Some(token.to_owned());
-      pos += 1;
-      token = guard!(tokens.get(pos), {
-        return None;
-      });
-    }
-    let is_nullable = if let Some(t) = is_nullable { vec![t.to_owned()] } else { vec![] };
-    let next_token = guard!(tokens.get(pos + 1), {
-      return None;
-    });
-    if
-      is_nullable.is_empty() &&
-      [TokenType::BitwiseOr, TokenType::BitwiseAnd].contains(&next_token.token_type)
-    {
-      let separator = next_token.token_type;
-      let mut matched = vec![];
-      let mut index = 0;
-      let mut last_token_type = None;
-      loop {
-        let token = guard!(tokens.get(index), {
-          return None;
-        });
-        index += 1;
-        if
-          ((last_token_type.is_none() || last_token_type.unwrap() == separator) &&
-            TYPES.contains(&token.token_type)) ||
-          (last_token_type.is_some() &&
-            TYPES.contains(&last_token_type.unwrap()) &&
-            token.token_type == separator)
-        {
-          last_token_type = Some(token.token_type);
-          matched.push(token.to_owned());
-          continue;
-        }
-        break;
-      }
-      if let Some(m) = matched.last() {
-        if m.token_type == separator {
-          matched.pop();
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+    if let Some(m) = match_pattern(tokens, &[Lookup::OptionalType]) {
+      if let Some(types) = m.get(0) {
+        if !types.is_empty() {
+          return Some(m);
         }
       }
-      if matched.is_empty() {
-        return None;
-      }
-      return Some(vec![matched]);
-    }
-    if TYPES.contains(&token.token_type) {
-      return Some(vec![is_nullable, vec![token.to_owned()]]);
     }
     None
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
-    start_loc: Location,
+    matched: Vec<LookupResult>,
+    _: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if matched.len() == 2 {
-      if let [is_nullable, types] = matched.as_slice() {
-        let name = guard!(types.first(), {
-          return Err(ParserError::internal("Type", args));
-        }).value.to_owned();
-        return Ok(TypeNode::new(!is_nullable.is_empty(), name, parser.gen_loc(start_loc)));
-      }
-    } else if matched.len() == 1 {
-      if let [types] = matched.as_slice() {
-        let mut separator = None;
-        let types = types
-          .iter()
-          .filter_map(|i| {
-            if [TokenType::BitwiseOr, TokenType::BitwiseAnd].contains(&i.token_type) {
-              separator = Some(i.token_type);
-              return None;
-            }
-            Some(i.value.to_owned())
-          })
-          .collect();
-        if let Some(separator) = separator {
-          if separator == TokenType::BitwiseOr {
-            return Ok(UnionTypeNode::new(types, parser.gen_loc(start_loc)));
-          } else if separator == TokenType::BitwiseAnd {
-            return Ok(IntersectionTypeNode::new(types, parser.gen_loc(start_loc)));
-          }
-        } else if types.len() == 1 {
-          return Ok(
-            TypeNode::new(false, types.last().unwrap().to_owned(), parser.gen_loc(start_loc))
-          );
-        }
+    if let [types] = matched.as_slice() {
+      if let LookupResultWrapper::OptionalType(types) = &types.wrapper {
+        return Ok(Self::from_matched(parser, types));
       }
     }
     Err(ParserError::internal("Type", args))
+  }
+
+  fn from_matched(parser: &mut Parser, types: &OptionalTypeResult) -> Box<Node> {
+    match types {
+      // OptionalTypeResult::None => todo!(),
+      OptionalTypeResult::Single(token) => {
+        let start_loc = token.get_location().unwrap();
+        let len = token.value.len();
+        let end_loc = Location {
+          line: start_loc.line,
+          column: start_loc.column + len,
+          offset: start_loc.offset + len,
+        };
+        return TypeNode::new(
+          false,
+          token.value.to_owned(),
+          Some(RangeLocation {
+            start: start_loc,
+            end: end_loc,
+          })
+        );
+      }
+      OptionalTypeResult::Nullable(nullable, token) => {
+        let start_loc = nullable.get_location().unwrap();
+        let end_loc = token.get_location().unwrap();
+        let len = token.value.len();
+        let end_loc = Location {
+          line: end_loc.line,
+          column: end_loc.column + len,
+          offset: end_loc.offset + len,
+        };
+        return TypeNode::new(
+          true,
+          token.value.to_owned(),
+          Some(RangeLocation {
+            start: start_loc,
+            end: end_loc,
+          })
+        );
+      }
+      OptionalTypeResult::Union(vec) => {
+        let items = vec
+          .iter()
+          .map(|x| Self::from_matched(parser, x))
+          .collect::<Vec<Box<Node>>>();
+        let start_loc = items.first().unwrap().clone().loc.unwrap().start.to_owned();
+        let end_loc = items.last().unwrap().clone().loc.unwrap().end.to_owned();
+        return UnionTypeNode::new(items, Some(RangeLocation { start: start_loc, end: end_loc }));
+      }
+      OptionalTypeResult::Intersection(vec) => {
+        let items = vec
+          .iter()
+          .map(|x| Self::from_matched(parser, x))
+          .collect::<Vec<Box<Node>>>();
+        let start_loc = items.first().unwrap().clone().loc.unwrap().start.to_owned();
+        let end_loc = items.last().unwrap().clone().loc.unwrap().end.to_owned();
+        return IntersectionTypeNode::new(
+          items,
+          Some(RangeLocation { start: start_loc, end: end_loc })
+        );
+      }
+      _ => {
+        panic!("TypeParser::from_matched: failed to get type");
+      }
+    }
   }
 }

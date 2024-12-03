@@ -5,7 +5,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 use super::{
@@ -22,58 +22,32 @@ use super::{
 pub struct ClassParser;
 
 impl ClassParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    let modifiers_rule = [
-      [TokenType::Readonly].to_vec(),
-      [TokenType::Abstract, TokenType::Final].to_vec(),
-    ];
-    let mut modifiers = vec![vec![], vec![]];
-    let mut pos = 0;
-    loop {
-      let token = tokens.get(pos);
-      pos += 1;
-      if pos > 2 || token.is_none() {
-        break;
-      }
-      let token = token.unwrap();
-      for (i, modifier) in modifiers_rule.iter().enumerate() {
-        if !modifiers[i].is_empty() {
-          continue;
-        }
-        if modifier.contains(&token.token_type) {
-          modifiers[i].push(token.clone());
-          break;
-        }
-      }
-    }
-    let modifier_count = modifiers
-      .iter()
-      .map(|i| i.len())
-      .sum::<usize>();
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     if
-      let Some(next_modifiers) = match_pattern(
-        &tokens[modifier_count..],
+      let Some(m) = match_pattern(
+        tokens,
         &[
+          Lookup::Modifiers(&[&[TokenType::Readonly], &[TokenType::Abstract, TokenType::Final]]),
           Lookup::Equal(&[TokenType::Class]),
           Lookup::Equal(&[TokenType::Identifier]),
           Lookup::Optional(&[TokenType::Extends]),
           Lookup::Optional(&[TokenType::Identifier, TokenType::Name]),
+          Lookup::Optional(&[TokenType::Implements]),
         ]
       )
     {
-      modifiers.extend(next_modifiers);
-      return Some(modifiers);
+      return Some(m);
     }
     // anonymous class
     match_pattern(
-      &tokens[modifier_count..],
+      tokens,
       &[Lookup::Equal(&[TokenType::Class]), Lookup::Optional(&[TokenType::LeftParenthesis])]
     )
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
@@ -86,12 +60,12 @@ impl ClassParser {
 
   fn parse_anonymous(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, has_parameter] = matched.as_slice() {
-      let parameters = if !has_parameter.is_empty() {
+      let parameters = if let LookupResultWrapper::Optional(Some(_)) = has_parameter.wrapper {
         parser.get_children(
           &mut LoopArgument::with_tokens(
             "class_anonymous_parameter",
@@ -166,30 +140,38 @@ impl ClassParser {
 
   fn parse_basic(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [readonly, modifier, _, name, _, extends] = matched.as_slice() {
-      let extends = extends.first().map(IdentifierParser::from_token);
-      let mut implements = vec![];
-      if let Some(t) = parser.tokens.get(parser.position) {
-        if t.token_type == TokenType::Implements {
-          parser.position += 1;
-          implements = parser.get_children(
-            &mut LoopArgument::new(
-              "class_implements",
-              &[TokenType::Comma],
-              &[TokenType::LeftCurlyBracket],
-              &[
-                (IdentifierParser::test, IdentifierParser::parse),
-                (CommentParser::test, CommentParser::parse),
-              ]
-            )
-          )?;
-          parser.position -= 1;
-        }
-      }
+    if let [modifiers, _, name, _, extends, has_implements] = matched.as_slice() {
+      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
+        Some(IdentifierParser::from_token(&name))
+      } else {
+        None
+      };
+      let extends = if let LookupResultWrapper::Optional(Some(extends)) = &extends.wrapper {
+        Some(IdentifierParser::from_token(&extends))
+      } else {
+        None
+      };
+      let implements = if let LookupResultWrapper::Optional(Some(_)) = has_implements.wrapper {
+        let t = parser.get_children(
+          &mut LoopArgument::new(
+            "class_implements",
+            &[TokenType::Comma],
+            &[TokenType::LeftCurlyBracket],
+            &[
+              (IdentifierParser::test, IdentifierParser::parse),
+              (CommentParser::test, CommentParser::parse),
+            ]
+          )
+        )?;
+        parser.position -= 1;
+        t
+      } else {
+        vec![]
+      };
       let body_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
       parser.position += 1;
       let body = parser.get_children(
@@ -207,20 +189,27 @@ impl ClassParser {
           ]
         )
       )?;
-      let name = if !name.is_empty() { Some(IdentifierParser::from_matched(name)) } else { None };
-      return Ok(
-        ClassNode::new(
-          Inheritance::try_parse(
-            &modifier
-              .first()
+      let mut inheritance = None;
+      let mut is_readonly = false;
+      if let LookupResultWrapper::Modifier(modifiers) = &modifiers.wrapper {
+        if let [readonly_modifier, inheritance_modifier] = modifiers.as_slice() {
+          is_readonly = readonly_modifier.is_some();
+          inheritance = Inheritance::try_parse(
+            &inheritance_modifier
+              .as_ref()
               .map(|i| i.value.to_owned())
               .unwrap_or_default()
-          ),
+          );
+        }
+      }
+      return Ok(
+        ClassNode::new(
+          inheritance,
           name,
           extends,
           implements,
           BlockNode::new(body, parser.gen_loc(body_loc)),
-          !readonly.is_empty(),
+          is_readonly,
           parser.gen_loc(start_loc)
         )
       );

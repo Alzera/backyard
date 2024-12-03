@@ -5,7 +5,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 use super::comment::CommentParser;
@@ -14,7 +14,7 @@ use super::comment::CommentParser;
 pub struct MatchParser;
 
 impl MatchParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[Lookup::Equal(&[TokenType::Match]), Lookup::Equal(&[TokenType::LeftParenthesis])]
@@ -23,7 +23,7 @@ impl MatchParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
@@ -58,13 +58,13 @@ impl MatchParser {
 pub struct MatchArmParser;
 
 impl MatchArmParser {
-  pub fn test(_: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(_: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     Some(vec![])
   }
 
   pub fn parse(
     parser: &mut Parser,
-    _: Vec<Vec<Token>>,
+    _: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {

@@ -13,14 +13,14 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 #[derive(Debug, Clone)]
 pub struct PreParser;
 
 impl PreParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[
@@ -42,14 +42,16 @@ impl PreParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [operator] = matched.as_slice() {
-      let operator = guard!(operator.first(), {
+      let operator = if let LookupResultWrapper::Equal(operator) = &operator.wrapper {
+        operator
+      } else {
         return Err(ParserError::internal("Pre", args));
-      });
+      };
       let argument = parser.get_statement(
         &mut LoopArgument::safe("pre", args.separators, args.breakers, &DEFAULT_PARSERS)
       )?;

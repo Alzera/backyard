@@ -5,20 +5,20 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 #[derive(Debug, Clone)]
 pub struct AttributeParser;
 
 impl AttributeParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(tokens, &[Lookup::Equal(&[TokenType::Attribute])])
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
@@ -47,20 +47,22 @@ impl AttributeParser {
 pub struct AttributeItemParser;
 
 impl AttributeItemParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(tokens, &[Lookup::Equal(&[TokenType::Identifier, TokenType::Name])])
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name] = matched.as_slice() {
-      let name = guard!(name.first(), {
+      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
+        name.value.to_owned()
+      } else {
         return Err(ParserError::internal("ArrayItem", args));
-      }).value.to_owned();
+      };
       let mut arguments = vec![];
       let token = guard!(parser.tokens.get(parser.position), {
         return Err(ParserError::internal("ArrayItem", args));

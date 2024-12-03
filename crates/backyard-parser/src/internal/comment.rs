@@ -10,16 +10,15 @@ use backyard_nodes::node::{
 
 use crate::{
   error::ParserError,
-  guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 #[derive(Debug, Clone)]
 pub struct CommentParser;
 
 impl CommentParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[Lookup::Equal(&[TokenType::CommentLine, TokenType::CommentBlock, TokenType::CommentDoc])]
@@ -28,14 +27,16 @@ impl CommentParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [comment] = matched.as_slice() {
-      let comment = guard!(comment.first(), {
+      let comment = if let LookupResultWrapper::Equal(comment) = &comment.wrapper {
+        comment
+      } else {
         return Err(ParserError::internal("Comment: failed to get type", args));
-      });
+      };
       let comment: Box<Node> = match comment.token_type {
         TokenType::CommentLine =>
           CommentLineNode::new(comment.value.to_owned(), parser.gen_loc(start_loc)),

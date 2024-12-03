@@ -3,7 +3,12 @@ use std::vec;
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ CallArgumentNode, CallNode, Location, Node };
 
-use crate::{ error::ParserError, guard, parser::{ LoopArgument, Parser } };
+use crate::{
+  error::ParserError,
+  guard,
+  parser::{ LoopArgument, Parser },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+};
 
 use super::{ comment::CommentParser, identifier::IdentifierParser };
 
@@ -27,20 +32,14 @@ impl CallParser {
 }
 
 impl CallParser {
-  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    if args.last_expr.is_some() {
-      if let Some(next_token) = tokens.first() {
-        if next_token.token_type == TokenType::LeftParenthesis {
-          return Some(vec![vec![next_token.to_owned()]]);
-        }
-      }
-    }
-    None
+  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+    args.last_expr.as_ref()?;
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::LeftParenthesis])])
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
@@ -61,28 +60,54 @@ impl CallParser {
 pub struct ArgumentParser;
 
 impl ArgumentParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     if let Some(is_colon) = tokens.get(1) {
       if is_colon.token_type == TokenType::Colon {
         if let Some(name) = tokens.first() {
-          return Some(vec![vec![name.to_owned()], vec![is_colon.to_owned()]]);
+          return Some(
+            vec![
+              LookupResult {
+                size: 1,
+                wrapper: LookupResultWrapper::Optional(Some(name.to_owned())),
+              },
+              LookupResult {
+                size: 1,
+                wrapper: LookupResultWrapper::Optional(Some(is_colon.to_owned())),
+              }
+            ]
+          );
         }
       }
     }
-    Some(vec![vec![], vec![]])
+    return Some(
+      vec![
+        LookupResult {
+          size: 0,
+          wrapper: LookupResultWrapper::Optional(None),
+        },
+        LookupResult {
+          size: 0,
+          wrapper: LookupResultWrapper::Optional(None),
+        }
+      ]
+    );
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name, has_name] = matched.as_slice() {
-      let name = if !has_name.is_empty() {
-        Some(IdentifierParser::from_matched(name))
+      let name = if let LookupResultWrapper::Optional(_) = &has_name.wrapper {
+        if let LookupResultWrapper::Optional(Some(name)) = &name.wrapper {
+          Some(IdentifierParser::from_token(name))
+        } else {
+          None
+        }
       } else {
-        parser.position -= name.len();
+        parser.position -= name.size;
         None
       };
       let value = guard!(

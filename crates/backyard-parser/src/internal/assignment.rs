@@ -4,14 +4,14 @@ use backyard_nodes::node::{ Location, Node, AssignmentNode };
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 #[derive(Debug, Clone)]
 pub struct AssignmentParser;
 
 impl AssignmentParser {
-  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     args.last_expr.as_ref()?;
     match_pattern(
       tokens,
@@ -41,12 +41,12 @@ impl AssignmentParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [operator] = matched.as_slice() {
-      if let Some(operator) = operator.first() {
+      if let LookupResultWrapper::Equal(operator) = &operator.wrapper {
         let left = args.last_expr.to_owned().unwrap();
         args.last_expr = None;
         if

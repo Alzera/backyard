@@ -4,7 +4,7 @@ use backyard_nodes::node::{ BlockNode, Location, Node, TraitNode };
 use crate::{
   error::ParserError,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 use super::{
@@ -21,7 +21,7 @@ use super::{
 pub struct TraitParser;
 
 impl TraitParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[Lookup::Equal(&[TokenType::Trait]), Lookup::Equal(&[TokenType::Identifier])]
@@ -30,11 +30,16 @@ impl TraitParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, name] = matched.as_slice() {
+      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
+        IdentifierParser::from_token(name)
+      } else {
+        return Err(ParserError::internal("Trait", args));
+      };
       let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
       parser.position += 1;
       let body = parser.get_children(
@@ -54,7 +59,7 @@ impl TraitParser {
       )?;
       return Ok(
         TraitNode::new(
-          IdentifierParser::from_matched(name),
+          name,
           BlockNode::new(body, parser.gen_loc(block_loc)),
           parser.gen_loc(start_loc)
         )

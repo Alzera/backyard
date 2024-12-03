@@ -22,14 +22,14 @@ use backyard_nodes::node::{
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 #[derive(Debug, Clone)]
 pub struct SinglesParser;
 
 impl SinglesParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[
@@ -59,12 +59,12 @@ impl SinglesParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [key] = matched.as_slice() {
-      if let Some(key) = key.first() {
+      if let LookupResultWrapper::Equal(key) = &key.wrapper {
         if
           [
             TokenType::Parent,

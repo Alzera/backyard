@@ -6,14 +6,14 @@ use crate::{
   guard,
   internal::{ identifier::IdentifierParser, variable::VariableParser },
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 #[derive(Debug, Clone)]
 pub struct ObjectAccessParser;
 
 impl ObjectAccessParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[Lookup::Equal(&[TokenType::ObjectAccess, TokenType::NullsafeObjectAccess])]
@@ -22,15 +22,16 @@ impl ObjectAccessParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [access_type] = matched.as_slice() {
-      let is_nullsafe =
-        guard!(access_type.first(), {
-          return Err(ParserError::internal("ObjectAccess", args));
-        }).token_type == TokenType::NullsafeObjectAccess;
+      let is_nullsafe = if let LookupResultWrapper::Equal(access_type) = &access_type.wrapper {
+        access_type.token_type == TokenType::NullsafeObjectAccess
+      } else {
+        return Err(ParserError::internal("ObjectAccess", args));
+      };
       let is_bracket = if let Some(next_token) = parser.tokens.get(parser.position) {
         next_token.token_type == TokenType::LeftCurlyBracket
       } else {
@@ -52,7 +53,7 @@ impl ObjectAccessParser {
         let loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
         parser.position += m
           .iter()
-          .map(|x| x.len())
+          .map(|x| x.size)
           .sum::<usize>();
         VariableParser::parse(parser, m, loc, args)?
       } else if let Some(token) = parser.tokens.get(parser.position) {

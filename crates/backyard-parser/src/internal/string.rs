@@ -10,7 +10,12 @@ use backyard_nodes::node::{
   StringNode,
 };
 
-use crate::{ error::ParserError, guard, parser::{ LocationHelper, LoopArgument, Parser } };
+use crate::{
+  error::ParserError,
+  guard,
+  parser::{ LocationHelper, LoopArgument, Parser },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+};
 
 use super::variable::VariableParser;
 
@@ -18,30 +23,30 @@ use super::variable::VariableParser;
 pub struct StringParser;
 
 impl StringParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    if let Some(token) = tokens.first() {
-      if
-        [
-          TokenType::EncapsedStringOpen,
-          TokenType::String,
-          TokenType::HeredocOpen,
-          TokenType::NowDocOpen,
-        ].contains(&token.token_type)
-      {
-        return Some(vec![vec![token.to_owned()]]);
-      }
-    }
-    None
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+    match_pattern(
+      tokens,
+      &[
+        Lookup::Equal(
+          &[
+            TokenType::EncapsedStringOpen,
+            TokenType::String,
+            TokenType::HeredocOpen,
+            TokenType::NowDocOpen,
+          ]
+        ),
+      ]
+    )
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [string_type] = matched.as_slice() {
-      if let Some(string_type) = string_type.first() {
+      if let LookupResultWrapper::Equal(string_type) = &string_type.wrapper {
         if string_type.token_type == TokenType::NowDocOpen {
           let label = string_type.value.to_owned();
           let text = guard!(parser.tokens.get(parser.position), {

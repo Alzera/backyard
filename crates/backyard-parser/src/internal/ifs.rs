@@ -5,7 +5,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 use super::{ block::BlockParser, comment::CommentParser };
@@ -14,7 +14,7 @@ use super::{ block::BlockParser, comment::CommentParser };
 pub struct IfParser;
 
 impl IfParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[Lookup::Equal(&[TokenType::If]), Lookup::Equal(&[TokenType::LeftParenthesis])]
@@ -23,7 +23,7 @@ impl IfParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
@@ -74,30 +74,49 @@ impl IfParser {
 pub struct ElseParser;
 
 impl ElseParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(tokens, &[Lookup::Equal(&[TokenType::Else, TokenType::ElseIf])])
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [keyword] = matched.as_slice() {
-      if let Some(keyword) = keyword.first() {
+    if let [keyword_result] = matched.as_slice() {
+      if let LookupResultWrapper::Equal(keyword) = &keyword_result.wrapper {
         if keyword.token_type == TokenType::ElseIf {
+          let token = parser.tokens.get(parser.position).unwrap();
+          let loc = token.get_location().unwrap();
           parser.position += 1;
-          let loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
-          let expr = IfParser::parse(parser, vec![vec![keyword.to_owned()], vec![]], loc, args)?;
+          let expr = IfParser::parse(
+            parser,
+            vec![
+              LookupResult { size: 1, wrapper: LookupResultWrapper::Equal(keyword.to_owned()) },
+              LookupResult { size: 1, wrapper: LookupResultWrapper::Equal(token.to_owned()) }
+            ],
+            loc,
+            args
+          )?;
           return Ok(ElseNode::new(expr, false, parser.gen_loc(start_loc)));
         }
       }
       if let Some(next_token) = parser.tokens.get(parser.position) {
         if next_token.token_type == TokenType::If {
-          parser.position += 2;
-          let loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
-          let expr = IfParser::parse(parser, vec![vec![next_token.to_owned()], vec![]], loc, args)?;
+          parser.position += 1;
+          let token = parser.tokens.get(parser.position).unwrap();
+          let loc = token.get_location().unwrap();
+          parser.position += 1;
+          let expr = IfParser::parse(
+            parser,
+            vec![
+              LookupResult { size: 1, wrapper: LookupResultWrapper::Equal(next_token.to_owned()) },
+              LookupResult { size: 1, wrapper: LookupResultWrapper::Equal(token.to_owned()) }
+            ],
+            loc,
+            args
+          )?;
           return Ok(ElseNode::new(expr, false, parser.gen_loc(start_loc)));
         }
       }

@@ -5,7 +5,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LocationHelper, LoopArgument, Parser, DEFAULT_PARSERS },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 use super::comment::CommentParser;
@@ -90,13 +90,13 @@ impl BlockParser {
     Err(ParserError::internal("Block", args))
   }
 
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(tokens, &[Lookup::Equal(&[TokenType::LeftCurlyBracket])])
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {

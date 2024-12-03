@@ -15,7 +15,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 use super::{
@@ -30,26 +30,14 @@ use super::{
 pub struct FunctionParser;
 
 impl FunctionParser {
-  pub fn class_test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    match_pattern(
-      tokens,
-      &[
-        Lookup::Equal(&[TokenType::Function]),
-        Lookup::Optional(&[TokenType::BitwiseAnd]),
-        Lookup::Any,
-        Lookup::Equal(&[TokenType::LeftParenthesis]),
-      ]
-    )
-  }
-
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     if
       let Some(m) = match_pattern(
         tokens,
         &[
           Lookup::Equal(&[TokenType::Function]),
           Lookup::Optional(&[TokenType::BitwiseAnd]),
-          Lookup::Equal(&[TokenType::Identifier, TokenType::Readonly]),
+          Lookup::Any,
           Lookup::Equal(&[TokenType::LeftParenthesis]),
         ]
       )
@@ -80,7 +68,7 @@ impl FunctionParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
@@ -88,7 +76,7 @@ impl FunctionParser {
       4 => FunctionParser::parse_basic(parser, matched, start_loc, args),
       3 => {
         if let Some(f) = matched.first() {
-          if let Some(f) = f.first() {
+          if let LookupResultWrapper::Equal(f) = &f.wrapper {
             if f.token_type == TokenType::Fn {
               return FunctionParser::parse_arrow(parser, matched, start_loc, args);
             } else if f.token_type == TokenType::Function {
@@ -96,9 +84,9 @@ impl FunctionParser {
             }
           }
         }
-        Err(ParserError::internal("Function", args))
+        Err(ParserError::internal("Function parse", args))
       }
-      _ => Err(ParserError::internal("Function", args)),
+      _ => Err(ParserError::internal("Function parse", args)),
     }
   }
 }
@@ -106,7 +94,7 @@ impl FunctionParser {
 impl FunctionParser {
   pub fn parse_arrow(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &LoopArgument
   ) -> Result<Box<Node>, ParserError> {
@@ -141,7 +129,7 @@ impl FunctionParser {
 
   pub fn parse_anonymous(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &LoopArgument
   ) -> Result<Box<Node>, ParserError> {
@@ -178,16 +166,17 @@ impl FunctionParser {
 
   pub fn parse_basic(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, is_ref, name, _] = matched.as_slice() {
-      let name_parsed = name
-        .first()
-        .map(|i| i.value.to_owned())
-        .unwrap_or_default();
-      let arguments = if name_parsed == "__construct" {
+      let name = if let LookupResultWrapper::Any(name) = &name.wrapper {
+        name
+      } else {
+        return Err(ParserError::internal("Function parse_basic 1", args));
+      };
+      let arguments = if name.value == "__construct" {
         parser.get_children(
           &mut LoopArgument::new(
             "function_construct_parameters",
@@ -196,7 +185,6 @@ impl FunctionParser {
             &[
               (ConstructorParameterParser::test, ConstructorParameterParser::parse),
               (TypesParser::test, TypesParser::parse),
-              (ParameterParser::test, ParameterParser::parse),
               (AttributeParser::test, AttributeParser::parse),
               (CommentParser::test, CommentParser::parse),
             ]
@@ -208,7 +196,7 @@ impl FunctionParser {
       let return_type = FunctionParser::get_return_type(parser, args).ok();
       let body = if
         guard!(parser.tokens.get(parser.position), {
-          return Err(ParserError::internal("Function", args));
+          return Err(ParserError::internal("Function parse_basic 2", args));
         }).token_type == TokenType::Semicolon
       {
         None
@@ -218,7 +206,7 @@ impl FunctionParser {
       return Ok(
         FunctionNode::new(
           !is_ref.is_empty(),
-          IdentifierParser::from_matched(name),
+          IdentifierParser::from_token(name),
           arguments,
           return_type,
           body,
@@ -226,7 +214,7 @@ impl FunctionParser {
         )
       );
     }
-    Err(ParserError::internal("Function", args))
+    Err(ParserError::internal("Function parse_basic 3", args))
   }
 
   pub fn get_parameters(parser: &mut Parser) -> Result<Vec<Box<Node>>, ParserError> {
@@ -269,7 +257,7 @@ impl FunctionParser {
         }
       }
     }
-    Err(ParserError::internal("Function", args))
+    Err(ParserError::internal("Function get_return_type", args))
   }
 }
 
@@ -277,95 +265,40 @@ impl FunctionParser {
 pub struct ConstructorParameterParser;
 
 impl ConstructorParameterParser {
-  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
-    let modifiers_rule = [
-      [TokenType::Public, TokenType::Private, TokenType::Protected].to_vec(),
-      [TokenType::Static, TokenType::Readonly].to_vec(),
-    ];
-    let mut modifiers = vec![vec![], vec![]];
-    let mut pos = 0;
-    loop {
-      let token = tokens.get(pos);
-      token?;
-      pos += 1;
-      if pos > 2 {
-        break;
-      }
-      let mut assigned = false;
-      let token = token.unwrap();
-      for (i, modifier) in modifiers_rule.iter().enumerate() {
-        if !modifiers[i].is_empty() {
-          continue;
-        }
-        if modifier.contains(&token.token_type) {
-          modifiers[i].push(token.clone());
-          assigned = true;
-          break;
-        }
-      }
-      if !assigned {
-        break;
-      }
-    }
-    let first_test_count = modifiers
-      .iter()
-      .map(|i| i.len())
-      .sum();
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+    println!("\nConstructorParameterParser::test: {:?}", tokens.get(0));
     if
-      let Some(has_var) = match_pattern(
-        &tokens[first_test_count..],
-        &[Lookup::Equal(&[TokenType::Var])]
-      )
-    {
-      if let Some(has_var) = has_var.first() {
-        modifiers.push(has_var.to_owned());
-      }
-    } else {
-      modifiers.push(vec![]);
-    }
-    // need to manually check for variable type
-    let first_test_count = modifiers
-      .iter()
-      .map(|i| i.len())
-      .sum();
-    let tmp_tokens = guard!(tokens.get(first_test_count..), {
-      return None;
-    }).to_vec();
-    let type_test = TypesParser::test(&tmp_tokens, args);
-    let type_test_count: usize = if let Some(t) = type_test {
-      t.iter()
-        .map(|i| i.len())
-        .sum()
-    } else {
-      0
-    };
-    let tmp_tokens = guard!(tmp_tokens.get(type_test_count..), {
-      return None;
-    }).to_vec();
-    guard!(
-      match_pattern(
-        &tmp_tokens,
+      let Some(m) = match_pattern(
+        tokens,
         &[
+          Lookup::Modifiers(
+            &[
+              &[TokenType::Public, TokenType::Private, TokenType::Protected],
+              &[TokenType::Static, TokenType::Readonly],
+            ]
+          ),
+          Lookup::Optional(&[TokenType::Var]),
+          Lookup::OptionalType,
           Lookup::Optional(&[TokenType::BitwiseAnd]),
           Lookup::Optional(&[TokenType::Ellipsis]),
           Lookup::Equal(&[TokenType::Variable]),
-          Lookup::Optional(&[TokenType::Assignment]),
         ]
-      ),
-      {
-        return None;
-      }
-    );
-    Some(modifiers)
+      )
+    {
+      println!("ConstructorParameterParser::test 1");
+      return Some(m[..2].to_vec());
+    }
+    println!("ConstructorParameterParser::test 2");
+    None
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [visibility, modifier, has_var] = matched.as_slice() {
+    if let [modifiers, has_var] = matched.as_slice() {
       let item = guard!(
         parser.get_statement(
           &mut LoopArgument::new(
@@ -384,27 +317,29 @@ impl ConstructorParameterParser {
           return Err(ParserError::internal("ConstructorParameter", args));
         }
       );
-      let mut visibility = Visibility::try_parse(
-        &visibility
-          .first()
-          .map(|i| i.value.to_owned())
-          .unwrap_or_default()
-      );
+      let mut visibility = None;
+      let mut modifier = None;
+      if let LookupResultWrapper::Modifier(modifiers) = &modifiers.wrapper {
+        if let [visibility_modifier, modifier_modifier] = modifiers.as_slice() {
+          visibility = Visibility::try_parse(
+            &visibility_modifier
+              .as_ref()
+              .map(|i| i.value.to_owned())
+              .unwrap_or_default()
+          );
+          modifier = Modifier::try_parse(
+            &modifier_modifier
+              .as_ref()
+              .map(|i| i.value.to_owned())
+              .unwrap_or_default()
+          );
+        }
+      }
       if visibility.is_none() && !has_var.is_empty() {
         visibility = Some(Visibility::Public);
       }
       return Ok(
-        ConstructorParameterNode::new(
-          visibility,
-          Modifier::try_parse(
-            &modifier
-              .first()
-              .map(|i| i.value.to_owned())
-              .unwrap_or_default()
-          ),
-          item,
-          parser.gen_loc(start_loc)
-        )
+        ConstructorParameterNode::new(visibility, modifier, item, parser.gen_loc(start_loc))
       );
     }
     Err(ParserError::internal("ConstructorParameter", args))
@@ -415,7 +350,7 @@ impl ConstructorParameterParser {
 pub struct ParameterParser;
 
 impl ParameterParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[
@@ -429,11 +364,16 @@ impl ParameterParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [is_ref, is_ellipsis, name, has_value] = matched.as_slice() {
+      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
+        IdentifierParser::from_token(name)
+      } else {
+        return Err(ParserError::internal("Parameter", args));
+      };
       let value = if !has_value.is_empty() {
         parser.get_statement(
           &mut LoopArgument::with_tokens(
@@ -452,7 +392,7 @@ impl ParameterParser {
           args.last_expr.to_owned(),
           is_ref,
           is_ellipsis,
-          IdentifierParser::from_matched(name),
+          name,
           value,
           parser.gen_loc(start_loc)
         )

@@ -12,7 +12,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 use super::{ comment::CommentParser, identifier::IdentifierParser };
@@ -21,13 +21,13 @@ use super::{ comment::CommentParser, identifier::IdentifierParser };
 pub struct TraitUseParser;
 
 impl TraitUseParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(tokens, &[Lookup::Equal(&[TokenType::Use])])
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
@@ -74,7 +74,7 @@ impl TraitUseParser {
 pub struct TraitUseAliasParser;
 
 impl TraitUseAliasParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[
@@ -90,27 +90,48 @@ impl TraitUseAliasParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [trait_name, double_colon, name, _, visibility, alias] = matched.as_slice() {
       let has_trait = !double_colon.is_empty();
-      let trait_to_parsed = if has_trait { trait_name } else { name };
-      let name_to_parsed = if has_trait { name } else { trait_name };
-      let trait_name_parsed = trait_to_parsed.first().map(IdentifierParser::from_token);
-      let alias = alias.first().map(IdentifierParser::from_token);
+      let trait_name = if let LookupResultWrapper::Equal(trait_name) = &trait_name.wrapper {
+        IdentifierParser::from_token(trait_name)
+      } else {
+        return Err(ParserError::internal("TraitUseAlias", args));
+      };
+      let name = if let LookupResultWrapper::Optional(name) = &name.wrapper {
+        name.to_owned().and_then(|x| Some(IdentifierParser::from_token(&x)))
+      } else {
+        return Err(ParserError::internal("TraitUseAlias", args));
+      };
+      let mut trait_name_parsed = None;
+      let name_parsed = if has_trait {
+        trait_name_parsed = Some(trait_name);
+        name.unwrap()
+      } else {
+        trait_name
+      };
+      let alias = if let LookupResultWrapper::Optional(Some(alias)) = &alias.wrapper {
+        Some(IdentifierParser::from_token(alias))
+      } else {
+        None
+      };
+      let visibility = if let LookupResultWrapper::Optional(visibility) = &visibility.wrapper {
+        visibility
+          .as_ref()
+          .map(|i| i.value.to_owned())
+          .unwrap_or_default()
+      } else {
+        "".to_owned()
+      };
       return Ok(
         TraitUseAliasNode::new(
           trait_name_parsed,
-          IdentifierParser::from_matched(name_to_parsed),
+          name_parsed,
           alias,
-          Visibility::try_parse(
-            &visibility
-              .first()
-              .map(|i| i.value.to_owned())
-              .unwrap_or_default()
-          ),
+          Visibility::try_parse(&visibility),
           parser.gen_loc(start_loc)
         )
       );
@@ -123,7 +144,7 @@ impl TraitUseAliasParser {
 pub struct TraitUsePrecedenceParser;
 
 impl TraitUsePrecedenceParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[
@@ -138,33 +159,34 @@ impl TraitUsePrecedenceParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [trait_name, _, method, _, instead] = matched.as_slice() {
+      let instead = if let LookupResultWrapper::Equal(instead) = &instead.wrapper {
+        IdentifierParser::from_token(instead)
+      } else {
+        return Err(ParserError::internal("TraitUsePrecedence", args));
+      };
       let mut trait_name_parsed = Some(
         IdentifierParser::from_token(
-          guard!(trait_name.first(), {
+          if let LookupResultWrapper::Equal(trait_name) = &trait_name.wrapper {
+            trait_name
+          } else {
             return Err(ParserError::internal("TraitUsePrecedence", args));
-          })
+          }
         )
       );
-      let method = match method.first() {
-        Some(t) => IdentifierParser::from_token(t),
-        _ => {
-          let t = trait_name_parsed.to_owned().unwrap();
-          trait_name_parsed = None;
-          t
-        }
+      let method = if let LookupResultWrapper::Optional(Some(method)) = &method.wrapper {
+        IdentifierParser::from_token(method)
+      } else {
+        let t = trait_name_parsed.to_owned().unwrap();
+        trait_name_parsed = None;
+        t
       };
       return Ok(
-        TraitUsePrecedenceNode::new(
-          trait_name_parsed,
-          method,
-          IdentifierParser::from_matched(instead),
-          parser.gen_loc(start_loc)
-        )
+        TraitUsePrecedenceNode::new(trait_name_parsed, method, instead, parser.gen_loc(start_loc))
       );
     }
     Err(ParserError::internal("TraitUsePrecedence", args))

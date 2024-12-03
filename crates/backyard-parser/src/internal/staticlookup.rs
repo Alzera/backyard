@@ -4,7 +4,7 @@ use backyard_nodes::node::{ ClassKeywordNode, Location, Node, StaticLookupNode }
 use crate::{
   error::ParserError,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 use super::{ identifier::IdentifierParser, variable::VariableParser };
@@ -13,14 +13,14 @@ use super::{ identifier::IdentifierParser, variable::VariableParser };
 pub struct StaticLookupParser;
 
 impl StaticLookupParser {
-  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     args.last_expr.as_ref()?;
     match_pattern(tokens, &[Lookup::Equal(&[TokenType::DoubleColon])])
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {

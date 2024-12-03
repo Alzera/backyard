@@ -4,7 +4,7 @@ use backyard_nodes::node::{ BlockNode, InterfaceNode, Location, Node };
 use crate::{
   error::ParserError,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 use super::{
@@ -19,7 +19,7 @@ use super::{
 pub struct InterfaceParser;
 
 impl InterfaceParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[Lookup::Equal(&[TokenType::Interface]), Lookup::Equal(&[TokenType::Identifier])]
@@ -28,11 +28,16 @@ impl InterfaceParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, name] = matched.as_slice() {
+      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
+        IdentifierParser::from_token(name)
+      } else {
+        return Err(ParserError::internal("Interface", args));
+      };
       let extends = if let Some(t) = parser.tokens.get(parser.position) {
         if t.token_type == TokenType::Extends {
           parser.position += 1;
@@ -72,7 +77,7 @@ impl InterfaceParser {
       )?;
       return Ok(
         InterfaceNode::new(
-          IdentifierParser::from_matched(name),
+          name,
           extends,
           BlockNode::new(body, parser.gen_loc(block_loc)),
           parser.gen_loc(start_loc)

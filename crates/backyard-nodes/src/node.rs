@@ -865,7 +865,7 @@ new_node!(Interface, InterfaceNode {
   body: Box<Node>,
 });
 new_node!(IntersectionType, IntersectionTypeNode {
-  types: Vec<String>,
+  types: Vec<Box<Node>>,
 });
 new_node!(Label, LabelNode {
   label: Box<Node>,
@@ -1015,7 +1015,7 @@ new_node!(Type, TypeNode {
   name: String,
 });
 new_node!(UnionType, UnionTypeNode {
-  types: Vec<String>,
+  types: Vec<Box<Node>>,
 });
 new_node!(Use, UseNode {
   name: Option<String>,

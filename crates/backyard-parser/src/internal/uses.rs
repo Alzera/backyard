@@ -5,7 +5,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
 use super::{ comment::CommentParser, identifier::IdentifierParser };
@@ -14,13 +14,13 @@ use super::{ comment::CommentParser, identifier::IdentifierParser };
 pub struct UseParser;
 
 impl UseParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(tokens, &[Lookup::Equal(&[TokenType::Use])])
   }
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
@@ -86,7 +86,7 @@ impl UseParser {
 pub struct UseItemParser;
 
 impl UseItemParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<Vec<Token>>> {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
       &[
@@ -98,20 +98,25 @@ impl UseItemParser {
 
   pub fn parse(
     parser: &mut Parser,
-    matched: Vec<Vec<Token>>,
+    matched: Vec<LookupResult>,
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [modifier, name] = matched.as_slice() {
-      let modifier = UseItemModifier::try_parse(
-        &modifier
-          .first()
+      let modifier = if let LookupResultWrapper::Optional(modifier) = &modifier.wrapper {
+        modifier
+          .as_ref()
           .map(|i| i.value.to_owned())
           .unwrap_or_default()
-      );
-      let name = guard!(name.first(), {
+      } else {
+        "".to_owned()
+      };
+      let modifier = UseItemModifier::try_parse(&modifier);
+      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
+        name.value.to_owned()
+      } else {
         return Err(ParserError::internal("UseItem", args));
-      }).value.to_owned();
+      };
       let mut alias = None;
       if let Some(last) = parser.tokens.get(parser.position) {
         if last.token_type == TokenType::As {
