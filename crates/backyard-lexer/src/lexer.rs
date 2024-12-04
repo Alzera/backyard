@@ -86,11 +86,11 @@ impl Control {
       end_position += 1;
     }
 
-    let result = self.chars[start_position..end_position].to_vec();
+    let result: String = self.chars[start_position..end_position].iter().collect();
     while self.position < end_position {
       self.next_char();
     }
-    result.iter().collect()
+    result
   }
 
   pub(crate) fn error_unrecognized(&self, t: &str) -> LexError {
@@ -108,13 +108,13 @@ pub enum SeriesCheckerMode {
 #[derive(Debug)]
 pub struct SeriesChecker<'a> {
   list: Vec<char>,
-  againsts: Vec<&'a str>,
+  againsts: &'a [&'a str],
   mode: SeriesCheckerMode,
 }
 
 impl<'a> SeriesChecker<'a> {
-  pub fn new(againsts: &[&'a str], mode: SeriesCheckerMode) -> Self {
-    Self { list: vec![], againsts: againsts.to_vec(), mode }
+  pub fn new(againsts: &'a [&'a str], mode: SeriesCheckerMode) -> Self {
+    Self { list: vec![], againsts, mode }
   }
 
   pub fn push(&mut self, ch: char) {

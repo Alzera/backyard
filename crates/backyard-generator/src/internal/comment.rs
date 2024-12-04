@@ -15,22 +15,17 @@ impl CommentGenerator {
     let node = cast_node!(NodeWrapper::CommentBlock, &node.node);
     builder.push("/*");
     builder.new_line();
-    let n: Vec<&str> = node.comment
-      .split('\n')
-      .map(|i| i.trim_start())
-      .collect();
-    for i in n
-      .iter()
-      .enumerate()
-      .filter_map(|(index, i)| (
-        if (index == 0 || index == n.len() - 1) && i.is_empty() {
-          None
-        } else {
-          let mut i = i.to_string();
-          i.insert(0, ' ');
-          Some(i)
-        }
-      )) {
+    let comments = node.comment.split('\n');
+    let comments_last_index = comments.clone().count() - 1;
+    let comments = comments.enumerate().filter_map(|(index, i)| {
+      let trimmed = i.trim_start();
+      if (index == 0 || index == comments_last_index) && trimmed.is_empty() {
+        None
+      } else {
+        Some(format!(" {}", trimmed))
+      }
+    });
+    for i in comments {
       builder.push(&i);
       builder.new_line();
     }
@@ -41,22 +36,17 @@ impl CommentGenerator {
     let node = cast_node!(NodeWrapper::CommentDoc, &node.node);
     builder.push("/**");
     builder.new_line();
-    let n: Vec<&str> = node.comment
-      .split('\n')
-      .map(|i| i.trim_start())
-      .collect();
-    for i in n
-      .iter()
-      .enumerate()
-      .filter_map(|(index, i)| (
-        if (index == 0 || index == n.len() - 1) && i.is_empty() {
-          None
-        } else {
-          let mut i = i.to_string();
-          i.insert(0, ' ');
-          Some(i)
-        }
-      )) {
+    let comments = node.comment.split('\n');
+    let comments_last_index = comments.clone().count() - 1;
+    let comments = comments.enumerate().filter_map(|(index, i)| {
+      let trimmed = i.trim_start();
+      if (index == 0 || index == comments_last_index) && trimmed.is_empty() {
+        None
+      } else {
+        Some(format!(" {}", trimmed))
+      }
+    });
+    for i in comments {
       builder.push(&i);
       builder.new_line();
     }

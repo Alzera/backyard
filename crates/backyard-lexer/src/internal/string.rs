@@ -7,7 +7,8 @@ pub struct StringToken;
 
 impl StringToken {
   fn get_parts(lexer: &mut Lexer, result: &mut Vec<Token>, breaker: &str, mode: SeriesCheckerMode) {
-    let mut checker = SeriesChecker::new(&[breaker], mode);
+    let againsts = [breaker];
+    let mut checker = SeriesChecker::new(&againsts, mode);
     let mut need_check_condition: Vec<char> = breaker.chars().collect();
     need_check_condition.push('$');
     need_check_condition.push('{');
@@ -129,11 +130,9 @@ impl StringToken {
       return Err(lexer.control.error_unrecognized(&label));
     }
     if label.starts_with('\'') && label.ends_with('\'') {
-      let clean_label = label
-        .get(1..label.len() - 1)
-        .unwrap_or_default()
-        .to_string();
-      let mut checker = SeriesChecker::new(&[&clean_label], SeriesCheckerMode::Heredoc);
+      let clean_label = label.get(1..label.len() - 1).unwrap_or_default();
+      let againsts = [clean_label];
+      let mut checker = SeriesChecker::new(&againsts, SeriesCheckerMode::Heredoc);
       let mut should_break = false;
       let content_snapshot = lexer.control.get_snapshot();
       let text = lexer.control.next_char_until(|_, i, _| {
