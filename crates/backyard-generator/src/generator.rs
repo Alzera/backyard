@@ -4,7 +4,7 @@ use crate::internal::{ attribute::AttributeGenerator, comment::CommentGenerator 
 
 pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Box<Node>);
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 78] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 79] = [
   (NodeType::AnonymousClass, super::internal::class::ClassGenerator::generate_anonymous),
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
@@ -15,7 +15,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 78] = [
   (NodeType::Assignment, super::internal::assignment::AssignmentGenerator::generate),
   (NodeType::Attribute, super::internal::attribute::AttributeGenerator::generate),
   (NodeType::Bin, super::internal::bin::BinGenerator::generate),
-  // (NodeType::Block, super::internal::block::BlockGenerator::generate),
+  (NodeType::Block, super::internal::block::BlockGenerator::generate_single),
   (NodeType::Boolean, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Break, super::internal::singles::SinglesGenerator::generate),
   (NodeType::Call, super::internal::call::CallGenerator::generate),

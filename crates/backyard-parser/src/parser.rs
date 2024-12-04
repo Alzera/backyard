@@ -6,6 +6,7 @@ use crate::{
   error::ParserError,
   internal::{
     attribute::AttributeParser,
+    block::BlockParser,
     echo::EchoParser,
     globals::GlobalParser,
     statics::StaticsParser,
@@ -65,7 +66,7 @@ type InternalParserParse = fn(
   &mut LoopArgument
 ) -> Result<Box<Node>, ParserError>;
 type InternalParser = (InternalParserTest, InternalParserParse);
-pub static DEFAULT_PARSERS: [InternalParser; 45] = [
+pub static DEFAULT_PARSERS: [InternalParser; 46] = [
   (CommentParser::test, CommentParser::parse),
   (ListParser::test, ListParser::parse),
   (ArrayLookupParser::test, ArrayLookupParser::parse),
@@ -108,10 +109,10 @@ pub static DEFAULT_PARSERS: [InternalParser; 45] = [
   (WhileParser::test, WhileParser::parse),
   (LabelParser::test, LabelParser::parse),
   (IdentifierParser::test, IdentifierParser::parse),
-  // (TypesParser::test, TypesParser::parse),
   (SinglesParser::test, SinglesParser::parse),
   (EchoParser::test, EchoParser::parse),
   (AttributeParser::test, AttributeParser::parse),
+  (BlockParser::test, BlockParser::parse),
 ];
 
 #[derive(Debug, Clone)]
