@@ -13,7 +13,8 @@ use crate::{
 pub struct ObjectAccessParser;
 
 impl ObjectAccessParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+    args.last_expr.as_ref()?;
     match_pattern(
       tokens,
       &[Lookup::Equal(&[TokenType::ObjectAccess, TokenType::NullsafeObjectAccess])]
