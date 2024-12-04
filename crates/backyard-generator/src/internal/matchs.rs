@@ -18,7 +18,7 @@ impl MatchGenerator {
       )
     );
     arms.indent();
-    builder.extend(&arms);
+    builder.extend(arms);
     builder.new_line();
     builder.push("}");
   }

@@ -37,7 +37,7 @@ impl EnumGenerator {
     );
     builder.push(" {");
     body.indent();
-    builder.extend(&body);
+    builder.extend(body);
     builder.new_line();
     builder.push("}");
   }

@@ -7,13 +7,14 @@ use backyard_nodes::node::{
   Node,
   NowDocNode,
   Quote,
+  RangeLocation,
   StringNode,
 };
 
 use crate::{
   error::ParserError,
   guard,
-  parser::{ LocationHelper, LoopArgument, Parser },
+  parser::{ LocationExtension, LocationHelper, LoopArgument, Parser },
   utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
@@ -102,18 +103,26 @@ impl StringParser {
           // }
           break;
         }
-        TokenType::EncapsedString =>
+        TokenType::EncapsedString => {
+          let start_loc = i.get_location().unwrap();
+          let end_loc = start_loc.gen_end_loc(i.value.len());
+          let loc = Some(RangeLocation {
+            start: start_loc,
+            end: end_loc,
+          });
           values.push(
             EncapsedPartNode::new(
               false,
-              StringNode::new(Quote::Single, i.value.to_owned(), parser.gen_loc(start_loc.clone())),
-              parser.gen_loc(start_loc)
+              StringNode::new(Quote::Single, i.value.to_owned(), loc.clone()),
+              loc
             )
-          ),
-        TokenType::Variable =>
-          values.push(
-            EncapsedPartNode::new(false, VariableParser::from_token(i), parser.gen_loc(start_loc))
-          ),
+          );
+        }
+        TokenType::Variable => {
+          let parsed = VariableParser::from_token(i);
+          let loc = parsed.loc.clone();
+          values.push(EncapsedPartNode::new(false, parsed, loc));
+        }
         TokenType::AdvanceInterpolationOpen => {
           let value = guard!(
             parser.get_statement(

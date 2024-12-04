@@ -21,7 +21,7 @@ impl TraitUseGenerator {
       2 + builder.last_len() + traits.total_len_with_separator(" ") > generator.max_length
     {
       traits.indent();
-      builder.extend_first_line(&traits);
+      builder.extend_first_line(traits);
     } else {
       builder.push(&traits.print(" "));
     }
@@ -38,7 +38,7 @@ impl TraitUseGenerator {
       );
       builder.push(" {");
       adaptations_builder.indent();
-      builder.extend(&adaptations_builder);
+      builder.extend(adaptations_builder);
       builder.new_line();
       builder.push("}");
     } else {

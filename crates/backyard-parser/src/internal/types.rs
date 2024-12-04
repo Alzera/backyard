@@ -83,22 +83,54 @@ impl TypesParser {
         )
       }
       OptionalTypeResult::Union(vec) => {
+        let mut start_loc = None;
+        let mut end_loc = None;
+        let items_last_index = vec.len() - 1;
         let items = vec
           .iter()
-          .map(Self::from_matched)
+          .enumerate()
+          .map(|(i, x)| {
+            let parsed = Self::from_matched(x);
+            if let Some(loc) = &parsed.loc {
+              if i == items_last_index {
+                end_loc = Some(loc.end.clone());
+              }
+              if i == 0 {
+                start_loc = Some(loc.end.clone());
+              }
+            }
+            parsed
+          })
           .collect::<Vec<Box<Node>>>();
-        let start_loc = items.first().unwrap().clone().loc.unwrap().start.to_owned();
-        let end_loc = items.last().unwrap().clone().loc.unwrap().end.to_owned();
-        UnionTypeNode::new(items, Some(RangeLocation { start: start_loc, end: end_loc }))
+        UnionTypeNode::new(
+          items,
+          Some(RangeLocation { start: start_loc.unwrap(), end: end_loc.unwrap() })
+        )
       }
       OptionalTypeResult::Intersection(vec) => {
+        let mut start_loc = None;
+        let mut end_loc = None;
+        let items_last_index = vec.len() - 1;
         let items = vec
           .iter()
-          .map(Self::from_matched)
+          .enumerate()
+          .map(|(i, x)| {
+            let parsed = Self::from_matched(x);
+            if let Some(loc) = &parsed.loc {
+              if i == items_last_index {
+                end_loc = Some(loc.end.clone());
+              }
+              if i == 0 {
+                start_loc = Some(loc.end.clone());
+              }
+            }
+            parsed
+          })
           .collect::<Vec<Box<Node>>>();
-        let start_loc = items.first().unwrap().clone().loc.unwrap().start.to_owned();
-        let end_loc = items.last().unwrap().clone().loc.unwrap().end.to_owned();
-        IntersectionTypeNode::new(items, Some(RangeLocation { start: start_loc, end: end_loc }))
+        IntersectionTypeNode::new(
+          items,
+          Some(RangeLocation { start: start_loc.unwrap(), end: end_loc.unwrap() })
+        )
       }
       _ => {
         panic!("TypeParser::from_matched: failed to get type");

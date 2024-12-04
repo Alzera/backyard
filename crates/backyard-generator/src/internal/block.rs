@@ -38,7 +38,7 @@ impl BlockGenerator {
       }
       Self::print_block(generator, &mut scoped_builder, node, short_close, generators);
       generator.handle_comments(&mut scoped_builder, trailings);
-      builder.extend_first_line(&scoped_builder);
+      builder.extend_first_line(scoped_builder);
     } else {
       Self::print_block(generator, builder, node, short_close, generators);
     }
@@ -55,7 +55,7 @@ impl BlockGenerator {
     block.indent();
     if let Some(close) = short_close {
       builder.push(":");
-      builder.extend(&block);
+      builder.extend(block);
       builder.new_line();
       builder.push(close);
     } else {
@@ -63,7 +63,7 @@ impl BlockGenerator {
         builder.push(" ");
       }
       builder.push("{");
-      builder.extend(&block);
+      builder.extend(block);
       builder.new_line();
       builder.push("}");
     }

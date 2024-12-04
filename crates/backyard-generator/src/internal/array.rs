@@ -7,17 +7,17 @@ impl ArrayGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Array, &node.node);
 
-    let mut items = generator.generate_nodes_new(
+    let items = generator.generate_nodes_new(
       &node.items,
       &mut GeneratorArgument::for_parameter(&[(NodeType::ArrayItem, Self::generate_item)])
     );
     if node.is_short {
       builder.push("[");
-      Self::print_values(generator, builder, &mut items, node);
+      Self::print_values(generator, builder, items, node);
       builder.push("]");
     } else {
       builder.push("array(");
-      Self::print_values(generator, builder, &mut items, node);
+      Self::print_values(generator, builder, items, node);
       builder.push(")");
     }
   }
@@ -25,7 +25,7 @@ impl ArrayGenerator {
   fn print_values(
     generator: &mut Generator,
     builder: &mut Builder,
-    items: &mut Builder,
+    mut items: Builder,
     node: &ArrayNode
   ) {
     if

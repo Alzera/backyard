@@ -12,9 +12,9 @@ impl AssignmentGenerator {
     let mut right = generator.generate_node_new(&node.right);
     if builder.last_len() + right.total_len_with_separator(" ") > generator.max_length {
       right.indent();
-      builder.extend(&right);
+      builder.extend(right);
     } else {
-      builder.extend_first_line(&right);
+      builder.extend_first_line(right);
     }
   }
 }

@@ -40,7 +40,6 @@ impl ParenthesisParser {
             "unset",
           ].contains(&token.value.as_str())
         {
-          let token = token.clone();
           if let Some(next_token) = parser.tokens.get(parser.position + 1) {
             if next_token.token_type == TokenType::RightParenthesis {
               parser.position += 2;

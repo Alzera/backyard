@@ -18,7 +18,7 @@ impl CallGenerator {
       2 + builder.last_len() + arguments.total_len_with_separator(" ") > generator.max_length
     {
       arguments.indent();
-      builder.extend(&arguments);
+      builder.extend(arguments);
       builder.new_line();
     } else {
       builder.push(&arguments.print(" "));

@@ -16,7 +16,7 @@ impl NamespaceGenerator {
     } else {
       builder.push(";");
       let body = BlockGenerator::generate_base(generator, &node.body, &DEFAULT_GENERATORS);
-      builder.extend(&body);
+      builder.extend(body);
     }
   }
 }

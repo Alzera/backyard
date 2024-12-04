@@ -58,10 +58,14 @@ impl CommentParser {
           )
         {
           let mut expr = expr.to_owned();
-          if expr.loc.clone().unwrap().start.offset < comment.loc.clone().unwrap().start.offset {
-            expr.trailings.push(comment);
-          } else {
-            expr.leadings.insert(0, comment);
+          if let Some(expr_loc) = &expr.loc {
+            if let Some(comment_loc) = &comment.loc {
+              if expr_loc.start.offset < comment_loc.start.offset {
+                expr.trailings.push(comment);
+              } else {
+                expr.leadings.insert(0, comment);
+              }
+            }
           }
           return Ok(expr);
         }

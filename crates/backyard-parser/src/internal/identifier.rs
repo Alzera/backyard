@@ -3,7 +3,7 @@ use backyard_nodes::node::{ IdentifierNode, Location, Node, RangeLocation };
 
 use crate::{
   error::ParserError,
-  parser::{ LocationHelper, LoopArgument, Parser },
+  parser::{ LocationExtension, LocationHelper, LoopArgument, Parser },
   utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
@@ -13,10 +13,7 @@ pub struct IdentifierParser;
 impl IdentifierParser {
   pub fn from_token(id: &Token) -> Box<Node> {
     let start_loc = id.get_location().unwrap();
-    let id_len = id.value.len();
-    let mut end_loc = start_loc.clone();
-    end_loc.column += id_len;
-    end_loc.offset += id_len;
+    let end_loc = start_loc.gen_end_loc(id.value.len());
     IdentifierNode::new(
       id.value.to_owned(),
       Some(RangeLocation {

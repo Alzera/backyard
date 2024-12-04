@@ -17,10 +17,10 @@ impl VariableGenerator {
       let mut expr = generator.generate_node_new(&node.name);
       if 1 + builder.last_len() + expr.first_len() > generator.max_length {
         expr.indent();
-        builder.extend(&expr);
+        builder.extend(expr);
         builder.new_line();
       } else {
-        builder.extend_first_line(&expr);
+        builder.extend_first_line(expr);
       }
       builder.push("}");
     }

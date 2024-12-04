@@ -17,7 +17,7 @@ impl ListGenerator {
       2 + builder.last_len() + values.total_len_with_separator(" ") > generator.max_length
     {
       values.indent();
-      builder.extend(&values);
+      builder.extend(values);
       builder.new_line();
     } else {
       builder.push(&values.print(" "));

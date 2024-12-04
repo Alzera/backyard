@@ -18,7 +18,7 @@ impl ConstGenerator {
       2 + builder.last_len() + consts.total_len_with_separator(" ") > generator.max_length
     {
       consts.indent();
-      builder.extend_first_line(&consts);
+      builder.extend_first_line(consts);
     } else {
       builder.push(&consts.print(" "));
     }
@@ -40,7 +40,7 @@ impl ConstGenerator {
       2 + builder.last_len() + consts.total_len_with_separator(" ") > generator.max_length
     {
       consts.indent();
-      builder.extend_first_line(&consts);
+      builder.extend_first_line(consts);
     } else {
       builder.push(&consts.print(" "));
     }

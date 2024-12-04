@@ -18,7 +18,7 @@ impl EchoGenerator {
       2 + builder.last_len() + items.total_len_with_separator(" ") > generator.max_length
     {
       items.indent();
-      builder.extend_first_line(&items);
+      builder.extend_first_line(items);
     } else {
       builder.push(&items.print(" "));
     }

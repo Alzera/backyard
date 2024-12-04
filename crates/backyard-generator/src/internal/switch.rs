@@ -35,7 +35,7 @@ impl SwitchGenerator {
     }
     let mut body = BlockGenerator::generate_base(generator, &node.body, &DEFAULT_GENERATORS);
     body.indent();
-    builder.extend(&body);
+    builder.extend(body);
   }
 }
 

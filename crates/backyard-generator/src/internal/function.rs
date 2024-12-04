@@ -55,14 +55,14 @@ impl FunctionGenerator {
         generator.max_length
     {
       parameters.indent();
-      builder.extend(&parameters);
+      builder.extend(parameters);
       builder.new_line();
     } else {
       builder.push(&parameters.print(" "));
     }
     builder.push(")");
 
-    if let Some(n) = &return_type {
+    if let Some(n) = return_type {
       builder.push(": ");
       builder.extend_first_line(n);
     }
@@ -97,7 +97,7 @@ impl FunctionGenerator {
         return_type_len > generator.max_length
     {
       parameters.indent();
-      builder.extend(&parameters);
+      builder.extend(parameters);
       builder.new_line();
     } else {
       builder.push(&parameters.print(" "));
@@ -111,7 +111,7 @@ impl FunctionGenerator {
         builder.last_len() + uses_len + return_type_len > generator.max_length
       {
         uses.indent();
-        builder.extend(&uses);
+        builder.extend(uses);
         builder.new_line();
       } else {
         builder.push(&uses.print(" "));
@@ -119,7 +119,7 @@ impl FunctionGenerator {
       builder.push(")");
     }
 
-    if let Some(n) = &return_type {
+    if let Some(n) = return_type {
       builder.push(": ");
       builder.extend_first_line(n);
     }
@@ -143,14 +143,14 @@ impl FunctionGenerator {
         generator.max_length
     {
       parameters.indent();
-      builder.extend(&parameters);
+      builder.extend(parameters);
       builder.new_line();
     } else {
       builder.push(&parameters.print(" "));
     }
     builder.push(")");
 
-    if let Some(n) = &return_type {
+    if let Some(n) = return_type {
       builder.push(": ");
       builder.extend_first_line(n);
     }

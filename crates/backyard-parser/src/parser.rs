@@ -359,6 +359,16 @@ impl<'a> Parser<'a> {
   }
 }
 
+pub trait LocationExtension {
+  fn gen_end_loc(&self, len: usize) -> Location;
+}
+
+impl LocationExtension for Location {
+  fn gen_end_loc(&self, len: usize) -> Location {
+    Location { line: self.line, column: self.column + len, offset: self.offset + len }
+  }
+}
+
 pub trait LocationHelper {
   fn get_location(&self) -> Option<Location>;
 }

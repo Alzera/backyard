@@ -51,7 +51,7 @@ impl EnumParser {
         let types = TypesParser::parse(
           parser,
           vec![enum_type.to_owned()],
-          start_loc.clone(),
+          Location { line: 0, column: 0, offset: 0 },
           args
         )?;
         Some(types)

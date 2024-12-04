@@ -134,15 +134,12 @@ impl<'a> SeriesChecker<'a> {
   }
 
   pub fn check(&mut self) -> Option<&str> {
-    let text = self.list.clone().into_iter().collect::<String>();
+    let text = self.list.iter().collect::<String>();
     if self.mode == SeriesCheckerMode::Heredoc {
       let label = *self.againsts.first().unwrap();
       return if text.trim() == label { Some(label) } else { None };
     }
-    let valid = self.againsts
-      .clone()
-      .into_iter()
-      .find(|i| text.ends_with(i));
+    let valid = self.againsts.iter().find(|i| text.ends_with(*i));
     if valid.is_some() {
       let valid = valid.unwrap();
       if !self.is_escaped(self.list.len() - valid.len()) {

@@ -14,12 +14,12 @@ impl BinGenerator {
       t.new_line();
       t.push(format!("{} ", node.operator).as_str());
       t.indent();
-      builder.extend(&t);
+      builder.extend(t);
       expr.indent();
-      builder.extend_first_line(&expr);
+      builder.extend_first_line(expr);
     } else {
       builder.push(format!(" {} ", node.operator).as_str());
-      builder.extend_first_line(&expr);
+      builder.extend_first_line(expr);
     }
   }
 }

@@ -190,30 +190,27 @@ impl Builder {
     });
   }
 
-  pub fn extend_first_line(&mut self, builder: &Builder) {
+  pub fn extend_first_line(&mut self, mut builder: Builder) {
     if builder.lines.is_empty() {
       return;
     }
-    let mut lines = builder.lines.clone();
-    let first = lines.remove(0);
+    let first = builder.lines.remove(0);
     if let Some(last) = self.lines.last_mut() {
       last.push(&first.line);
     }
-    self.lines.extend(lines);
+    self.lines.extend(builder.lines);
   }
 
-  pub fn extend(&mut self, builder: &Builder) {
-    self.lines.extend(builder.lines.clone());
+  pub fn extend(&mut self, builder: Builder) {
+    self.lines.extend(builder.lines);
   }
 
   pub fn print(&self, separator: &str) -> String {
-    let mut lines = self.lines.clone();
-    if self.last_len() == 0 {
-      lines.pop();
-    }
-    lines
+    self.lines
       .iter()
-      .map(|i| i.print())
+      .filter_map(|x| {
+        if x.line.is_empty() { None } else { Some(x.print()) }
+      })
       .collect::<Vec<String>>()
       .join(separator)
   }
@@ -376,12 +373,12 @@ impl<'a> Generator<'a> {
           }
           self.handle_comments(&mut scoped_builder, trailings);
           if builder.last_len() == 0 {
-            builder.extend_first_line(&scoped_builder);
+            builder.extend_first_line(scoped_builder);
           } else {
             if ![NodeType::DoWhileCondition, NodeType::Else].contains(&node.node_type) {
               scoped_builder.indent();
             }
-            builder.extend(&scoped_builder);
+            builder.extend(scoped_builder);
           }
         } else {
           generator(self, builder, node);
