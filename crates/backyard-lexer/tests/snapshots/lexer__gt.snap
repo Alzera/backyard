@@ -1,0 +1,55 @@
+---
+source: crates/backyard-lexer/tests/lexer.rs
+expression: tokens
+snapshot_kind: text
+---
+- token_type: Variable
+  value: a
+  line: 1
+  column: 0
+  offset: 0
+- token_type: BitwiseShiftRightAssignment
+  value: ">>="
+  line: 1
+  column: 3
+  offset: 3
+- token_type: Variable
+  value: b
+  line: 1
+  column: 7
+  offset: 7
+- token_type: IsGreaterOrEqual
+  value: ">="
+  line: 1
+  column: 10
+  offset: 10
+- token_type: Variable
+  value: c
+  line: 1
+  column: 13
+  offset: 13
+- token_type: BitwiseShiftRight
+  value: ">>"
+  line: 1
+  column: 16
+  offset: 16
+- token_type: Variable
+  value: d
+  line: 1
+  column: 19
+  offset: 19
+- token_type: IsGreater
+  value: ">"
+  line: 1
+  column: 22
+  offset: 22
+- token_type: Variable
+  value: e
+  line: 1
+  column: 24
+  offset: 24
+- token_type: Semicolon
+  value: ;
+  line: 1
+  column: 26
+  offset: 26

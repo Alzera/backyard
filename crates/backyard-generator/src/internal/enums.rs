@@ -48,33 +48,3 @@ impl EnumGenerator {
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("enum Suit {
-  case Hearts;
-  case Spades;
-}");
-    test_eval("enum Suit: int {
-  case Hearts = 5;
-  case Spades = 6;
-}");
-    test_eval(
-      "enum Suit implements SuitInterface {
-  case Hearts;
-  case Spades;
-  public const MY_CONST = \"constant\";
-  public function color(): string {
-    return match($this) {
-      Suit::Hearts, Suit::Diamonds => 'Red',
-      Suit::Clubs, Suit::Spades => 'Black'
-    };
-  }
-}"
-    );
-  }
-}

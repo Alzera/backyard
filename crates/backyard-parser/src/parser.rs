@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use std::{ collections::HashSet, fmt::Debug };
 
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Location, Node, NodeType, RangeLocation };
@@ -391,19 +391,14 @@ impl LocationHelper for &Token {
   }
 }
 
-// pub struct LocationUtils;
+pub trait TokenTypeArrayCombine {
+  fn combine(self, tokens: &[TokenType]) -> Vec<TokenType>;
+}
 
-// impl LocationUtils {
-
-//   // pub fn gen<T>(start: Option<&T>, end: Option<&T>) -> Option<RangeLocation> where T: LocationHelper {
-//   //   let start = start.and_then(|x| x.get_location());
-//   //   let end = end.and_then(|x| x.get_location());
-//   //   if start.is_none() || end.is_none() {
-//   //     return None;
-//   //   }
-//   //   Some(RangeLocation {
-//   //     start: start.unwrap(),
-//   //     end: end.unwrap(),
-//   //   })
-//   // }
-// }
+impl TokenTypeArrayCombine for &[TokenType] {
+  fn combine(self, tokens: &[TokenType]) -> Vec<TokenType> {
+    let combined: Vec<TokenType> = [self, tokens].concat();
+    let unique: HashSet<_> = combined.into_iter().collect();
+    unique.into_iter().collect()
+  }
+}

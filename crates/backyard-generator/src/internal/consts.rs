@@ -46,15 +46,3 @@ impl ConstGenerator {
     }
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("class A {\n  const A = 0, B = 1;\n}");
-    test_eval("class A {\n  public const A = 0, B = 1;\n}");
-    test_eval("const A = 0, B = 1;");
-  }
-}

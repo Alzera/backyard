@@ -24,15 +24,3 @@ impl WhileGenerator {
     }
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("while (true) $pattern = 4;");
-    test_eval("while ($i <= 10) {\n}");
-    test_eval("while ($i <= 10):\nendwhile;");
-  }
-}

@@ -1,10 +1,10 @@
-use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
+use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Location, Node, YieldFromNode, YieldNode };
 
 use crate::{
   error::ParserError,
   guard,
-  parser::{ LoopArgument, Parser },
+  parser::{ LoopArgument, Parser, TokenTypeArrayCombine },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 

@@ -4,7 +4,7 @@ mod utils;
 mod guards;
 pub mod error;
 
-use backyard_lexer::{ error::LexResult, lex, lex_eval };
+use backyard_lexer::{ error::LexError, lex, lex_eval, token::Token };
 use backyard_nodes::node::{ Location, Node, ProgramNode, RangeLocation };
 use error::ParserError;
 use parser::{ LocationHelper, LoopArgument, Parser };
@@ -17,7 +17,7 @@ pub fn parse_eval(input: &str) -> Result<Box<Node>, ParserError> {
   parse_base(lex_eval(input))
 }
 
-fn parse_base(tokens: LexResult) -> Result<Box<Node>, ParserError> {
+fn parse_base(tokens: Result<Vec<Token>, LexError>) -> Result<Box<Node>, ParserError> {
   match tokens {
     Ok(tokens) => {
       let mut parser = Parser::new(&tokens);

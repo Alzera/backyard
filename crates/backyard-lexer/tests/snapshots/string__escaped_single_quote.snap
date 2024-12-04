@@ -1,0 +1,11 @@
+---
+source: crates/backyard-lexer/tests/string.rs
+assertion_line: 54
+expression: tokens
+snapshot_kind: text
+---
+- token_type: String
+  value: "'test \\' still'"
+  line: 1
+  column: 0
+  offset: 0

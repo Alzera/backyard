@@ -84,35 +84,3 @@ impl SinglesGenerator {
     }
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::{ test, test_eval };
-
-  #[test]
-  fn basic() {
-    test_eval("break;");
-    test_eval("break 2;");
-    test_eval("continue;");
-    test_eval("continue 2;");
-    test_eval("return;");
-    test_eval("return 2;");
-    test_eval("clone $a;");
-    test_eval("new A;");
-    test_eval("print \"Hello\";");
-    test_eval("throw new A;");
-    test_eval("goto jumpHere;");
-    test_eval("$this->a();");
-    test_eval("parent::a();");
-    test_eval("static::a();");
-    test("<div>this is an inline</div>");
-    test("<div><?php 
-echo \"Hello\"; ?> world<?php 
-echo \"!\"; ?></div>");
-    test(
-      "<ul class=\"customize-outer-pane-parent\"><?php 
-  // Outer panel and sections are not implemented, but its here as a placeholder to avoid any side-effect in api.Section. 
-   ?></ul>"
-    );
-  }
-}

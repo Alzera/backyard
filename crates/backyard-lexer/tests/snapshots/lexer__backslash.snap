@@ -1,0 +1,15 @@
+---
+source: crates/backyard-lexer/tests/lexer.rs
+expression: tokens
+snapshot_kind: text
+---
+- token_type: Name
+  value: "\\A\\B"
+  line: 1
+  column: 0
+  offset: 0
+- token_type: Semicolon
+  value: ;
+  line: 1
+  column: 4
+  offset: 4

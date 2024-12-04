@@ -1,0 +1,10 @@
+---
+source: crates/backyard-lexer/tests/lexer.rs
+expression: tokens
+snapshot_kind: text
+---
+- token_type: Magic
+  value: __DIR__
+  line: 1
+  column: 0
+  offset: 0

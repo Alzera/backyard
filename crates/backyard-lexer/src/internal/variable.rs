@@ -20,7 +20,6 @@ impl VariableToken {
         if t == "this" {
           tokens.push(Token::new(TokenType::This, t, snapshot));
         } else {
-          // $ skipped on value but not on snapshot
           tokens.push(Token::new(TokenType::Variable, t, snapshot));
         }
       }

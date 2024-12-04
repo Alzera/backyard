@@ -207,8 +207,6 @@ impl Lexer {
 
     match current_char {
       '$' => VariableToken::lex(self, snapshot),
-      c if c.is_whitespace() =>
-        Ok(vec![Token::new(TokenType::Whitespace, current_char.to_string(), snapshot)]),
       c if c.is_ascii_digit() => NumberToken::lex(self, current_char, snapshot),
       c if c.is_alphabetic() || c == '_' => {
         let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_' || *ch == '\\'));
@@ -224,9 +222,8 @@ impl Lexer {
             "__TRAIT__",
           ].contains(&t.as_str())
         {
-          return Ok(vec![Token::new(TokenType::Magic, &t, snapshot)]);
-        }
-        if
+          Ok(vec![Token::new(TokenType::Magic, &t, snapshot)])
+        } else if
           [
             // "array",
             "bool",
@@ -244,12 +241,12 @@ impl Lexer {
             // "null",
           ].contains(&t.as_str())
         {
-          return Ok(vec![Token::new(TokenType::Type, &t, snapshot)]);
+          Ok(vec![Token::new(TokenType::Type, &t, snapshot)])
+        } else if KeywordToken::is_keyword(&t) {
+          KeywordToken::lex(self, &t, snapshot)
+        } else {
+          Ok(vec![Token::new(TokenType::Identifier, &t, snapshot)])
         }
-        if KeywordToken::is_keyword(&t) {
-          return KeywordToken::lex(self, &t, snapshot);
-        }
-        Ok(vec![Token::new(TokenType::Identifier, &t, snapshot)])
       }
       '=' => {
         let t = self.until(current_char, |ch| !['=', '>', '&'].contains(ch));
@@ -369,9 +366,10 @@ impl Lexer {
               None => true,
             };
             if is_post {
-              return Ok(vec![Token::new(TokenType::PostDecrement, "--", snapshot)]);
+              Ok(vec![Token::new(TokenType::PostDecrement, "--", snapshot)])
+            } else {
+              Ok(vec![Token::new(TokenType::PreDecrement, "--", snapshot)])
             }
-            Ok(vec![Token::new(TokenType::PreDecrement, "--", snapshot)])
           }
           "-" => Ok(vec![Token::new(TokenType::Subtraction, "-", snapshot)]),
           _ => Err(self.control.error_unrecognized(&t)),
@@ -432,9 +430,10 @@ impl Lexer {
               None => true,
             };
             if is_post {
-              return Ok(vec![Token::new(TokenType::PostIncrement, "++", snapshot)]);
+              Ok(vec![Token::new(TokenType::PostIncrement, "++", snapshot)])
+            } else {
+              Ok(vec![Token::new(TokenType::PreIncrement, "++", snapshot)])
             }
-            Ok(vec![Token::new(TokenType::PreIncrement, "++", snapshot)])
           }
           "+" => Ok(vec![Token::new(TokenType::Addition, "+", snapshot)]),
           _ => Err(self.control.error_unrecognized(&t)),
@@ -448,7 +447,7 @@ impl Lexer {
       ']' => Ok(vec![Token::new(TokenType::RightSquareBracket, "]", snapshot)]),
       '`' => StringToken::lex(self, '`', snapshot),
       '"' => StringToken::lex(self, '"', snapshot),
-      '\'' => StringToken::lex(self, '\'', snapshot),
+      '\'' => StringToken::lex_basic(self, '\'', snapshot),
       '\\' => {
         let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_' || *ch == '\\'));
         Ok(vec![Token::new(TokenType::Name, t, snapshot)])
@@ -457,7 +456,6 @@ impl Lexer {
       ';' => Ok(vec![Token::new(TokenType::Semicolon, ";", snapshot)]),
       '~' => Ok(vec![Token::new(TokenType::BooleanNegate, "~", snapshot)]),
       '@' => Ok(vec![Token::new(TokenType::AtSign, "@", snapshot)]),
-      // '\n' => Ok(vec![Token::new(TokenType::LineBreak, "\n", snapshot)]),
       _ => Err(self.control.error_unrecognized(&current_char.to_string())),
     }
   }

@@ -32,24 +32,3 @@ impl TraitGenerator {
     );
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval(
-      "trait B {
-  use Ale;
-  use Loggable, Usable {
-    log as private alias;
-    Loggable::log as aliasLoggable;
-    Usable::useResource insteadof Loggable;
-  }
-  public const MY_CONST = \"constant\";
-  public static ?A $instance = 4;
-}"
-    );
-  }
-}

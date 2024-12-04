@@ -194,36 +194,3 @@ impl FunctionGenerator {
     };
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval(
-      "class A {
-  public function __construct(protected int $x, protected string &$y = 0) {
-  }
-}"
-    );
-    test_eval("class A {
-  public function __construct(Pattern ...$patterns) {
-  }
-}");
-    test_eval(
-      "class A {
-  public function __construct(
-    $guard,
-    #[\\SensitiveParameter]
-    $credentials,
-    $remember
-  ) {
-  }
-}"
-    );
-    test_eval("function &a(?int ...$b = 0, String &$c = [0.01, 0x12], bool $d): ?int {\n}");
-    test_eval("$a = fn &(int $x): ?int => null;");
-    test_eval("$a = function &(int $x, ?int $y) use ($arg2): static {\n};");
-  }
-}

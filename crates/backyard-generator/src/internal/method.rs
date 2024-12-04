@@ -21,19 +21,3 @@ impl MethodGenerator {
     FunctionGenerator::generate(generator, builder, &node.function);
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval(
-      "abstract class A {
-  public function dayOfYear(?array &$matches, array|int &$matches = null): static|int {
-  }
-  public final static function b(int $x, int $y = 0): int;
-}"
-    );
-  }
-}

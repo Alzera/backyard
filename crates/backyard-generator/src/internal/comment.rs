@@ -53,33 +53,3 @@ impl CommentGenerator {
     builder.push(" */");
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("if (false !== 'getaddrinfo'
-// DNS lookup failed
- || false !== 'getaddrinfo') {
-}");
-    test_eval(
-      "///////////////////////////////////////////////
-/////////////////// Testing ///////////////////
-///////////////////////////////////////////////
-$a;"
-    );
-    test_eval(
-      "/*
- testing leading
- */
-function a() {
-  /**
-   * testing inside
-   */
-}
-// testing trailing"
-    );
-  }
-}

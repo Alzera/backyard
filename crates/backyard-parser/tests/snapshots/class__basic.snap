@@ -1,0 +1,62 @@
+---
+source: crates/backyard-parser/tests/class.rs
+expression: asts
+snapshot_kind: text
+---
+leadings: []
+trailings: []
+node_type: program
+children:
+  - leadings: []
+    trailings: []
+    node_type: class
+    inheritance: ~
+    name:
+      leadings: []
+      trailings: []
+      node_type: identifier
+      name: A
+      loc:
+        start:
+          line: 1
+          column: 6
+          offset: 6
+        end:
+          line: 1
+          column: 7
+          offset: 7
+    extends: ~
+    implements: []
+    body:
+      leadings: []
+      trailings: []
+      node_type: block
+      statements: []
+      loc:
+        start:
+          line: 1
+          column: 8
+          offset: 8
+        end:
+          line: 2
+          column: 0
+          offset: 10
+    is_readonly: false
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 2
+        column: 0
+        offset: 10
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 2
+    column: 0
+    offset: 10

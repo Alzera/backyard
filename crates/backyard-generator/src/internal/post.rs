@@ -11,14 +11,3 @@ impl PostGenerator {
     builder.push(node.operator.as_str());
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("$a = ++($a++);");
-    test_eval("$a = --($a--);");
-  }
-}

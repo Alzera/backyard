@@ -20,15 +20,3 @@ impl StaticLookupGenerator {
     }
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("++A::b();");
-    test_eval("A::class;");
-    test_eval("$a = !(static::{'shouldOverflow' . $ucUnit}());");
-  }
-}

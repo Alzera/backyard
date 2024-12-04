@@ -50,15 +50,3 @@ impl DeclareGenerator {
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("declare(strict_types = 1);");
-    test_eval("declare(ticks = 1):\nenddeclare;");
-    test_eval("declare(ticks = 1, ticks = 1) {\n}");
-  }
-}

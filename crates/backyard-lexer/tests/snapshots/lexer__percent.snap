@@ -1,0 +1,35 @@
+---
+source: crates/backyard-lexer/tests/lexer.rs
+expression: tokens
+snapshot_kind: text
+---
+- token_type: Variable
+  value: a
+  line: 1
+  column: 0
+  offset: 0
+- token_type: ModulusAssignment
+  value: "%="
+  line: 1
+  column: 3
+  offset: 3
+- token_type: Variable
+  value: b
+  line: 1
+  column: 6
+  offset: 6
+- token_type: Modulus
+  value: "%"
+  line: 1
+  column: 9
+  offset: 9
+- token_type: Variable
+  value: c
+  line: 1
+  column: 11
+  offset: 11
+- token_type: Semicolon
+  value: ;
+  line: 1
+  column: 13
+  offset: 13

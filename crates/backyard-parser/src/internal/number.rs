@@ -12,7 +12,10 @@ pub struct NumberParser;
 
 impl NumberParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Number, TokenType::NumberHex])])
+    match_pattern(
+      tokens,
+      &[Lookup::Equal(&[TokenType::Number, TokenType::NumberHex, TokenType::NumberBinary])]
+    )
   }
 
   pub fn parse(

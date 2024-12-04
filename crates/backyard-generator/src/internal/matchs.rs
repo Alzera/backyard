@@ -38,21 +38,3 @@ impl MatchGenerator {
     generator.generate_node(builder, &node.expr, &mut GeneratorArgument::default());
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval(
-      "$this->fixedWidth = 
-  match($charset) {
-    // 16 bits
-    'ucs2', 'utf-16' => 2,
-    // and fallback
-    default => 1
-  };"
-    );
-  }
-}

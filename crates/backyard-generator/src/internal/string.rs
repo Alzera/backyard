@@ -73,20 +73,3 @@ impl StringGenerator {
     builder.push(&node.label);
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("$a = \"ale\" . \" ini string $ \\\" \\$var $b {${\"ale\" . 5}} {$a}\";");
-    test_eval("'a';");
-    test_eval("echo <<<'START'
-a {$a}
-START;");
-    test_eval("echo <<<START
-a {$a}
-START;");
-  }
-}

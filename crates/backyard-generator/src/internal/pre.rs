@@ -37,16 +37,3 @@ impl PreGenerator {
     }
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("$a = ++($a++);");
-    test_eval("!$a;");
-    test_eval("@$a;");
-    test_eval("...$a;");
-  }
-}

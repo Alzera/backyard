@@ -1,9 +1,9 @@
-use backyard_lexer::token::{ Token, TokenType, TokenTypeArrayCombine };
+use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ EchoNode, Location, Node };
 
 use crate::{
   error::ParserError,
-  parser::{ LoopArgument, Parser },
+  parser::{ LoopArgument, Parser, TokenTypeArrayCombine },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 

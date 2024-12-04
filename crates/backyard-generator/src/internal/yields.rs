@@ -27,16 +27,3 @@ impl YieldGenerator {
     generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("yield;");
-    test_eval("yield \"another_value\";");
-    test_eval("yield \"key\" => \"value\";");
-    test_eval("yield from [1, 2, 3];");
-  }
-}

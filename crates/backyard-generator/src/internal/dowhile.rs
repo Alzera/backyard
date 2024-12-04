@@ -26,18 +26,3 @@ impl DoWhileGenerator {
     builder.push(");");
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("do {
-} while (false);");
-    test_eval("do {
-}
-// this comment
-while (false);");
-  }
-}

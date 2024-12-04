@@ -18,6 +18,7 @@ impl ArrayLookupParser {
     });
     if
       ![
+        NodeType::This,
         NodeType::Variable,
         NodeType::StaticLookup,
         NodeType::ArrayLookup,

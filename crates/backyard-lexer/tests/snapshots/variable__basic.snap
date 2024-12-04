@@ -1,0 +1,11 @@
+---
+source: crates/backyard-lexer/tests/variable.rs
+assertion_line: 6
+expression: tokens
+snapshot_kind: text
+---
+- token_type: Variable
+  value: a
+  line: 1
+  column: 0
+  offset: 0

@@ -10,13 +10,3 @@ impl MagicGenerator {
     builder.push(&node.name)
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("__DIR__ . \"/something_that_does_not_exist\";");
-  }
-}

@@ -14,6 +14,13 @@ impl NumberToken {
         n.push_str(&t);
         return Ok(vec![Token::new(TokenType::NumberHex, n, snapshot)]);
       }
+      if next == 'b' {
+        lexer.control.next_char();
+        let t = lexer.control.next_char_until(|_, ch, _| !(*ch == '0' || *ch == '1' || *ch == '_'));
+        let mut n = "0b".to_string();
+        n.push_str(&t);
+        return Ok(vec![Token::new(TokenType::NumberBinary, n, snapshot)]);
+      }
     }
     let mut t = lexer.control.next_char_until(|_, ch, _| !(ch.is_ascii_digit() || *ch == '.'));
     t.insert(0, current_char);

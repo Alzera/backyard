@@ -198,3 +198,4 @@ Cargo.lock
 
 test-run/
 tarpaulin-report.html
+*.snap.new

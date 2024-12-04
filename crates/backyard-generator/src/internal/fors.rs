@@ -58,16 +58,3 @@ impl ForGenerator {
     }
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("for (; ; ):\nendfor;");
-    test_eval("for ($i = 1; $i <= 10; $i++) {\n}");
-    test_eval("for ($i = 1; ; $i++) {\n}");
-    test_eval("for ($i = 1, $j = 0; $i <= 10; $j += $i, print $i, $i++);");
-  }
-}

@@ -18,21 +18,3 @@ impl AssignmentGenerator {
     }
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    ["=", "&=", "??=", "%=", "^=", "**=", "*=", "/=", ".=", "|=", "-=", ">>=", "<<=", "+="]
-      .iter()
-      .for_each(|i| {
-        test_eval(format!("$a {} 0;", i).as_str());
-      });
-    test_eval(
-      "$an_unneccessary_very_long_variable_name = 
-  $another_unnecessary_very_long_variable_name_that_should_be_on_new_line;"
-    );
-  }
-}

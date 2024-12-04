@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use serde::{ Deserialize, Serialize };
 use ts_rs::TS;
 
@@ -12,8 +10,8 @@ pub enum TokenType {
   Type,
   Identifier,
   Magic,
-  Whitespace,
 
+  NumberBinary,
   NumberHex,
   Number,
 
@@ -192,18 +190,6 @@ pub enum TokenType {
   While,
   Yield,
   Xor,
-}
-
-pub trait TokenTypeArrayCombine {
-  fn combine(self, tokens: &[TokenType]) -> Vec<TokenType>;
-}
-
-impl TokenTypeArrayCombine for &[TokenType] {
-  fn combine(self, tokens: &[TokenType]) -> Vec<TokenType> {
-    let combined: Vec<TokenType> = [self, tokens].concat();
-    let unique: HashSet<_> = combined.into_iter().collect();
-    unique.into_iter().collect()
-  }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]

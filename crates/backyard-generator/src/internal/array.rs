@@ -49,32 +49,3 @@ impl ArrayGenerator {
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("$a = [$key = (is_int($key) ? $value : $key) => $value === true ? $key : $value];");
-    test_eval("[1, 2, 3];");
-    test_eval("[\"a\" => 1, \"b\" => 2, \"c\" => 3];");
-    test_eval(
-      "...[
-  \"an_unneccessary_very_long_string\" => 1,
-  \"another_unneccessary_very_long_string\" => 2,
-  \"still_another_unneccessary_very_long_string\" => 3
-];"
-    );
-    test_eval(
-      "[
-  // Unit with indexes starting at 1 (other units start at 0) 
-  \"day\",
-  \"week\",
-  \"month\",
-  \"quarter\"
-];"
-    );
-    test_eval("array(1, 2, 3);");
-  }
-}

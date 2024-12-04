@@ -30,19 +30,3 @@ impl ForeachGenerator {
     }
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("foreach ($escape as $probe) $pattern = 5;");
-    test_eval("foreach ($A as $x):
-endforeach;");
-    test_eval("foreach ($data as $k => $value):
-endforeach;");
-    test_eval("foreach ($A as &$x) {\n}");
-    test_eval("foreach ($arr as $key => $value) {\n}");
-  }
-}

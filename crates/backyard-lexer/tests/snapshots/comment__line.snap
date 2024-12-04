@@ -1,0 +1,11 @@
+---
+source: crates/backyard-lexer/tests/comment.rs
+assertion_line: 6
+expression: tokens
+snapshot_kind: text
+---
+- token_type: CommentLine
+  value: " test"
+  line: 1
+  column: 0
+  offset: 0

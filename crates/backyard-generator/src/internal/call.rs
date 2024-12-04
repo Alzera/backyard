@@ -35,26 +35,3 @@ impl CallGenerator {
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("$instance = new self();");
-    test_eval("return new static($expression, $fieldFactory);");
-    test_eval("floor(((int) $this->rawFormat(\"u\")) / 1000);");
-    test_eval("\\call();");
-    test_eval("(fn () => 0)();");
-    test_eval("call(true);");
-    test_eval("call(a: 0, b: 0);");
-    test_eval(
-      "call(
-  an_unneccessary_very_long_variable_name: 0,
-  another_unneccessary_very_long_variable_name: 0,
-  still_another_unneccessary_very_long_variable_name: 0
-);"
-    );
-  }
-}

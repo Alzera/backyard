@@ -19,15 +19,3 @@ impl ArrayLookupGenerator {
     builder.push("]");
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("[][0];");
-    test_eval("$a[0];");
-    test_eval("$a[] = 1;");
-  }
-}

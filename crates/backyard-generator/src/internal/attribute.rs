@@ -30,21 +30,3 @@ impl AttributeGenerator {
     }
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval(
-      "#[Attr]
-#[\\MyExample\\MyAttribute]
-#[Attr(123)]
-#[\\Attr(123)]
-#[Attr(123), \\Attr(123)]
-class A {
-}"
-    );
-  }
-}

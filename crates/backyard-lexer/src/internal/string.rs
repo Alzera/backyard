@@ -1,5 +1,5 @@
-use crate::internal::variable::VariableToken;
 use crate::error::LexResult;
+use crate::internal::variable::VariableToken;
 use crate::lexer::{ ControlSnapshot, Lexer, SeriesChecker, SeriesCheckerMode };
 use crate::token::{ Token, TokenType };
 
@@ -65,14 +65,9 @@ impl StringToken {
       let snapshot = lexer.control.get_snapshot();
 
       if current == '$' {
-        if next.is_some() && next.unwrap() == '{' {
-          let tokens = lexer.next_tokens_until_right_bracket();
-          result.extend(tokens);
-        } else {
-          lexer.control.next_char();
-          if let Ok(token) = VariableToken::lex(lexer, &snapshot) {
-            result.extend(token);
-          }
+        lexer.control.next_char();
+        if let Ok(token) = VariableToken::lex(lexer, &snapshot) {
+          result.extend(token);
         }
       } else if next.is_some() && current == '{' && next.unwrap() == '$' {
         lexer.control.next_char();
@@ -84,6 +79,20 @@ impl StringToken {
         );
       }
     }
+  }
+
+  pub fn lex_basic(lexer: &mut Lexer, breaker: char, snapshot: &ControlSnapshot) -> LexResult {
+    let checker_breaker: [&str; 1] = [&breaker.to_string()];
+    let mut checker = SeriesChecker::new(&checker_breaker, SeriesCheckerMode::String);
+    let text = lexer.control.next_char_until(|_, i, _| {
+      checker.push(*i);
+      checker.check().is_some()
+    });
+    lexer.control.next_char();
+
+    return Ok(
+      vec![Token::new(TokenType::String, format!("{}{}{}", breaker, text, breaker), snapshot)]
+    );
   }
 
   pub fn lex(lexer: &mut Lexer, breaker: char, snapshot: &ControlSnapshot) -> LexResult {

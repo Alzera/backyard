@@ -1,0 +1,11 @@
+---
+source: crates/backyard-lexer/tests/number.rs
+assertion_line: 24
+expression: tokens
+snapshot_kind: text
+---
+- token_type: NumberHex
+  value: "0xff9abc"
+  line: 1
+  column: 0
+  offset: 0

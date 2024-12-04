@@ -1,0 +1,86 @@
+---
+source: crates/backyard-parser/tests/array.rs
+expression: asts
+snapshot_kind: text
+---
+leadings: []
+trailings: []
+node_type: program
+children:
+  - leadings: []
+    trailings: []
+    node_type: array
+    is_short: false
+    items:
+      - leadings: []
+        trailings: []
+        node_type: array_item
+        key: ~
+        value:
+          leadings: []
+          trailings: []
+          node_type: number
+          value: "1"
+          loc:
+            start:
+              line: 1
+              column: 6
+              offset: 6
+            end:
+              line: 1
+              column: 6
+              offset: 6
+        loc:
+          start:
+            line: 1
+            column: 6
+            offset: 6
+          end:
+            line: 1
+            column: 6
+            offset: 6
+      - leadings: []
+        trailings: []
+        node_type: array_item
+        key: ~
+        value:
+          leadings: []
+          trailings: []
+          node_type: number
+          value: "2"
+          loc:
+            start:
+              line: 1
+              column: 9
+              offset: 9
+            end:
+              line: 1
+              column: 9
+              offset: 9
+        loc:
+          start:
+            line: 1
+            column: 9
+            offset: 9
+          end:
+            line: 1
+            column: 9
+            offset: 9
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 1
+        column: 10
+        offset: 10
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 1
+    column: 11
+    offset: 11

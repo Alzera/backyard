@@ -17,7 +17,7 @@ impl Display for LexError {
     match self {
       LexError::Unrecognized { token, line, column } =>
         write!(f, "Unrecognized character '{}' at line {}, column {}", token, line, column),
-      LexError::Eof => write!(f, "no more tokens"),
+      LexError::Eof => write!(f, "End of file"),
     }
   }
 }

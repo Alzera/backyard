@@ -35,34 +35,3 @@ impl TryGenerator {
     BlockGenerator::generate(generator, builder, &node.body, None);
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval(
-      "class A {
-  public function assertEquals() {
-    try {
-    } catch (ComparisonFailure $e) {
-    }
-  }
-  protected function toArray() {
-  }
-}"
-    );
-    test_eval("try {
-} catch (UnknownGetterException | ReflectionException) {
-}");
-    test_eval(
-      "try {
-  throw new Error(\"Custom error occurred\");
-} catch (FooError $err) {
-} catch (Foo2Error | BarError $err) {
-} finally {
-}"
-    );
-  }
-}

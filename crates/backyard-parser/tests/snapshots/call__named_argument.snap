@@ -1,0 +1,125 @@
+---
+source: crates/backyard-parser/tests/call.rs
+expression: asts
+snapshot_kind: text
+---
+leadings: []
+trailings: []
+node_type: program
+children:
+  - leadings: []
+    trailings: []
+    node_type: call
+    name:
+      leadings: []
+      trailings: []
+      node_type: identifier
+      name: call
+      loc:
+        start:
+          line: 1
+          column: 0
+          offset: 0
+        end:
+          line: 1
+          column: 4
+          offset: 4
+    arguments:
+      - leadings: []
+        trailings: []
+        node_type: call_argument
+        name:
+          leadings: []
+          trailings: []
+          node_type: identifier
+          name: a
+          loc:
+            start:
+              line: 1
+              column: 5
+              offset: 5
+            end:
+              line: 1
+              column: 6
+              offset: 6
+        value:
+          leadings: []
+          trailings: []
+          node_type: number
+          value: "1"
+          loc:
+            start:
+              line: 1
+              column: 8
+              offset: 8
+            end:
+              line: 1
+              column: 8
+              offset: 8
+        loc:
+          start:
+            line: 1
+            column: 5
+            offset: 5
+          end:
+            line: 1
+            column: 8
+            offset: 8
+      - leadings: []
+        trailings: []
+        node_type: call_argument
+        name:
+          leadings: []
+          trailings: []
+          node_type: identifier
+          name: b
+          loc:
+            start:
+              line: 1
+              column: 11
+              offset: 11
+            end:
+              line: 1
+              column: 12
+              offset: 12
+        value:
+          leadings: []
+          trailings: []
+          node_type: number
+          value: "2"
+          loc:
+            start:
+              line: 1
+              column: 14
+              offset: 14
+            end:
+              line: 1
+              column: 14
+              offset: 14
+        loc:
+          start:
+            line: 1
+            column: 11
+            offset: 11
+          end:
+            line: 1
+            column: 14
+            offset: 14
+    loc:
+      start:
+        line: 1
+        column: 4
+        offset: 4
+      end:
+        line: 1
+        column: 15
+        offset: 15
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 1
+    column: 16
+    offset: 16

@@ -1,0 +1,66 @@
+---
+source: crates/backyard-lexer/tests/lexer.rs
+assertion_line: 84
+expression: tokens
+snapshot_kind: text
+---
+- token_type: Variable
+  value: a
+  line: 1
+  column: 0
+  offset: 0
+- token_type: SubtractionAssignment
+  value: "-="
+  line: 1
+  column: 3
+  offset: 3
+- token_type: Variable
+  value: b
+  line: 1
+  column: 6
+  offset: 6
+- token_type: ObjectAccess
+  value: "->"
+  line: 1
+  column: 8
+  offset: 8
+- token_type: Identifier
+  value: c
+  line: 1
+  column: 10
+  offset: 10
+- token_type: Subtraction
+  value: "-"
+  line: 1
+  column: 12
+  offset: 12
+- token_type: Variable
+  value: d
+  line: 1
+  column: 14
+  offset: 14
+- token_type: PostDecrement
+  value: "--"
+  line: 1
+  column: 16
+  offset: 16
+- token_type: Subtraction
+  value: "-"
+  line: 1
+  column: 19
+  offset: 19
+- token_type: PreDecrement
+  value: "--"
+  line: 1
+  column: 21
+  offset: 21
+- token_type: Variable
+  value: e
+  line: 1
+  column: 23
+  offset: 23
+- token_type: Semicolon
+  value: ;
+  line: 1
+  column: 25
+  offset: 25

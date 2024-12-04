@@ -95,30 +95,3 @@ impl ClassGenerator {
     );
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("abstract class A {
-  private Extension\\Another $a;
-}");
-    test_eval("final class A extends \\PHPUnit\\Framework\\Exception {\n}");
-    test_eval("return new class extends B {\n};");
-    test_eval("return new class($a, .5) extends B {\n};");
-    test_eval(
-      "readonly class A implements C, D, E {
-  use Ale;
-  use Loggable, Usable {
-    log as private alias;
-    Loggable::log as aliasLoggable;
-    Usable::useResource insteadof Loggable;
-  }
-  public const MY_CONST = \"constant\";
-  public static ?A $instance = 4;
-}"
-    );
-  }
-}

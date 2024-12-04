@@ -25,17 +25,3 @@ impl IncludeGenerator {
     }
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("require(__DIR__ . \"/something_that_does_not_exist\");");
-    test_eval("require_once(__DIR__ . \"/something_that_does_not_exist\");");
-    test_eval("include(\"something_that_does_not_exist\");");
-    test_eval("include_once(\"something_that_does_not_exist\");");
-    test_eval("include_once $a;");
-  }
-}

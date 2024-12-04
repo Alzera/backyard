@@ -1,0 +1,11 @@
+---
+source: crates/backyard-lexer/tests/keywords.rs
+assertion_line: 366
+expression: tokens
+snapshot_kind: text
+---
+- token_type: Xor
+  value: xor
+  line: 1
+  column: 0
+  offset: 0

@@ -1,0 +1,11 @@
+---
+source: crates/backyard-lexer/tests/number.rs
+assertion_line: 30
+expression: tokens
+snapshot_kind: text
+---
+- token_type: NumberBinary
+  value: 0b1010_1010
+  line: 1
+  column: 0
+  offset: 0

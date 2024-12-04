@@ -24,13 +24,3 @@ impl EchoGenerator {
     }
   }
 }
-#[cfg(test)]
-mod tests {
-  use crate::test_utils::test_eval;
-
-  #[test]
-  fn basic() {
-    test_eval("echo \"Hello\";");
-    test_eval("echo \"Hello\", \"World\";");
-  }
-}
