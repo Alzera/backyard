@@ -146,12 +146,12 @@ impl ClassParser {
   ) -> Result<Box<Node>, ParserError> {
     if let [modifiers, _, name, _, extends, has_implements] = matched.as_slice() {
       let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
-        Some(IdentifierParser::from_token(&name))
+        Some(IdentifierParser::from_token(name))
       } else {
         None
       };
       let extends = if let LookupResultWrapper::Optional(Some(extends)) = &extends.wrapper {
-        Some(IdentifierParser::from_token(&extends))
+        Some(IdentifierParser::from_token(extends))
       } else {
         None
       };

@@ -79,7 +79,7 @@ impl ArgumentParser {
         }
       }
     }
-    return Some(
+    Some(
       vec![
         LookupResult {
           size: 0,
@@ -90,7 +90,7 @@ impl ArgumentParser {
           wrapper: LookupResultWrapper::Optional(None),
         }
       ]
-    );
+    )
   }
 
   pub fn parse(

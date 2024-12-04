@@ -7,9 +7,9 @@ pub struct TypeGenerator;
 impl TypeGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     match node.node_type {
-      NodeType::Type => Self::generate_basic(generator, builder, &node),
-      NodeType::UnionType => Self::generate_union(generator, builder, &node),
-      NodeType::IntersectionType => Self::generate_intersection(generator, builder, &node),
+      NodeType::Type => Self::generate_basic(generator, builder, node),
+      NodeType::UnionType => Self::generate_union(generator, builder, node),
+      NodeType::IntersectionType => Self::generate_intersection(generator, builder, node),
       _ => panic!("TypeGenerator::generate: failed to generate type"),
     }
   }
@@ -35,7 +35,7 @@ impl TypeGenerator {
     builder.push(&types.join("&"));
   }
 
-  fn map_types(generator: &mut Generator, types: &Vec<Box<Node>>) -> Vec<String> {
+  fn map_types(generator: &mut Generator, types: &[Box<Node>]) -> Vec<String> {
     types
       .iter()
       .map(|x| {

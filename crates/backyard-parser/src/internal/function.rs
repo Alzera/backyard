@@ -266,7 +266,7 @@ pub struct ConstructorParameterParser;
 
 impl ConstructorParameterParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    println!("\nConstructorParameterParser::test: {:?}", tokens.get(0));
+    println!("\nConstructorParameterParser::test: {:?}", tokens.first());
     if
       let Some(m) = match_pattern(
         tokens,

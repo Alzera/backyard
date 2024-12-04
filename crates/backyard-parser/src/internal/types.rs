@@ -21,7 +21,7 @@ impl TypesParser {
   #[allow(unused_assignments)]
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     if let Some(m) = match_pattern(tokens, &[Lookup::OptionalType]) {
-      if let Some(types) = m.get(0) {
+      if let Some(types) = m.first() {
         if !types.is_empty() {
           return Some(m);
         }
@@ -31,20 +31,20 @@ impl TypesParser {
   }
 
   pub fn parse(
-    parser: &mut Parser,
+    _: &mut Parser,
     matched: Vec<LookupResult>,
     _: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [types] = matched.as_slice() {
       if let LookupResultWrapper::OptionalType(types) = &types.wrapper {
-        return Ok(Self::from_matched(parser, types));
+        return Ok(Self::from_matched(types));
       }
     }
     Err(ParserError::internal("Type", args))
   }
 
-  fn from_matched(parser: &mut Parser, types: &OptionalTypeResult) -> Box<Node> {
+  fn from_matched(types: &OptionalTypeResult) -> Box<Node> {
     match types {
       // OptionalTypeResult::None => todo!(),
       OptionalTypeResult::Single(token) => {
@@ -55,14 +55,14 @@ impl TypesParser {
           column: start_loc.column + len,
           offset: start_loc.offset + len,
         };
-        return TypeNode::new(
+        TypeNode::new(
           false,
           token.value.to_owned(),
           Some(RangeLocation {
             start: start_loc,
             end: end_loc,
           })
-        );
+        )
       }
       OptionalTypeResult::Nullable(nullable, token) => {
         let start_loc = nullable.get_location().unwrap();
@@ -73,35 +73,32 @@ impl TypesParser {
           column: end_loc.column + len,
           offset: end_loc.offset + len,
         };
-        return TypeNode::new(
+        TypeNode::new(
           true,
           token.value.to_owned(),
           Some(RangeLocation {
             start: start_loc,
             end: end_loc,
           })
-        );
+        )
       }
       OptionalTypeResult::Union(vec) => {
         let items = vec
           .iter()
-          .map(|x| Self::from_matched(parser, x))
+          .map(Self::from_matched)
           .collect::<Vec<Box<Node>>>();
         let start_loc = items.first().unwrap().clone().loc.unwrap().start.to_owned();
         let end_loc = items.last().unwrap().clone().loc.unwrap().end.to_owned();
-        return UnionTypeNode::new(items, Some(RangeLocation { start: start_loc, end: end_loc }));
+        UnionTypeNode::new(items, Some(RangeLocation { start: start_loc, end: end_loc }))
       }
       OptionalTypeResult::Intersection(vec) => {
         let items = vec
           .iter()
-          .map(|x| Self::from_matched(parser, x))
+          .map(Self::from_matched)
           .collect::<Vec<Box<Node>>>();
         let start_loc = items.first().unwrap().clone().loc.unwrap().start.to_owned();
         let end_loc = items.last().unwrap().clone().loc.unwrap().end.to_owned();
-        return IntersectionTypeNode::new(
-          items,
-          Some(RangeLocation { start: start_loc, end: end_loc })
-        );
+        IntersectionTypeNode::new(items, Some(RangeLocation { start: start_loc, end: end_loc }))
       }
       _ => {
         panic!("TypeParser::from_matched: failed to get type");

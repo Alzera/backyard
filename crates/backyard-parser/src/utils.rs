@@ -325,7 +325,7 @@ fn parse_type(tokens: &[Token], index: &mut usize) -> OptionalTypeResult {
     *index += 1;
     return OptionalTypeResult::Single(token.to_owned());
   }
-  return OptionalTypeResult::None;
+  OptionalTypeResult::None
 }
 
 fn parse_union_or_intersection_type(
@@ -336,11 +336,7 @@ fn parse_union_or_intersection_type(
   let mut result: Vec<OptionalTypeResult> = vec![];
   let mut last_token_type = None;
   loop {
-    let token = if let Some(t) = tokens.get(*index) {
-      t
-    } else {
-      return None;
-    };
+    let token = tokens.get(*index)?;
     if
       !TYPES.contains(&token.token_type) &&
       ![separator, TokenType::LeftParenthesis, TokenType::RightParenthesis].contains(

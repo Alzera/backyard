@@ -102,7 +102,7 @@ impl TraitUseAliasParser {
         return Err(ParserError::internal("TraitUseAlias", args));
       };
       let name = if let LookupResultWrapper::Optional(name) = &name.wrapper {
-        name.to_owned().and_then(|x| Some(IdentifierParser::from_token(&x)))
+        name.to_owned().map(|x| IdentifierParser::from_token(&x))
       } else {
         return Err(ParserError::internal("TraitUseAlias", args));
       };
