@@ -38,9 +38,11 @@ fn main() {
 
 // // property hook only, single item
 // public bool $virtualHook { &get => true; set($i) => $value; }
-// public string $fullName { get { return $this->firstName.' '.$this->lastName; } }
+// public string $a { &get { return $b; } set($c) => $d; }
 
 // // support type on const, make const item
 // const string FOO = 'foo';
 
 // // globalize argument and parameter
+
+// // match_pattern should skip unexpected comments

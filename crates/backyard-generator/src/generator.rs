@@ -282,6 +282,7 @@ impl<'a> GeneratorArgument<'a> {
           NodeType::CommentDoc,
           NodeType::CommentLine,
           NodeType::Inline,
+          NodeType::PropertyHook,
         ].contains(node_type)
       {
         return Some(";");

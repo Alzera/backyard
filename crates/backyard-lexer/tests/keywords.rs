@@ -437,3 +437,15 @@ fn public_test() {
   let tokens = lex_eval("public public(get) public(set)").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }
+
+#[test]
+fn get_test() {
+  let tokens = lex_eval("get").unwrap();
+  insta::assert_yaml_snapshot!(tokens);
+}
+
+#[test]
+fn set_test() {
+  let tokens = lex_eval("set").unwrap();
+  insta::assert_yaml_snapshot!(tokens);
+}

@@ -1,5 +1,13 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Modifier, Node, PropertyItemNode, PropertyNode, Visibility };
+use backyard_nodes::node::{
+  Location,
+  Modifier,
+  Node,
+  PropertyHookNode,
+  PropertyItemNode,
+  PropertyNode,
+  Visibility,
+};
 
 use crate::{
   error::ParserError,
@@ -14,7 +22,13 @@ use crate::{
   },
 };
 
-use super::{ comment::CommentParser, identifier::IdentifierParser, types::TypesParser };
+use super::{
+  block::BlockParser,
+  comment::CommentParser,
+  function::FunctionParser,
+  identifier::IdentifierParser,
+  types::TypesParser,
+};
 
 #[derive(Debug, Clone)]
 pub struct PropertyParser;
@@ -53,7 +67,7 @@ impl PropertyParser {
         &mut LoopArgument::new(
           "property",
           &[TokenType::Comma],
-          &[TokenType::Semicolon],
+          &[TokenType::Semicolon, TokenType::LeftCurlyBracket],
           &[
             (CommentParser::test, CommentParser::parse),
             (TypesParser::test, TypesParser::parse),
@@ -61,6 +75,25 @@ impl PropertyParser {
           ]
         )
       )?;
+      let mut hooks = vec![];
+      if let Some(close_token) = parser.tokens.get(parser.position - 1) {
+        if close_token.token_type == TokenType::LeftCurlyBracket {
+          if items.len() != 1 {
+            return Err(ParserError::internal("Property", args));
+          }
+          hooks = parser.get_children(
+            &mut LoopArgument::new(
+              "property",
+              &[],
+              &[TokenType::RightCurlyBracket],
+              &[
+                (CommentParser::test, CommentParser::parse),
+                (HookParser::test, HookParser::parse),
+              ]
+            )
+          )?;
+        }
+      }
       let mut visibilities = vec![];
       let mut modifier = None;
       if let LookupResultWrapper::Modifier(modifiers) = &modifiers.wrapper {
@@ -85,7 +118,7 @@ impl PropertyParser {
       if visibilities.is_empty() && !has_var.is_empty() {
         visibilities.push(Visibility::Public);
       }
-      return Ok(PropertyNode::new(visibilities, modifier, items, parser.gen_loc(start_loc)));
+      return Ok(PropertyNode::new(visibilities, modifier, hooks, items, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Property", args))
   }
@@ -130,5 +163,65 @@ impl PropertyItemParser {
       );
     }
     Err(ParserError::internal("PropertyItem", args))
+  }
+}
+
+#[derive(Debug, Clone)]
+pub struct HookParser;
+
+impl HookParser {
+  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+    match_pattern(
+      tokens,
+      &[
+        Lookup::Optional(&[TokenType::BitwiseAnd]),
+        Lookup::Equal(&[TokenType::Get, TokenType::Set]),
+        Lookup::Optional(&[TokenType::LeftParenthesis]),
+      ]
+    )
+  }
+
+  pub fn parse(
+    parser: &mut Parser,
+    matched: Vec<LookupResult>,
+    start_loc: Location,
+    args: &mut LoopArgument
+  ) -> Result<Box<Node>, ParserError> {
+    if let [is_ref, name, has_param] = matched.as_slice() {
+      let is_get = if let LookupResultWrapper::Equal(name) = &name.wrapper {
+        name.token_type == TokenType::Get
+      } else {
+        return Err(ParserError::internal("Hook", args));
+      };
+      let mut params = vec![];
+      if !is_get {
+        if let LookupResultWrapper::Optional(Some(_)) = &has_param.wrapper {
+          params = FunctionParser::get_parameters(parser)?;
+        }
+      }
+      if let Some(next_token) = parser.tokens.get(parser.position) {
+        let body = if next_token.token_type == TokenType::LeftCurlyBracket {
+          BlockParser::new(parser)?
+        } else if next_token.token_type == TokenType::Arrow {
+          parser.position += 1;
+          if
+            let Some(expr) = parser.get_statement(
+              &mut LoopArgument::with_tokens("set_hook", &[], &[TokenType::Semicolon])
+            )?
+          {
+            parser.position += 1;
+            expr
+          } else {
+            return Err(ParserError::internal("SetHook", args));
+          }
+        } else {
+          return Err(ParserError::internal("SetHook", args));
+        };
+        return Ok(
+          PropertyHookNode::new(is_get, !is_ref.is_empty(), params, body, parser.gen_loc(start_loc))
+        );
+      }
+    }
+    Err(ParserError::internal("SetHook", args))
   }
 }

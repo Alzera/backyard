@@ -2,7 +2,7 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
-use super::identifier::IdentifierGenerator;
+use super::{ block::BlockGenerator, function::FunctionGenerator, identifier::IdentifierGenerator };
 
 pub struct PropertyGenerator;
 
@@ -29,6 +29,17 @@ impl PropertyGenerator {
     } else {
       builder.push(&items.print(" "));
     }
+    if !node.hooks.is_empty() {
+      let mut hooks = generator.generate_nodes_new(
+        &node.hooks,
+        &mut GeneratorArgument::generator(&[(NodeType::PropertyHook, Self::generate_hook)])
+      );
+      hooks.indent();
+      builder.push(" {");
+      builder.extend(hooks);
+      builder.new_line();
+      builder.push("}");
+    }
   }
 
   pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
@@ -42,6 +53,40 @@ impl PropertyGenerator {
     if let Some(value) = &node.value {
       builder.push(" = ");
       generator.generate_node(builder, value, &mut GeneratorArgument::default());
+    }
+  }
+
+  pub fn generate_hook(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+    let node = cast_node!(NodeWrapper::PropertyHook, &node.node);
+    if node.is_ref {
+      builder.push("&");
+    }
+    if node.is_get {
+      builder.push("get");
+    } else {
+      builder.push("set");
+    }
+    if !node.parameters.is_empty() {
+      let mut parameters = FunctionGenerator::get_parameters(generator, &node.parameters);
+      builder.push("(");
+      if
+        Generator::check_nodes_has_comments(&node.parameters) ||
+        3 + builder.last_len() + parameters.total_len_with_separator(" ") > generator.max_length
+      {
+        parameters.indent();
+        builder.extend(parameters);
+        builder.new_line();
+      } else {
+        builder.push(&parameters.print(" "));
+      }
+      builder.push(")");
+    }
+    if node.body.node_type == NodeType::Block {
+      builder.push(" ");
+      BlockGenerator::generate(generator, builder, &node.body, None);
+    } else {
+      builder.push(" => ");
+      generator.generate_node(builder, &node.body, &mut GeneratorArgument::default());
     }
   }
 }

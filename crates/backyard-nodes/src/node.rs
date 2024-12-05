@@ -355,6 +355,9 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::Print => { serde_json::from_value(node_data).map(NodeWrapper::Print) }
             NodeType::Program => { serde_json::from_value(node_data).map(NodeWrapper::Program) }
             NodeType::Property => { serde_json::from_value(node_data).map(NodeWrapper::Property) }
+            NodeType::PropertyHook => {
+              serde_json::from_value(node_data).map(NodeWrapper::PropertyHook)
+            }
             NodeType::PropertyItem => {
               serde_json::from_value(node_data).map(NodeWrapper::PropertyItem)
             }
@@ -488,6 +491,7 @@ pub enum NodeWrapper {
   Print(PrintNode),
   Program(ProgramNode),
   Property(PropertyNode),
+  PropertyHook(PropertyHookNode),
   PropertyItem(PropertyItemNode),
   Reference(ReferenceNode),
   Return(ReturnNode),
@@ -595,6 +599,7 @@ pub enum NodeType {
   Print,
   Program,
   Property,
+  PropertyHook,
   PropertyItem,
   Reference,
   Return,
@@ -945,7 +950,14 @@ new_node!(Program, ProgramNode {
 new_node!(Property, PropertyNode {
   visibilities: Vec<Visibility>,
   modifier: Option<Modifier>,
+  hooks: Vec<Box<Node>>,
   items: Vec<Box<Node>>,
+});
+new_node!(PropertyHook, PropertyHookNode {
+  is_get: bool,
+  is_ref: bool,
+  parameters: Vec<Box<Node>>,
+  body: Box<Node>,
 });
 new_node!(PropertyItem, PropertyItemNode {
   name: Box<Node>,

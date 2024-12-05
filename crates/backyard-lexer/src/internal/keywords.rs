@@ -3,7 +3,7 @@ use crate::{ error::LexResult, lexer::{ ControlSnapshot, Lexer }, token::{ Token
 pub struct KeywordToken;
 
 impl KeywordToken {
-  const KEYS: [&'static str; 73] = [
+  const KEYS: [&'static str; 75] = [
     "abstract",
     "array",
     "as",
@@ -40,6 +40,7 @@ impl KeywordToken {
     "foreach",
     "from",
     "function",
+    "get",
     "global",
     "goto",
     "if",
@@ -68,6 +69,7 @@ impl KeywordToken {
     "true",
     "parent",
     "self",
+    "set",
     "switch",
     "throw",
     "trait",
@@ -121,6 +123,7 @@ impl KeywordToken {
       "foreach" => Ok(vec![Token::new(TokenType::Foreach, input, snapshot)]),
       "from" => Ok(vec![Token::new(TokenType::From, input, snapshot)]),
       "function" => Ok(vec![Token::new(TokenType::Function, input, snapshot)]),
+      "get" => Ok(vec![Token::new(TokenType::Get, input, snapshot)]),
       "global" => Ok(vec![Token::new(TokenType::Global, input, snapshot)]),
       "goto" => Ok(vec![Token::new(TokenType::Goto, input, snapshot)]),
       "if" => Ok(vec![Token::new(TokenType::If, input, snapshot)]),
@@ -148,6 +151,7 @@ impl KeywordToken {
       "static" => Ok(vec![Token::new(TokenType::Static, input, snapshot)]),
       "parent" => Ok(vec![Token::new(TokenType::Parent, input, snapshot)]),
       "self" => Ok(vec![Token::new(TokenType::SelfKeyword, input, snapshot)]),
+      "set" => Ok(vec![Token::new(TokenType::Set, input, snapshot)]),
       "switch" => Ok(vec![Token::new(TokenType::Switch, input, snapshot)]),
       "throw" => Ok(vec![Token::new(TokenType::Throw, input, snapshot)]),
       "trait" => Ok(vec![Token::new(TokenType::Trait, input, snapshot)]),

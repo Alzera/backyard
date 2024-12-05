@@ -1,5 +1,6 @@
 ---
 source: crates/backyard-parser/tests/trait.rs
+assertion_line: 17
 expression: asts
 snapshot_kind: text
 ---
@@ -302,6 +303,7 @@ children:
           visibilities:
             - Public
           modifier: Static
+          hooks: []
           items:
             - node_type: property_item
               name:

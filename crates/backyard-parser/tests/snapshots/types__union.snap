@@ -30,6 +30,7 @@ children:
           visibilities:
             - Private
           modifier: ~
+          hooks: []
           items:
             - node_type: property_item
               name:

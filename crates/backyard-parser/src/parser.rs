@@ -293,6 +293,7 @@ impl<'a> Parser<'a> {
             NodeType::CommentBlock,
             NodeType::Inline,
             NodeType::Program,
+            NodeType::PropertyHook,
           ].contains(&n.node_type);
           args.last_expr = Some(n);
           if force_end_statement {
