@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/whiles.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+while (true) $a = 4;

@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/types.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"class A {\n  protected ((\\A|\\C)&\\B)|null $currentHandler2;\n}"

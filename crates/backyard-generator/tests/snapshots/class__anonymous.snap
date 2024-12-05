@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/class.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"$a = new class {\n};"

@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/dowhile.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"do {\n}\n// this comment\nwhile (false);"

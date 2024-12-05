@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/array.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"array(1, 2);"

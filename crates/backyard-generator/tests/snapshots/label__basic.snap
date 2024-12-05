@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/label.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"label:"

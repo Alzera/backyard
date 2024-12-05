@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/string.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"echo <<<START\na {$a}\nSTART;"

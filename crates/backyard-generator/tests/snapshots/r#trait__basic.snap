@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/trait.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"trait B {\n  use Ale;\n  use Loggable, Usable {\n    log as private alias;\n    Loggable::log as aliasLoggable;\n    Usable::useResource insteadof Loggable;\n  }\n  public const MY_CONST = \"constant\";\n  public static ?A $instance = 4;\n}"

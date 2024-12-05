@@ -57,7 +57,6 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
   let mut check_position = 0;
 
   for p in pattern.iter() {
-    // println!("match_pattern: {:?}, {:?}", tokens.get(check_position), p);
     match p {
       Lookup::Equal(contains_tokens) => {
         let cur = tokens.get(check_position);
@@ -141,89 +140,6 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
           size: check_position - old_check_position,
           wrapper: LookupResultWrapper::OptionalType(parsed),
         });
-
-        // if TYPES.contains(&cur.token_type) {
-        //   if let Some(next) = next {
-        //     if next.token_type == TokenType::BitwiseOr {
-        //       if let Some(t) = union_type(tokens, &mut check_position) {
-        //         result.push(LookupResult {
-        //           size: check_position - old_check_position,
-        //           wrapper: LookupResultWrapper::OptionalType(OptionalTypeResult::Union(t)),
-        //         });
-        //         continue;
-        //       }
-        //     } else if next.token_type == TokenType::BitwiseAnd {
-        //       if let Some(t) = intersection_type(tokens, &mut check_position) {
-        //         result.push(LookupResult {
-        //           size: check_position - old_check_position,
-        //           wrapper: LookupResultWrapper::OptionalType(OptionalTypeResult::Intersection(t)),
-        //         });
-        //         continue;
-        //       }
-        //     } else {
-        //       check_position += 1;
-        //       result.push(LookupResult {
-        //         size: 1,
-        //         wrapper: LookupResultWrapper::OptionalType(
-        //           OptionalTypeResult::Single(cur.to_owned())
-        //         ),
-        //       });
-        //       continue;
-        //     }
-        //   }
-        // } else if cur.token_type == TokenType::LeftParenthesis {
-        //   println!("Ale type 1");
-        //   if let Some(next) = next {
-        //     println!("Ale type 2");
-        //     if TYPES.contains(&next.token_type) {
-        //       println!("Ale type 3");
-        //       if let Some(is_union_or_intersection) = tokens.get(check_position + 2) {
-        //         println!("Ale type 4: {:?}", is_union_or_intersection);
-        //         if is_union_or_intersection.token_type == TokenType::BitwiseOr {
-        //           check_position += 1;
-        //           if let Some(t) = union_type(tokens, &mut check_position) {
-        //             if let Some(has_next) = tokens.get(check_position) {
-        //               if has_next.token_type == TokenType::BitwiseOr {
-        //                 if let Some(is_type) = tokens.get(check_position + 1) {
-        //                 }
-        //               }
-        //             }
-        //             result.push(LookupResult {
-        //               size: check_position - old_check_position,
-        //               wrapper: LookupResultWrapper::OptionalType(OptionalTypeResult::Union(t)),
-        //             });
-        //             continue;
-        //           }
-        //         } else if is_union_or_intersection.token_type == TokenType::BitwiseAnd {
-        //           check_position += 1;
-        //           if let Some(t) = intersection_type(tokens, &mut check_position) {
-        //             result.push(LookupResult {
-        //               size: check_position - old_check_position,
-        //               wrapper: LookupResultWrapper::OptionalType(
-        //                 OptionalTypeResult::Intersection(t)
-        //               ),
-        //             });
-        //             continue;
-        //           }
-        //         } else if is_union_or_intersection.token_type == TokenType::RightParenthesis {
-        //           check_position += 3;
-        //           result.push(LookupResult {
-        //             size: 3,
-        //             wrapper: LookupResultWrapper::OptionalType(
-        //               OptionalTypeResult::Single(next.to_owned())
-        //             ),
-        //           });
-        //           continue;
-        //         }
-        //       }
-        //     }
-        //   }
-        // }
-        // result.push(LookupResult {
-        //   size: 0,
-        //   wrapper: LookupResultWrapper::OptionalType(OptionalTypeResult::None),
-        // });
-        // continue;
       }
       Lookup::Modifiers(modifiers_rule) => {
         let mut modifiers: Vec<Option<Token>> = modifiers_rule
@@ -361,42 +277,6 @@ fn parse_union_or_intersection_type(
         } else if token.token_type == TokenType::RightParenthesis {
           break;
         }
-        // if token.token_type == TokenType::LeftParenthesis {
-        //   let next_token = if let Some(t) = tokens.get(*index) {
-        //     t
-        //   } else {
-        //     return None;
-        //   };
-        //   if !TYPES.contains(&next_token.token_type) {
-        //     return None;
-        //   }
-        //   let separator = if let Some(t) = tokens.get(*index + 1) {
-        //     t
-        //   } else {
-        //     return None;
-        //   };
-        //   if separator.token_type == TokenType::RightParenthesis {
-        //     last_token_type = Some(next_token.token_type);
-        //     result.push(OptionalTypeResult::Single(next_token.to_owned()));
-        //     continue;
-        //   } else if separator.token_type == TokenType::BitwiseAnd {
-        //     if let Some(t) = union_type(tokens, index) {
-        //       last_token_type = Some(TokenType::And);
-        //       result.push(OptionalTypeResult::Union(t));
-        //       continue;
-        //     }
-        //   } else if separator.token_type == TokenType::BitwiseOr {
-        //     if let Some(t) = intersection_type(tokens, index) {
-        //       last_token_type = Some(TokenType::Or);
-        //       result.push(OptionalTypeResult::Intersection(t));
-        //       continue;
-        //     }
-        //   } else {
-        //     return None;
-        //   }
-        // } else if token.token_type == TokenType::RightParenthesis {
-        //   break;
-        // }
       } else if token.token_type == separator {
         last_token_type = Some(token.token_type);
         continue;

@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/tries.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"try {\n} catch (UnknownGetterException | ReflectionException) {\n}"

@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/yields.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+yield $a => $b;

@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/eval.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"eval(\"\");"

@@ -1,4 +1,5 @@
 use backyard_lexer::{ lex as process_lex, lex_eval as process_lex_eval };
+use backyard_nodes::node::Node;
 use backyard_parser::{ parse as process_parse, parse_eval as process_parse_eval };
 use backyard_generator::generate as process_generate;
 use serde::Serialize;
@@ -57,12 +58,10 @@ pub fn parse_eval(input: String) -> Result<NodeArray, Error> {
 
 #[wasm_bindgen]
 pub fn generate(input: NodeArray) -> Result<String, Error> {
-  let nodes = serde_wasm_bindgen::from_value(input.obj)?;
+  let nodes: Box<Node> = serde_wasm_bindgen::from_value(input.obj)?;
 
-  match process_generate(nodes) {
-    Ok(nodes) => {
-      Ok(nodes)
-    }
+  match process_generate(&nodes) {
+    Ok(nodes) => { Ok(nodes) }
     Err(err) => Err(Error::new(format!("{}", err))),
   }
 }

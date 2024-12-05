@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/enums.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"enum Suit: int {\n  case Hearts = 5;\n  case Spades = 6;\n}"

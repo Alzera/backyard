@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/bin.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+$a = 5 + 5;

@@ -38,7 +38,6 @@ impl ClassParser {
     {
       return Some(m);
     }
-    // anonymous class
     match_pattern(
       tokens,
       &[Lookup::Equal(&[TokenType::Class]), Lookup::Optional(&[TokenType::LeftParenthesis])]

@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/call.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+(fn () => 5)();

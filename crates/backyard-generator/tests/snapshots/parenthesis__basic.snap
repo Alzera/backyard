@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/parenthesis.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+$a = 5 * (.5 + 0x2e45);

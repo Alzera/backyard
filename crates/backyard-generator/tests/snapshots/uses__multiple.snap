@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/uses.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"use A\\B as A, B\\C as B;"

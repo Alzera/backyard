@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/attribute.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"#[\\Attr]\n#[Attr(123), \\Attr(123)]\nclass A {\n}"

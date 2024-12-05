@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/string.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"$a = ' ini string $ \\\" \\$var $b {${\"ale\" . 5}} {$a}';"

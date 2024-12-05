@@ -51,7 +51,6 @@ impl IfParser {
           &[],
           &[TokenType::RightCurlyBracket, TokenType::EndIf],
           &[
-            // (IfParser::test, IfParser::parse),
             (ElseParser::test, ElseParser::parse),
             (CommentParser::test, CommentParser::parse),
           ]

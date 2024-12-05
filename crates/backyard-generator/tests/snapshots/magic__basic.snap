@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/magic.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+__DIR__ . __FILE__;

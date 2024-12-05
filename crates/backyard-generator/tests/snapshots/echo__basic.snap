@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/echo.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"echo \"Hello\";"

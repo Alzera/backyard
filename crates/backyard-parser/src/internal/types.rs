@@ -46,7 +46,6 @@ impl TypesParser {
 
   fn from_matched(types: &OptionalTypeResult) -> Box<Node> {
     match types {
-      // OptionalTypeResult::None => todo!(),
       OptionalTypeResult::Single(token) => {
         let start_loc = token.get_location().unwrap();
         let len = token.value.len();

@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/global.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"global $title, $hook_suffix, $current_screen;"

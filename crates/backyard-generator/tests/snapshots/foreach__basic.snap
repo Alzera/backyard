@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/foreach.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"foreach ($a as &$b) {\n}"

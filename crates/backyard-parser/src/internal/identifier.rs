@@ -22,17 +22,6 @@ impl IdentifierParser {
       })
     )
   }
-
-  // pub fn from_matched(name: &LookupResult) -> Box<Node> {
-  //   match &name.wrapper {
-  //     LookupResultWrapper::Equal(name) => Self::from_token(name),
-  //     LookupResultWrapper::Optional(Some(name)) => Self::from_token(name),
-  //     _ => {
-  //       println!("IdentifierParser::from_matched: {:?}", name);
-  //       panic!("IdentifierParser::from_matched: failed to get name");
-  //     }
-  //   }
-  // }
 }
 
 impl IdentifierParser {

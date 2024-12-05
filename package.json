@@ -6,6 +6,7 @@
     "test": "cargo test",
     "test:update-snap": "INSTA_UPDATE=always cargo test",
     "test:coverage": "./scripts/gen_coverage.sh",
+    "test:bench": "cargo bench",
     "prebuild": "cargo test && cd ./crates/backyard && npm run build",
     "build": "node ./scripts/combine.js",
     "publish:rust": "cargo publish -p backyard-lexer && cargo publish -p backyard-nodes && cargo publish -p backyard-parser && cargo publish -p backyard-generator",

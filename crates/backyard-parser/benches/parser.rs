@@ -92,7 +92,7 @@ BAR;
 }";
 
 fn criterion_benchmark(c: &mut Criterion) {
-  c.bench_function("basic", |b| {
+  c.bench_function("parser_basic", |b| {
     b.iter(|| {
       let _ = parse(black_box(&CONTENT));
     });
@@ -103,7 +103,7 @@ criterion_group! {
   name = benches;
   config = Criterion::default()
     .warm_up_time(std::time::Duration::from_secs(5))
-    .measurement_time(std::time::Duration::from_secs(50))
+    .measurement_time(std::time::Duration::from_secs(60))
     .sample_size(500);
   targets = criterion_benchmark,
 }

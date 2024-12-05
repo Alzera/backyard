@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/functions.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"class A {\n  public function __construct(protected int $x, protected string &...$y = 0) {\n  }\n}"

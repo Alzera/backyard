@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/list.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"list($a, $b) = [0, 1];"

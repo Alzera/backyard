@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/traituse.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"class A {\n  use Ale;\n}"

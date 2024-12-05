@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/tries.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"try {\n  throw new Error(\"Custom error occurred\");\n} catch (FooError $err) {\n} catch (Foo2Error | BarError $err) {\n} finally {\n}"

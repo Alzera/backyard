@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/comment.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"/*\n test\n */"

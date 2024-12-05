@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/include.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"require_once(\"a\");"

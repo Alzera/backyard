@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/functions.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"$a = function &(int $x, ?int $y) use ($arg2): static {\n};"

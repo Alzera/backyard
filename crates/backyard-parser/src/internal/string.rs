@@ -92,15 +92,11 @@ impl StringParser {
     breaker: TokenType
   ) -> Result<Vec<Box<Node>>, ParserError> {
     let mut values: Vec<Box<Node>> = vec![];
-    // let quote = open.value.to_owned();
     while let Some(i) = parser.tokens.get(parser.position) {
       let start_loc = i.get_location().unwrap();
       parser.position += 1;
       match i.token_type {
         c if c == breaker => {
-          // if quote != i.value {
-          //   return Err(ParserError::internal("StringEncapsed", args));
-          // }
           break;
         }
         TokenType::EncapsedString => {

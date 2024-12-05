@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/fors.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"for ($i = 1, $j = 0; $i <= 10; $j += $i, print $i, $i++);"

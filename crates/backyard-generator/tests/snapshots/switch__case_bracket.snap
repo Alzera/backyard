@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/switch.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"switch ($a) {\n  case 1:\n    break;\n  default:\n    continue;\n}"

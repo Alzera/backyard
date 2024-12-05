@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/declare.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"declare(ticks = 1, ticks = 1) {\n}"

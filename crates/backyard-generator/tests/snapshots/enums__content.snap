@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/enums.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"enum Suit implements SuitInterface {\n  case Hearts;\n  case Spades;\n  public const MY_CONST = \"constant\";\n  public function color(): string {\n    return match($this) {\n      Suit::Hearts, Suit::Diamonds => 'Red',\n      Suit::Clubs, Suit::Spades => 'Black'\n    };\n  }\n}"

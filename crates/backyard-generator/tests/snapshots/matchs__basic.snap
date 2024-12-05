@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/matchs.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"$a = match($a) {\n  'ucs2', 'utf-16' => 2,\n  default => 1\n};"

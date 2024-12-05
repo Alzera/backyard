@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/method.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"abstract class A {\n  public final static function b();\n}"

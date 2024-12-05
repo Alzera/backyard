@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/traituse.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"class A {\n  use Loggable, Usable {\n    log as public;\n    log as private alias;\n    Loggable::log as aliasLoggable;\n    Usable insteadof Loggable;\n    Usable::useResource insteadof Loggable;\n  }\n}"

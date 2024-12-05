@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/uses.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"use App\\Models\\{\n  const User\\UserTesting as UserTestingA,\n  User\\UserTestingB as UserTestingB,\n  function UserTestingC\n};"

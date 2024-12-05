@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/number.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+$a = 0b1101_1010;

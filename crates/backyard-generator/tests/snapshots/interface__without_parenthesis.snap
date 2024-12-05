@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/interface.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"interface A extends B, C {\n  const MY_CONSTANT = \"constant value\";\n  public function a(int $x, int $y = 0): int;\n}"

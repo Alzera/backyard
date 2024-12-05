@@ -1,0 +1,6 @@
+---
+source: crates/backyard-generator/tests/ifs.rs
+expression: generate(asts).unwrap()
+snapshot_kind: text
+---
+"if (false) {\n}"
