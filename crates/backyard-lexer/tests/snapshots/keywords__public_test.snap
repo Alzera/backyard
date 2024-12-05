@@ -1,6 +1,6 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 281
+assertion_line: 438
 expression: tokens
 snapshot_kind: text
 ---
@@ -9,3 +9,13 @@ snapshot_kind: text
   line: 1
   column: 0
   offset: 0
+- token_type: PublicGet
+  value: public(get)
+  line: 1
+  column: 7
+  offset: 7
+- token_type: PublicSet
+  value: public(set)
+  line: 1
+  column: 14
+  offset: 19

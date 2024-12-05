@@ -6,7 +6,13 @@ pub enum Lookup<'a> {
   Optional(&'a [TokenType]),
   Any,
   OptionalType,
-  Modifiers(&'a [&'a [TokenType]]),
+  Modifiers(&'a [ModifierLookup<'a>]),
+}
+
+#[derive(Debug, Clone)]
+pub enum ModifierLookup<'a> {
+  Visibility,
+  Custom(&'a [TokenType]),
 }
 
 #[derive(Debug, Clone)]
@@ -27,7 +33,13 @@ pub enum LookupResultWrapper {
   Optional(Option<Token>),
   Any(Token),
   OptionalType(OptionalTypeResult),
-  Modifier(Vec<Option<Token>>),
+  Modifier(Vec<ModifierResult>),
+}
+
+#[derive(Debug, Clone)]
+pub enum ModifierResult {
+  Visibility(Vec<Token>),
+  Custom(Option<Token>),
 }
 
 #[derive(Debug, Clone)]
@@ -142,28 +154,45 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
         });
       }
       Lookup::Modifiers(modifiers_rule) => {
-        let mut modifiers: Vec<Option<Token>> = modifiers_rule
+        let mut modifiers: Vec<Vec<Token>> = modifiers_rule
           .iter()
-          .map(|_| None)
+          .map(|_| vec![])
           .collect();
         let mut pos = 0;
         loop {
           let token = tokens.get(check_position + pos);
           token?;
           pos += 1;
-          if pos > modifiers_rule.len() {
-            break;
-          }
           let mut assigned = false;
           let token = token.unwrap();
           for (i, modifier) in modifiers_rule.iter().enumerate() {
-            if modifiers[i].is_some() {
-              continue;
-            }
-            if modifier.contains(&token.token_type) {
-              modifiers[i] = Some(token.to_owned());
-              assigned = true;
-              break;
+            if let ModifierLookup::Custom(types) = modifier {
+              if !modifiers[i].is_empty() {
+                continue;
+              }
+              if types.contains(&token.token_type) {
+                modifiers[i].push(token.to_owned());
+                assigned = true;
+                break;
+              }
+            } else {
+              if
+                [
+                  TokenType::Private,
+                  TokenType::PrivateGet,
+                  TokenType::PrivateSet,
+                  TokenType::Protected,
+                  TokenType::ProtectedGet,
+                  TokenType::ProtectedSet,
+                  TokenType::Public,
+                  TokenType::PublicGet,
+                  TokenType::PublicSet,
+                ].contains(&token.token_type)
+              {
+                modifiers[i].push(token.to_owned());
+                assigned = true;
+                break;
+              }
             }
           }
           if !assigned {
@@ -174,6 +203,17 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
           pos -= 1;
           check_position += pos;
         }
+        let modifiers = modifiers
+          .iter()
+          .enumerate()
+          .map(|(i, x)| {
+            if let ModifierLookup::Visibility = modifiers_rule[i] {
+              ModifierResult::Visibility(x.to_owned())
+            } else {
+              ModifierResult::Custom(x.get(0).cloned())
+            }
+          })
+          .collect();
         result.push(LookupResult {
           size: pos,
           wrapper: LookupResultWrapper::Modifier(modifiers),

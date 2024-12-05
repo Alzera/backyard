@@ -83,8 +83,8 @@ impl KeywordToken {
     Self::KEYS.contains(&input)
   }
 
-  pub fn lex(lexer: &mut Lexer, input: &String, snapshot: &ControlSnapshot) -> LexResult {
-    match input.as_str() {
+  pub fn lex(lexer: &mut Lexer, input: &str, snapshot: &ControlSnapshot) -> LexResult {
+    match input {
       "abstract" => Ok(vec![Token::new(TokenType::Abstract, input, snapshot)]),
       "array" => Ok(vec![Token::new(TokenType::Array, input, snapshot)]),
       "as" => Ok(vec![Token::new(TokenType::As, input, snapshot)]),
@@ -138,9 +138,9 @@ impl KeywordToken {
       "new" => Ok(vec![Token::new(TokenType::New, input, snapshot)]),
       "null" => Ok(vec![Token::new(TokenType::Null, input, snapshot)]),
       "print" => Ok(vec![Token::new(TokenType::Print, input, snapshot)]),
-      "private" => Ok(vec![Token::new(TokenType::Private, input, snapshot)]),
-      "protected" => Ok(vec![Token::new(TokenType::Protected, input, snapshot)]),
-      "public" => Ok(vec![Token::new(TokenType::Public, input, snapshot)]),
+      // "private" => Ok(vec![Token::new(TokenType::Private, input, snapshot)]),
+      // "protected" => Ok(vec![Token::new(TokenType::Protected, input, snapshot)]),
+      // "public" => Ok(vec![Token::new(TokenType::Public, input, snapshot)]),
       "readonly" => Ok(vec![Token::new(TokenType::Readonly, input, snapshot)]),
       "require" => Ok(vec![Token::new(TokenType::Require, input, snapshot)]),
       "require_once" => Ok(vec![Token::new(TokenType::RequireOnce, input, snapshot)]),
@@ -158,7 +158,28 @@ impl KeywordToken {
       "while" => Ok(vec![Token::new(TokenType::While, input, snapshot)]),
       "yield" => Ok(vec![Token::new(TokenType::Yield, input, snapshot)]),
       "xor" => Ok(vec![Token::new(TokenType::Xor, input, snapshot)]),
-      _ => Err(lexer.control.error_unrecognized(&input.to_owned())),
+      _ => Self::check_visibility(lexer, input, snapshot),
     }
+  }
+
+  fn check_visibility(lexer: &mut Lexer, input: &str, snapshot: &ControlSnapshot) -> LexResult {
+    let token_type = match input {
+      "private" => [TokenType::Private, TokenType::PrivateGet, TokenType::PrivateSet],
+      "protected" => [TokenType::Protected, TokenType::ProtectedGet, TokenType::ProtectedSet],
+      "public" => [TokenType::Public, TokenType::PublicGet, TokenType::PublicSet],
+      _ => {
+        return Err(lexer.control.error_unrecognized(&input.to_owned()));
+      }
+    };
+    if let Some(pos) = lexer.control.peek_char_n(None, 5) {
+      if pos == "(get)" {
+        lexer.control.consume(5);
+        return Ok(vec![Token::new(token_type[1], format!("{}(get)", input), snapshot)]);
+      } else if pos == "(set)" {
+        lexer.control.consume(5);
+        return Ok(vec![Token::new(token_type[2], format!("{}(set)", input), snapshot)]);
+      }
+    }
+    Ok(vec![Token::new(token_type[0], input, snapshot)])
   }
 }

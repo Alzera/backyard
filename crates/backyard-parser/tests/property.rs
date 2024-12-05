@@ -4,7 +4,7 @@ use backyard_parser::parse_eval;
 fn basic() {
   let asts = parse_eval(
     "class A {
-  protected static var ?A $a = 4;
+  protected public(get) static var ?A $a = 4;
   public readonly A|callable|null $b = 4;
 }"
   ).unwrap();

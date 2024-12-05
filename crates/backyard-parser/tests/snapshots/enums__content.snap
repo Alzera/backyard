@@ -1,5 +1,6 @@
 ---
 source: crates/backyard-parser/tests/enums.rs
+assertion_line: 38
 expression: asts
 snapshot_kind: text
 ---
@@ -89,7 +90,8 @@ children:
         leadings: []
         trailings: []
       - node_type: const_property
-        visibility: Public
+        visibilities:
+          - Public
         items:
           - node_type: assignment
             left:

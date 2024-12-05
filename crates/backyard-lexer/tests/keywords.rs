@@ -319,24 +319,6 @@ fn print_test() {
 }
 
 #[test]
-fn private_test() {
-  let tokens = lex_eval("private").unwrap();
-  insta::assert_yaml_snapshot!(tokens);
-}
-
-#[test]
-fn protected_test() {
-  let tokens = lex_eval("protected").unwrap();
-  insta::assert_yaml_snapshot!(tokens);
-}
-
-#[test]
-fn public_test() {
-  let tokens = lex_eval("public").unwrap();
-  insta::assert_yaml_snapshot!(tokens);
-}
-
-#[test]
 fn readonly_test() {
   let tokens = lex_eval("readonly").unwrap();
   insta::assert_yaml_snapshot!(tokens);
@@ -435,5 +417,23 @@ fn yield_test() {
 #[test]
 fn xor_test() {
   let tokens = lex_eval("xor").unwrap();
+  insta::assert_yaml_snapshot!(tokens);
+}
+
+#[test]
+fn private_test() {
+  let tokens = lex_eval("private private(get) private(set)").unwrap();
+  insta::assert_yaml_snapshot!(tokens);
+}
+
+#[test]
+fn protected_test() {
+  let tokens = lex_eval("protected protected(get) protected(set)").unwrap();
+  insta::assert_yaml_snapshot!(tokens);
+}
+
+#[test]
+fn public_test() {
+  let tokens = lex_eval("public public(get) public(set)").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }

@@ -170,7 +170,7 @@ impl FunctionGenerator {
     node: &Box<Node>
   ) {
     let node = cast_node!(NodeWrapper::ConstructorParameter, &node.node);
-    if let Some(visibility) = &node.visibility {
+    for visibility in &node.visibilities {
       builder.push(&format!("{} ", visibility));
     }
     if let Some(modifier) = &node.modifier {

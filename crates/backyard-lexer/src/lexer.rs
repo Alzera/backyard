@@ -44,6 +44,10 @@ impl Control {
     self.position
   }
 
+  pub(crate) fn consume(&mut self, len: usize) {
+    self.position += len;
+  }
+
   pub(crate) fn get_snapshot(&self) -> ControlSnapshot {
     ControlSnapshot { line: self.line, column: self.column, offset: self.position }
   }
@@ -55,6 +59,11 @@ impl Control {
   pub(crate) fn peek_char(&mut self, pos: Option<usize>) -> Option<char> {
     let p = if let Some(pos) = pos { pos } else { self.position };
     self.chars.get(p).copied()
+  }
+
+  pub(crate) fn peek_char_n(&mut self, pos: Option<usize>, n: usize) -> Option<String> {
+    let p = if let Some(pos) = pos { pos } else { self.position };
+    self.chars.get(p..p + n).map(|i| i.iter().collect())
   }
 
   pub(crate) fn next_char(&mut self) -> Option<char> {

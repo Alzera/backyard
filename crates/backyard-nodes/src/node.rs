@@ -114,16 +114,28 @@ impl Display for Inheritance {
 #[ts(export)]
 pub enum Visibility {
   Public,
+  PublicGet,
+  PublicSet,
   Private,
+  PrivateGet,
+  PrivateSet,
   Protected,
+  ProtectedGet,
+  ProtectedSet,
 }
 
 impl Visibility {
   pub fn try_parse(s: &str) -> Option<Self> {
     match s {
       "public" => Some(Visibility::Public),
+      "public(get)" => Some(Visibility::PublicGet),
+      "public(set)" => Some(Visibility::PublicSet),
       "private" => Some(Visibility::Private),
+      "private(get)" => Some(Visibility::PrivateGet),
+      "private(set)" => Some(Visibility::PrivateSet),
       "protected" => Some(Visibility::Protected),
+      "protected(get)" => Some(Visibility::ProtectedGet),
+      "protected(set)" => Some(Visibility::ProtectedSet),
       _ => None,
     }
   }
@@ -133,8 +145,14 @@ impl Display for Visibility {
   fn fmt(&self, f: &mut Formatter) -> fmt::Result {
     write!(f, "{}", match self {
       Visibility::Public => "public",
+      Visibility::PublicGet => "public(get)",
+      Visibility::PublicSet => "public(set)",
       Visibility::Private => "private",
+      Visibility::PrivateGet => "private(get)",
+      Visibility::PrivateSet => "private(set)",
       Visibility::Protected => "protected",
+      Visibility::ProtectedGet => "protected(get)",
+      Visibility::ProtectedSet => "protected(set)",
     })
   }
 }
@@ -734,11 +752,11 @@ new_node!(Const, ConstNode {
   items: Vec<Box<Node>>,
 });
 new_node!(ConstProperty, ConstPropertyNode {
-  visibility: Option<Visibility>,
+  visibilities: Vec<Visibility>,
   items: Vec<Box<Node>>,
 });
 new_node!(ConstructorParameter, ConstructorParameterNode {
-  visibility: Option<Visibility>,
+  visibilities: Vec<Visibility>,
   modifier: Option<Modifier>,
   parameter: Box<Node>,
 });
@@ -925,7 +943,7 @@ new_node!(Program, ProgramNode {
   children: Vec<Box<Node>>,
 });
 new_node!(Property, PropertyNode {
-  visibility: Option<Visibility>,
+  visibilities: Vec<Visibility>,
   modifier: Option<Modifier>,
   items: Vec<Box<Node>>,
 });

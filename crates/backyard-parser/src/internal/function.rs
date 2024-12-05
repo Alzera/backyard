@@ -15,7 +15,14 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser, TokenTypeArrayCombine },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{
+    match_pattern,
+    Lookup,
+    LookupResult,
+    LookupResultWrapper,
+    ModifierLookup,
+    ModifierResult,
+  },
 };
 
 use super::{
@@ -281,8 +288,8 @@ impl ConstructorParameterParser {
         &[
           Lookup::Modifiers(
             &[
-              &[TokenType::Public, TokenType::Private, TokenType::Protected],
-              &[TokenType::Static, TokenType::Readonly],
+              ModifierLookup::Visibility,
+              ModifierLookup::Custom(&[TokenType::Static, TokenType::Readonly]),
             ]
           ),
           Lookup::Optional(&[TokenType::Var]),
@@ -323,16 +330,19 @@ impl ConstructorParameterParser {
           return Err(ParserError::internal("ConstructorParameter", args));
         }
       );
-      let mut visibility = None;
+      let mut visibilities = vec![];
       let mut modifier = None;
       if let LookupResultWrapper::Modifier(modifiers) = &modifiers.wrapper {
-        if let [visibility_modifier, modifier_modifier] = modifiers.as_slice() {
-          visibility = Visibility::try_parse(
-            &visibility_modifier
-              .as_ref()
-              .map(|i| i.value.to_owned())
-              .unwrap_or_default()
-          );
+        if
+          let [
+            ModifierResult::Visibility(visibilities_modifier),
+            ModifierResult::Custom(modifier_modifier),
+          ] = modifiers.as_slice()
+        {
+          visibilities = visibilities_modifier
+            .iter()
+            .filter_map(|x| Visibility::try_parse(&x.value))
+            .collect();
           modifier = Modifier::try_parse(
             &modifier_modifier
               .as_ref()
@@ -341,11 +351,11 @@ impl ConstructorParameterParser {
           );
         }
       }
-      if visibility.is_none() && !has_var.is_empty() {
-        visibility = Some(Visibility::Public);
+      if visibilities.is_empty() && !has_var.is_empty() {
+        visibilities.push(Visibility::Public);
       }
       return Ok(
-        ConstructorParameterNode::new(visibility, modifier, item, parser.gen_loc(start_loc))
+        ConstructorParameterNode::new(visibilities, modifier, item, parser.gen_loc(start_loc))
       );
     }
     Err(ParserError::internal("ConstructorParameter", args))

@@ -5,7 +5,14 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{
+    match_pattern,
+    Lookup,
+    LookupResult,
+    LookupResultWrapper,
+    ModifierLookup,
+    ModifierResult,
+  },
 };
 
 use super::{ comment::CommentParser, function::FunctionParser };
@@ -21,9 +28,9 @@ impl MethodParser {
       &[
         Lookup::Modifiers(
           &[
-            &[TokenType::Public, TokenType::Private, TokenType::Protected],
-            &[TokenType::Abstract, TokenType::Final],
-            &[TokenType::Static],
+            ModifierLookup::Custom(&[TokenType::Private, TokenType::Protected, TokenType::Public]),
+            ModifierLookup::Custom(&[TokenType::Abstract, TokenType::Final]),
+            ModifierLookup::Custom(&[TokenType::Static]),
           ]
         ),
         Lookup::Equal(&[TokenType::Function]),
@@ -59,7 +66,13 @@ impl MethodParser {
       let mut inheritance = None;
       let mut is_static = false;
       if let LookupResultWrapper::Modifier(modifiers) = &modifiers.wrapper {
-        if let [visibility_modifier, inheritance_modifier, static_modifier] = modifiers.as_slice() {
+        if
+          let [
+            ModifierResult::Custom(visibility_modifier),
+            ModifierResult::Custom(inheritance_modifier),
+            ModifierResult::Custom(static_modifier),
+          ] = modifiers.as_slice()
+        {
           visibility = Visibility::try_parse(
             &visibility_modifier
               .as_ref()

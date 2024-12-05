@@ -4,7 +4,14 @@ use backyard_nodes::node::{ ConstNode, ConstPropertyNode, Location, Node, Visibi
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{
+    match_pattern,
+    Lookup,
+    LookupResult,
+    LookupResultWrapper,
+    ModifierLookup,
+    ModifierResult,
+  },
 };
 
 use super::{ assignment::AssignmentParser, comment::CommentParser, identifier::IdentifierParser };
@@ -56,10 +63,7 @@ impl ConstPropertyParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
-      &[
-        Lookup::Modifiers(&[&[TokenType::Public, TokenType::Private, TokenType::Protected]]),
-        Lookup::Equal(&[TokenType::Const]),
-      ]
+      &[Lookup::Modifiers(&[ModifierLookup::Visibility]), Lookup::Equal(&[TokenType::Const])]
     )
   }
 
@@ -70,20 +74,18 @@ impl ConstPropertyParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [modifiers, _] = matched.as_slice() {
-      let mut visibility = None;
+      let mut visibilities = vec![];
       if let LookupResultWrapper::Modifier(modifiers) = &modifiers.wrapper {
-        if let [visibility_modifier] = modifiers.as_slice() {
-          visibility = Visibility::try_parse(
-            &visibility_modifier
-              .as_ref()
-              .map(|i| i.value.to_owned())
-              .unwrap_or_default()
-          );
+        if let [ModifierResult::Visibility(visibilities_modifier)] = modifiers.as_slice() {
+          visibilities = visibilities_modifier
+            .iter()
+            .filter_map(|x| Visibility::try_parse(&x.value))
+            .collect();
         }
       }
       return Ok(
         ConstPropertyNode::new(
-          visibility,
+          visibilities,
           ConstParser::get_consts(parser)?,
           parser.gen_loc(start_loc)
         )

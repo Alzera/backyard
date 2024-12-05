@@ -4,7 +4,14 @@ use backyard_nodes::node::{ Location, Modifier, Node, PropertyItemNode, Property
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser, TokenTypeArrayCombine },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{
+    match_pattern,
+    Lookup,
+    LookupResult,
+    LookupResultWrapper,
+    ModifierLookup,
+    ModifierResult,
+  },
 };
 
 use super::{ comment::CommentParser, identifier::IdentifierParser, types::TypesParser };
@@ -20,8 +27,8 @@ impl PropertyParser {
         &[
           Lookup::Modifiers(
             &[
-              &[TokenType::Public, TokenType::Private, TokenType::Protected],
-              &[TokenType::Static, TokenType::Readonly],
+              ModifierLookup::Visibility,
+              ModifierLookup::Custom(&[TokenType::Static, TokenType::Readonly]),
             ]
           ),
           Lookup::Optional(&[TokenType::Var]),
@@ -54,16 +61,19 @@ impl PropertyParser {
           ]
         )
       )?;
-      let mut visibility = None;
+      let mut visibilities = vec![];
       let mut modifier = None;
       if let LookupResultWrapper::Modifier(modifiers) = &modifiers.wrapper {
-        if let [visibility_modifier, modifier_modifier] = modifiers.as_slice() {
-          visibility = Visibility::try_parse(
-            &visibility_modifier
-              .as_ref()
-              .map(|i| i.value.to_owned())
-              .unwrap_or_default()
-          );
+        if
+          let [
+            ModifierResult::Visibility(visibilities_modifier),
+            ModifierResult::Custom(modifier_modifier),
+          ] = modifiers.as_slice()
+        {
+          visibilities = visibilities_modifier
+            .iter()
+            .filter_map(|x| Visibility::try_parse(&x.value))
+            .collect();
           modifier = Modifier::try_parse(
             &modifier_modifier
               .as_ref()
@@ -72,10 +82,10 @@ impl PropertyParser {
           );
         }
       }
-      if visibility.is_none() && !has_var.is_empty() {
-        visibility = Some(Visibility::Public);
+      if visibilities.is_empty() && !has_var.is_empty() {
+        visibilities.push(Visibility::Public);
       }
-      return Ok(PropertyNode::new(visibility, modifier, items, parser.gen_loc(start_loc)));
+      return Ok(PropertyNode::new(visibilities, modifier, items, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Property", args))
   }

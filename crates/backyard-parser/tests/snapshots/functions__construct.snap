@@ -1,5 +1,6 @@
 ---
 source: crates/backyard-parser/tests/functions.rs
+assertion_line: 19
 expression: asts
 snapshot_kind: text
 ---
@@ -49,7 +50,8 @@ children:
               trailings: []
             parameters:
               - node_type: constructor_parameter
-                visibility: Protected
+                visibilities:
+                  - Protected
                 modifier: ~
                 parameter:
                   node_type: parameter
@@ -108,7 +110,8 @@ children:
                 leadings: []
                 trailings: []
               - node_type: constructor_parameter
-                visibility: Protected
+                visibilities:
+                  - Protected
                 modifier: ~
                 parameter:
                   node_type: parameter

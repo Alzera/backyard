@@ -1,5 +1,6 @@
 ---
 source: crates/backyard-parser/tests/interface.rs
+assertion_line: 17
 expression: asts
 snapshot_kind: text
 ---
@@ -51,7 +52,7 @@ children:
       node_type: block
       statements:
         - node_type: const_property
-          visibility: ~
+          visibilities: []
           items:
             - node_type: assignment
               left:

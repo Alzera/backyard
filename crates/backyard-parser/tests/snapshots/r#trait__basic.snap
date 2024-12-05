@@ -242,7 +242,8 @@ children:
           leadings: []
           trailings: []
         - node_type: const_property
-          visibility: Public
+          visibilities:
+            - Public
           items:
             - node_type: assignment
               left:
@@ -298,7 +299,8 @@ children:
           leadings: []
           trailings: []
         - node_type: property
-          visibility: Public
+          visibilities:
+            - Public
           modifier: Static
           items:
             - node_type: property_item

@@ -27,7 +27,8 @@ children:
       node_type: block
       statements:
         - node_type: property
-          visibility: Protected
+          visibilities:
+            - Protected
           modifier: ~
           items:
             - node_type: property_item

@@ -9,11 +9,11 @@ pub struct PropertyGenerator;
 impl PropertyGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let node = cast_node!(NodeWrapper::Property, &node.node);
-    if let Some(n) = &node.visibility {
-      builder.push(format!("{} ", n).as_str());
+    for visibility in &node.visibilities {
+      builder.push(&format!("{} ", visibility));
     }
     if let Some(n) = &node.modifier {
-      builder.push(format!("{} ", n).as_str());
+      builder.push(&format!("{} ", n));
     }
 
     let mut items = generator.generate_nodes_new(

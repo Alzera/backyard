@@ -5,7 +5,14 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{
+    match_pattern,
+    Lookup,
+    LookupResult,
+    LookupResultWrapper,
+    ModifierLookup,
+    ModifierResult,
+  },
 };
 
 use super::{
@@ -27,7 +34,12 @@ impl ClassParser {
       let Some(m) = match_pattern(
         tokens,
         &[
-          Lookup::Modifiers(&[&[TokenType::Readonly], &[TokenType::Abstract, TokenType::Final]]),
+          Lookup::Modifiers(
+            &[
+              ModifierLookup::Custom(&[TokenType::Readonly]),
+              ModifierLookup::Custom(&[TokenType::Abstract, TokenType::Final]),
+            ]
+          ),
           Lookup::Equal(&[TokenType::Class]),
           Lookup::Equal(&[TokenType::Identifier]),
           Lookup::Optional(&[TokenType::Extends]),
@@ -191,7 +203,12 @@ impl ClassParser {
       let mut inheritance = None;
       let mut is_readonly = false;
       if let LookupResultWrapper::Modifier(modifiers) = &modifiers.wrapper {
-        if let [readonly_modifier, inheritance_modifier] = modifiers.as_slice() {
+        if
+          let [
+            ModifierResult::Custom(readonly_modifier),
+            ModifierResult::Custom(inheritance_modifier),
+          ] = modifiers.as_slice()
+        {
           is_readonly = readonly_modifier.is_some();
           inheritance = Inheritance::try_parse(
             &inheritance_modifier
