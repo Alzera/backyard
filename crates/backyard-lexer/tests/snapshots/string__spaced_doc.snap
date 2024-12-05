@@ -1,0 +1,26 @@
+---
+source: crates/backyard-lexer/tests/string.rs
+assertion_line: 72
+expression: tokens
+snapshot_kind: text
+---
+- token_type: NowDocOpen
+  value: TEST
+  line: 1
+  column: 0
+  offset: 0
+- token_type: EncapsedString
+  value: "\ntest"
+  line: 1
+  column: 14
+  offset: 14
+- token_type: NowDocClose
+  value: TEST
+  line: 3
+  column: 3
+  offset: 23
+- token_type: Semicolon
+  value: ;
+  line: 3
+  column: 4
+  offset: 24

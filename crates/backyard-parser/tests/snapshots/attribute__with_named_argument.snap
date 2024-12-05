@@ -1,6 +1,6 @@
 ---
 source: crates/backyard-parser/tests/attribute.rs
-assertion_line: 32
+assertion_line: 24
 expression: asts
 snapshot_kind: text
 ---
@@ -15,11 +15,11 @@ children:
         start:
           line: 2
           column: 6
-          offset: 31
+          offset: 22
         end:
           line: 2
           column: 7
-          offset: 32
+          offset: 23
       leadings: []
       trailings: []
     extends: ~
@@ -31,11 +31,11 @@ children:
         start:
           line: 2
           column: 8
-          offset: 33
+          offset: 24
         end:
           line: 3
           column: 0
-          offset: 35
+          offset: 26
       leadings: []
       trailings: []
     is_readonly: false
@@ -43,11 +43,11 @@ children:
       start:
         line: 2
         column: 0
-        offset: 25
+        offset: 16
       end:
         line: 3
         column: 0
-        offset: 35
+        offset: 26
     leadings:
       - node_type: attribute
         items:
@@ -55,10 +55,9 @@ children:
             name: Attr
             arguments:
               - node_type: call_argument
-                name: ~
-                value:
-                  node_type: number
-                  value: "123"
+                name:
+                  node_type: identifier
+                  name: a
                   loc:
                     start:
                       line: 1
@@ -66,8 +65,22 @@ children:
                       offset: 7
                     end:
                       line: 1
-                      column: 7
-                      offset: 7
+                      column: 8
+                      offset: 8
+                  leadings: []
+                  trailings: []
+                value:
+                  node_type: number
+                  value: "123"
+                  loc:
+                    start:
+                      line: 1
+                      column: 10
+                      offset: 10
+                    end:
+                      line: 1
+                      column: 10
+                      offset: 10
                   leadings: []
                   trailings: []
                 loc:
@@ -77,8 +90,8 @@ children:
                     offset: 7
                   end:
                     line: 1
-                    column: 7
-                    offset: 7
+                    column: 10
+                    offset: 10
                 leadings: []
                 trailings: []
             loc:
@@ -88,49 +101,8 @@ children:
                 offset: 2
               end:
                 line: 1
-                column: 10
-                offset: 10
-            leadings: []
-            trailings: []
-          - node_type: attribute_item
-            name: "\\Attr"
-            arguments:
-              - node_type: call_argument
-                name: ~
-                value:
-                  node_type: number
-                  value: "123"
-                  loc:
-                    start:
-                      line: 1
-                      column: 19
-                      offset: 19
-                    end:
-                      line: 1
-                      column: 19
-                      offset: 19
-                  leadings: []
-                  trailings: []
-                loc:
-                  start:
-                    line: 1
-                    column: 19
-                    offset: 19
-                  end:
-                    line: 1
-                    column: 19
-                    offset: 19
-                leadings: []
-                trailings: []
-            loc:
-              start:
-                line: 1
                 column: 13
                 offset: 13
-              end:
-                line: 1
-                column: 22
-                offset: 22
             leadings: []
             trailings: []
         loc:
@@ -141,7 +113,7 @@ children:
           end:
             line: 3
             column: 0
-            offset: 35
+            offset: 26
         leadings: []
         trailings: []
     trailings: []
@@ -153,6 +125,6 @@ loc:
   end:
     line: 3
     column: 0
-    offset: 35
+    offset: 26
 leadings: []
 trailings: []

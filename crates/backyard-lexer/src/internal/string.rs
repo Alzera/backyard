@@ -121,10 +121,12 @@ impl StringToken {
   }
 
   pub fn lex_doc(lexer: &mut Lexer, snapshot: &ControlSnapshot) -> LexResult {
-    let label = lexer.control.next_char_until(|_, i, _| *i == '\n');
+    let label = lexer.control
+      .next_char_until(|_, i, _| *i == '\n')
+      .trim()
+      .to_owned();
     if
       !label
-        .trim()
         .chars()
         .enumerate()
         .fold(

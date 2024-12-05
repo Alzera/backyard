@@ -65,3 +65,9 @@ fn heredoc() {
   let tokens = lex_eval("<<<TEST\ntest $a\nTEST;").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }
+
+#[test]
+fn spaced_doc() {
+  let tokens = lex_eval("<<<   'TEST'  \ntest\nTEST;").unwrap();
+  insta::assert_yaml_snapshot!(tokens);
+}

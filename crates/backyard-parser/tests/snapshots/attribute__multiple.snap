@@ -1,5 +1,6 @@
 ---
 source: crates/backyard-parser/tests/attribute.rs
+assertion_line: 41
 expression: asts
 snapshot_kind: text
 ---
@@ -80,8 +81,22 @@ children:
           - node_type: attribute_item
             name: Attr
             arguments:
-              - node_type: number
-                value: "123"
+              - node_type: call_argument
+                name: ~
+                value:
+                  node_type: number
+                  value: "123"
+                  loc:
+                    start:
+                      line: 2
+                      column: 7
+                      offset: 17
+                    end:
+                      line: 2
+                      column: 7
+                      offset: 17
+                  leadings: []
+                  trailings: []
                 loc:
                   start:
                     line: 2
@@ -107,8 +122,22 @@ children:
           - node_type: attribute_item
             name: "\\Attr"
             arguments:
-              - node_type: number
-                value: "123"
+              - node_type: call_argument
+                name: ~
+                value:
+                  node_type: number
+                  value: "123"
+                  loc:
+                    start:
+                      line: 2
+                      column: 19
+                      offset: 29
+                    end:
+                      line: 2
+                      column: 19
+                      offset: 29
+                  leadings: []
+                  trailings: []
                 loc:
                   start:
                     line: 2

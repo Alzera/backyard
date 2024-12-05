@@ -3,10 +3,11 @@ use backyard_nodes::node::{ AttributeItemNode, AttributeNode, Location, Node };
 
 use crate::{
   error::ParserError,
-  guard,
   parser::{ LoopArgument, Parser },
   utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
+
+use super::call::CallParser;
 
 #[derive(Debug, Clone)]
 pub struct AttributeParser;
@@ -48,7 +49,13 @@ pub struct AttributeItemParser;
 
 impl AttributeItemParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Identifier, TokenType::Name])])
+    match_pattern(
+      tokens,
+      &[
+        Lookup::Equal(&[TokenType::Identifier, TokenType::Name]),
+        Lookup::Optional(&[TokenType::LeftParenthesis]),
+      ]
+    )
   }
 
   pub fn parse(
@@ -57,25 +64,15 @@ impl AttributeItemParser {
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [name] = matched.as_slice() {
+    if let [name, has_argument] = matched.as_slice() {
       let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
         name.value.to_owned()
       } else {
         return Err(ParserError::internal("ArrayItem", args));
       };
       let mut arguments = vec![];
-      let token = guard!(parser.tokens.get(parser.position), {
-        return Err(ParserError::internal("ArrayItem", args));
-      });
-      if [TokenType::LeftParenthesis].contains(&token.token_type) {
-        parser.position += 1;
-        arguments = parser.get_children(
-          &mut LoopArgument::with_tokens(
-            "attribute_item",
-            &[TokenType::Comma],
-            &[TokenType::RightParenthesis]
-          )
-        )?;
+      if !has_argument.is_empty() {
+        arguments = CallParser::get_arguments(parser)?;
       }
       return Ok(AttributeItemNode::new(name, arguments, parser.gen_loc(start_loc)));
     }

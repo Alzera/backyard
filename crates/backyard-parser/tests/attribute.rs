@@ -7,6 +7,7 @@ class A {
 }").unwrap();
   insta::assert_yaml_snapshot!(asts);
 }
+
 #[test]
 fn with_argument() {
   let asts = parse_eval("#[Attr(123)]
@@ -14,6 +15,15 @@ class A {
 }").unwrap();
   insta::assert_yaml_snapshot!(asts);
 }
+
+#[test]
+fn with_named_argument() {
+  let asts = parse_eval("#[Attr(a: 123)]
+class A {
+}").unwrap();
+  insta::assert_yaml_snapshot!(asts);
+}
+
 #[test]
 fn multiple_items() {
   let asts = parse_eval("#[Attr(123), \\Attr(123)]
@@ -21,6 +31,7 @@ class A {
 }").unwrap();
   insta::assert_yaml_snapshot!(asts);
 }
+
 #[test]
 fn multiple() {
   let asts = parse_eval("#[\\Attr] 

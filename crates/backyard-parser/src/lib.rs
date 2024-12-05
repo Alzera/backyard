@@ -20,6 +20,9 @@ pub fn parse_eval(input: &str) -> Result<Box<Node>, ParserError> {
 fn parse_base(tokens: Result<Vec<Token>, LexError>) -> Result<Box<Node>, ParserError> {
   match tokens {
     Ok(tokens) => {
+      if tokens.is_empty() {
+        return Err(ParserError::Failed("Empty tokens".to_string()));
+      }
       let mut parser = Parser::new(&tokens);
       let parsed = parser.get_children(&mut LoopArgument::default("main"))?;
       let wrapped = ProgramNode::new(

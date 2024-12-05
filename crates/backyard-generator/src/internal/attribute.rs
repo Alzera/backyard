@@ -1,5 +1,7 @@
 use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
-use crate::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATORS };
+use crate::generator::{ Builder, Generator, GeneratorArgument };
+
+use super::call::CallGenerator;
 
 pub struct AttributeGenerator;
 
@@ -23,7 +25,9 @@ impl AttributeGenerator {
       builder.push("(");
       let arguments = generator.generate_nodes_new(
         &node.arguments,
-        &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
+        &mut GeneratorArgument::for_parameter(
+          &[(NodeType::CallArgument, CallGenerator::generate_argument)]
+        )
       );
       builder.push(&arguments.print(" "));
       builder.push(")");
