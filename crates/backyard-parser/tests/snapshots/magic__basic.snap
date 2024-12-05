@@ -1,0 +1,59 @@
+---
+source: crates/backyard-parser/tests/magic.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: bin
+    left:
+      node_type: magic
+      name: __DIR__
+      loc:
+        start:
+          line: 1
+          column: 0
+          offset: 0
+        end:
+          line: 1
+          column: 0
+          offset: 0
+      leadings: []
+      trailings: []
+    operator: "."
+    right:
+      node_type: magic
+      name: __FILE__
+      loc:
+        start:
+          line: 1
+          column: 10
+          offset: 10
+        end:
+          line: 1
+          column: 10
+          offset: 10
+      leadings: []
+      trailings: []
+    loc:
+      start:
+        line: 1
+        column: 8
+        offset: 8
+      end:
+        line: 1
+        column: 10
+        offset: 10
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 1
+    column: 18
+    offset: 18
+leadings: []
+trailings: []

@@ -1,0 +1,112 @@
+---
+source: crates/backyard-parser/tests/tries.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: try
+    body:
+      node_type: block
+      statements: []
+      loc:
+        start:
+          line: 1
+          column: 4
+          offset: 4
+        end:
+          line: 2
+          column: 0
+          offset: 6
+      leadings: []
+      trailings: []
+    catches:
+      - node_type: catch
+        types:
+          - node_type: identifier
+            name: Exception
+            loc:
+              start:
+                line: 2
+                column: 9
+                offset: 15
+              end:
+                line: 2
+                column: 18
+                offset: 24
+            leadings: []
+            trailings: []
+        variable:
+          node_type: variable
+          name:
+            node_type: identifier
+            name: e
+            loc:
+              start:
+                line: 2
+                column: 19
+                offset: 25
+              end:
+                line: 2
+                column: 20
+                offset: 26
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 2
+              column: 19
+              offset: 25
+            end:
+              line: 2
+              column: 20
+              offset: 26
+          leadings: []
+          trailings: []
+        body:
+          node_type: block
+          statements: []
+          loc:
+            start:
+              line: 2
+              column: 23
+              offset: 29
+            end:
+              line: 3
+              column: 0
+              offset: 31
+          leadings: []
+          trailings: []
+        loc:
+          start:
+            line: 2
+            column: 2
+            offset: 8
+          end:
+            line: 3
+            column: 0
+            offset: 31
+        leadings: []
+        trailings: []
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 3
+        column: 0
+        offset: 31
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 3
+    column: 0
+    offset: 31
+leadings: []
+trailings: []

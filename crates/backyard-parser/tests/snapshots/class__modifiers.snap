@@ -3,17 +3,11 @@ source: crates/backyard-parser/tests/class.rs
 expression: asts
 snapshot_kind: text
 ---
-leadings: []
-trailings: []
 node_type: program
 children:
-  - leadings: []
-    trailings: []
-    node_type: class
+  - node_type: class
     inheritance: Final
     name:
-      leadings: []
-      trailings: []
       node_type: identifier
       name: A
       loc:
@@ -25,11 +19,11 @@ children:
           line: 1
           column: 22
           offset: 22
+      leadings: []
+      trailings: []
     extends: ~
     implements: []
     body:
-      leadings: []
-      trailings: []
       node_type: block
       statements: []
       loc:
@@ -41,6 +35,8 @@ children:
           line: 2
           column: 0
           offset: 25
+      leadings: []
+      trailings: []
     is_readonly: true
     loc:
       start:
@@ -51,6 +47,8 @@ children:
         line: 2
         column: 0
         offset: 25
+    leadings: []
+    trailings: []
 loc:
   start:
     line: 1
@@ -60,3 +58,5 @@ loc:
     line: 2
     column: 0
     offset: 25
+leadings: []
+trailings: []

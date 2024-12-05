@@ -1,0 +1,48 @@
+---
+source: crates/backyard-parser/tests/fors.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: for
+    inits: []
+    tests: []
+    increments: []
+    body:
+      node_type: block
+      statements: []
+      loc:
+        start:
+          line: 1
+          column: 8
+          offset: 8
+        end:
+          line: 2
+          column: 0
+          offset: 10
+      leadings: []
+      trailings: []
+    body_type: Short
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 2
+        column: 0
+        offset: 10
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 2
+    column: 6
+    offset: 16
+leadings: []
+trailings: []

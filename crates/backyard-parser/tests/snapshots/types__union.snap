@@ -1,0 +1,160 @@
+---
+source: crates/backyard-parser/tests/types.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: class
+    inheritance: ~
+    name:
+      node_type: identifier
+      name: A
+      loc:
+        start:
+          line: 1
+          column: 6
+          offset: 6
+        end:
+          line: 1
+          column: 7
+          offset: 7
+      leadings: []
+      trailings: []
+    extends: ~
+    implements: []
+    body:
+      node_type: block
+      statements:
+        - node_type: property
+          visibility: Private
+          modifier: ~
+          items:
+            - node_type: property_item
+              name:
+                node_type: identifier
+                name: suggestedValues
+                loc:
+                  start:
+                    line: 2
+                    column: 25
+                    offset: 35
+                  end:
+                    line: 2
+                    column: 40
+                    offset: 50
+                leadings: []
+                trailings: []
+              variable_type:
+                node_type: union_type
+                types:
+                  - node_type: type
+                    is_nullable: false
+                    name: array
+                    loc:
+                      start:
+                        line: 2
+                        column: 10
+                        offset: 20
+                      end:
+                        line: 2
+                        column: 15
+                        offset: 25
+                    leadings: []
+                    trailings: []
+                  - node_type: type
+                    is_nullable: false
+                    name: "\\Closure"
+                    loc:
+                      start:
+                        line: 2
+                        column: 16
+                        offset: 26
+                      end:
+                        line: 2
+                        column: 24
+                        offset: 34
+                    leadings: []
+                    trailings: []
+                loc:
+                  start:
+                    line: 2
+                    column: 15
+                    offset: 25
+                  end:
+                    line: 2
+                    column: 24
+                    offset: 34
+                leadings: []
+                trailings: []
+              value:
+                node_type: array
+                is_short: true
+                items: []
+                loc:
+                  start:
+                    line: 2
+                    column: 44
+                    offset: 54
+                  end:
+                    line: 2
+                    column: 45
+                    offset: 55
+                leadings: []
+                trailings: []
+              loc:
+                start:
+                  line: 2
+                  column: 25
+                  offset: 35
+                end:
+                  line: 2
+                  column: 45
+                  offset: 55
+              leadings: []
+              trailings: []
+          loc:
+            start:
+              line: 2
+              column: 2
+              offset: 12
+            end:
+              line: 2
+              column: 46
+              offset: 56
+          leadings: []
+          trailings: []
+      loc:
+        start:
+          line: 1
+          column: 8
+          offset: 8
+        end:
+          line: 3
+          column: 0
+          offset: 58
+      leadings: []
+      trailings: []
+    is_readonly: false
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 3
+        column: 0
+        offset: 58
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 3
+    column: 0
+    offset: 58
+leadings: []
+trailings: []

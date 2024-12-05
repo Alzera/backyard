@@ -1,0 +1,141 @@
+---
+source: crates/backyard-parser/tests/string.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: echo
+    items:
+      - node_type: here_doc
+        label: START
+        values:
+          - node_type: encapsed_part
+            is_advanced: false
+            value:
+              node_type: string
+              quote: Single
+              value: "\na "
+              loc:
+                start:
+                  line: 1
+                  column: 13
+                  offset: 13
+                end:
+                  line: 1
+                  column: 16
+                  offset: 16
+              leadings: []
+              trailings: []
+            loc:
+              start:
+                line: 1
+                column: 13
+                offset: 13
+              end:
+                line: 1
+                column: 16
+                offset: 16
+            leadings: []
+            trailings: []
+          - node_type: encapsed_part
+            is_advanced: true
+            value:
+              node_type: variable
+              name:
+                node_type: identifier
+                name: a
+                loc:
+                  start:
+                    line: 2
+                    column: 3
+                    offset: 17
+                  end:
+                    line: 2
+                    column: 4
+                    offset: 18
+                leadings: []
+                trailings: []
+              loc:
+                start:
+                  line: 2
+                  column: 3
+                  offset: 17
+                end:
+                  line: 2
+                  column: 4
+                  offset: 18
+              leadings: []
+              trailings: []
+            loc:
+              start:
+                line: 2
+                column: 2
+                offset: 16
+              end:
+                line: 2
+                column: 5
+                offset: 19
+            leadings: []
+            trailings: []
+          - node_type: encapsed_part
+            is_advanced: false
+            value:
+              node_type: string
+              quote: Single
+              value: "\n"
+              loc:
+                start:
+                  line: 2
+                  column: 6
+                  offset: 20
+                end:
+                  line: 2
+                  column: 7
+                  offset: 21
+              leadings: []
+              trailings: []
+            loc:
+              start:
+                line: 2
+                column: 6
+                offset: 20
+              end:
+                line: 2
+                column: 7
+                offset: 21
+            leadings: []
+            trailings: []
+        loc:
+          start:
+            line: 1
+            column: 5
+            offset: 5
+          end:
+            line: 3
+            column: 4
+            offset: 25
+        leadings: []
+        trailings: []
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 3
+        column: 4
+        offset: 25
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 3
+    column: 6
+    offset: 27
+leadings: []
+trailings: []

@@ -1,0 +1,70 @@
+---
+source: crates/backyard-parser/tests/singles.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: inline
+    text: "Hello "
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 1
+        column: 0
+        offset: 0
+    leadings: []
+    trailings: []
+  - node_type: echo
+    items:
+      - node_type: variable
+        name:
+          node_type: identifier
+          name: world
+          loc:
+            start:
+              line: 1
+              column: 10
+              offset: 10
+            end:
+              line: 1
+              column: 15
+              offset: 15
+          leadings: []
+          trailings: []
+        loc:
+          start:
+            line: 1
+            column: 10
+            offset: 10
+          end:
+            line: 1
+            column: 15
+            offset: 15
+        leadings: []
+        trailings: []
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 1
+        column: 10
+        offset: 10
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 1
+    column: 10
+    offset: 10
+leadings: []
+trailings: []

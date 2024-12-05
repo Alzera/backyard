@@ -4,171 +4,89 @@ use criterion::{ criterion_group, criterion_main, Criterion };
 
 const CONTENT: &str =
   "<?php
+declare(strict_types = 1);
+require_once 'foo.php';
 
-declare(strict_types=1);
-include_once 'foo.php';
+namespace sample;
 
-/** a comment before the namespace comment **/
+use foo\\ {
+  baz,
+  bar as fooBar
+};
 
-namespace foo\\bar {
-?>Hello<?php
-  # single line comment
-  use function foo\\{
-    // sample code
-    baz,
-    // with alias
-    bar as fooBar
-  };
-  use bar as nsBar;
+global $b;
+const FOOBAR = 'BARFOO';
 
-  // generic constant
-  const FOOBAR = 'foo & bar';
+trait foo {}
 
-  /**
-   * a class
-   */
-  abstract class fooBar implements namespace\\fooBaz
-  {
-    use Line;
-    use foo, bar {
-      foo::baz insteadof bar;
-      bar::foo as baz;
-    }
-    const FOOBAR = 'BARFOO';
-    protected $dwarf = [
-      'sneezy' => 'achoum',
-      'bashful' => 'tadah'
-    ];
-    /**
-     * Something is done here
-     */
-    final public function doSomething()
-    {
-      // do not wanna do
-      foreach ($this->dwarf as $name => $greeting) {
-        echo \"Hey ho $name, $greeting !\";
-        continue $foo;
-      }
-      throw new \\ComeToHome('Thats it');
-    }
+interface bar {}
+
+/* comment block */
+enum foo {
+  case bar;
+}
+
+/**
+ * comment doc
+ */
+class A {
+  use foo, bar {
+    foo::baz insteadof bar;
+    bar::foo as baz;
   }
 
-  interface Miror extends Object
-  {
-    public function Am_I_Uggly(): bool;
-    function broken(): bool;
-    static function isWhiteSnowAlive(): bool;
-  }
+  const FOOBAR = 'BARFOO';
+  protected (A&B)|null $foo = null;
 
-  function iter()
-  {
-    yield 'ator' => $foo;
-    yield from iter(50);
-  }
-
-  trait Line
-  {
-    public function draw(bool $arrow = false): string
-    {
-      switch ($this->style) {
-        case 'dot':
-        case 'point':
-          $body = '......';
-          break;
-        default:
-          $body = '-----';
-          break;
-      }
-      return $body . ($arrow ? '>' : '');
-    }
-    private function shuut()
-    {
-      return __NAMESPACE__;
-    }
-  }
-
-  // this is SPARTA !
-  function sparta(): ?int
-  {
-    global $persians;
-
-    $index = -1;
-    next:
-    $guy = $persians[++$index];
-    if (rand(0, 10) > 5 || false) {
-      @$guy->kill();
-    } else {
-      $guy->kick(...$foo);
-    }
-    if ((int)$index < count($persians)) goto next;
-
-    return 300 | 5;
-  }
-
-  $foo = function (?int $bar = 42) use ($something): bool {
-    static $banana;
-    if ($bar > fooBar::NUMBAR) {
-      while ($bar) {
-        if ((int)calculateMeaningOfLife() === 42) {
-          break foo;
-        } else continue;
-      }
+  function __construct(public $a){
+    list($a, $b) = match ($a) {
+      __DIR__ => clone 2,
+      default => (int) 3,
+    };
+    if(Foo > 5) {
       do {
-  ?>
-Caesar: here I was
-<?php
+        ?>Test<?php
       } while (false);
-    } else if (!($something instanceof Banana)) {
-      try {
-        $bipbip = clone $something;
-        $bipbip->crazy()->boom([1, 2, 3]);
-      } catch (Coco | Nut $ex) {
-        $ex->printStackTrace();
-      } finally {
-        if (isset($bipbip, $ex)) unset($bipbip, $ex);
-        return (new class extends fooBar {
-          function goatIt()
-          {
-            return \"meeeh\";
-          }
-        })->goatIt();
-      }
     } else {
-      for ($i = 0; $i < count($this->banana); $i++) {
-        $x %= ($i * 2) / ($i - 1);
-        $what = $this->$x[++$i] ? 'yes!' : 'noo!';
-      }
-      // @todo $this->a_$foo
-      return $$foo ?? false;
+      echo (function() {
+
+      })(fn() => 5);
     }
-    return empty(namespace\\FOOBAR);
-  };
+  }
 
-  if ($foo):
-    echo `bar&`;
-  elseif ($bar):
-    echo `ls -larth`;
-  endif;
-
-  // list version
-  list($a, list($b, $c)) = [1, [2, 3]];
-  print(<<<BAZ
-Hello world
-BAZ
-  );
-  die($foo(
-    <<<'BAR'
-$foo + $bar
-BAR
-  ));
-  eval(<<<FOO
-return 'This is madness!';
-FOO);
-
-  // nested blocks
-  { { {
-        echo \"Hello world\";
+  // comment line
+  #[attr]
+  private function test(int $x, string &...$y = 0) {
+    LABEL:
+    try {
+      while (false) {
+        yield @$this->a(...$a) ? !static::class : (self[0]++)(a: 1);
+        yield from ++$a;
+        return new class {};
       }
+      throw new \\ComeToHome(<<<'BAR'
+  NowDoc
+BAR);
+      goto LABEL;
+      eval(\"return \" . \"'This is $a!';\");
+      exit;
+    } catch (Exception $e) {
+      switch (parent) {
+        case 1:
+          foreach ($a as $b => $c) {
+          }
+          break;
+        case 2:
+          for($i = 0; $i < 5; $i++) {
+          }
+          continue;
+        default:
+          break;
+      }
+    } finally {
+      print <<<BAR
+  HereDoc
+BAR;
     }
   }
 }";

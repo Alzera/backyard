@@ -1,0 +1,156 @@
+---
+source: crates/backyard-parser/tests/attribute.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: class
+    inheritance: ~
+    name:
+      node_type: identifier
+      name: A
+      loc:
+        start:
+          line: 3
+          column: 6
+          offset: 41
+        end:
+          line: 3
+          column: 7
+          offset: 42
+      leadings: []
+      trailings: []
+    extends: ~
+    implements: []
+    body:
+      node_type: block
+      statements: []
+      loc:
+        start:
+          line: 3
+          column: 8
+          offset: 43
+        end:
+          line: 4
+          column: 0
+          offset: 45
+      leadings: []
+      trailings: []
+    is_readonly: false
+    loc:
+      start:
+        line: 3
+        column: 0
+        offset: 35
+      end:
+        line: 4
+        column: 0
+        offset: 45
+    leadings:
+      - node_type: attribute
+        items:
+          - node_type: attribute_item
+            name: "\\Attr"
+            arguments: []
+            loc:
+              start:
+                line: 1
+                column: 2
+                offset: 2
+              end:
+                line: 1
+                column: 2
+                offset: 2
+            leadings: []
+            trailings: []
+        loc:
+          start:
+            line: 1
+            column: 0
+            offset: 0
+          end:
+            line: 4
+            column: 0
+            offset: 45
+        leadings: []
+        trailings: []
+      - node_type: attribute
+        items:
+          - node_type: attribute_item
+            name: Attr
+            arguments:
+              - node_type: number
+                value: "123"
+                loc:
+                  start:
+                    line: 2
+                    column: 7
+                    offset: 17
+                  end:
+                    line: 2
+                    column: 7
+                    offset: 17
+                leadings: []
+                trailings: []
+            loc:
+              start:
+                line: 2
+                column: 2
+                offset: 12
+              end:
+                line: 2
+                column: 10
+                offset: 20
+            leadings: []
+            trailings: []
+          - node_type: attribute_item
+            name: "\\Attr"
+            arguments:
+              - node_type: number
+                value: "123"
+                loc:
+                  start:
+                    line: 2
+                    column: 19
+                    offset: 29
+                  end:
+                    line: 2
+                    column: 19
+                    offset: 29
+                leadings: []
+                trailings: []
+            loc:
+              start:
+                line: 2
+                column: 13
+                offset: 23
+              end:
+                line: 2
+                column: 22
+                offset: 32
+            leadings: []
+            trailings: []
+        loc:
+          start:
+            line: 2
+            column: 0
+            offset: 10
+          end:
+            line: 4
+            column: 0
+            offset: 45
+        leadings: []
+        trailings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 4
+    column: 0
+    offset: 45
+leadings: []
+trailings: []

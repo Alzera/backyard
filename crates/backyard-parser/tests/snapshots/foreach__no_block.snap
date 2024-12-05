@@ -1,0 +1,167 @@
+---
+source: crates/backyard-parser/tests/foreach.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: foreach
+    source:
+      node_type: variable
+      name:
+        node_type: identifier
+        name: a
+        loc:
+          start:
+            line: 1
+            column: 9
+            offset: 9
+          end:
+            line: 1
+            column: 10
+            offset: 10
+        leadings: []
+        trailings: []
+      loc:
+        start:
+          line: 1
+          column: 9
+          offset: 9
+        end:
+          line: 1
+          column: 10
+          offset: 10
+      leadings: []
+      trailings: []
+    key:
+      node_type: variable
+      name:
+        node_type: identifier
+        name: b
+        loc:
+          start:
+            line: 1
+            column: 15
+            offset: 15
+          end:
+            line: 1
+            column: 16
+            offset: 16
+        leadings: []
+        trailings: []
+      loc:
+        start:
+          line: 1
+          column: 15
+          offset: 15
+        end:
+          line: 1
+          column: 16
+          offset: 16
+      leadings: []
+      trailings: []
+    value:
+      node_type: variable
+      name:
+        node_type: identifier
+        name: c
+        loc:
+          start:
+            line: 1
+            column: 21
+            offset: 21
+          end:
+            line: 1
+            column: 22
+            offset: 22
+        leadings: []
+        trailings: []
+      loc:
+        start:
+          line: 1
+          column: 21
+          offset: 21
+        end:
+          line: 1
+          column: 22
+          offset: 22
+      leadings: []
+      trailings: []
+    body:
+      node_type: assignment
+      left:
+        node_type: variable
+        name:
+          node_type: identifier
+          name: d
+          loc:
+            start:
+              line: 2
+              column: 1
+              offset: 26
+            end:
+              line: 2
+              column: 2
+              offset: 27
+          leadings: []
+          trailings: []
+        loc:
+          start:
+            line: 2
+            column: 1
+            offset: 26
+          end:
+            line: 2
+            column: 2
+            offset: 27
+        leadings: []
+        trailings: []
+      operator: "="
+      right:
+        node_type: number
+        value: "5"
+        loc:
+          start:
+            line: 2
+            column: 6
+            offset: 31
+          end:
+            line: 2
+            column: 6
+            offset: 31
+        leadings: []
+        trailings: []
+      loc:
+        start:
+          line: 2
+          column: 4
+          offset: 29
+        end:
+          line: 2
+          column: 6
+          offset: 31
+      leadings: []
+      trailings: []
+    is_short: false
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 2
+        column: 7
+        offset: 32
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 2
+    column: 7
+    offset: 32
+leadings: []
+trailings: []

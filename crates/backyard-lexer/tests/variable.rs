@@ -17,3 +17,9 @@ fn bracket() {
   let tokens = lex_eval("${$a}").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }
+
+#[test]
+fn multiple() {
+  let tokens = lex_eval("$$$a").unwrap();
+  insta::assert_yaml_snapshot!(tokens);
+}

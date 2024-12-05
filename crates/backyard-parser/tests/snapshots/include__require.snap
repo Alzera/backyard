@@ -1,0 +1,48 @@
+---
+source: crates/backyard-parser/tests/include.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: include
+    use_parenthesis: true
+    is_require: true
+    is_once: false
+    argument:
+      node_type: string
+      quote: Double
+      value: a
+      loc:
+        start:
+          line: 1
+          column: 8
+          offset: 8
+        end:
+          line: 1
+          column: 8
+          offset: 8
+      leadings: []
+      trailings: []
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 1
+        column: 11
+        offset: 11
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 1
+    column: 12
+    offset: 12
+leadings: []
+trailings: []

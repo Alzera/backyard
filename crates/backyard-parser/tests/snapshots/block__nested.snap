@@ -1,0 +1,44 @@
+---
+source: crates/backyard-parser/tests/block.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: block
+    statements:
+      - node_type: block
+        statements: []
+        loc:
+          start:
+            line: 2
+            column: 1
+            offset: 3
+          end:
+            line: 3
+            column: 1
+            offset: 6
+        leadings: []
+        trailings: []
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 4
+        column: 0
+        offset: 8
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 4
+    column: 0
+    offset: 8
+leadings: []
+trailings: []

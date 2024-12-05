@@ -1,0 +1,45 @@
+---
+source: crates/backyard-parser/tests/singles.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: print
+    statement:
+      node_type: string
+      quote: Double
+      value: Hello
+      loc:
+        start:
+          line: 1
+          column: 6
+          offset: 6
+        end:
+          line: 1
+          column: 6
+          offset: 6
+      leadings: []
+      trailings: []
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 1
+        column: 6
+        offset: 6
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 1
+    column: 13
+    offset: 13
+leadings: []
+trailings: []

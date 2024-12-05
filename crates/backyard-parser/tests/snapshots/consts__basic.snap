@@ -3,20 +3,12 @@ source: crates/backyard-parser/tests/consts.rs
 expression: asts
 snapshot_kind: text
 ---
-leadings: []
-trailings: []
 node_type: program
 children:
-  - leadings: []
-    trailings: []
-    node_type: const
+  - node_type: const
     items:
-      - leadings: []
-        trailings: []
-        node_type: assignment
+      - node_type: assignment
         left:
-          leadings: []
-          trailings: []
           node_type: identifier
           name: A
           loc:
@@ -28,10 +20,10 @@ children:
               line: 1
               column: 7
               offset: 7
-        operator: "="
-        right:
           leadings: []
           trailings: []
+        operator: "="
+        right:
           node_type: number
           value: "1"
           loc:
@@ -43,6 +35,8 @@ children:
               line: 1
               column: 10
               offset: 10
+          leadings: []
+          trailings: []
         loc:
           start:
             line: 1
@@ -52,12 +46,10 @@ children:
             line: 1
             column: 10
             offset: 10
-      - leadings: []
+        leadings: []
         trailings: []
-        node_type: assignment
+      - node_type: assignment
         left:
-          leadings: []
-          trailings: []
           node_type: identifier
           name: B
           loc:
@@ -69,10 +61,10 @@ children:
               line: 1
               column: 14
               offset: 14
-        operator: "="
-        right:
           leadings: []
           trailings: []
+        operator: "="
+        right:
           node_type: number
           value: "2"
           loc:
@@ -84,6 +76,8 @@ children:
               line: 1
               column: 17
               offset: 17
+          leadings: []
+          trailings: []
         loc:
           start:
             line: 1
@@ -93,6 +87,8 @@ children:
             line: 1
             column: 17
             offset: 17
+        leadings: []
+        trailings: []
     loc:
       start:
         line: 1
@@ -102,6 +98,8 @@ children:
         line: 1
         column: 17
         offset: 17
+    leadings: []
+    trailings: []
 loc:
   start:
     line: 1
@@ -111,3 +109,5 @@ loc:
     line: 1
     column: 18
     offset: 18
+leadings: []
+trailings: []

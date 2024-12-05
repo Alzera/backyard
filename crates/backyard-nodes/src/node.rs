@@ -147,28 +147,28 @@ pub enum BodyType {
   Empty,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
 pub struct RangeLocation {
   pub start: Location,
   pub end: Location,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
 pub struct Location {
   pub line: usize,
   pub column: usize,
   pub offset: usize,
 }
 
-#[derive(Debug, Clone, Serialize, TS)]
+#[derive(Debug, Clone, PartialEq, Serialize, TS)]
 #[ts(export)]
 pub struct Node {
-  pub leadings: Vec<Box<Node>>,
-  pub trailings: Vec<Box<Node>>,
   pub node_type: NodeType,
   #[serde(flatten)]
   pub node: NodeWrapper,
   pub loc: Option<RangeLocation>,
+  pub leadings: Vec<Box<Node>>,
+  pub trailings: Vec<Box<Node>>,
 }
 
 impl<'de> Deserialize<'de> for Node {
@@ -286,7 +286,6 @@ impl<'de> Deserialize<'de> for Node {
               serde_json::from_value(node_data).map(NodeWrapper::DoWhileCondition)
             }
             NodeType::Echo => { serde_json::from_value(node_data).map(NodeWrapper::Echo) }
-            NodeType::Elvis => { serde_json::from_value(node_data).map(NodeWrapper::Elvis) }
             NodeType::Else => { serde_json::from_value(node_data).map(NodeWrapper::Else) }
             NodeType::Encapsed => { serde_json::from_value(node_data).map(NodeWrapper::Encapsed) }
             NodeType::EncapsedPart => {
@@ -309,9 +308,6 @@ impl<'de> Deserialize<'de> for Node {
             NodeType::If => { serde_json::from_value(node_data).map(NodeWrapper::If) }
             NodeType::Include => { serde_json::from_value(node_data).map(NodeWrapper::Include) }
             NodeType::Inline => { serde_json::from_value(node_data).map(NodeWrapper::Inline) }
-            NodeType::InstanceOf => {
-              serde_json::from_value(node_data).map(NodeWrapper::InstanceOf)
-            }
             NodeType::Interface => { serde_json::from_value(node_data).map(NodeWrapper::Interface) }
             NodeType::IntersectionType => {
               serde_json::from_value(node_data).map(NodeWrapper::IntersectionType)
@@ -397,7 +393,7 @@ impl<'de> Deserialize<'de> for Node {
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
 #[serde(untagged)]
 pub enum NodeWrapper {
   AnonymousClass(AnonymousClassNode),
@@ -434,7 +430,6 @@ pub enum NodeWrapper {
   DoWhileCondition(DoWhileConditionNode),
   Echo(EchoNode),
   Else(ElseNode),
-  Elvis(ElvisNode),
   Encapsed(EncapsedNode),
   EncapsedPart(EncapsedPartNode),
   Enum(EnumNode),
@@ -452,7 +447,6 @@ pub enum NodeWrapper {
   If(IfNode),
   Include(IncludeNode),
   Inline(InlineNode),
-  InstanceOf(InstanceOfNode),
   Interface(InterfaceNode),
   IntersectionType(IntersectionTypeNode),
   Label(LabelNode),
@@ -543,7 +537,6 @@ pub enum NodeType {
   DoWhileCondition,
   Echo,
   Else,
-  Elvis,
   Encapsed,
   EncapsedPart,
   Enum,
@@ -561,7 +554,6 @@ pub enum NodeType {
   If,
   Include,
   Inline,
-  InstanceOf,
   Interface,
   IntersectionType,
   Label,
@@ -616,7 +608,7 @@ pub enum NodeType {
 
 macro_rules! new_node {
   ($node_type:ident, $struct_name:ident { $($field_name:ident: $field_type:ty),* $(,)? }) => {
-    #[derive(Debug, Clone, Serialize, Deserialize, TS)]
+    #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
     #[ts(export)]
     pub struct $struct_name {
       $(pub $field_name: $field_type),*
@@ -776,10 +768,6 @@ new_node!(Else, ElseNode {
   body: Box<Node>,
   is_short: bool,
 });
-new_node!(Elvis, ElvisNode {
-  left: Box<Node>,
-  right: Box<Node>,
-});
 new_node!(Encapsed, EncapsedNode {
   quote: Quote,
   values: Vec<Box<Node>>,
@@ -854,10 +842,6 @@ new_node!(Include, IncludeNode {
 });
 new_node!(Inline, InlineNode {
   text: String,
-});
-new_node!(InstanceOf, InstanceOfNode {
-  left: Box<Node>,
-  right: Box<Node>,
 });
 new_node!(Interface, InterfaceNode {
   name: Box<Node>,

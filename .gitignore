@@ -197,5 +197,5 @@ Cargo.lock
 *.node
 
 test-run/
-tarpaulin-report.html
 *.snap.new
+*.profraw

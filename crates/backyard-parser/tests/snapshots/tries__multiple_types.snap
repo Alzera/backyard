@@ -1,0 +1,99 @@
+---
+source: crates/backyard-parser/tests/tries.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: try
+    body:
+      node_type: block
+      statements: []
+      loc:
+        start:
+          line: 1
+          column: 4
+          offset: 4
+        end:
+          line: 2
+          column: 0
+          offset: 6
+      leadings: []
+      trailings: []
+    catches:
+      - node_type: catch
+        types:
+          - node_type: identifier
+            name: UnknownGetterException
+            loc:
+              start:
+                line: 2
+                column: 9
+                offset: 15
+              end:
+                line: 2
+                column: 31
+                offset: 37
+            leadings: []
+            trailings: []
+          - node_type: identifier
+            name: ReflectionException
+            loc:
+              start:
+                line: 2
+                column: 34
+                offset: 40
+              end:
+                line: 2
+                column: 53
+                offset: 59
+            leadings: []
+            trailings: []
+        variable: ~
+        body:
+          node_type: block
+          statements: []
+          loc:
+            start:
+              line: 2
+              column: 55
+              offset: 61
+            end:
+              line: 3
+              column: 0
+              offset: 63
+          leadings: []
+          trailings: []
+        loc:
+          start:
+            line: 2
+            column: 2
+            offset: 8
+          end:
+            line: 3
+            column: 0
+            offset: 63
+        leadings: []
+        trailings: []
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 3
+        column: 0
+        offset: 63
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 3
+    column: 0
+    offset: 63
+leadings: []
+trailings: []

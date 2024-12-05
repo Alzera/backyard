@@ -1,0 +1,166 @@
+---
+source: crates/backyard-parser/tests/list.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: assignment
+    left:
+      node_type: list
+      items:
+        - node_type: variable
+          name:
+            node_type: identifier
+            name: a
+            loc:
+              start:
+                line: 1
+                column: 5
+                offset: 5
+              end:
+                line: 1
+                column: 6
+                offset: 6
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 1
+              column: 5
+              offset: 5
+            end:
+              line: 1
+              column: 6
+              offset: 6
+          leadings: []
+          trailings: []
+        - node_type: variable
+          name:
+            node_type: identifier
+            name: b
+            loc:
+              start:
+                line: 1
+                column: 9
+                offset: 9
+              end:
+                line: 1
+                column: 10
+                offset: 10
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 1
+              column: 9
+              offset: 9
+            end:
+              line: 1
+              column: 10
+              offset: 10
+          leadings: []
+          trailings: []
+      loc:
+        start:
+          line: 1
+          column: 0
+          offset: 0
+        end:
+          line: 1
+          column: 11
+          offset: 11
+      leadings: []
+      trailings: []
+    operator: "="
+    right:
+      node_type: array
+      is_short: true
+      items:
+        - node_type: array_item
+          key: ~
+          value:
+            node_type: number
+            value: "0"
+            loc:
+              start:
+                line: 1
+                column: 16
+                offset: 16
+              end:
+                line: 1
+                column: 16
+                offset: 16
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 1
+              column: 16
+              offset: 16
+            end:
+              line: 1
+              column: 16
+              offset: 16
+          leadings: []
+          trailings: []
+        - node_type: array_item
+          key: ~
+          value:
+            node_type: number
+            value: "1"
+            loc:
+              start:
+                line: 1
+                column: 19
+                offset: 19
+              end:
+                line: 1
+                column: 19
+                offset: 19
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 1
+              column: 19
+              offset: 19
+            end:
+              line: 1
+              column: 19
+              offset: 19
+          leadings: []
+          trailings: []
+      loc:
+        start:
+          line: 1
+          column: 15
+          offset: 15
+        end:
+          line: 1
+          column: 20
+          offset: 20
+      leadings: []
+      trailings: []
+    loc:
+      start:
+        line: 1
+        column: 13
+        offset: 13
+      end:
+        line: 1
+        column: 20
+        offset: 20
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 1
+    column: 21
+    offset: 21
+leadings: []
+trailings: []

@@ -107,8 +107,7 @@ impl ArgumentParser {
           None
         }
       } else {
-        parser.position -= name.size;
-        None
+        return Err(ParserError::internal("Argument", args));
       };
       let value = guard!(
         parser.get_statement(

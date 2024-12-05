@@ -3,17 +3,11 @@ source: crates/backyard-parser/tests/consts.rs
 expression: asts
 snapshot_kind: text
 ---
-leadings: []
-trailings: []
 node_type: program
 children:
-  - leadings: []
-    trailings: []
-    node_type: class
+  - node_type: class
     inheritance: ~
     name:
-      leadings: []
-      trailings: []
       node_type: identifier
       name: A
       loc:
@@ -25,67 +19,20 @@ children:
           line: 1
           column: 7
           offset: 7
+      leadings: []
+      trailings: []
     extends: ~
     implements: []
     body:
-      leadings: []
-      trailings: []
       node_type: block
       statements:
-        - leadings: []
-          trailings: []
-          node_type: const_property
-          visibility: ~
+        - node_type: const_property
+          visibility: Public
           items:
-            - leadings: []
-              trailings: []
-              node_type: assignment
+            - node_type: assignment
               left:
-                leadings: []
-                trailings: []
                 node_type: identifier
                 name: A
-                loc:
-                  start:
-                    line: 1
-                    column: 16
-                    offset: 16
-                  end:
-                    line: 1
-                    column: 17
-                    offset: 17
-              operator: "="
-              right:
-                leadings: []
-                trailings: []
-                node_type: number
-                value: "1"
-                loc:
-                  start:
-                    line: 1
-                    column: 20
-                    offset: 20
-                  end:
-                    line: 1
-                    column: 20
-                    offset: 20
-              loc:
-                start:
-                  line: 1
-                  column: 18
-                  offset: 18
-                end:
-                  line: 1
-                  column: 20
-                  offset: 20
-            - leadings: []
-              trailings: []
-              node_type: assignment
-              left:
-                leadings: []
-                trailings: []
-                node_type: identifier
-                name: B
                 loc:
                   start:
                     line: 1
@@ -95,12 +42,12 @@ children:
                     line: 1
                     column: 24
                     offset: 24
-              operator: "="
-              right:
                 leadings: []
                 trailings: []
+              operator: "="
+              right:
                 node_type: number
-                value: "2"
+                value: "1"
                 loc:
                   start:
                     line: 1
@@ -110,6 +57,8 @@ children:
                     line: 1
                     column: 27
                     offset: 27
+                leadings: []
+                trailings: []
               loc:
                 start:
                   line: 1
@@ -119,6 +68,49 @@ children:
                   line: 1
                   column: 27
                   offset: 27
+              leadings: []
+              trailings: []
+            - node_type: assignment
+              left:
+                node_type: identifier
+                name: B
+                loc:
+                  start:
+                    line: 1
+                    column: 30
+                    offset: 30
+                  end:
+                    line: 1
+                    column: 31
+                    offset: 31
+                leadings: []
+                trailings: []
+              operator: "="
+              right:
+                node_type: number
+                value: "2"
+                loc:
+                  start:
+                    line: 1
+                    column: 34
+                    offset: 34
+                  end:
+                    line: 1
+                    column: 34
+                    offset: 34
+                leadings: []
+                trailings: []
+              loc:
+                start:
+                  line: 1
+                  column: 32
+                  offset: 32
+                end:
+                  line: 1
+                  column: 34
+                  offset: 34
+              leadings: []
+              trailings: []
           loc:
             start:
               line: 1
@@ -126,8 +118,10 @@ children:
               offset: 10
             end:
               line: 1
-              column: 27
-              offset: 27
+              column: 34
+              offset: 34
+          leadings: []
+          trailings: []
       loc:
         start:
           line: 1
@@ -135,8 +129,10 @@ children:
           offset: 8
         end:
           line: 1
-          column: 30
-          offset: 30
+          column: 37
+          offset: 37
+      leadings: []
+      trailings: []
     is_readonly: false
     loc:
       start:
@@ -145,8 +141,10 @@ children:
         offset: 0
       end:
         line: 1
-        column: 30
-        offset: 30
+        column: 37
+        offset: 37
+    leadings: []
+    trailings: []
 loc:
   start:
     line: 1
@@ -154,5 +152,7 @@ loc:
     offset: 0
   end:
     line: 1
-    column: 30
-    offset: 30
+    column: 37
+    offset: 37
+leadings: []
+trailings: []

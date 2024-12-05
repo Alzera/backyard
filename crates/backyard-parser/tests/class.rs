@@ -32,6 +32,6 @@ fn parameter() {
 
 #[test]
 fn anonymous_extended() {
-  let asts = parse_eval("$a = new class($b) implements C, D {\n}").unwrap();
+  let asts = parse_eval("$a = new class($b) extends B implements C, D {\n}").unwrap();
   insta::assert_yaml_snapshot!(asts);
 }

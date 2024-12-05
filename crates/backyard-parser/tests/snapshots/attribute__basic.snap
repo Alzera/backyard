@@ -1,0 +1,89 @@
+---
+source: crates/backyard-parser/tests/attribute.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: class
+    inheritance: ~
+    name:
+      node_type: identifier
+      name: A
+      loc:
+        start:
+          line: 2
+          column: 6
+          offset: 14
+        end:
+          line: 2
+          column: 7
+          offset: 15
+      leadings: []
+      trailings: []
+    extends: ~
+    implements: []
+    body:
+      node_type: block
+      statements: []
+      loc:
+        start:
+          line: 2
+          column: 8
+          offset: 16
+        end:
+          line: 3
+          column: 0
+          offset: 18
+      leadings: []
+      trailings: []
+    is_readonly: false
+    loc:
+      start:
+        line: 2
+        column: 0
+        offset: 8
+      end:
+        line: 3
+        column: 0
+        offset: 18
+    leadings:
+      - node_type: attribute
+        items:
+          - node_type: attribute_item
+            name: Attr
+            arguments: []
+            loc:
+              start:
+                line: 1
+                column: 2
+                offset: 2
+              end:
+                line: 1
+                column: 2
+                offset: 2
+            leadings: []
+            trailings: []
+        loc:
+          start:
+            line: 1
+            column: 0
+            offset: 0
+          end:
+            line: 3
+            column: 0
+            offset: 18
+        leadings: []
+        trailings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 3
+    column: 0
+    offset: 18
+leadings: []
+trailings: []

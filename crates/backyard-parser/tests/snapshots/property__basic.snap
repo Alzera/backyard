@@ -1,0 +1,243 @@
+---
+source: crates/backyard-parser/tests/property.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: class
+    inheritance: ~
+    name:
+      node_type: identifier
+      name: A
+      loc:
+        start:
+          line: 1
+          column: 6
+          offset: 6
+        end:
+          line: 1
+          column: 7
+          offset: 7
+      leadings: []
+      trailings: []
+    extends: ~
+    implements: []
+    body:
+      node_type: block
+      statements:
+        - node_type: property
+          visibility: Protected
+          modifier: Static
+          items:
+            - node_type: property_item
+              name:
+                node_type: identifier
+                name: a
+                loc:
+                  start:
+                    line: 2
+                    column: 26
+                    offset: 36
+                  end:
+                    line: 2
+                    column: 27
+                    offset: 37
+                leadings: []
+                trailings: []
+              variable_type:
+                node_type: type
+                is_nullable: true
+                name: A
+                loc:
+                  start:
+                    line: 2
+                    column: 23
+                    offset: 33
+                  end:
+                    line: 2
+                    column: 25
+                    offset: 35
+                leadings: []
+                trailings: []
+              value:
+                node_type: number
+                value: "4"
+                loc:
+                  start:
+                    line: 2
+                    column: 31
+                    offset: 41
+                  end:
+                    line: 2
+                    column: 31
+                    offset: 41
+                leadings: []
+                trailings: []
+              loc:
+                start:
+                  line: 2
+                  column: 26
+                  offset: 36
+                end:
+                  line: 2
+                  column: 31
+                  offset: 41
+              leadings: []
+              trailings: []
+          loc:
+            start:
+              line: 2
+              column: 2
+              offset: 12
+            end:
+              line: 2
+              column: 32
+              offset: 42
+          leadings: []
+          trailings: []
+        - node_type: property
+          visibility: Public
+          modifier: Readonly
+          items:
+            - node_type: property_item
+              name:
+                node_type: identifier
+                name: b
+                loc:
+                  start:
+                    line: 3
+                    column: 34
+                    offset: 78
+                  end:
+                    line: 3
+                    column: 35
+                    offset: 79
+                leadings: []
+                trailings: []
+              variable_type:
+                node_type: union_type
+                types:
+                  - node_type: type
+                    is_nullable: false
+                    name: A
+                    loc:
+                      start:
+                        line: 3
+                        column: 18
+                        offset: 62
+                      end:
+                        line: 3
+                        column: 19
+                        offset: 63
+                    leadings: []
+                    trailings: []
+                  - node_type: type
+                    is_nullable: false
+                    name: callable
+                    loc:
+                      start:
+                        line: 3
+                        column: 20
+                        offset: 64
+                      end:
+                        line: 3
+                        column: 28
+                        offset: 72
+                    leadings: []
+                    trailings: []
+                  - node_type: type
+                    is_nullable: false
+                    name: "null"
+                    loc:
+                      start:
+                        line: 3
+                        column: 29
+                        offset: 73
+                      end:
+                        line: 3
+                        column: 33
+                        offset: 77
+                    leadings: []
+                    trailings: []
+                loc:
+                  start:
+                    line: 3
+                    column: 19
+                    offset: 63
+                  end:
+                    line: 3
+                    column: 33
+                    offset: 77
+                leadings: []
+                trailings: []
+              value:
+                node_type: number
+                value: "4"
+                loc:
+                  start:
+                    line: 3
+                    column: 39
+                    offset: 83
+                  end:
+                    line: 3
+                    column: 39
+                    offset: 83
+                leadings: []
+                trailings: []
+              loc:
+                start:
+                  line: 3
+                  column: 34
+                  offset: 78
+                end:
+                  line: 3
+                  column: 39
+                  offset: 83
+              leadings: []
+              trailings: []
+          loc:
+            start:
+              line: 3
+              column: 2
+              offset: 46
+            end:
+              line: 3
+              column: 40
+              offset: 84
+          leadings: []
+          trailings: []
+      loc:
+        start:
+          line: 1
+          column: 8
+          offset: 8
+        end:
+          line: 4
+          column: 0
+          offset: 86
+      leadings: []
+      trailings: []
+    is_readonly: false
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 4
+        column: 0
+        offset: 86
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 4
+    column: 0
+    offset: 86
+leadings: []
+trailings: []

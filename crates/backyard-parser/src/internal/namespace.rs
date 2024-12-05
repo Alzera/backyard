@@ -36,7 +36,7 @@ impl NamespaceParser {
       let is_bracket = if let Some(t) = parser.tokens.get(parser.position) {
         t.token_type == TokenType::LeftCurlyBracket
       } else {
-        false
+        return Err(ParserError::internal("Namespace", args));
       };
       let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
       if is_bracket {

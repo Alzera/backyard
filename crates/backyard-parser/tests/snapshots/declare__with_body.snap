@@ -1,0 +1,126 @@
+---
+source: crates/backyard-parser/tests/declare.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: declare
+    arguments:
+      - node_type: declare_argument
+        name:
+          node_type: identifier
+          name: ticks
+          loc:
+            start:
+              line: 1
+              column: 8
+              offset: 8
+            end:
+              line: 1
+              column: 13
+              offset: 13
+          leadings: []
+          trailings: []
+        value:
+          node_type: number
+          value: "1"
+          loc:
+            start:
+              line: 1
+              column: 16
+              offset: 16
+            end:
+              line: 1
+              column: 16
+              offset: 16
+          leadings: []
+          trailings: []
+        loc:
+          start:
+            line: 1
+            column: 8
+            offset: 8
+          end:
+            line: 1
+            column: 16
+            offset: 16
+        leadings: []
+        trailings: []
+      - node_type: declare_argument
+        name:
+          node_type: identifier
+          name: ticks
+          loc:
+            start:
+              line: 1
+              column: 19
+              offset: 19
+            end:
+              line: 1
+              column: 24
+              offset: 24
+          leadings: []
+          trailings: []
+        value:
+          node_type: number
+          value: "1"
+          loc:
+            start:
+              line: 1
+              column: 27
+              offset: 27
+            end:
+              line: 1
+              column: 27
+              offset: 27
+          leadings: []
+          trailings: []
+        loc:
+          start:
+            line: 1
+            column: 19
+            offset: 19
+          end:
+            line: 1
+            column: 27
+            offset: 27
+        leadings: []
+        trailings: []
+    body:
+      node_type: block
+      statements: []
+      loc:
+        start:
+          line: 1
+          column: 30
+          offset: 30
+        end:
+          line: 2
+          column: 0
+          offset: 32
+      leadings: []
+      trailings: []
+    body_type: Basic
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 2
+        column: 0
+        offset: 32
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 2
+    column: 0
+    offset: 32
+leadings: []
+trailings: []

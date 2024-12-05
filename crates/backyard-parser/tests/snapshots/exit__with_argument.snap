@@ -1,0 +1,44 @@
+---
+source: crates/backyard-parser/tests/exit.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: exit
+    statement:
+      node_type: number
+      value: "0"
+      loc:
+        start:
+          line: 1
+          column: 5
+          offset: 5
+        end:
+          line: 1
+          column: 5
+          offset: 5
+      leadings: []
+      trailings: []
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 1
+        column: 6
+        offset: 6
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 1
+    column: 7
+    offset: 7
+leadings: []
+trailings: []

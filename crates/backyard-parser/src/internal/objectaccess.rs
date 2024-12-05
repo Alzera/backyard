@@ -36,7 +36,7 @@ impl ObjectAccessParser {
       let is_bracket = if let Some(next_token) = parser.tokens.get(parser.position) {
         next_token.token_type == TokenType::LeftCurlyBracket
       } else {
-        false
+        return Err(ParserError::internal("ObjectAccess", args));
       };
       let expr = if is_bracket {
         parser.position += 1;

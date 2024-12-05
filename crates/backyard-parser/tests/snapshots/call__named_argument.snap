@@ -3,18 +3,11 @@ source: crates/backyard-parser/tests/call.rs
 expression: asts
 snapshot_kind: text
 ---
-leadings: []
-trailings: []
 node_type: program
 children:
-  - leadings: []
-    trailings: []
-    node_type: call
+  - node_type: call
     name:
-      leadings: []
-      trailings: []
-      node_type: identifier
-      name: call
+      node_type: this
       loc:
         start:
           line: 1
@@ -22,98 +15,102 @@ children:
           offset: 0
         end:
           line: 1
-          column: 4
-          offset: 4
+          column: 0
+          offset: 0
+      leadings: []
+      trailings: []
     arguments:
-      - leadings: []
-        trailings: []
-        node_type: call_argument
+      - node_type: call_argument
         name:
-          leadings: []
-          trailings: []
           node_type: identifier
           name: a
           loc:
             start:
               line: 1
-              column: 5
-              offset: 5
-            end:
-              line: 1
               column: 6
               offset: 6
-        value:
+            end:
+              line: 1
+              column: 7
+              offset: 7
           leadings: []
           trailings: []
+        value:
           node_type: number
           value: "1"
           loc:
             start:
               line: 1
-              column: 8
-              offset: 8
+              column: 9
+              offset: 9
             end:
               line: 1
-              column: 8
-              offset: 8
+              column: 9
+              offset: 9
+          leadings: []
+          trailings: []
         loc:
           start:
             line: 1
-            column: 5
-            offset: 5
+            column: 6
+            offset: 6
           end:
             line: 1
-            column: 8
-            offset: 8
-      - leadings: []
+            column: 9
+            offset: 9
+        leadings: []
         trailings: []
-        node_type: call_argument
+      - node_type: call_argument
         name:
-          leadings: []
-          trailings: []
           node_type: identifier
           name: b
           loc:
             start:
               line: 1
-              column: 11
-              offset: 11
-            end:
-              line: 1
               column: 12
               offset: 12
-        value:
+            end:
+              line: 1
+              column: 13
+              offset: 13
           leadings: []
           trailings: []
+        value:
           node_type: number
           value: "2"
           loc:
             start:
               line: 1
-              column: 14
-              offset: 14
+              column: 15
+              offset: 15
             end:
               line: 1
-              column: 14
-              offset: 14
+              column: 15
+              offset: 15
+          leadings: []
+          trailings: []
         loc:
           start:
             line: 1
-            column: 11
-            offset: 11
+            column: 12
+            offset: 12
           end:
             line: 1
-            column: 14
-            offset: 14
+            column: 15
+            offset: 15
+        leadings: []
+        trailings: []
     loc:
       start:
         line: 1
-        column: 4
-        offset: 4
+        column: 5
+        offset: 5
       end:
         line: 1
-        column: 15
-        offset: 15
+        column: 16
+        offset: 16
+    leadings: []
+    trailings: []
 loc:
   start:
     line: 1
@@ -121,5 +118,7 @@ loc:
     offset: 0
   end:
     line: 1
-    column: 16
-    offset: 16
+    column: 17
+    offset: 17
+leadings: []
+trailings: []

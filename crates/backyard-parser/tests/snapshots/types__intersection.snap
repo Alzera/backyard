@@ -1,0 +1,146 @@
+---
+source: crates/backyard-parser/tests/types.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: class
+    inheritance: ~
+    name:
+      node_type: identifier
+      name: A
+      loc:
+        start:
+          line: 1
+          column: 6
+          offset: 6
+        end:
+          line: 1
+          column: 7
+          offset: 7
+      leadings: []
+      trailings: []
+    extends: ~
+    implements: []
+    body:
+      node_type: block
+      statements:
+        - node_type: property
+          visibility: Protected
+          modifier: ~
+          items:
+            - node_type: property_item
+              name:
+                node_type: identifier
+                name: currentHandler
+                loc:
+                  start:
+                    line: 2
+                    column: 20
+                    offset: 30
+                  end:
+                    line: 2
+                    column: 34
+                    offset: 44
+                leadings: []
+                trailings: []
+              variable_type:
+                node_type: intersection_type
+                types:
+                  - node_type: type
+                    is_nullable: false
+                    name: "\\A"
+                    loc:
+                      start:
+                        line: 2
+                        column: 14
+                        offset: 24
+                      end:
+                        line: 2
+                        column: 16
+                        offset: 26
+                    leadings: []
+                    trailings: []
+                  - node_type: type
+                    is_nullable: false
+                    name: "\\B"
+                    loc:
+                      start:
+                        line: 2
+                        column: 17
+                        offset: 27
+                      end:
+                        line: 2
+                        column: 19
+                        offset: 29
+                    leadings: []
+                    trailings: []
+                loc:
+                  start:
+                    line: 2
+                    column: 16
+                    offset: 26
+                  end:
+                    line: 2
+                    column: 19
+                    offset: 29
+                leadings: []
+                trailings: []
+              value: ~
+              loc:
+                start:
+                  line: 2
+                  column: 20
+                  offset: 30
+                end:
+                  line: 2
+                  column: 20
+                  offset: 30
+              leadings: []
+              trailings: []
+          loc:
+            start:
+              line: 2
+              column: 4
+              offset: 14
+            end:
+              line: 2
+              column: 35
+              offset: 45
+          leadings: []
+          trailings: []
+      loc:
+        start:
+          line: 1
+          column: 8
+          offset: 8
+        end:
+          line: 3
+          column: 0
+          offset: 47
+      leadings: []
+      trailings: []
+    is_readonly: false
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 3
+        column: 0
+        offset: 47
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 3
+    column: 0
+    offset: 47
+leadings: []
+trailings: []

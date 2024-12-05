@@ -8,7 +8,7 @@ fn basic() {
 
 #[test]
 fn named_argument() {
-  let asts = parse_eval("call(a: 1, b: 2);").unwrap();
+  let asts = parse_eval("$this(a: 1, b: 2);").unwrap();
   insta::assert_yaml_snapshot!(asts);
 }
 

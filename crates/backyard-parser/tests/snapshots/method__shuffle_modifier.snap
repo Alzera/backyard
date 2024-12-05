@@ -1,0 +1,108 @@
+---
+source: crates/backyard-parser/tests/method.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: class
+    inheritance: Abstract
+    name:
+      node_type: identifier
+      name: A
+      loc:
+        start:
+          line: 1
+          column: 15
+          offset: 15
+        end:
+          line: 1
+          column: 16
+          offset: 16
+      leadings: []
+      trailings: []
+    extends: ~
+    implements: []
+    body:
+      node_type: block
+      statements:
+        - node_type: method
+          visibility: Public
+          inheritance: Final
+          is_static: true
+          function:
+            node_type: function
+            is_ref: false
+            name:
+              node_type: identifier
+              name: b
+              loc:
+                start:
+                  line: 2
+                  column: 31
+                  offset: 50
+                end:
+                  line: 2
+                  column: 32
+                  offset: 51
+              leadings: []
+              trailings: []
+            parameters: []
+            return_type: ~
+            body: ~
+            loc:
+              start:
+                line: 2
+                column: 22
+                offset: 41
+              end:
+                line: 2
+                column: 33
+                offset: 52
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 2
+              column: 2
+              offset: 21
+            end:
+              line: 2
+              column: 33
+              offset: 52
+          leadings: []
+          trailings: []
+      loc:
+        start:
+          line: 1
+          column: 17
+          offset: 17
+        end:
+          line: 3
+          column: 0
+          offset: 55
+      leadings: []
+      trailings: []
+    is_readonly: false
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 3
+        column: 0
+        offset: 55
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 3
+    column: 0
+    offset: 55
+leadings: []
+trailings: []

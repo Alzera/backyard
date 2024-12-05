@@ -1,0 +1,126 @@
+---
+source: crates/backyard-parser/tests/foreach.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: foreach
+    source:
+      node_type: variable
+      name:
+        node_type: identifier
+        name: a
+        loc:
+          start:
+            line: 1
+            column: 9
+            offset: 9
+          end:
+            line: 1
+            column: 10
+            offset: 10
+        leadings: []
+        trailings: []
+      loc:
+        start:
+          line: 1
+          column: 9
+          offset: 9
+        end:
+          line: 1
+          column: 10
+          offset: 10
+      leadings: []
+      trailings: []
+    key:
+      node_type: variable
+      name:
+        node_type: identifier
+        name: b
+        loc:
+          start:
+            line: 1
+            column: 15
+            offset: 15
+          end:
+            line: 1
+            column: 16
+            offset: 16
+        leadings: []
+        trailings: []
+      loc:
+        start:
+          line: 1
+          column: 15
+          offset: 15
+        end:
+          line: 1
+          column: 16
+          offset: 16
+      leadings: []
+      trailings: []
+    value:
+      node_type: variable
+      name:
+        node_type: identifier
+        name: c
+        loc:
+          start:
+            line: 1
+            column: 21
+            offset: 21
+          end:
+            line: 1
+            column: 22
+            offset: 22
+        leadings: []
+        trailings: []
+      loc:
+        start:
+          line: 1
+          column: 21
+          offset: 21
+        end:
+          line: 1
+          column: 22
+          offset: 22
+      leadings: []
+      trailings: []
+    body:
+      node_type: block
+      statements: []
+      loc:
+        start:
+          line: 1
+          column: 24
+          offset: 24
+        end:
+          line: 2
+          column: 1
+          offset: 27
+      leadings: []
+      trailings: []
+    is_short: true
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 2
+        column: 1
+        offset: 27
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 2
+    column: 11
+    offset: 37
+leadings: []
+trailings: []

@@ -1,0 +1,165 @@
+---
+source: crates/backyard-parser/tests/switch.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: switch
+    condition:
+      node_type: variable
+      name:
+        node_type: identifier
+        name: a
+        loc:
+          start:
+            line: 1
+            column: 8
+            offset: 8
+          end:
+            line: 1
+            column: 9
+            offset: 9
+        leadings: []
+        trailings: []
+      loc:
+        start:
+          line: 1
+          column: 8
+          offset: 8
+        end:
+          line: 1
+          column: 9
+          offset: 9
+      leadings: []
+      trailings: []
+    body:
+      node_type: block
+      statements:
+        - node_type: case
+          condition:
+            node_type: number
+            value: "1"
+            loc:
+              start:
+                line: 2
+                column: 7
+                offset: 21
+              end:
+                line: 2
+                column: 7
+                offset: 21
+            leadings: []
+            trailings: []
+          body:
+            node_type: block
+            statements:
+              - node_type: break
+                statement: ~
+                loc:
+                  start:
+                    line: 3
+                    column: 4
+                    offset: 30
+                  end:
+                    line: 3
+                    column: 4
+                    offset: 30
+                leadings: []
+                trailings: []
+            loc:
+              start:
+                line: 2
+                column: 10
+                offset: 24
+              end:
+                line: 4
+                column: 2
+                offset: 39
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 2
+              column: 2
+              offset: 16
+            end:
+              line: 4
+              column: 2
+              offset: 39
+          leadings: []
+          trailings: []
+        - node_type: case
+          condition: ~
+          body:
+            node_type: block
+            statements:
+              - node_type: continue
+                statement: ~
+                loc:
+                  start:
+                    line: 6
+                    column: 4
+                    offset: 56
+                  end:
+                    line: 6
+                    column: 4
+                    offset: 56
+                leadings: []
+                trailings: []
+            loc:
+              start:
+                line: 6
+                column: 4
+                offset: 56
+              end:
+                line: 6
+                column: 12
+                offset: 64
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 5
+              column: 2
+              offset: 43
+            end:
+              line: 6
+              column: 12
+              offset: 64
+          leadings: []
+          trailings: []
+      loc:
+        start:
+          line: 1
+          column: 12
+          offset: 12
+        end:
+          line: 7
+          column: 0
+          offset: 66
+      leadings: []
+      trailings: []
+    is_short: false
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 7
+        column: 0
+        offset: 66
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 7
+    column: 0
+    offset: 66
+leadings: []
+trailings: []

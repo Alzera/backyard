@@ -1,0 +1,334 @@
+---
+source: crates/backyard-parser/tests/string.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: assignment
+    left:
+      node_type: variable
+      name:
+        node_type: identifier
+        name: a
+        loc:
+          start:
+            line: 1
+            column: 0
+            offset: 0
+          end:
+            line: 1
+            column: 1
+            offset: 1
+        leadings: []
+        trailings: []
+      loc:
+        start:
+          line: 1
+          column: 0
+          offset: 0
+        end:
+          line: 1
+          column: 1
+          offset: 1
+      leadings: []
+      trailings: []
+    operator: "="
+    right:
+      node_type: encapsed
+      quote: Double
+      values:
+        - node_type: encapsed_part
+          is_advanced: false
+          value:
+            node_type: string
+            quote: Single
+            value: " ini string $ \\\" \\$var "
+            loc:
+              start:
+                line: 1
+                column: 6
+                offset: 6
+              end:
+                line: 1
+                column: 29
+                offset: 29
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 1
+              column: 6
+              offset: 6
+            end:
+              line: 1
+              column: 29
+              offset: 29
+          leadings: []
+          trailings: []
+        - node_type: encapsed_part
+          is_advanced: false
+          value:
+            node_type: variable
+            name:
+              node_type: identifier
+              name: b
+              loc:
+                start:
+                  line: 1
+                  column: 29
+                  offset: 29
+                end:
+                  line: 1
+                  column: 30
+                  offset: 30
+              leadings: []
+              trailings: []
+            loc:
+              start:
+                line: 1
+                column: 29
+                offset: 29
+              end:
+                line: 1
+                column: 30
+                offset: 30
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 1
+              column: 29
+              offset: 29
+            end:
+              line: 1
+              column: 30
+              offset: 30
+          leadings: []
+          trailings: []
+        - node_type: encapsed_part
+          is_advanced: false
+          value:
+            node_type: string
+            quote: Single
+            value: " "
+            loc:
+              start:
+                line: 1
+                column: 31
+                offset: 31
+              end:
+                line: 1
+                column: 32
+                offset: 32
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 1
+              column: 31
+              offset: 31
+            end:
+              line: 1
+              column: 32
+              offset: 32
+          leadings: []
+          trailings: []
+        - node_type: encapsed_part
+          is_advanced: true
+          value:
+            node_type: variable
+            name:
+              node_type: bin
+              left:
+                node_type: string
+                quote: Double
+                value: ale
+                loc:
+                  start:
+                    line: 1
+                    column: 35
+                    offset: 35
+                  end:
+                    line: 1
+                    column: 35
+                    offset: 35
+                leadings: []
+                trailings: []
+              operator: "."
+              right:
+                node_type: number
+                value: "5"
+                loc:
+                  start:
+                    line: 1
+                    column: 43
+                    offset: 43
+                  end:
+                    line: 1
+                    column: 43
+                    offset: 43
+                leadings: []
+                trailings: []
+              loc:
+                start:
+                  line: 1
+                  column: 41
+                  offset: 41
+                end:
+                  line: 1
+                  column: 43
+                  offset: 43
+              leadings: []
+              trailings: []
+            loc:
+              start:
+                line: 1
+                column: 33
+                offset: 33
+              end:
+                line: 1
+                column: 45
+                offset: 45
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 1
+              column: 32
+              offset: 32
+            end:
+              line: 1
+              column: 45
+              offset: 45
+          leadings: []
+          trailings: []
+        - node_type: encapsed_part
+          is_advanced: false
+          value:
+            node_type: string
+            quote: Single
+            value: " "
+            loc:
+              start:
+                line: 1
+                column: 46
+                offset: 46
+              end:
+                line: 1
+                column: 47
+                offset: 47
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 1
+              column: 46
+              offset: 46
+            end:
+              line: 1
+              column: 47
+              offset: 47
+          leadings: []
+          trailings: []
+        - node_type: encapsed_part
+          is_advanced: true
+          value:
+            node_type: variable
+            name:
+              node_type: identifier
+              name: a
+              loc:
+                start:
+                  line: 1
+                  column: 48
+                  offset: 48
+                end:
+                  line: 1
+                  column: 49
+                  offset: 49
+              leadings: []
+              trailings: []
+            loc:
+              start:
+                line: 1
+                column: 48
+                offset: 48
+              end:
+                line: 1
+                column: 49
+                offset: 49
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 1
+              column: 47
+              offset: 47
+            end:
+              line: 1
+              column: 50
+              offset: 50
+          leadings: []
+          trailings: []
+        - node_type: encapsed_part
+          is_advanced: false
+          value:
+            node_type: string
+            quote: Single
+            value: ""
+            loc:
+              start:
+                line: 1
+                column: 51
+                offset: 51
+              end:
+                line: 1
+                column: 51
+                offset: 51
+            leadings: []
+            trailings: []
+          loc:
+            start:
+              line: 1
+              column: 51
+              offset: 51
+            end:
+              line: 1
+              column: 51
+              offset: 51
+          leadings: []
+          trailings: []
+      loc:
+        start:
+          line: 1
+          column: 5
+          offset: 5
+        end:
+          line: 1
+          column: 51
+          offset: 51
+      leadings: []
+      trailings: []
+    loc:
+      start:
+        line: 1
+        column: 3
+        offset: 3
+      end:
+        line: 1
+        column: 51
+        offset: 51
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 1
+    column: 52
+    offset: 52
+leadings: []
+trailings: []

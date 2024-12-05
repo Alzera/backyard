@@ -1,0 +1,119 @@
+---
+source: crates/backyard-parser/tests/types.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: class
+    inheritance: ~
+    name:
+      node_type: identifier
+      name: A
+      loc:
+        start:
+          line: 1
+          column: 6
+          offset: 6
+        end:
+          line: 1
+          column: 7
+          offset: 7
+      leadings: []
+      trailings: []
+    extends: ~
+    implements: []
+    body:
+      node_type: block
+      statements:
+        - node_type: property
+          visibility: Protected
+          modifier: ~
+          items:
+            - node_type: property_item
+              name:
+                node_type: identifier
+                name: a
+                loc:
+                  start:
+                    line: 2
+                    column: 18
+                    offset: 28
+                  end:
+                    line: 2
+                    column: 19
+                    offset: 29
+                leadings: []
+                trailings: []
+              variable_type:
+                node_type: type
+                is_nullable: false
+                name: int
+                loc:
+                  start:
+                    line: 2
+                    column: 13
+                    offset: 23
+                  end:
+                    line: 2
+                    column: 16
+                    offset: 26
+                leadings: []
+                trailings: []
+              value: ~
+              loc:
+                start:
+                  line: 2
+                  column: 18
+                  offset: 28
+                end:
+                  line: 2
+                  column: 18
+                  offset: 28
+              leadings: []
+              trailings: []
+          loc:
+            start:
+              line: 2
+              column: 2
+              offset: 12
+            end:
+              line: 2
+              column: 20
+              offset: 30
+          leadings: []
+          trailings: []
+      loc:
+        start:
+          line: 1
+          column: 8
+          offset: 8
+        end:
+          line: 3
+          column: 0
+          offset: 32
+      leadings: []
+      trailings: []
+    is_readonly: false
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 3
+        column: 0
+        offset: 32
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 3
+    column: 0
+    offset: 32
+leadings: []
+trailings: []

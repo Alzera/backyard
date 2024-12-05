@@ -1,0 +1,46 @@
+---
+source: crates/backyard-parser/tests/namespace.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: namespace
+    name: "MyApp\\B"
+    body:
+      node_type: block
+      statements: []
+      loc:
+        start:
+          line: 1
+          column: 18
+          offset: 18
+        end:
+          line: 1
+          column: 19
+          offset: 19
+      leadings: []
+      trailings: []
+    is_bracket: true
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 1
+        column: 19
+        offset: 19
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 1
+    column: 19
+    offset: 19
+leadings: []
+trailings: []

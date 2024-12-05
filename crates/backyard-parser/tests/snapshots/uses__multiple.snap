@@ -1,0 +1,88 @@
+---
+source: crates/backyard-parser/tests/uses.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: use
+    name: ~
+    items:
+      - node_type: use_item
+        modifier: ~
+        name: "A\\B"
+        alias:
+          node_type: identifier
+          name: A
+          loc:
+            start:
+              line: 1
+              column: 11
+              offset: 11
+            end:
+              line: 1
+              column: 12
+              offset: 12
+          leadings: []
+          trailings: []
+        loc:
+          start:
+            line: 1
+            column: 4
+            offset: 4
+          end:
+            line: 1
+            column: 11
+            offset: 11
+        leadings: []
+        trailings: []
+      - node_type: use_item
+        modifier: ~
+        name: "B\\C"
+        alias:
+          node_type: identifier
+          name: B
+          loc:
+            start:
+              line: 1
+              column: 21
+              offset: 21
+            end:
+              line: 1
+              column: 22
+              offset: 22
+          leadings: []
+          trailings: []
+        loc:
+          start:
+            line: 1
+            column: 14
+            offset: 14
+          end:
+            line: 1
+            column: 21
+            offset: 21
+        leadings: []
+        trailings: []
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 1
+        column: 22
+        offset: 22
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 1
+    column: 22
+    offset: 22
+leadings: []
+trailings: []

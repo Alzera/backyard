@@ -17,3 +17,11 @@ fn with_key() {
   let asts = parse_eval("['a' => 1, 'b' => 2];").unwrap();
   insta::assert_yaml_snapshot!(asts);
 }
+
+#[test]
+fn complex() {
+  let asts = parse_eval(
+    "$a = [$key = (is_int($key) ? $value : $key) => $value === true ? $key : $value];"
+  ).unwrap();
+  insta::assert_yaml_snapshot!(asts);
+}

@@ -1,0 +1,103 @@
+---
+source: crates/backyard-parser/tests/uses.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: use
+    name: "App\\Models\\"
+    items:
+      - node_type: use_item
+        modifier: Const
+        name: "User\\UserTesting"
+        alias:
+          node_type: identifier
+          name: UserTestingA
+          loc:
+            start:
+              line: 2
+              column: 28
+              offset: 45
+            end:
+              line: 2
+              column: 40
+              offset: 57
+          leadings: []
+          trailings: []
+        loc:
+          start:
+            line: 2
+            column: 2
+            offset: 19
+          end:
+            line: 2
+            column: 28
+            offset: 45
+        leadings: []
+        trailings: []
+      - node_type: use_item
+        modifier: ~
+        name: "User\\UserTestingB"
+        alias:
+          node_type: identifier
+          name: UserTestingB
+          loc:
+            start:
+              line: 3
+              column: 23
+              offset: 82
+            end:
+              line: 3
+              column: 35
+              offset: 94
+          leadings: []
+          trailings: []
+        loc:
+          start:
+            line: 3
+            column: 2
+            offset: 61
+          end:
+            line: 3
+            column: 23
+            offset: 82
+        leadings: []
+        trailings: []
+      - node_type: use_item
+        modifier: Function
+        name: UserTestingC
+        alias: ~
+        loc:
+          start:
+            line: 4
+            column: 2
+            offset: 98
+          end:
+            line: 4
+            column: 11
+            offset: 107
+        leadings: []
+        trailings: []
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 5
+        column: 0
+        offset: 120
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 5
+    column: 1
+    offset: 121
+leadings: []
+trailings: []

@@ -1,0 +1,402 @@
+---
+source: crates/backyard-parser/tests/trait.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: trait
+    name:
+      node_type: identifier
+      name: B
+      loc:
+        start:
+          line: 1
+          column: 6
+          offset: 6
+        end:
+          line: 1
+          column: 7
+          offset: 7
+      leadings: []
+      trailings: []
+    body:
+      node_type: block
+      statements:
+        - node_type: trait_use
+          traits:
+            - node_type: identifier
+              name: Ale
+              loc:
+                start:
+                  line: 2
+                  column: 6
+                  offset: 16
+                end:
+                  line: 2
+                  column: 9
+                  offset: 19
+              leadings: []
+              trailings: []
+          adaptations: []
+          loc:
+            start:
+              line: 2
+              column: 2
+              offset: 12
+            end:
+              line: 2
+              column: 6
+              offset: 16
+          leadings: []
+          trailings: []
+        - node_type: trait_use
+          traits:
+            - node_type: identifier
+              name: Loggable
+              loc:
+                start:
+                  line: 3
+                  column: 6
+                  offset: 27
+                end:
+                  line: 3
+                  column: 14
+                  offset: 35
+              leadings: []
+              trailings: []
+            - node_type: identifier
+              name: Usable
+              loc:
+                start:
+                  line: 3
+                  column: 16
+                  offset: 37
+                end:
+                  line: 3
+                  column: 22
+                  offset: 43
+              leadings: []
+              trailings: []
+          adaptations:
+            - node_type: trait_use_alias
+              trait_name: ~
+              method:
+                node_type: identifier
+                name: log
+                loc:
+                  start:
+                    line: 4
+                    column: 4
+                    offset: 50
+                  end:
+                    line: 4
+                    column: 7
+                    offset: 53
+                leadings: []
+                trailings: []
+              alias:
+                node_type: identifier
+                name: alias
+                loc:
+                  start:
+                    line: 4
+                    column: 19
+                    offset: 65
+                  end:
+                    line: 4
+                    column: 24
+                    offset: 70
+                leadings: []
+                trailings: []
+              visibility: Private
+              loc:
+                start:
+                  line: 4
+                  column: 4
+                  offset: 50
+                end:
+                  line: 4
+                  column: 19
+                  offset: 65
+              leadings: []
+              trailings: []
+            - node_type: trait_use_alias
+              trait_name:
+                node_type: identifier
+                name: Loggable
+                loc:
+                  start:
+                    line: 5
+                    column: 4
+                    offset: 76
+                  end:
+                    line: 5
+                    column: 12
+                    offset: 84
+                leadings: []
+                trailings: []
+              method:
+                node_type: identifier
+                name: log
+                loc:
+                  start:
+                    line: 5
+                    column: 14
+                    offset: 86
+                  end:
+                    line: 5
+                    column: 17
+                    offset: 89
+                leadings: []
+                trailings: []
+              alias:
+                node_type: identifier
+                name: aliasLoggable
+                loc:
+                  start:
+                    line: 5
+                    column: 21
+                    offset: 93
+                  end:
+                    line: 5
+                    column: 34
+                    offset: 106
+                leadings: []
+                trailings: []
+              visibility: ~
+              loc:
+                start:
+                  line: 5
+                  column: 4
+                  offset: 76
+                end:
+                  line: 5
+                  column: 21
+                  offset: 93
+              leadings: []
+              trailings: []
+            - node_type: trait_use_precedence
+              trait_name:
+                node_type: identifier
+                name: Usable
+                loc:
+                  start:
+                    line: 6
+                    column: 4
+                    offset: 112
+                  end:
+                    line: 6
+                    column: 10
+                    offset: 118
+                leadings: []
+                trailings: []
+              method:
+                node_type: identifier
+                name: useResource
+                loc:
+                  start:
+                    line: 6
+                    column: 12
+                    offset: 120
+                  end:
+                    line: 6
+                    column: 23
+                    offset: 131
+                leadings: []
+                trailings: []
+              instead:
+                node_type: identifier
+                name: Loggable
+                loc:
+                  start:
+                    line: 6
+                    column: 34
+                    offset: 142
+                  end:
+                    line: 6
+                    column: 42
+                    offset: 150
+                leadings: []
+                trailings: []
+              loc:
+                start:
+                  line: 6
+                  column: 4
+                  offset: 112
+                end:
+                  line: 6
+                  column: 34
+                  offset: 142
+              leadings: []
+              trailings: []
+          loc:
+            start:
+              line: 3
+              column: 2
+              offset: 23
+            end:
+              line: 7
+              column: 2
+              offset: 154
+          leadings: []
+          trailings: []
+        - node_type: const_property
+          visibility: Public
+          items:
+            - node_type: assignment
+              left:
+                node_type: identifier
+                name: MY_CONST
+                loc:
+                  start:
+                    line: 8
+                    column: 15
+                    offset: 171
+                  end:
+                    line: 8
+                    column: 23
+                    offset: 179
+                leadings: []
+                trailings: []
+              operator: "="
+              right:
+                node_type: string
+                quote: Double
+                value: constant
+                loc:
+                  start:
+                    line: 8
+                    column: 26
+                    offset: 182
+                  end:
+                    line: 8
+                    column: 26
+                    offset: 182
+                leadings: []
+                trailings: []
+              loc:
+                start:
+                  line: 8
+                  column: 24
+                  offset: 180
+                end:
+                  line: 8
+                  column: 26
+                  offset: 182
+              leadings: []
+              trailings: []
+          loc:
+            start:
+              line: 8
+              column: 2
+              offset: 158
+            end:
+              line: 8
+              column: 26
+              offset: 182
+          leadings: []
+          trailings: []
+        - node_type: property
+          visibility: Public
+          modifier: Static
+          items:
+            - node_type: property_item
+              name:
+                node_type: identifier
+                name: instance
+                loc:
+                  start:
+                    line: 9
+                    column: 19
+                    offset: 213
+                  end:
+                    line: 9
+                    column: 27
+                    offset: 221
+                leadings: []
+                trailings: []
+              variable_type:
+                node_type: type
+                is_nullable: true
+                name: A
+                loc:
+                  start:
+                    line: 9
+                    column: 16
+                    offset: 210
+                  end:
+                    line: 9
+                    column: 18
+                    offset: 212
+                leadings: []
+                trailings: []
+              value:
+                node_type: number
+                value: "4"
+                loc:
+                  start:
+                    line: 9
+                    column: 31
+                    offset: 225
+                  end:
+                    line: 9
+                    column: 31
+                    offset: 225
+                leadings: []
+                trailings: []
+              loc:
+                start:
+                  line: 9
+                  column: 19
+                  offset: 213
+                end:
+                  line: 9
+                  column: 31
+                  offset: 225
+              leadings: []
+              trailings: []
+          loc:
+            start:
+              line: 9
+              column: 2
+              offset: 196
+            end:
+              line: 9
+              column: 32
+              offset: 226
+          leadings: []
+          trailings: []
+      loc:
+        start:
+          line: 1
+          column: 8
+          offset: 8
+        end:
+          line: 10
+          column: 0
+          offset: 228
+      leadings: []
+      trailings: []
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 10
+        column: 0
+        offset: 228
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 10
+    column: 0
+    offset: 228
+leadings: []
+trailings: []

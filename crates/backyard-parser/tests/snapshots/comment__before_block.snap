@@ -1,0 +1,73 @@
+---
+source: crates/backyard-parser/tests/comment.rs
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: if
+    condition:
+      node_type: boolean
+      is_true: false
+      loc:
+        start:
+          line: 1
+          column: 4
+          offset: 4
+        end:
+          line: 1
+          column: 4
+          offset: 4
+      leadings: []
+      trailings: []
+    valid:
+      node_type: block
+      statements: []
+      loc:
+        start:
+          line: 2
+          column: 0
+          offset: 19
+        end:
+          line: 3
+          column: 0
+          offset: 21
+      leadings:
+        - node_type: comment_line
+          comment: " test"
+          loc:
+            start:
+              line: 1
+              column: 11
+              offset: 11
+            end:
+              line: 1
+              column: 11
+              offset: 11
+          leadings: []
+          trailings: []
+      trailings: []
+    invalid: ~
+    is_short: false
+    loc:
+      start:
+        line: 1
+        column: 0
+        offset: 0
+      end:
+        line: 3
+        column: 0
+        offset: 21
+    leadings: []
+    trailings: []
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 3
+    column: 0
+    offset: 21
+leadings: []
+trailings: []

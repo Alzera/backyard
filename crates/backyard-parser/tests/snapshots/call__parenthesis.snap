@@ -3,27 +3,17 @@ source: crates/backyard-parser/tests/call.rs
 expression: asts
 snapshot_kind: text
 ---
-leadings: []
-trailings: []
 node_type: program
 children:
-  - leadings: []
-    trailings: []
-    node_type: call
+  - node_type: call
     name:
-      leadings: []
-      trailings: []
       node_type: parenthesis
       statement:
-        leadings: []
-        trailings: []
         node_type: arrow_function
         is_ref: false
         parameters: []
         return_type: ~
         body:
-          leadings: []
-          trailings: []
           node_type: number
           value: "5"
           loc:
@@ -35,6 +25,8 @@ children:
               line: 1
               column: 9
               offset: 9
+          leadings: []
+          trailings: []
         loc:
           start:
             line: 1
@@ -44,6 +36,8 @@ children:
             line: 1
             column: 9
             offset: 9
+        leadings: []
+        trailings: []
       loc:
         start:
           line: 1
@@ -53,6 +47,8 @@ children:
           line: 1
           column: 10
           offset: 10
+      leadings: []
+      trailings: []
     arguments: []
     loc:
       start:
@@ -63,6 +59,8 @@ children:
         line: 1
         column: 12
         offset: 12
+    leadings: []
+    trailings: []
 loc:
   start:
     line: 1
@@ -72,3 +70,5 @@ loc:
     line: 1
     column: 13
     offset: 13
+leadings: []
+trailings: []
