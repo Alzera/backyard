@@ -23,6 +23,7 @@ use super::{
   block::BlockParser,
   comment::CommentParser,
   identifier::IdentifierParser,
+  magic::MagicParser,
   types::TypesParser,
 };
 
@@ -171,12 +172,20 @@ impl FunctionParser {
     args: &LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, is_ref, name, _] = matched.as_slice() {
+      let mut is_contructor = false;
       let name = if let LookupResultWrapper::Any(name) = &name.wrapper {
-        name
+        if name.token_type == TokenType::MagicMethod {
+          if name.value == "__construct" {
+            is_contructor = true;
+          }
+          MagicParser::from_token(name)
+        } else {
+          IdentifierParser::from_token(name)
+        }
       } else {
         return Err(ParserError::internal("Function parse_basic 1", args));
       };
-      let arguments = if name.value == "__construct" {
+      let arguments = if is_contructor {
         parser.get_children(
           &mut LoopArgument::new(
             "function_construct_parameters",
@@ -206,7 +215,7 @@ impl FunctionParser {
       return Ok(
         FunctionNode::new(
           !is_ref.is_empty(),
-          IdentifierParser::from_token(name),
+          name,
           arguments,
           return_type,
           body,

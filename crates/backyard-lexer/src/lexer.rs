@@ -220,9 +220,32 @@ impl Lexer {
             "__METHOD__",
             "__NAMESPACE__",
             "__TRAIT__",
+            "__PROPERTY__",
           ].contains(&t.as_str())
         {
           Ok(vec![Token::new(TokenType::Magic, &t, snapshot)])
+        } else if
+          [
+            "__construct",
+            "__destruct",
+            "__call",
+            "__callStatic",
+            "__get",
+            "__set",
+            "__isset",
+            "__unset",
+            "__sleep",
+            "__wakeup",
+            "__serialize",
+            "__unserialize",
+            "__toString",
+            "__invoke",
+            "__set_state",
+            "__clone",
+            "__debugInfo",
+          ].contains(&t.as_str())
+        {
+          Ok(vec![Token::new(TokenType::MagicMethod, &t, snapshot)])
         } else if
           [
             // "array",

@@ -33,17 +33,22 @@ impl FunctionGenerator {
     if node.is_ref {
       builder.push("&");
     }
-    let name = cast_node!(NodeWrapper::Identifier, &node.name.node);
-    builder.push(&name.name);
-
-    let mut parameters = if name.name == "__construct" {
-      generator.generate_nodes_new(
-        &node.parameters,
-        &mut GeneratorArgument::for_parameter(
-          &[(NodeType::ConstructorParameter, Self::generate_constructor_parameter)]
+    let mut parameters = if node.name.node_type == NodeType::Magic {
+      let name = cast_node!(NodeWrapper::Magic, &node.name.node);
+      builder.push(&name.name);
+      if name.name == "__construct" {
+        generator.generate_nodes_new(
+          &node.parameters,
+          &mut GeneratorArgument::for_parameter(
+            &[(NodeType::ConstructorParameter, Self::generate_constructor_parameter)]
+          )
         )
-      )
+      } else {
+        Self::get_parameters(generator, &node.parameters)
+      }
     } else {
+      let name = cast_node!(NodeWrapper::Identifier, &node.name.node);
+      builder.push(&name.name);
       Self::get_parameters(generator, &node.parameters)
     };
     let (return_type, return_type_len) = Self::get_return_type(generator, &node.return_type);

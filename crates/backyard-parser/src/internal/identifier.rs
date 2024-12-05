@@ -22,9 +22,7 @@ impl IdentifierParser {
       })
     )
   }
-}
 
-impl IdentifierParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(tokens, &[Lookup::Equal(&[TokenType::Identifier, TokenType::Name])])
   }

@@ -1,9 +1,9 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, MagicNode };
+use backyard_nodes::node::{ Location, MagicNode, Node, RangeLocation };
 
 use crate::{
   error::ParserError,
-  parser::{ LoopArgument, Parser },
+  parser::{ LocationExtension, LocationHelper, LoopArgument, Parser },
   utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
@@ -11,8 +11,20 @@ use crate::{
 pub struct MagicParser;
 
 impl MagicParser {
+  pub fn from_token(id: &Token) -> Box<Node> {
+    let start_loc = id.get_location().unwrap();
+    let end_loc = start_loc.gen_end_loc(id.value.len());
+    MagicNode::new(
+      id.value.to_owned(),
+      Some(RangeLocation {
+        start: start_loc,
+        end: end_loc,
+      })
+    )
+  }
+
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Magic])])
+    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Magic, TokenType::MagicMethod])])
   }
 
   pub fn parse(
@@ -22,12 +34,9 @@ impl MagicParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [text] = matched.as_slice() {
-      let text = if let LookupResultWrapper::Equal(text) = &text.wrapper {
-        text.value.to_owned()
-      } else {
-        return Err(ParserError::internal("Magic", args));
+      if let LookupResultWrapper::Equal(text) = &text.wrapper {
+        return Ok(MagicNode::new(text.value.to_owned(), parser.gen_loc(start_loc)));
       };
-      return Ok(MagicNode::new(text, parser.gen_loc(start_loc)));
     }
     Err(ParserError::internal("Magic", args))
   }

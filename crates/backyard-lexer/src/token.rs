@@ -10,6 +10,7 @@ pub enum TokenType {
   Type,
   Identifier,
   Magic,
+  MagicMethod,
 
   NumberBinary,
   NumberHex,

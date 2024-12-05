@@ -35,3 +35,15 @@ fn main() {
     }
   }
 }
+
+// // property hook
+// public bool $virtualHook { &get => true; set($i) => $value; }
+// public string $fullName { get { return $this->firstName.' '.$this->lastName; } }
+
+// // flatten all FLAGS, add _SET and _GET
+// public private(set) mixed $publicPrivate;
+
+// // support type on const, make const item
+// const string FOO = 'foo';
+
+// // globalize argument and parameter

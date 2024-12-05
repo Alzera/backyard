@@ -7,6 +7,12 @@ fn magic() {
 }
 
 #[test]
+fn magic_method() {
+  let tokens = lex_eval("__construct").unwrap();
+  insta::assert_yaml_snapshot!(tokens);
+}
+
+#[test]
 fn type_test() {
   let tokens = lex_eval("int").unwrap();
   insta::assert_yaml_snapshot!(tokens);
