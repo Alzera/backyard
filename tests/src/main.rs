@@ -42,6 +42,4 @@ fn main() {
 
 // // globalize argument and parameter
 
-// // match_pattern should skip unexpected comments
-
 // unwrap, clone, to_string, Arc?

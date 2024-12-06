@@ -36,7 +36,7 @@ impl AttributeParser {
         &mut LoopArgument::new("attribute", args.separators, args.breakers, args.parsers)
       )?;
       if let Some(mut expr) = expr {
-        expr.leadings.insert(0, AttributeNode::new(items, parser.gen_loc(start_loc)));
+        expr.leadings.insert(0, AttributeNode::loc(items, parser.gen_loc(start_loc)));
         return Ok(expr);
       }
     }
@@ -74,7 +74,7 @@ impl AttributeItemParser {
       if !has_argument.is_empty() {
         arguments = CallParser::get_arguments(parser)?;
       }
-      return Ok(AttributeItemNode::new(name, arguments, parser.gen_loc(start_loc)));
+      return Ok(AttributeItemNode::loc(name, arguments, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

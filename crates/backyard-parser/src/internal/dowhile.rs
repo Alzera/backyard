@@ -25,7 +25,7 @@ impl DoWhileParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      let body = BlockParser::new(parser)?;
+      let body = BlockParser::new_block(parser)?;
       let condition = guard!(
         parser.get_statement(
           &mut LoopArgument::new(
@@ -40,7 +40,7 @@ impl DoWhileParser {
         )?
       );
       parser.position += 1;
-      return Ok(DoWhileNode::new(condition, body, parser.gen_loc(start_loc)));
+      return Ok(DoWhileNode::loc(condition, body, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }
@@ -69,7 +69,7 @@ impl DoWhileConditionParser {
           &mut LoopArgument::with_tokens("do_while_condition", &[], &[TokenType::RightParenthesis])
         )?
       );
-      return Ok(DoWhileConditionNode::new(condition, parser.gen_loc(start_loc)));
+      return Ok(DoWhileConditionNode::loc(condition, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

@@ -76,10 +76,10 @@ impl InterfaceParser {
         )
       )?;
       return Ok(
-        InterfaceNode::new(
+        InterfaceNode::loc(
           name,
           extends,
-          BlockNode::new(body, parser.gen_loc(block_loc)),
+          BlockNode::loc(body, parser.gen_loc(block_loc)),
           parser.gen_loc(start_loc)
         )
       );

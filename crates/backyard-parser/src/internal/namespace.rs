@@ -42,11 +42,11 @@ impl NamespaceParser {
       if is_bracket {
         parser.position += 1;
       }
-      let body = BlockNode::new(
+      let body = BlockNode::loc(
         parser.get_children(&mut LoopArgument::default("block_parser"))?,
         parser.gen_loc(block_loc)
       );
-      return Ok(NamespaceNode::new(name, body, is_bracket, parser.gen_loc(start_loc)));
+      return Ok(NamespaceNode::loc(name, body, is_bracket, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

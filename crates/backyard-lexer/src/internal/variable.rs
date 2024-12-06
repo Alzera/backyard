@@ -10,10 +10,10 @@ impl VariableToken {
     if let Some(next_char) = lexer.control.peek_char(None) {
       if next_char == '{' {
         lexer.control.next_char();
-        tokens.push(Token::new(TokenType::VariableBracketOpen, "${", snapshot));
+        tokens.push(Token::new(TokenType::VariableBracketOpen, "${".into(), snapshot));
         tokens.extend(lexer.next_tokens_until_right_bracket());
         tokens.push(
-          Token::new(TokenType::VariableBracketClose, "}", lexer.control.get_last_snapshot())
+          Token::new(TokenType::VariableBracketClose, "}".into(), lexer.control.get_last_snapshot())
         );
       } else {
         let t = lexer.control.next_char_until(|_, ch, _| !(ch.is_alphanumeric() || *ch == '_'));

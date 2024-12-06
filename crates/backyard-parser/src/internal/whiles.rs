@@ -39,7 +39,7 @@ impl WhileParser {
         &[TokenType::EndWhile],
         args
       )?;
-      return Ok(WhileNode::new(condition, body, is_short, parser.gen_loc(start_loc)));
+      return Ok(WhileNode::loc(condition, body, is_short, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

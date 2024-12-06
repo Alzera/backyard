@@ -58,9 +58,9 @@ impl TraitParser {
         )
       )?;
       return Ok(
-        TraitNode::new(
+        TraitNode::loc(
           name,
-          BlockNode::new(body, parser.gen_loc(block_loc)),
+          BlockNode::loc(body, parser.gen_loc(block_loc)),
           parser.gen_loc(start_loc)
         )
       );

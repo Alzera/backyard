@@ -45,7 +45,7 @@ impl MatchParser {
           ]
         )
       )?;
-      return Ok(MatchNode::new(condition, arms, parser.gen_loc(start_loc)));
+      return Ok(MatchNode::loc(condition, arms, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }
@@ -93,6 +93,6 @@ impl MatchArmParser {
         parser.position += 1;
       }
     }
-    Ok(MatchArmNode::new(conditions, body, parser.gen_loc(start_loc)))
+    Ok(MatchArmNode::loc(conditions, body, parser.gen_loc(start_loc)))
   }
 }

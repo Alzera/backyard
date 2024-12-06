@@ -60,7 +60,7 @@ impl UseParser {
           }
           items
         };
-        return Ok(UseNode::new(Some(name), items, parser.gen_loc(start_loc)));
+        return Ok(UseNode::loc(Some(name), items, parser.gen_loc(start_loc)));
       } else {
         let items = parser.get_children(
           &mut LoopArgument::new(
@@ -73,7 +73,7 @@ impl UseParser {
             ]
           )
         )?;
-        return Ok(UseNode::new(None, items, parser.gen_loc(start_loc)));
+        return Ok(UseNode::loc(None, items, parser.gen_loc(start_loc)));
       }
     }
     Err(ParserError::Internal)
@@ -109,7 +109,7 @@ impl UseItemParser {
           .map(|i| i.value.to_owned())
           .unwrap_or_default()
       } else {
-        "".to_owned()
+        "".into()
       };
       let modifier = UseItemModifier::try_parse(&modifier);
       let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
@@ -128,7 +128,7 @@ impl UseItemParser {
           }
         }
       }
-      return Ok(UseItemNode::new(modifier, name, alias, parser.gen_loc(start_loc)));
+      return Ok(UseItemNode::loc(modifier, name, alias, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

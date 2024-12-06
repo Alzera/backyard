@@ -31,7 +31,7 @@ impl PostParser {
         return Err(ParserError::Internal);
       };
       return Ok(
-        PostNode::new(
+        PostNode::loc(
           args.last_expr.to_owned().unwrap(),
           operator.value.to_owned(),
           parser.gen_loc(start_loc)

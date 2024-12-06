@@ -45,7 +45,7 @@ impl CallParser {
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       return Ok(
-        CallNode::new(
+        CallNode::loc(
           args.last_expr.to_owned().unwrap(),
           CallParser::get_arguments(parser)?,
           parser.gen_loc(start_loc)
@@ -118,7 +118,7 @@ impl ArgumentParser {
           )
         )?
       );
-      return Ok(CallArgumentNode::new(name, value, parser.gen_loc(start_loc)));
+      return Ok(CallArgumentNode::loc(name, value, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

@@ -76,7 +76,7 @@ impl EnumParser {
           ]
         )
       )?;
-      return Ok(EnumNode::new(name, enum_type, implements, items, parser.gen_loc(start_loc)));
+      return Ok(EnumNode::loc(name, enum_type, implements, items, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }
@@ -106,7 +106,7 @@ impl EnumItemParser {
           )
         )?
       {
-        return Ok(EnumItemNode::new(value, parser.gen_loc(start_loc)));
+        return Ok(EnumItemNode::loc(value, parser.gen_loc(start_loc)));
       }
     }
     Err(ParserError::Internal)

@@ -34,7 +34,7 @@ impl ArrayParser {
             let loc = i.loc.to_owned();
             i.leadings = vec![];
             i.trailings = vec![];
-            let mut a = ArrayItemNode::new(None, i, loc);
+            let mut a = ArrayItemNode::loc(None, i, loc);
             a.leadings = leadings;
             a.trailings = trailings;
             a
@@ -64,7 +64,7 @@ impl ArrayParser {
       1 => {
         if let [_] = matched.as_slice() {
           return Ok(
-            ArrayNode::new(
+            ArrayNode::loc(
               true,
               ArrayParser::get_values(parser, TokenType::RightSquareBracket)?,
               parser.gen_loc(start_loc)
@@ -75,7 +75,7 @@ impl ArrayParser {
       2 => {
         if let [_, _] = matched.as_slice() {
           return Ok(
-            ArrayNode::new(
+            ArrayNode::loc(
               false,
               ArrayParser::get_values(parser, TokenType::RightParenthesis)?,
               parser.gen_loc(start_loc)
@@ -110,7 +110,7 @@ impl ArrayItemParser {
         )?
       );
       let key = args.last_expr.to_owned();
-      return Ok(ArrayItemNode::new(key, value, parser.gen_loc(start_loc)));
+      return Ok(ArrayItemNode::loc(key, value, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

@@ -68,7 +68,7 @@ impl ForeachParser {
         &[TokenType::EndForeach],
         args
       )?;
-      return Ok(ForeachNode::new(source, key, value, body, is_short, parser.gen_loc(start_loc)));
+      return Ok(ForeachNode::loc(source, key, value, body, is_short, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

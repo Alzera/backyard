@@ -42,7 +42,7 @@ impl TernaryParser {
           )
         )?
       );
-      return Ok(TernaryNode::new(left, valid, invalid, parser.gen_loc(start_loc)));
+      return Ok(TernaryNode::loc(left, valid, invalid, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

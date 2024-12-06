@@ -9,15 +9,15 @@ use backyard_nodes::node::{ Location, Node, ProgramNode, RangeLocation };
 use error::ParserError;
 use parser::{ LocationHelper, LoopArgument, Parser };
 
-pub fn parse(input: &str) -> Result<Box<Node>, ParserError> {
+pub fn parse(input: &str) -> Result<Node, ParserError> {
   parse_base(lex(input))
 }
 
-pub fn parse_eval(input: &str) -> Result<Box<Node>, ParserError> {
+pub fn parse_eval(input: &str) -> Result<Node, ParserError> {
   parse_base(lex_eval(input))
 }
 
-fn parse_base(tokens: Result<Vec<Token>, LexError>) -> Result<Box<Node>, ParserError> {
+fn parse_base(tokens: Result<Vec<Token>, LexError>) -> Result<Node, ParserError> {
   match tokens {
     Ok(tokens) => {
       if tokens.is_empty() {
@@ -25,14 +25,14 @@ fn parse_base(tokens: Result<Vec<Token>, LexError>) -> Result<Box<Node>, ParserE
       }
       let mut parser = Parser::new(&tokens);
       let parsed = parser.get_children(&mut LoopArgument::default("main"))?;
-      let wrapped = ProgramNode::new(
+      let wrapped = ProgramNode::loc(
         parsed,
         Some(RangeLocation {
           start: Location { line: 1, column: 0, offset: 0 },
           end: tokens.last().unwrap().get_location().unwrap(),
         })
       );
-      Ok(wrapped)
+      Ok(*wrapped)
     }
     Err(err) => Err(ParserError::LexError(err)),
   }

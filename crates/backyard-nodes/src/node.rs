@@ -1,10 +1,9 @@
 use std::fmt::{ self, Display, Formatter };
 
+use compact_str::CompactString;
 use serde::{ de::{ self, MapAccess, Visitor }, Deserialize, Deserializer, Serialize };
-use ts_rs::TS;
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub enum UseItemModifier {
   Function,
   Const,
@@ -29,8 +28,7 @@ impl Display for UseItemModifier {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub enum Modifier {
   Static,
   Readonly,
@@ -55,8 +53,7 @@ impl Display for Modifier {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub enum Quote {
   Single,
   Double,
@@ -84,8 +81,7 @@ impl Display for Quote {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub enum Inheritance {
   Abstract,
   Final,
@@ -110,8 +106,7 @@ impl Display for Inheritance {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub enum Visibility {
   Public,
   PublicGet,
@@ -157,29 +152,27 @@ impl Display for Visibility {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub enum BodyType {
   Basic,
   Short,
   Empty,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct RangeLocation {
   pub start: Location,
   pub end: Location,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Location {
   pub line: usize,
   pub column: usize,
   pub offset: usize,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct Node {
   pub node_type: NodeType,
   #[serde(flatten)]
@@ -414,7 +407,7 @@ impl<'de> Deserialize<'de> for Node {
   }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum NodeWrapper {
   AnonymousClass(AnonymousClassNode),
@@ -521,8 +514,7 @@ pub enum NodeWrapper {
   YieldFrom(YieldFromNode),
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum NodeType {
   AnonymousClass,
@@ -631,13 +623,26 @@ pub enum NodeType {
 
 macro_rules! new_node {
   ($node_type:ident, $struct_name:ident { $($field_name:ident: $field_type:ty),* $(,)? }) => {
-    #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
-    #[ts(export)]
+    #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
     pub struct $struct_name {
       $(pub $field_name: $field_type),*
     }
     impl $struct_name {
-      pub fn new($($field_name: $field_type,)* loc: Option<RangeLocation>) -> Box<Node> {
+      pub fn make($($field_name: $field_type),*) -> Box<Node> {
+        Box::new(
+          Node {
+            leadings: vec![],
+            trailings: vec![],
+            node_type: NodeType::$node_type,
+            node: NodeWrapper::$node_type(
+              Self { $($field_name),* }
+            ),
+            loc: None
+          }
+        )
+      }
+
+      pub fn loc($($field_name: $field_type,)* loc: Option<RangeLocation>) -> Box<Node> {
         Box::new(
           Node {
             leadings: vec![],
@@ -691,19 +696,19 @@ new_node!(ArrowFunction, ArrowFunctionNode {
 });
 new_node!(Assignment, AssignmentNode {
   left: Box<Node>,
-  operator: String,
+  operator: CompactString,
   right: Box<Node>,
 });
 new_node!(Attribute, AttributeNode {
   items: Vec<Box<Node>>,
 });
 new_node!(AttributeItem, AttributeItemNode {
-  name: String,
+  name: CompactString,
   arguments: Vec<Box<Node>>,
 });
 new_node!(Bin, BinNode {
   left: Box<Node>,
-  operator: String,
+  operator: CompactString,
   right: Box<Node>,
 });
 new_node!(Block, BlockNode {
@@ -724,7 +729,7 @@ new_node!(Case, CaseNode {
   body: Box<Node>,
 });
 new_node!(Cast, CastNode {
-  cast_type: String,
+  cast_type: CompactString,
   expression: Box<Node>,
 });
 new_node!(Catch, CatchNode {
@@ -745,13 +750,13 @@ new_node!(Clone, CloneNode {
   statement: Box<Node>,
 });
 new_node!(CommentBlock, CommentBlockNode {
-  comment: String,
+  comment: CompactString,
 });
 new_node!(CommentDoc, CommentDocNode {
-  comment: String,
+  comment: CompactString,
 });
 new_node!(CommentLine, CommentLineNode {
-  comment: String,
+  comment: CompactString,
 });
 new_node!(Const, ConstNode {
   items: Vec<Box<Node>>,
@@ -846,11 +851,11 @@ new_node!(Goto, GotoNode {
   label: Box<Node>,
 });
 new_node!(HereDoc, HereDocNode {
-  label: String,
+  label: CompactString,
   values: Vec<Box<Node>>,
 });
 new_node!(Identifier, IdentifierNode {
-  name: String,
+  name: CompactString,
 });
 new_node!(If, IfNode {
   condition: Box<Node>,
@@ -865,7 +870,7 @@ new_node!(Include, IncludeNode {
   argument: Box<Node>,
 });
 new_node!(Inline, InlineNode {
-  text: String,
+  text: CompactString,
 });
 new_node!(Interface, InterfaceNode {
   name: Box<Node>,
@@ -882,7 +887,7 @@ new_node!(List, ListNode {
   items: Vec<Box<Node>>,
 });
 new_node!(Magic, MagicNode {
-  name: String,
+  name: CompactString,
 });
 new_node!(Match, MatchNode {
   condition: Box<Node>,
@@ -899,7 +904,7 @@ new_node!(Method, MethodNode {
   function: Box<Node>,
 });
 new_node!(Namespace, NamespaceNode {
-  name: String,
+  name: CompactString,
   body: Box<Node>,
   is_bracket: bool,
 });
@@ -910,12 +915,12 @@ new_node!(New, NewNode {
   statement: Box<Node>,
 });
 new_node!(NowDoc, NowDocNode {
-  label: String,
-  value: String,
+  label: CompactString,
+  value: CompactString,
 });
 new_node!(Null, NullNode {});
 new_node!(Number, NumberNode {
-  value: String,
+  value: CompactString,
 });
 new_node!(ObjectAccess, ObjectAccessNode {
   object: Box<Node>,
@@ -936,11 +941,11 @@ new_node!(Parenthesis, ParenthesisNode {
 });
 new_node!(Post, PostNode {
   statement: Box<Node>,
-  operator: String,
+  operator: CompactString,
 });
 new_node!(Pre, PreNode {
   statement: Box<Node>,
-  operator: String,
+  operator: CompactString,
 });
 new_node!(Print, PrintNode {
   statement: Box<Node>,
@@ -986,7 +991,7 @@ new_node!(StaticLookup, StaticLookupNode {
 });
 new_node!(String, StringNode {
   quote: Quote,
-  value: String,
+  value: CompactString,
 });
 new_node!(Switch, SwitchNode {
   condition: Box<Node>,
@@ -1027,18 +1032,18 @@ new_node!(Try, TryNode {
 });
 new_node!(Type, TypeNode {
   is_nullable: bool,
-  name: String,
+  name: CompactString,
 });
 new_node!(UnionType, UnionTypeNode {
   types: Vec<Box<Node>>,
 });
 new_node!(Use, UseNode {
-  name: Option<String>,
+  name: Option<CompactString>,
   items: Vec<Box<Node>>,
 });
 new_node!(UseItem, UseItemNode {
   modifier: Option<UseItemModifier>,
-  name: String,
+  name: CompactString,
   alias: Option<Box<Node>>,
 });
 new_node!(Variable, VariableNode {

@@ -51,10 +51,10 @@ impl DeclareParser {
       };
       let body = match body_type {
         BodyType::Empty => None,
-        BodyType::Basic => Some(BlockParser::new(parser)?),
+        BodyType::Basic => Some(BlockParser::new_block(parser)?),
         BodyType::Short => Some(BlockParser::new_short(parser, &[TokenType::EndDeclare])?),
       };
-      return Ok(DeclareNode::new(arguments, body, body_type, parser.gen_loc(start_loc)));
+      return Ok(DeclareNode::loc(arguments, body, body_type, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }
@@ -92,7 +92,7 @@ impl DeclareArgumentParser {
           )
         )?
       {
-        return Ok(DeclareArgumentNode::new(name, value, parser.gen_loc(start_loc)));
+        return Ok(DeclareArgumentNode::loc(name, value, parser.gen_loc(start_loc)));
       }
     }
     Err(ParserError::Internal)

@@ -9,6 +9,7 @@ use backyard_nodes::node::{
   Quote,
   StringNode,
 };
+use compact_str::ToCompactString;
 
 use crate::{
   error::ParserError,
@@ -53,18 +54,18 @@ impl StringParser {
           if let Some(next) = parser.tokens.get(parser.position + 1) {
             if next.token_type == TokenType::NowDocClose {
               parser.position += 2;
-              return Ok(NowDocNode::new(label, text, parser.gen_loc(start_loc)));
+              return Ok(NowDocNode::loc(label, text, parser.gen_loc(start_loc)));
             }
           }
         } else if string_type.token_type == TokenType::HeredocOpen {
           let values = StringParser::parse_encapsed(parser, args, TokenType::HeredocClose)?;
           let label = string_type.value.to_owned();
-          return Ok(HereDocNode::new(label, values, parser.gen_loc(start_loc)));
+          return Ok(HereDocNode::loc(label, values, parser.gen_loc(start_loc)));
         } else if string_type.token_type == TokenType::EncapsedStringOpen {
           let values = StringParser::parse_encapsed(parser, args, TokenType::EncapsedStringClose)?;
           let quote = string_type.value.to_owned();
           return Ok(
-            EncapsedNode::new(Quote::try_parse(&quote).unwrap(), values, parser.gen_loc(start_loc))
+            EncapsedNode::loc(Quote::try_parse(&quote).unwrap(), values, parser.gen_loc(start_loc))
           );
         } else if string_type.token_type == TokenType::String {
           let mut value = string_type.value.to_owned();
@@ -72,9 +73,9 @@ impl StringParser {
           value = value
             .get(..value.len() - 1)
             .unwrap_or_default()
-            .to_owned();
+            .to_compact_string();
           return Ok(
-            StringNode::new(Quote::try_parse(&quote).unwrap(), value, parser.gen_loc(start_loc))
+            StringNode::loc(Quote::try_parse(&quote).unwrap(), value, parser.gen_loc(start_loc))
           );
         }
       }
@@ -99,9 +100,9 @@ impl StringParser {
         TokenType::EncapsedString => {
           let loc = i.get_range_location();
           values.push(
-            EncapsedPartNode::new(
+            EncapsedPartNode::loc(
               false,
-              StringNode::new(Quote::Single, i.value.to_owned(), loc.clone()),
+              StringNode::loc(Quote::Single, i.value.to_owned(), loc.clone()),
               loc
             )
           );
@@ -109,7 +110,7 @@ impl StringParser {
         TokenType::Variable => {
           let parsed = VariableParser::from_token(i);
           let loc = parsed.loc.clone();
-          values.push(EncapsedPartNode::new(false, parsed, loc));
+          values.push(EncapsedPartNode::loc(false, parsed, loc));
         }
         TokenType::AdvanceInterpolationOpen => {
           let value = guard!(
@@ -118,7 +119,7 @@ impl StringParser {
             )?
           );
           parser.position += 1;
-          values.push(EncapsedPartNode::new(true, value, parser.gen_loc(start_loc)));
+          values.push(EncapsedPartNode::loc(true, value, parser.gen_loc(start_loc)));
         }
         _ => {
           continue;

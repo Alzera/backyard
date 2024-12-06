@@ -52,7 +52,7 @@ impl IncludeParser {
         }
       );
       return Ok(
-        IncludeNode::new(use_parenthesis, is_require, is_once, argument, parser.gen_loc(start_loc))
+        IncludeNode::loc(use_parenthesis, is_require, is_once, argument, parser.gen_loc(start_loc))
       );
     }
     Err(ParserError::Internal)

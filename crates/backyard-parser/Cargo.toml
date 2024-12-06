@@ -14,6 +14,8 @@ workspace = true
 backyard-lexer = { workspace = true }
 backyard-nodes = { workspace = true }
 
+compact_str = { workspace = true }
+
 [dev-dependencies]
 insta = { workspace = true }
 criterion = { workspace = true }

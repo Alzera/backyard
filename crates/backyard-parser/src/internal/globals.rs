@@ -35,7 +35,7 @@ impl GlobalParser {
           ]
         )
       )?;
-      return Ok(GlobalNode::new(items, parser.gen_loc(start_loc)));
+      return Ok(GlobalNode::loc(items, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

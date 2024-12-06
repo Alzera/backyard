@@ -56,7 +56,7 @@ impl PreParser {
         &mut LoopArgument::safe("pre", args.separators, args.breakers, &DEFAULT_PARSERS)
       )?;
       if operator.token_type == TokenType::Ellipsis {
-        return Ok(VariadicNode::new(argument, parser.gen_loc(start_loc)));
+        return Ok(VariadicNode::loc(argument, parser.gen_loc(start_loc)));
       }
       let argument = guard!(argument);
       return match operator.token_type {
@@ -64,10 +64,10 @@ impl PreParser {
         | TokenType::PreDecrement
         | TokenType::Addition
         | TokenType::Subtraction =>
-          Ok(PreNode::new(argument, operator.value.to_owned(), parser.gen_loc(start_loc))),
-        TokenType::BooleanNegate => Ok(NegateNode::new(argument, parser.gen_loc(start_loc))),
-        TokenType::AtSign => Ok(SilentNode::new(argument, parser.gen_loc(start_loc))),
-        TokenType::BitwiseAnd => Ok(ReferenceNode::new(argument, parser.gen_loc(start_loc))),
+          Ok(PreNode::loc(argument, operator.value.to_owned(), parser.gen_loc(start_loc))),
+        TokenType::BooleanNegate => Ok(NegateNode::loc(argument, parser.gen_loc(start_loc))),
+        TokenType::AtSign => Ok(SilentNode::loc(argument, parser.gen_loc(start_loc))),
+        TokenType::BitwiseAnd => Ok(ReferenceNode::loc(argument, parser.gen_loc(start_loc))),
         _ => Err(ParserError::Internal),
       };
     }

@@ -13,7 +13,7 @@ pub struct IdentifierParser;
 impl IdentifierParser {
   pub fn from_token(id: &Token) -> Box<Node> {
     let loc = id.get_range_location();
-    IdentifierNode::new(id.value.to_owned(), loc)
+    IdentifierNode::loc(id.value.to_owned(), loc)
   }
 
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {

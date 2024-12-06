@@ -20,7 +20,7 @@ impl VariableParser {
   }
 
   pub fn new_bracked(name: Box<Node>, loc: Option<RangeLocation>) -> Box<Node> {
-    VariableNode::new(name, loc)
+    VariableNode::loc(name, loc)
   }
 }
 

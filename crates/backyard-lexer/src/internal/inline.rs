@@ -25,12 +25,12 @@ impl InlineToken {
         result.push(Token::new(TokenType::Inline, inline, snapshot));
       }
     } else if let Some(breaker) = checker.check() {
-      inline = inline[..inline.len() - breaker[..breaker.len() - 1].len()].to_string();
+      inline = inline[..inline.len() - breaker[..breaker.len() - 1].len()].into();
       if !inline.is_empty() {
         result.push(Token::new(TokenType::Inline, inline, snapshot));
       }
       if breaker == "<?=" {
-        result.push(Token::new(TokenType::Echo, "echo", snapshot));
+        result.push(Token::new(TokenType::Echo, "echo".into(), snapshot));
       }
     }
     Ok(result)

@@ -1,3 +1,5 @@
+use compact_str::{ format_compact, CompactString, ToCompactString };
+
 use crate::error::LexResult;
 use crate::internal::variable::VariableToken;
 use crate::lexer::{ ControlSnapshot, Lexer, SeriesChecker, SeriesCheckerMode };
@@ -52,7 +54,7 @@ impl StringToken {
       };
       if checker.check().is_some() {
         t.push(current);
-        t = t[..t.len() - breaker.len()].to_string();
+        t = t[..t.len() - breaker.len()].into();
         result.push(Token::new(TokenType::EncapsedString, t, &snapshot));
         lexer.control.next_char();
         break;
@@ -71,18 +73,22 @@ impl StringToken {
         }
       } else if next.is_some() && current == '{' && next.unwrap() == '$' {
         lexer.control.next_char();
-        result.push(Token::new(TokenType::AdvanceInterpolationOpen, "{", &snapshot));
+        result.push(Token::new(TokenType::AdvanceInterpolationOpen, "{".into(), &snapshot));
         let tokens = lexer.next_tokens_until_right_bracket();
         result.extend(tokens);
         result.push(
-          Token::new(TokenType::AdvanceInterpolationClose, "}", lexer.control.get_last_snapshot())
+          Token::new(
+            TokenType::AdvanceInterpolationClose,
+            "}".into(),
+            lexer.control.get_last_snapshot()
+          )
         );
       }
     }
   }
 
-  pub fn lex_basic(lexer: &mut Lexer, breaker: char, snapshot: &ControlSnapshot) -> LexResult {
-    let checker_breaker: [&str; 1] = [&breaker.to_string()];
+  pub fn lex_basic(lexer: &mut Lexer, breaker: &str, snapshot: &ControlSnapshot) -> LexResult {
+    let checker_breaker: [&str; 1] = [breaker];
     let mut checker = SeriesChecker::new(&checker_breaker, SeriesCheckerMode::String);
     let text = lexer.control.next_char_until(|_, i, _| {
       checker.push(*i);
@@ -91,30 +97,33 @@ impl StringToken {
     lexer.control.next_char();
 
     Ok(
-      vec![Token::new(TokenType::String, format!("{}{}{}", breaker, text, breaker), snapshot)]
+      vec![
+        Token::new(TokenType::String, format_compact!("{}{}{}", breaker, text, breaker), snapshot)
+      ]
     )
   }
 
-  pub fn lex(lexer: &mut Lexer, breaker: char, snapshot: &ControlSnapshot) -> LexResult {
-    let mut result = vec![
-      Token::new(TokenType::EncapsedStringOpen, String::from(breaker), snapshot)
-    ];
+  pub fn lex(lexer: &mut Lexer, breaker: &str, snapshot: &ControlSnapshot) -> LexResult {
+    let breaker = breaker.to_compact_string();
+    let mut result = vec![Token::new(TokenType::EncapsedStringOpen, breaker.clone(), snapshot)];
 
-    Self::get_parts(lexer, &mut result, &breaker.to_string(), SeriesCheckerMode::String);
+    Self::get_parts(lexer, &mut result, &breaker, SeriesCheckerMode::String);
 
     if result.len() < 3 {
-      let t = if let Some(t) = result.get(1) { t.value.to_owned() } else { String::from("") };
+      let t = if let Some(t) = result.get(1) {
+        t.value.to_owned()
+      } else {
+        CompactString::const_new("")
+      };
       return Ok(
-        vec![Token::new(TokenType::String, format!("{}{}{}", breaker, t, breaker), snapshot)]
+        vec![
+          Token::new(TokenType::String, format_compact!("{}{}{}", breaker, t, breaker), snapshot)
+        ]
       );
     }
 
     result.push(
-      Token::new(
-        TokenType::EncapsedStringClose,
-        String::from(breaker),
-        lexer.control.get_last_snapshot()
-      )
+      Token::new(TokenType::EncapsedStringClose, breaker, lexer.control.get_last_snapshot())
     );
 
     Ok(result)
@@ -124,7 +133,7 @@ impl StringToken {
     let label = lexer.control
       .next_char_until(|_, i, _| *i == '\n')
       .trim()
-      .to_owned();
+      .to_compact_string();
     if
       !label
         .chars()
@@ -141,8 +150,11 @@ impl StringToken {
       return Err(lexer.control.error_unrecognized(&label));
     }
     if label.starts_with('\'') && label.ends_with('\'') {
-      let clean_label = label.get(1..label.len() - 1).unwrap_or_default();
-      let againsts = [clean_label];
+      let clean_label: CompactString = label
+        .get(1..label.len() - 1)
+        .unwrap_or_default()
+        .into();
+      let againsts: [&str; 1] = [clean_label.as_str()];
       let mut checker = SeriesChecker::new(&againsts, SeriesCheckerMode::Heredoc);
       let mut should_break = false;
       let content_snapshot = lexer.control.get_snapshot();
@@ -152,18 +164,18 @@ impl StringToken {
         should_break = checker.check().is_some();
         t
       });
-      let text = text[..text.len() - clean_label.len() - 1].to_string();
+      let text = text[..text.len() - clean_label.len() - 1].into();
       Ok(
         vec![
-          Token::new(TokenType::NowDocOpen, clean_label, snapshot),
+          Token::new(TokenType::NowDocOpen, clean_label.clone(), snapshot),
           Token::new(TokenType::EncapsedString, text, &content_snapshot),
           Token::new(TokenType::NowDocClose, clean_label, lexer.control.get_last_snapshot())
         ]
       )
     } else {
-      let mut result = vec![Token::new(TokenType::HeredocOpen, &label, snapshot)];
+      let mut result = vec![Token::new(TokenType::HeredocOpen, label.clone(), snapshot)];
       Self::get_parts(lexer, &mut result, &label, SeriesCheckerMode::Heredoc);
-      result.push(Token::new(TokenType::HeredocClose, &label, lexer.control.get_last_snapshot()));
+      result.push(Token::new(TokenType::HeredocClose, label, lexer.control.get_last_snapshot()));
       Ok(result)
     }
   }

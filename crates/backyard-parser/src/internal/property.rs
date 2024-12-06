@@ -75,7 +75,7 @@ impl PropertyParser {
           )?
         {
           let item_start_loc = name.get_location().unwrap();
-          PropertyItemNode::new(
+          PropertyItemNode::loc(
             IdentifierParser::from_token(name),
             prop_type.to_owned(),
             Some(value),
@@ -86,7 +86,7 @@ impl PropertyParser {
         }
       } else {
         let item_start_loc = name.get_location().unwrap();
-        PropertyItemNode::new(
+        PropertyItemNode::loc(
           IdentifierParser::from_token(name),
           prop_type.to_owned(),
           None,
@@ -148,7 +148,7 @@ impl PropertyParser {
       if visibilities.is_empty() && !has_var.is_empty() {
         visibilities.push(Visibility::Public);
       }
-      return Ok(PropertyNode::new(visibilities, modifier, hooks, items, parser.gen_loc(start_loc)));
+      return Ok(PropertyNode::loc(visibilities, modifier, hooks, items, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }
@@ -189,7 +189,7 @@ impl PropertyItemParser {
         None
       };
       return Ok(
-        PropertyItemNode::new(name, args.last_expr.to_owned(), value, parser.gen_loc(start_loc))
+        PropertyItemNode::loc(name, args.last_expr.to_owned(), value, parser.gen_loc(start_loc))
       );
     }
     Err(ParserError::Internal)
@@ -231,7 +231,7 @@ impl HookParser {
       }
       if let Some(next_token) = parser.tokens.get(parser.position) {
         let body = if next_token.token_type == TokenType::LeftCurlyBracket {
-          BlockParser::new(parser)?
+          BlockParser::new_block(parser)?
         } else if next_token.token_type == TokenType::Arrow {
           parser.position += 1;
           if
@@ -248,7 +248,7 @@ impl HookParser {
           return Err(ParserError::Internal);
         };
         return Ok(
-          PropertyHookNode::new(is_get, !is_ref.is_empty(), params, body, parser.gen_loc(start_loc))
+          PropertyHookNode::loc(is_get, !is_ref.is_empty(), params, body, parser.gen_loc(start_loc))
         );
       }
     }

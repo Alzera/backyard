@@ -139,7 +139,7 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
                 size: 2,
                 wrapper: LookupResultWrapper::OptionalType(
                   Some(
-                    TypeNode::new(
+                    TypeNode::loc(
                       true,
                       next.value.to_owned(),
                       Some(RangeLocation {
@@ -278,7 +278,7 @@ fn parse_type(tokens: &[Token], index: &mut usize) -> Option<Box<Node>> {
       {
         next.insert(0, child);
         let loc = get_range_location_from_vec_node(&next);
-        return Some(IntersectionTypeNode::new(next, loc));
+        return Some(IntersectionTypeNode::loc(next, loc));
       } else {
         return Some(child);
       }
@@ -287,7 +287,7 @@ fn parse_type(tokens: &[Token], index: &mut usize) -> Option<Box<Node>> {
       if let Some(mut next) = parse_union_or_intersection_type(tokens, index, TokenType::BitwiseOr) {
         next.insert(0, child);
         let loc = get_range_location_from_vec_node(&next);
-        return Some(UnionTypeNode::new(next, loc));
+        return Some(UnionTypeNode::loc(next, loc));
       } else {
         return Some(child);
       }
@@ -300,17 +300,17 @@ fn parse_type(tokens: &[Token], index: &mut usize) -> Option<Box<Node>> {
     if next_token.token_type == TokenType::BitwiseAnd {
       if let Some(child) = parse_union_or_intersection_type(tokens, index, TokenType::BitwiseAnd) {
         let loc = get_range_location_from_vec_node(&child);
-        return Some(IntersectionTypeNode::new(child, loc));
+        return Some(IntersectionTypeNode::loc(child, loc));
       }
     } else if next_token.token_type == TokenType::BitwiseOr {
       if let Some(child) = parse_union_or_intersection_type(tokens, index, TokenType::BitwiseOr) {
         let loc = get_range_location_from_vec_node(&child);
-        return Some(UnionTypeNode::new(child, loc));
+        return Some(UnionTypeNode::loc(child, loc));
       }
     }
     *index += 1;
     let loc = token.get_range_location();
-    return Some(TypeNode::new(false, token.value.to_owned(), loc));
+    return Some(TypeNode::loc(false, token.value.to_owned(), loc));
   }
   None
 }
@@ -335,7 +335,7 @@ fn parse_union_or_intersection_type(
         if TYPES.contains(&token.token_type) {
           last_token_type = Some(token.token_type);
           let loc = token.get_range_location();
-          result.push(TypeNode::new(false, token.value.to_owned(), loc));
+          result.push(TypeNode::loc(false, token.value.to_owned(), loc));
           continue;
         } else if token.token_type == TokenType::LeftParenthesis {
           result.push(parse_type(tokens, index)?);

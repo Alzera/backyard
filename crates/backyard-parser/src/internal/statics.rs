@@ -44,7 +44,7 @@ impl StaticsParser {
           ]
         )
       )?;
-      return Ok(StaticNode::new(items, parser.gen_loc(start_loc)));
+      return Ok(StaticNode::loc(items, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

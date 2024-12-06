@@ -49,7 +49,7 @@ impl ParenthesisParser {
                 )?
               );
               return Ok(
-                CastNode::new(token.value.to_owned(), expression, parser.gen_loc(start_loc))
+                CastNode::loc(token.value.to_owned(), expression, parser.gen_loc(start_loc))
               );
             }
           }
@@ -61,7 +61,7 @@ impl ParenthesisParser {
         )?
       );
       parser.position += 1;
-      return Ok(ParenthesisNode::new(statement, parser.gen_loc(start_loc)));
+      return Ok(ParenthesisNode::loc(statement, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

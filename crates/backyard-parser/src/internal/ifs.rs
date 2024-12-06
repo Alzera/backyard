@@ -60,7 +60,7 @@ impl IfParser {
           }
         }
       }
-      return Ok(IfNode::new(condition, valid, invalid, is_short, parser.gen_loc(start_loc)));
+      return Ok(IfNode::loc(condition, valid, invalid, is_short, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }
@@ -95,7 +95,7 @@ impl ElseParser {
             loc,
             args
           )?;
-          return Ok(ElseNode::new(expr, false, parser.gen_loc(start_loc)));
+          return Ok(ElseNode::loc(expr, false, parser.gen_loc(start_loc)));
         }
       }
       if let Some(next_token) = parser.tokens.get(parser.position) {
@@ -113,7 +113,7 @@ impl ElseParser {
             loc,
             args
           )?;
-          return Ok(ElseNode::new(expr, false, parser.gen_loc(start_loc)));
+          return Ok(ElseNode::loc(expr, false, parser.gen_loc(start_loc)));
         }
       }
       let (is_short, valid) = BlockParser::new_or_short_or_single(
@@ -121,7 +121,7 @@ impl ElseParser {
         &[TokenType::ElseIf, TokenType::Else, TokenType::EndIf],
         args
       )?;
-      return Ok(ElseNode::new(valid, is_short, parser.gen_loc(start_loc)));
+      return Ok(ElseNode::loc(valid, is_short, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

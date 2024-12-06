@@ -36,7 +36,7 @@ impl YieldParser {
             )
           )?
         );
-        return Ok(YieldFromNode::new(expr, parser.gen_loc(start_loc)));
+        return Ok(YieldFromNode::loc(expr, parser.gen_loc(start_loc)));
       }
       let mut value = parser.get_statement(
         &mut LoopArgument::with_tokens(
@@ -46,7 +46,7 @@ impl YieldParser {
         )
       )?;
       if value.is_none() {
-        return Ok(YieldNode::new(None, None, parser.gen_loc(start_loc)));
+        return Ok(YieldNode::loc(None, None, parser.gen_loc(start_loc)));
       }
       let mut key = None;
       if guard!(parser.tokens.get(parser.position)).token_type == TokenType::Arrow {
@@ -64,7 +64,7 @@ impl YieldParser {
           )
         );
       }
-      return Ok(YieldNode::new(key, value, parser.gen_loc(start_loc)));
+      return Ok(YieldNode::loc(key, value, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

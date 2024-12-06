@@ -45,7 +45,7 @@ impl ArrayLookupParser {
         &mut LoopArgument::with_tokens("arraylookup", &[], &[TokenType::RightSquareBracket])
       )?;
       parser.position += 1;
-      return Ok(ArrayLookupNode::new(on, target, parser.gen_loc(start_loc)));
+      return Ok(ArrayLookupNode::loc(on, target, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

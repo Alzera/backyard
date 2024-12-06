@@ -30,7 +30,7 @@ impl NumberParser {
       } else {
         return Err(ParserError::Internal);
       };
-      return Ok(NumberNode::new(number, parser.gen_loc(start_loc)));
+      return Ok(NumberNode::loc(number, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

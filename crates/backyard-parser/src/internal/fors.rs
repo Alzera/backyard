@@ -51,7 +51,7 @@ impl ForParser {
         };
         body = Some(parsed_block);
       }
-      return Ok(ForNode::new(inits, tests, increments, body, body_type, parser.gen_loc(start_loc)));
+      return Ok(ForNode::loc(inits, tests, increments, body, body_type, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

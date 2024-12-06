@@ -12,7 +12,7 @@ fn basic() {
       "{}",
       ParserError::UnexpectedToken(Token {
         token_type: TokenType::And,
-        value: "and".to_string(),
+        value: "and".into(),
         line: 0,
         column: 0,
         offset: 0,

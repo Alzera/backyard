@@ -131,11 +131,11 @@ impl ClassParser {
         )
       )?;
       return Ok(
-        AnonymousClassNode::new(
+        AnonymousClassNode::loc(
           parameters,
           extends,
           implements,
-          BlockNode::new(body, parser.gen_loc(body_loc)),
+          BlockNode::loc(body, parser.gen_loc(body_loc)),
           parser.gen_loc(start_loc)
         )
       );
@@ -213,12 +213,12 @@ impl ClassParser {
         }
       }
       return Ok(
-        ClassNode::new(
+        ClassNode::loc(
           inheritance,
           name,
           extends,
           implements,
-          BlockNode::new(body, parser.gen_loc(body_loc)),
+          BlockNode::loc(body, parser.gen_loc(body_loc)),
           is_readonly,
           parser.gen_loc(start_loc)
         )

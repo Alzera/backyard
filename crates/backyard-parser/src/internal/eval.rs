@@ -32,7 +32,7 @@ impl EvalParser {
       if argument.is_none() {
         return Err(ParserError::Internal);
       }
-      return Ok(EvalNode::new(argument.unwrap(), parser.gen_loc(start_loc)));
+      return Ok(EvalNode::loc(argument.unwrap(), parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

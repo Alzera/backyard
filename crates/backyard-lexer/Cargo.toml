@@ -11,7 +11,7 @@ license.workspace = true
 workspace = true
 
 [dependencies]
-ts-rs = { workspace = true }
+compact_str = { workspace = true }
 serde = { workspace = true }
 wasm-bindgen = { workspace = true }
 

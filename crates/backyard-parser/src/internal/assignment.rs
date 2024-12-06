@@ -62,7 +62,7 @@ impl AssignmentParser {
           )?
         {
           return Ok(
-            AssignmentNode::new(left, operator.value.to_owned(), right, parser.gen_loc(start_loc))
+            AssignmentNode::loc(left, operator.value.to_owned(), right, parser.gen_loc(start_loc))
           );
         }
       }

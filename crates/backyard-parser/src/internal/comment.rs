@@ -39,11 +39,11 @@ impl CommentParser {
       };
       let comment: Box<Node> = match comment.token_type {
         TokenType::CommentLine =>
-          CommentLineNode::new(comment.value.to_owned(), parser.gen_loc(start_loc)),
+          CommentLineNode::loc(comment.value.to_owned(), parser.gen_loc(start_loc)),
         TokenType::CommentBlock =>
-          CommentBlockNode::new(comment.value.to_owned(), parser.gen_loc(start_loc)),
+          CommentBlockNode::loc(comment.value.to_owned(), parser.gen_loc(start_loc)),
         TokenType::CommentDoc =>
-          CommentDocNode::new(comment.value.to_owned(), parser.gen_loc(start_loc)),
+          CommentDocNode::loc(comment.value.to_owned(), parser.gen_loc(start_loc)),
         _ => {
           return Err(ParserError::Internal);
         }

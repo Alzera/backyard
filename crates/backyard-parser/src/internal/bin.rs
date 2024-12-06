@@ -74,7 +74,7 @@ impl BinParser {
           )?
         {
           return Ok(
-            BinNode::new(left, operator.value.to_owned(), right, parser.gen_loc(start_loc))
+            BinNode::loc(left, operator.value.to_owned(), right, parser.gen_loc(start_loc))
           );
         }
       }

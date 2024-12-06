@@ -60,7 +60,7 @@ impl TraitUseParser {
           )
         )?;
       }
-      return Ok(TraitUseNode::new(traits, adaptations, parser.gen_loc(start_loc)));
+      return Ok(TraitUseNode::loc(traits, adaptations, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }
@@ -120,10 +120,10 @@ impl TraitUseAliasParser {
           .map(|i| i.value.to_owned())
           .unwrap_or_default()
       } else {
-        "".to_owned()
+        "".into()
       };
       return Ok(
-        TraitUseAliasNode::new(
+        TraitUseAliasNode::loc(
           trait_name_parsed,
           name_parsed,
           alias,
@@ -182,7 +182,7 @@ impl TraitUsePrecedenceParser {
         t
       };
       return Ok(
-        TraitUsePrecedenceNode::new(trait_name_parsed, method, instead, parser.gen_loc(start_loc))
+        TraitUsePrecedenceNode::loc(trait_name_parsed, method, instead, parser.gen_loc(start_loc))
       );
     }
     Err(ParserError::Internal)

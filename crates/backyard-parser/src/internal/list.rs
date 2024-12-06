@@ -28,7 +28,7 @@ impl ListParser {
       let values = parser.get_children(
         &mut LoopArgument::with_tokens("list", &[TokenType::Comma], &[TokenType::RightParenthesis])
       )?;
-      return Ok(ListNode::new(values, parser.gen_loc(start_loc)));
+      return Ok(ListNode::loc(values, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

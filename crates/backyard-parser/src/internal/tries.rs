@@ -29,7 +29,7 @@ impl TryParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      let body = BlockParser::new(parser)?;
+      let body = BlockParser::new_block(parser)?;
       let catches = parser.get_children(
         &mut LoopArgument::safe(
           "try",
@@ -42,7 +42,7 @@ impl TryParser {
           ]
         )
       )?;
-      return Ok(TryNode::new(body, catches, parser.gen_loc(start_loc)));
+      return Ok(TryNode::loc(body, catches, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }
@@ -95,8 +95,8 @@ impl CatchParser {
         }
       }
       parser.position += 1;
-      let body = BlockParser::new(parser)?;
-      return Ok(CatchNode::new(types, variable, body, parser.gen_loc(start_loc)));
+      let body = BlockParser::new_block(parser)?;
+      return Ok(CatchNode::loc(types, variable, body, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }
@@ -117,8 +117,8 @@ impl FinallyParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      let body = BlockParser::new(parser)?;
-      return Ok(FinallyNode::new(body, parser.gen_loc(start_loc)));
+      let body = BlockParser::new_block(parser)?;
+      return Ok(FinallyNode::loc(body, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

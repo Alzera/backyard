@@ -121,7 +121,7 @@ impl FunctionParser {
         )?
       );
       return Ok(
-        ArrowFunctionNode::new(
+        ArrowFunctionNode::loc(
           !is_ref.is_empty(),
           arguments,
           return_type,
@@ -154,9 +154,9 @@ impl FunctionParser {
         }
       }
       let return_type = FunctionParser::get_return_type(parser).ok();
-      let body = BlockParser::new(parser)?;
+      let body = BlockParser::new_block(parser)?;
       return Ok(
-        AnonymousFunctionNode::new(
+        AnonymousFunctionNode::loc(
           !is_ref.is_empty(),
           arguments,
           uses,
@@ -209,10 +209,10 @@ impl FunctionParser {
       let body = if guard!(parser.tokens.get(parser.position)).token_type == TokenType::Semicolon {
         None
       } else {
-        Some(BlockParser::new(parser)?)
+        Some(BlockParser::new_block(parser)?)
       };
       return Ok(
-        FunctionNode::new(
+        FunctionNode::loc(
           !is_ref.is_empty(),
           name,
           arguments,
@@ -316,7 +316,7 @@ impl ConstructorParameterParser {
         None
       };
       let prop_type = cast_lookup_result!(OptionalType, &prop_type.wrapper);
-      let item = ParameterNode::new(
+      let item = ParameterNode::loc(
         prop_type.to_owned(),
         !is_ref.is_empty(),
         !is_variadic.is_empty(),
@@ -349,7 +349,7 @@ impl ConstructorParameterParser {
         visibilities.push(Visibility::Public);
       }
       return Ok(
-        ConstructorParameterNode::new(visibilities, modifier, item, parser.gen_loc(start_loc))
+        ConstructorParameterNode::loc(visibilities, modifier, item, parser.gen_loc(start_loc))
       );
     }
     Err(ParserError::Internal)
@@ -398,7 +398,7 @@ impl ParameterParser {
       };
       let prop_type = cast_lookup_result!(OptionalType, &prop_type.wrapper);
       return Ok(
-        ParameterNode::new(
+        ParameterNode::loc(
           prop_type.to_owned(),
           !is_ref.is_empty(),
           !is_ellipsis.is_empty(),

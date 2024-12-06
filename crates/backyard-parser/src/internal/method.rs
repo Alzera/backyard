@@ -86,7 +86,7 @@ impl MethodParser {
         }
       }
       return Ok(
-        MethodNode::new(visibility, inheritance, is_static, function, parser.gen_loc(start_loc))
+        MethodNode::loc(visibility, inheritance, is_static, function, parser.gen_loc(start_loc))
       );
     }
     Err(ParserError::Internal)

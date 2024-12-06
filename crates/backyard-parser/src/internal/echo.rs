@@ -36,7 +36,7 @@ impl EchoParser {
           parser.position -= 1;
         }
       }
-      return Ok(EchoNode::new(items, parser.gen_loc(start_loc)));
+      return Ok(EchoNode::loc(items, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

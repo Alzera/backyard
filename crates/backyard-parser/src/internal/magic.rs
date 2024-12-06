@@ -13,7 +13,7 @@ pub struct MagicParser;
 impl MagicParser {
   pub fn from_token(id: &Token) -> Box<Node> {
     let loc = id.get_range_location();
-    MagicNode::new(id.value.to_owned(), loc)
+    MagicNode::loc(id.value.to_owned(), loc)
   }
 
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
@@ -28,7 +28,7 @@ impl MagicParser {
   ) -> Result<Box<Node>, ParserError> {
     if let [text] = matched.as_slice() {
       if let LookupResultWrapper::Equal(text) = &text.wrapper {
-        return Ok(MagicNode::new(text.value.to_owned(), parser.gen_loc(start_loc)));
+        return Ok(MagicNode::loc(text.value.to_owned(), parser.gen_loc(start_loc)));
       };
     }
     Err(ParserError::Internal)

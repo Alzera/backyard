@@ -34,7 +34,7 @@ impl LabelParser {
       } else {
         start_loc
       };
-      return Ok(LabelNode::new(name, parser.gen_loc(name_loc)));
+      return Ok(LabelNode::loc(name, parser.gen_loc(name_loc)));
     }
     Err(ParserError::Internal)
   }

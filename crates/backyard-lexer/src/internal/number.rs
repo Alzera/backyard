@@ -1,3 +1,5 @@
+use compact_str::format_compact;
+
 use crate::error::LexResult;
 use crate::lexer::{ ControlSnapshot, Lexer };
 use crate::token::{ Token, TokenType };
@@ -10,15 +12,13 @@ impl NumberToken {
       if next == 'x' {
         lexer.control.next_char();
         let t = lexer.control.next_char_until(|_, ch, _| !ch.is_alphanumeric());
-        let mut n = "0x".to_string();
-        n.push_str(&t);
+        let n = format_compact!("0x{}", t);
         return Ok(vec![Token::new(TokenType::NumberHex, n, snapshot)]);
       }
       if next == 'b' {
         lexer.control.next_char();
         let t = lexer.control.next_char_until(|_, ch, _| !(*ch == '0' || *ch == '1' || *ch == '_'));
-        let mut n = "0b".to_string();
-        n.push_str(&t);
+        let n = format_compact!("0b{}", t);
         return Ok(vec![Token::new(TokenType::NumberBinary, n, snapshot)]);
       }
     }

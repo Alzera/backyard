@@ -1,10 +1,9 @@
+use compact_str::CompactString;
 use serde::{ Deserialize, Serialize };
-use ts_rs::TS;
 
 use crate::lexer::ControlSnapshot;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize, Deserialize)]
 pub enum TokenType {
   Inline,
   Type,
@@ -201,25 +200,24 @@ pub enum TokenType {
   Xor,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Token {
   pub token_type: TokenType,
-  pub value: String,
+  pub value: CompactString,
   pub line: usize,
   pub column: usize,
   pub offset: usize,
 }
 
 impl Token {
-  pub(crate) fn new<T: AsRef<str>>(
+  pub(crate) fn new(
     token_type: TokenType,
-    value: T,
+    value: CompactString,
     snapshot: &ControlSnapshot
   ) -> Self {
     Token {
       token_type,
-      value: value.as_ref().to_string(),
+      value,
       line: snapshot.line,
       column: snapshot.column,
       offset: snapshot.offset,

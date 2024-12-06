@@ -49,9 +49,9 @@ impl SwitchParser {
         )
       )?;
       return Ok(
-        SwitchNode::new(
+        SwitchNode::loc(
           condition,
-          BlockNode::new(statements, parser.gen_loc(block_loc)),
+          BlockNode::loc(statements, parser.gen_loc(block_loc)),
           is_short,
           parser.gen_loc(start_loc)
         )
@@ -91,7 +91,7 @@ impl CaseParser {
       let statements = {
         let token = guard!(parser.tokens.get(parser.position)).token_type;
         if token == TokenType::LeftCurlyBracket {
-          BlockParser::new(parser)?
+          BlockParser::new_block(parser)?
         } else {
           let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
           let s = parser.get_children(
@@ -107,10 +107,10 @@ impl CaseParser {
             )
           )?;
           parser.position -= 1;
-          BlockNode::new(s, parser.gen_loc(block_loc))
+          BlockNode::loc(s, parser.gen_loc(block_loc))
         }
       };
-      return Ok(CaseNode::new(condition, statements, parser.gen_loc(start_loc)));
+      return Ok(CaseNode::loc(condition, statements, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

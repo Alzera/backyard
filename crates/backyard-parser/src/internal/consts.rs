@@ -51,7 +51,7 @@ impl ConstParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      return Ok(ConstNode::new(ConstParser::get_consts(parser)?, parser.gen_loc(start_loc)));
+      return Ok(ConstNode::loc(ConstParser::get_consts(parser)?, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }
@@ -90,7 +90,7 @@ impl ConstPropertyParser {
       }
       let const_type = cast_lookup_result!(OptionalType, &const_type.wrapper);
       return Ok(
-        ConstPropertyNode::new(
+        ConstPropertyNode::loc(
           const_type.to_owned(),
           visibilities,
           ConstParser::get_consts(parser)?,

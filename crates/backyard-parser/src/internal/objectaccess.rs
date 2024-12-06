@@ -61,7 +61,7 @@ impl ObjectAccessParser {
         return Err(ParserError::Internal);
       };
       return Ok(
-        ObjectAccessNode::new(
+        ObjectAccessNode::loc(
           args.last_expr.to_owned().unwrap(),
           expr,
           is_bracket,
