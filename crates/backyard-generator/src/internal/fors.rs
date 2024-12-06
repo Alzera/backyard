@@ -8,7 +8,7 @@ pub struct ForGenerator;
 
 impl ForGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::For, &node.node);
+    let node = cast_node!(For, &node.node);
 
     builder.push("for (");
     let mut inits = Builder::new();

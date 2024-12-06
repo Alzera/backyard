@@ -7,7 +7,7 @@ pub struct AttributeGenerator;
 
 impl AttributeGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Attribute, &node.node);
+    let node = cast_node!(Attribute, &node.node);
 
     builder.push("#[");
     let items = generator.generate_nodes_new(
@@ -19,7 +19,7 @@ impl AttributeGenerator {
   }
 
   pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::AttributeItem, &node.node);
+    let node = cast_node!(AttributeItem, &node.node);
     builder.push(&node.name);
     if !node.arguments.is_empty() {
       builder.push("(");

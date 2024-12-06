@@ -25,7 +25,7 @@ impl ExitParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, has_argument] = matched.as_slice() {
       let argument = if !has_argument.is_empty() {
@@ -38,6 +38,6 @@ impl ExitParser {
       parser.position += 1;
       return Ok(ExitNode::new(argument, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Exit", args))
+    Err(ParserError::Internal)
   }
 }

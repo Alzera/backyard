@@ -8,7 +8,7 @@ pub struct StaticGenerator;
 
 impl StaticGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Static, &node.node);
+    let node = cast_node!(Static, &node.node);
 
     builder.push("static ");
     let mut items = generator.generate_nodes_new(

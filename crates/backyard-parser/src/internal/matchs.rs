@@ -25,16 +25,13 @@ impl MatchParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let condition = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("match", &[], &[TokenType::RightParenthesis])
-        )?,
-        {
-          return Err(ParserError::internal("Match", args));
-        }
+        )?
       );
       parser.position += 2;
       let arms = parser.get_children(
@@ -50,7 +47,7 @@ impl MatchParser {
       )?;
       return Ok(MatchNode::new(condition, arms, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Match", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -66,13 +63,9 @@ impl MatchArmParser {
     parser: &mut Parser,
     _: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    let conditions = match
-      guard!(parser.tokens.get(parser.position), {
-        return Err(ParserError::internal("MatchArm", args));
-      }).token_type
-    {
+    let conditions = match guard!(parser.tokens.get(parser.position)).token_type {
       TokenType::Default => {
         parser.position += 2;
         vec![]
@@ -93,10 +86,7 @@ impl MatchArmParser {
           &[],
           &[TokenType::Comma, TokenType::RightCurlyBracket]
         )
-      )?,
-      {
-        return Err(ParserError::internal("MatchArm", args));
-      }
+      )?
     );
     if let Some(next_token) = parser.tokens.get(parser.position) {
       if next_token.token_type == TokenType::Comma {

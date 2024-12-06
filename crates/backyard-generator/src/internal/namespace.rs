@@ -8,7 +8,7 @@ pub struct NamespaceGenerator;
 
 impl NamespaceGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Namespace, &node.node);
+    let node = cast_node!(Namespace, &node.node);
     builder.push("namespace ");
     builder.push(&node.name);
     if node.is_bracket {

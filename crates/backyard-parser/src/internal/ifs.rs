@@ -31,10 +31,7 @@ impl IfParser {
       let condition = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("if", &[], &[TokenType::RightParenthesis])
-        )?,
-        {
-          return Err(ParserError::internal("If", args));
-        }
+        )?
       );
       parser.position += 1;
       let (is_short, valid) = BlockParser::new_or_short_or_single(
@@ -65,7 +62,7 @@ impl IfParser {
       }
       return Ok(IfNode::new(condition, valid, invalid, is_short, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("If", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -126,6 +123,6 @@ impl ElseParser {
       )?;
       return Ok(ElseNode::new(valid, is_short, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Else", args))
+    Err(ParserError::Internal)
   }
 }

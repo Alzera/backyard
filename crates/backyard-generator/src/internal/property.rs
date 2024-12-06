@@ -8,7 +8,7 @@ pub struct PropertyGenerator;
 
 impl PropertyGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Property, &node.node);
+    let node = cast_node!(Property, &node.node);
     for visibility in &node.visibilities {
       builder.push(&format!("{} ", visibility));
     }
@@ -43,7 +43,7 @@ impl PropertyGenerator {
   }
 
   pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::PropertyItem, &node.node);
+    let node = cast_node!(PropertyItem, &node.node);
     if let Some(variable_type) = &node.variable_type {
       generator.generate_node(builder, variable_type, &mut GeneratorArgument::default());
       builder.push(" ");
@@ -57,7 +57,7 @@ impl PropertyGenerator {
   }
 
   pub fn generate_hook(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::PropertyHook, &node.node);
+    let node = cast_node!(PropertyHook, &node.node);
     if node.is_ref {
       builder.push("&");
     }

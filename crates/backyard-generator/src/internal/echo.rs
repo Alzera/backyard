@@ -6,7 +6,7 @@ pub struct EchoGenerator;
 
 impl EchoGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Echo, &node.node);
+    let node = cast_node!(Echo, &node.node);
 
     builder.push("echo ");
     let mut items = generator.generate_nodes_new(

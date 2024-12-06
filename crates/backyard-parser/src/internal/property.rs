@@ -10,8 +10,10 @@ use backyard_nodes::node::{
 };
 
 use crate::{
+  cast_lookup_result,
   error::ParserError,
-  parser::{ LoopArgument, Parser, TokenTypeArrayCombine },
+  guard,
+  parser::{ LocationHelper, LoopArgument, Parser, TokenTypeArrayCombine },
   utils::{
     match_pattern,
     Lookup,
@@ -35,64 +37,92 @@ pub struct PropertyParser;
 
 impl PropertyParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    if
-      let Some(m) = match_pattern(
-        tokens,
-        &[
-          Lookup::Modifiers(
-            &[
-              ModifierLookup::Visibility,
-              ModifierLookup::Custom(&[TokenType::Static, TokenType::Readonly]),
-            ]
-          ),
-          Lookup::Optional(&[TokenType::Var]),
-          Lookup::OptionalType,
-          Lookup::Equal(&[TokenType::Variable]),
-        ]
-      )
-    {
-      return Some(m[..2].to_vec());
-    }
-    None
+    match_pattern(
+      tokens,
+      &[
+        Lookup::Modifiers(
+          &[
+            ModifierLookup::Visibility,
+            ModifierLookup::Custom(&[TokenType::Static, TokenType::Readonly]),
+          ]
+        ),
+        Lookup::Optional(&[TokenType::Var]),
+        Lookup::OptionalType,
+        Lookup::Equal(&[TokenType::Variable]),
+      ]
+    )
   }
 
   pub fn parse(
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [modifiers, has_var] = matched.as_slice() {
-      let items = parser.get_children(
-        &mut LoopArgument::new(
-          "property",
-          &[TokenType::Comma],
-          &[TokenType::Semicolon, TokenType::LeftCurlyBracket],
-          &[
-            (CommentParser::test, CommentParser::parse),
-            (TypesParser::test, TypesParser::parse),
-            (PropertyItemParser::test, PropertyItemParser::parse),
-          ]
-        )
-      )?;
-      let mut hooks = vec![];
-      if let Some(close_token) = parser.tokens.get(parser.position - 1) {
-        if close_token.token_type == TokenType::LeftCurlyBracket {
-          if items.len() != 1 {
-            return Err(ParserError::internal("Property", args));
-          }
-          hooks = parser.get_children(
-            &mut LoopArgument::new(
+    if let [modifiers, has_var, prop_type, name] = matched.as_slice() {
+      let next_token = guard!(parser.tokens.get(parser.position));
+      let name = cast_lookup_result!(Equal, &name.wrapper);
+      let prop_type = cast_lookup_result!(OptionalType, &prop_type.wrapper);
+      let first_prop = if next_token.token_type == TokenType::Assignment {
+        parser.position += 1;
+        if
+          let Some(value) = parser.get_statement(
+            &mut LoopArgument::with_tokens(
               "property",
-              &[],
-              &[TokenType::RightCurlyBracket],
-              &[
-                (CommentParser::test, CommentParser::parse),
-                (HookParser::test, HookParser::parse),
-              ]
+              &[TokenType::Comma, TokenType::Semicolon, TokenType::LeftCurlyBracket],
+              &[]
             )
-          )?;
+          )?
+        {
+          let item_start_loc = name.get_location().unwrap();
+          PropertyItemNode::new(
+            IdentifierParser::from_token(&name),
+            prop_type.to_owned(),
+            Some(value),
+            parser.gen_loc(item_start_loc)
+          )
+        } else {
+          return Err(ParserError::Internal);
         }
+      } else {
+        let item_start_loc = name.get_location().unwrap();
+        PropertyItemNode::new(
+          IdentifierParser::from_token(&name),
+          prop_type.to_owned(),
+          None,
+          parser.gen_loc(item_start_loc)
+        )
+      };
+      let mut items = vec![first_prop];
+      let mut hooks = vec![];
+      let next_token = guard!(parser.tokens.get(parser.position));
+      if next_token.token_type == TokenType::Comma {
+        let next_items = parser.get_children(
+          &mut LoopArgument::new(
+            "property",
+            &[TokenType::Comma],
+            &[TokenType::Semicolon, TokenType::LeftCurlyBracket],
+            &[
+              (CommentParser::test, CommentParser::parse),
+              (TypesParser::test, TypesParser::parse),
+              (PropertyItemParser::test, PropertyItemParser::parse),
+            ]
+          )
+        )?;
+        items.extend(next_items);
+      } else if next_token.token_type == TokenType::LeftCurlyBracket {
+        parser.position += 1;
+        hooks = parser.get_children(
+          &mut LoopArgument::new(
+            "property",
+            &[],
+            &[TokenType::RightCurlyBracket],
+            &[
+              (CommentParser::test, CommentParser::parse),
+              (HookParser::test, HookParser::parse),
+            ]
+          )
+        )?;
       }
       let mut visibilities = vec![];
       let mut modifier = None;
@@ -120,7 +150,7 @@ impl PropertyParser {
       }
       return Ok(PropertyNode::new(visibilities, modifier, hooks, items, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Property", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -145,7 +175,7 @@ impl PropertyItemParser {
       let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
         IdentifierParser::from_token(name)
       } else {
-        return Err(ParserError::internal("PropertyItem", args));
+        return Err(ParserError::Internal);
       };
       let value = if !has_value.is_empty() {
         parser.get_statement(
@@ -162,7 +192,7 @@ impl PropertyItemParser {
         PropertyItemNode::new(name, args.last_expr.to_owned(), value, parser.gen_loc(start_loc))
       );
     }
-    Err(ParserError::internal("PropertyItem", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -185,13 +215,13 @@ impl HookParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [is_ref, name, has_param] = matched.as_slice() {
       let is_get = if let LookupResultWrapper::Equal(name) = &name.wrapper {
         name.token_type == TokenType::Get
       } else {
-        return Err(ParserError::internal("Hook", args));
+        return Err(ParserError::Internal);
       };
       let mut params = vec![];
       if !is_get {
@@ -212,16 +242,16 @@ impl HookParser {
             parser.position += 1;
             expr
           } else {
-            return Err(ParserError::internal("SetHook", args));
+            return Err(ParserError::Internal);
           }
         } else {
-          return Err(ParserError::internal("SetHook", args));
+          return Err(ParserError::Internal);
         };
         return Ok(
           PropertyHookNode::new(is_get, !is_ref.is_empty(), params, body, parser.gen_loc(start_loc))
         );
       }
     }
-    Err(ParserError::internal("SetHook", args))
+    Err(ParserError::Internal)
   }
 }

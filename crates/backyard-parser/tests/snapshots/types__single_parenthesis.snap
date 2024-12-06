@@ -81,8 +81,8 @@ children:
               offset: 12
             end:
               line: 2
-              column: 20
-              offset: 30
+              column: 18
+              offset: 28
           leadings: []
           trailings: []
       loc:

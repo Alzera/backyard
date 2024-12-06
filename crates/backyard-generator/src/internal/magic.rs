@@ -6,7 +6,7 @@ pub struct MagicGenerator;
 
 impl MagicGenerator {
   pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Magic, &node.node);
+    let node = cast_node!(Magic, &node.node);
     builder.push(&node.name)
   }
 }

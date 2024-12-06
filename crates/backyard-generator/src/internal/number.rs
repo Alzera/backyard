@@ -6,7 +6,7 @@ pub struct NumberGenerator;
 
 impl NumberGenerator {
   pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Number, &node.node);
+    let node = cast_node!(Number, &node.node);
     builder.push(&node.value);
   }
 }

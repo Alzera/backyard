@@ -79,6 +79,6 @@ impl BinParser {
         }
       }
     }
-    Err(ParserError::internal("Bin", args))
+    Err(ParserError::Internal)
   }
 }

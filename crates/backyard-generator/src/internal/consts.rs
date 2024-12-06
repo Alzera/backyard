@@ -6,7 +6,7 @@ pub struct ConstGenerator;
 
 impl ConstGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Const, &node.node);
+    let node = cast_node!(Const, &node.node);
 
     builder.push("const ");
     let mut consts = generator.generate_nodes_new(
@@ -25,12 +25,16 @@ impl ConstGenerator {
   }
 
   pub fn generate_property(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::ConstProperty, &node.node);
+    let node = cast_node!(ConstProperty, &node.node);
 
     for visibility in &node.visibilities {
       builder.push(&format!("{} ", visibility));
     }
     builder.push("const ");
+    if let Some(const_type) = &node.const_type {
+      generator.generate_node(builder, const_type, &mut GeneratorArgument::default());
+      builder.push(" ");
+    }
     let mut consts = generator.generate_nodes_new(
       &node.items,
       &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)

@@ -8,12 +8,12 @@ pub struct TryGenerator;
 
 impl TryGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Try, &node.node);
+    let node = cast_node!(Try, &node.node);
     builder.push("try");
     BlockGenerator::generate(generator, builder, &node.body, None);
     for catch in &node.catches {
       if catch.node_type == NodeType::Finally {
-        let node = cast_node!(NodeWrapper::Finally, &catch.node);
+        let node = cast_node!(Finally, &catch.node);
         builder.push(" finally");
         BlockGenerator::generate(generator, builder, &node.body, None);
       } else {
@@ -23,7 +23,7 @@ impl TryGenerator {
   }
 
   pub fn generate_catch(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Catch, &node.node);
+    let node = cast_node!(Catch, &node.node);
     builder.push(" catch (");
     let types = generator.generate_nodes_new(&node.types, &mut GeneratorArgument::default());
     builder.push(&types.print(" | "));

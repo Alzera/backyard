@@ -26,7 +26,7 @@ impl TryParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       let body = BlockParser::new(parser)?;
@@ -44,7 +44,7 @@ impl TryParser {
       )?;
       return Ok(TryNode::new(body, catches, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Try", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -63,7 +63,7 @@ impl CatchParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let types = parser.get_children(
@@ -98,7 +98,7 @@ impl CatchParser {
       let body = BlockParser::new(parser)?;
       return Ok(CatchNode::new(types, variable, body, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("DoWhileCondition", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -114,12 +114,12 @@ impl FinallyParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       let body = BlockParser::new(parser)?;
       return Ok(FinallyNode::new(body, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Finally", args))
+    Err(ParserError::Internal)
   }
 }

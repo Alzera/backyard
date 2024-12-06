@@ -22,7 +22,7 @@ impl UseParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       let mut p = parser.position;
@@ -37,9 +37,7 @@ impl UseParser {
         p += 1;
       }
       if has_bracket {
-        let name = guard!(parser.tokens.get(parser.position), {
-          return Err(ParserError::internal("Use", args));
-        }).value.to_owned();
+        let name = guard!(parser.tokens.get(parser.position)).value.to_owned();
         parser.position += 1;
 
         let items = {
@@ -78,7 +76,7 @@ impl UseParser {
         return Ok(UseNode::new(None, items, parser.gen_loc(start_loc)));
       }
     }
-    Err(ParserError::internal("Use", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -91,7 +89,9 @@ impl UseItemParser {
       tokens,
       &[
         Lookup::Optional(&[TokenType::Function, TokenType::Const]),
-        Lookup::Equal(&[TokenType::Identifier, TokenType::Name]),
+        Lookup::Equal(
+          &[TokenType::Identifier, TokenType::Name, TokenType::Name, TokenType::Get, TokenType::Set]
+        ),
       ]
     )
   }
@@ -100,7 +100,7 @@ impl UseItemParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [modifier, name] = matched.as_slice() {
       let modifier = if let LookupResultWrapper::Optional(modifier) = &modifier.wrapper {
@@ -115,7 +115,7 @@ impl UseItemParser {
       let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
         name.value.to_owned()
       } else {
-        return Err(ParserError::internal("UseItem", args));
+        return Err(ParserError::Internal);
       };
       let mut alias = None;
       if let Some(last) = parser.tokens.get(parser.position) {
@@ -124,12 +124,12 @@ impl UseItemParser {
             alias = Some(IdentifierParser::from_token(id));
             parser.position += 2;
           } else {
-            return Err(ParserError::internal("UseItem", args));
+            return Err(ParserError::Internal);
           }
         }
       }
       return Ok(UseItemNode::new(modifier, name, alias, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("UseItem", args))
+    Err(ParserError::Internal)
   }
 }

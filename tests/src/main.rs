@@ -1,6 +1,6 @@
 use std::{ fs::read_to_string, path::{ Path, PathBuf } };
 
-use backyard_parser::parse;
+use backyard_parser::{ error::ParserError, parse };
 use walkdir::WalkDir;
 
 fn list_php_files(directory: &Path) -> Vec<PathBuf> {
@@ -21,12 +21,16 @@ fn list_php_files(directory: &Path) -> Vec<PathBuf> {
 fn main() {
   let directory = Path::new("./target/samples");
   let php_files = list_php_files(directory);
+  println!("Found {} PHP files", php_files.len());
   for file in php_files {
     match read_to_string(&file) {
       Ok(content) => {
         let parsed = parse(&content);
-        if parsed.is_err() {
-          eprintln!("\nError parsing file {}: {}", file.display(), parsed.unwrap_err());
+        if let Err(err) = parsed {
+          if let ParserError::Eof = err {
+          } else {
+            eprintln!("\nError parsing file {}: {}", file.display(), err);
+          }
         }
       }
       Err(err) => {
@@ -36,13 +40,8 @@ fn main() {
   }
 }
 
-// // property hook only, single item
-// public bool $virtualHook { &get => true; set($i) => $value; }
-// public string $a { &get { return $b; } set($c) => $d; }
-
-// // support type on const, make const item
-// const string FOO = 'foo';
-
 // // globalize argument and parameter
 
 // // match_pattern should skip unexpected comments
+
+// unwrap, clone, to_string, Arc?

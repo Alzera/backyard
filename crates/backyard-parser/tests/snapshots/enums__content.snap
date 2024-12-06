@@ -90,6 +90,7 @@ children:
         leadings: []
         trailings: []
       - node_type: const_property
+        const_type: ~
         visibilities:
           - Public
         items:

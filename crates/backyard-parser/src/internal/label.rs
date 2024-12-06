@@ -28,11 +28,14 @@ impl LabelParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      let name = guard!(args.last_expr.to_owned(), {
-        return Err(ParserError::internal("Label", args));
-      });
-      return Ok(LabelNode::new(name, parser.gen_loc(start_loc)));
+      let name = guard!(args.last_expr.to_owned());
+      let name_loc = if let Some(loc) = &name.loc.as_ref().map(|x| x.start.clone()) {
+        loc.to_owned()
+      } else {
+        start_loc
+      };
+      return Ok(LabelNode::new(name, parser.gen_loc(name_loc)));
     }
-    Err(ParserError::internal("Label", args))
+    Err(ParserError::Internal)
   }
 }

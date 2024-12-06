@@ -6,7 +6,7 @@ pub struct ArrayLookupGenerator;
 
 impl ArrayLookupGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::ArrayLookup, &node.node);
+    let node = cast_node!(ArrayLookup, &node.node);
     generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
     builder.push("[");
     if node.right.is_some() {

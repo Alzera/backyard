@@ -22,7 +22,7 @@ impl ListParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let values = parser.get_children(
@@ -30,6 +30,6 @@ impl ListParser {
       )?;
       return Ok(ListNode::new(values, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("List", args))
+    Err(ParserError::Internal)
   }
 }

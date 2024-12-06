@@ -25,18 +25,18 @@ impl NamespaceParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, name] = matched.as_slice() {
       let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
         name.value.to_owned()
       } else {
-        return Err(ParserError::internal("Namespace", args));
+        return Err(ParserError::Internal);
       };
       let is_bracket = if let Some(t) = parser.tokens.get(parser.position) {
         t.token_type == TokenType::LeftCurlyBracket
       } else {
-        return Err(ParserError::internal("Namespace", args));
+        return Err(ParserError::Internal);
       };
       let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
       if is_bracket {
@@ -48,6 +48,6 @@ impl NamespaceParser {
       );
       return Ok(NamespaceNode::new(name, body, is_bracket, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Namespace", args))
+    Err(ParserError::Internal)
   }
 }

@@ -49,15 +49,12 @@ impl IncludeParser {
           parser.get_statement(
             &mut LoopArgument::with_tokens("include", &[], &args.breakers.combine(args.separators))
           )?
-        },
-        {
-          return Err(ParserError::internal("Include", args));
         }
       );
       return Ok(
         IncludeNode::new(use_parenthesis, is_require, is_once, argument, parser.gen_loc(start_loc))
       );
     }
-    Err(ParserError::internal("Include", args))
+    Err(ParserError::Internal)
   }
 }

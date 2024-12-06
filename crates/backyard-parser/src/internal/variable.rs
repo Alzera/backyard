@@ -33,7 +33,7 @@ impl VariableParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name] = matched.as_slice() {
       if let LookupResultWrapper::Equal(name) = &name.wrapper {
@@ -56,6 +56,6 @@ impl VariableParser {
         }
       }
     }
-    Err(ParserError::internal("Variable", args))
+    Err(ParserError::Internal)
   }
 }

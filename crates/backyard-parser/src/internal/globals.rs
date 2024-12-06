@@ -7,7 +7,7 @@ use crate::{
   utils::{ match_pattern, Lookup, LookupResult },
 };
 
-use super::{ comment::CommentParser, property::PropertyItemParser };
+use super::{ comment::CommentParser, variable::VariableParser };
 
 #[derive(Debug, Clone)]
 pub struct GlobalParser;
@@ -21,7 +21,7 @@ impl GlobalParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       let items = parser.get_children(
@@ -31,12 +31,12 @@ impl GlobalParser {
           &[TokenType::Semicolon],
           &[
             (CommentParser::test, CommentParser::parse),
-            (PropertyItemParser::test, PropertyItemParser::parse),
+            (VariableParser::test, VariableParser::parse),
           ]
         )
       )?;
       return Ok(GlobalNode::new(items, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("StaticLookup", args))
+    Err(ParserError::Internal)
   }
 }

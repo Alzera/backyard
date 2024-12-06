@@ -757,6 +757,7 @@ new_node!(Const, ConstNode {
   items: Vec<Box<Node>>,
 });
 new_node!(ConstProperty, ConstPropertyNode {
+  const_type: Option<Box<Node>>,
   visibilities: Vec<Visibility>,
   items: Vec<Box<Node>>,
 });

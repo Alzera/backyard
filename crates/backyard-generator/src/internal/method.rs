@@ -8,7 +8,7 @@ pub struct MethodGenerator;
 
 impl MethodGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Method, &node.node);
+    let node = cast_node!(Method, &node.node);
     if let Some(n) = &node.visibility {
       builder.push(format!("{} ", n).as_str());
     }

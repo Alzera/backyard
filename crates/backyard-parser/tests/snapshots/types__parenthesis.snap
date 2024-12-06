@@ -85,8 +85,8 @@ children:
                         loc:
                           start:
                             line: 2
-                            column: 16
-                            offset: 26
+                            column: 14
+                            offset: 24
                           end:
                             line: 2
                             column: 19
@@ -110,8 +110,8 @@ children:
                     loc:
                       start:
                         line: 2
-                        column: 19
-                        offset: 29
+                        column: 14
+                        offset: 24
                       end:
                         line: 2
                         column: 23
@@ -135,8 +135,8 @@ children:
                 loc:
                   start:
                     line: 2
-                    column: 23
-                    offset: 33
+                    column: 14
+                    offset: 24
                   end:
                     line: 2
                     column: 29
@@ -162,8 +162,8 @@ children:
               offset: 12
             end:
               line: 2
-              column: 46
-              offset: 56
+              column: 30
+              offset: 40
           leadings: []
           trailings: []
       loc:

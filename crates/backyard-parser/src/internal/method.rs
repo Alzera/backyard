@@ -42,7 +42,7 @@ impl MethodParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [modifiers, _] = matched.as_slice() {
       parser.position -= 1;
@@ -57,10 +57,7 @@ impl MethodParser {
               (CommentParser::test, CommentParser::parse),
             ]
           )
-        )?,
-        {
-          return Err(ParserError::internal("Method", args));
-        }
+        )?
       );
       let mut visibility = None;
       let mut inheritance = None;
@@ -92,6 +89,6 @@ impl MethodParser {
         MethodNode::new(visibility, inheritance, is_static, function, parser.gen_loc(start_loc))
       );
     }
-    Err(ParserError::internal("Method", args))
+    Err(ParserError::Internal)
   }
 }

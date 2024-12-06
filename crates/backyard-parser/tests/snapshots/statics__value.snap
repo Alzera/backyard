@@ -1,6 +1,6 @@
 ---
 source: crates/backyard-parser/tests/statics.rs
-assertion_line: 6
+assertion_line: 12
 expression: asts
 snapshot_kind: text
 ---
@@ -24,7 +24,20 @@ children:
           leadings: []
           trailings: []
         variable_type: ~
-        value: ~
+        value:
+          node_type: number
+          value: "1"
+          loc:
+            start:
+              line: 1
+              column: 16
+              offset: 16
+            end:
+              line: 1
+              column: 16
+              offset: 16
+          leadings: []
+          trailings: []
         loc:
           start:
             line: 1
@@ -32,8 +45,8 @@ children:
             offset: 7
           end:
             line: 1
-            column: 7
-            offset: 7
+            column: 16
+            offset: 16
         leadings: []
         trailings: []
     loc:
@@ -43,8 +56,8 @@ children:
         offset: 7
       end:
         line: 1
-        column: 13
-        offset: 13
+        column: 17
+        offset: 17
     leadings: []
     trailings: []
 loc:
@@ -54,7 +67,7 @@ loc:
     offset: 0
   end:
     line: 1
-    column: 13
-    offset: 13
+    column: 17
+    offset: 17
 leadings: []
 trailings: []

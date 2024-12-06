@@ -13,7 +13,7 @@ pub struct InterfaceGenerator;
 
 impl InterfaceGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Interface, &node.node);
+    let node = cast_node!(Interface, &node.node);
     builder.push("interface ");
     IdentifierGenerator::generate(generator, builder, &node.name);
     if !node.extends.is_empty() {

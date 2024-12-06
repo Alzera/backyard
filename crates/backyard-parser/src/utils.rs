@@ -1,4 +1,14 @@
 use backyard_lexer::token::{ Token, TokenType };
+use backyard_nodes::node::{
+  IntersectionTypeNode,
+  Node,
+  NodeType,
+  RangeLocation,
+  TypeNode,
+  UnionTypeNode,
+};
+
+use crate::parser::LocationHelper;
 
 #[derive(Debug, Clone)]
 pub enum Lookup<'a> {
@@ -32,7 +42,7 @@ pub enum LookupResultWrapper {
   Equal(Token),
   Optional(Option<Token>),
   Any(Token),
-  OptionalType(OptionalTypeResult),
+  OptionalType(Option<Box<Node>>),
   Modifier(Vec<ModifierResult>),
 }
 
@@ -42,14 +52,6 @@ pub enum ModifierResult {
   Custom(Option<Token>),
 }
 
-#[derive(Debug, Clone)]
-pub enum OptionalTypeResult {
-  None,
-  Single(Token),
-  Nullable(Token, Token),
-  Union(Vec<OptionalTypeResult>),
-  Intersection(Vec<OptionalTypeResult>),
-}
 const TYPES: [TokenType; 11] = [
   TokenType::Identifier,
   TokenType::Name,
@@ -121,7 +123,7 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
         if cur.is_none() {
           result.push(LookupResult {
             size: 0,
-            wrapper: LookupResultWrapper::OptionalType(OptionalTypeResult::None),
+            wrapper: LookupResultWrapper::OptionalType(None),
           });
           continue;
         }
@@ -131,10 +133,21 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
           if let Some(next) = next {
             if TYPES.contains(&next.token_type) {
               check_position += 2;
+              let start_loc = cur.get_location().unwrap();
+              let end_loc = next.get_range_location().unwrap().end;
               result.push(LookupResult {
                 size: 2,
                 wrapper: LookupResultWrapper::OptionalType(
-                  OptionalTypeResult::Nullable(cur.to_owned(), next.to_owned())
+                  Some(
+                    TypeNode::new(
+                      true,
+                      next.value.to_owned(),
+                      Some(RangeLocation {
+                        start: start_loc,
+                        end: end_loc,
+                      })
+                    )
+                  )
                 ),
               });
               continue;
@@ -142,12 +155,22 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
           }
           result.push(LookupResult {
             size: 0,
-            wrapper: LookupResultWrapper::OptionalType(OptionalTypeResult::None),
+            wrapper: LookupResultWrapper::OptionalType(None),
           });
           continue;
         }
         let old_check_position = check_position;
-        let parsed = parse_type(tokens, &mut check_position);
+        let mut parsed = parse_type(tokens, &mut check_position);
+        if let Some(to_check) = &parsed {
+          if to_check.node_type == NodeType::Type && cur.token_type == TokenType::Identifier {
+            if let Some(next) = next {
+              if next.token_type == TokenType::Assignment {
+                parsed = None;
+                check_position = old_check_position;
+              }
+            }
+          }
+        }
         result.push(LookupResult {
           size: check_position - old_check_position,
           wrapper: LookupResultWrapper::OptionalType(parsed),
@@ -227,99 +250,112 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
   Some(result)
 }
 
-fn parse_type(tokens: &[Token], index: &mut usize) -> OptionalTypeResult {
-  let token = if let Some(t) = tokens.get(*index) {
-    t
+fn get_range_location_from_vec_node(vec_node: &Vec<Box<Node>>) -> Option<RangeLocation> {
+  if
+    let Some(start_loc) = vec_node
+      .first()
+      .map(|x| x.loc.as_ref().map(|loc| loc.start.clone()))
+      .unwrap_or_default()
+  {
+    if
+      let Some(end_loc) = vec_node
+        .last()
+        .map(|x| x.loc.as_ref().map(|loc| loc.end.clone()))
+        .unwrap_or_default()
+    {
+      Some(RangeLocation { start: start_loc, end: end_loc })
+    } else {
+      None
+    }
   } else {
-    return OptionalTypeResult::None;
-  };
+    None
+  }
+}
+
+fn parse_type(tokens: &[Token], index: &mut usize) -> Option<Box<Node>> {
+  let token = tokens.get(*index)?;
   if token.token_type == TokenType::LeftParenthesis {
     *index += 1;
-    let child = parse_type(tokens, index);
-    let token = if let Some(t) = tokens.get(*index) {
-      t
-    } else {
-      return OptionalTypeResult::None;
-    };
+    let child = parse_type(tokens, index)?;
+    let token = tokens.get(*index)?;
     if token.token_type == TokenType::BitwiseAnd {
       *index += 1;
       if
         let Some(mut next) = parse_union_or_intersection_type(tokens, index, TokenType::BitwiseAnd)
       {
         next.insert(0, child);
-        return OptionalTypeResult::Intersection(next);
+        let loc = get_range_location_from_vec_node(&next);
+        return Some(IntersectionTypeNode::new(next, loc));
       } else {
-        return child;
+        return Some(child);
       }
     } else if token.token_type == TokenType::BitwiseOr {
       *index += 1;
       if let Some(mut next) = parse_union_or_intersection_type(tokens, index, TokenType::BitwiseOr) {
         next.insert(0, child);
-        return OptionalTypeResult::Union(next);
+        let loc = get_range_location_from_vec_node(&next);
+        return Some(UnionTypeNode::new(next, loc));
       } else {
-        return child;
+        return Some(child);
       }
     } else if token.token_type == TokenType::RightParenthesis {
       *index += 1;
-      return child;
+      return Some(child);
     }
   } else if TYPES.contains(&token.token_type) {
-    let next_token = if let Some(t) = tokens.get(*index + 1) {
-      t
-    } else {
-      return OptionalTypeResult::None;
-    };
+    let next_token = tokens.get(*index + 1)?;
     if next_token.token_type == TokenType::BitwiseAnd {
       if let Some(child) = parse_union_or_intersection_type(tokens, index, TokenType::BitwiseAnd) {
-        return OptionalTypeResult::Intersection(child);
+        let loc = get_range_location_from_vec_node(&child);
+        return Some(IntersectionTypeNode::new(child, loc));
       }
     } else if next_token.token_type == TokenType::BitwiseOr {
       if let Some(child) = parse_union_or_intersection_type(tokens, index, TokenType::BitwiseOr) {
-        return OptionalTypeResult::Union(child);
+        let loc = get_range_location_from_vec_node(&child);
+        return Some(UnionTypeNode::new(child, loc));
       }
     }
     *index += 1;
-    return OptionalTypeResult::Single(token.to_owned());
+    let loc = token.get_range_location();
+    return Some(TypeNode::new(false, token.value.to_owned(), loc));
   }
-  OptionalTypeResult::None
+  None
 }
 
 fn parse_union_or_intersection_type(
   tokens: &[Token],
   index: &mut usize,
   separator: TokenType
-) -> Option<Vec<OptionalTypeResult>> {
-  let mut result: Vec<OptionalTypeResult> = vec![];
+) -> Option<Vec<Box<Node>>> {
+  let mut result: Vec<Box<Node>> = vec![];
   let mut last_token_type = None;
   loop {
     let token = tokens.get(*index)?;
     if
-      !TYPES.contains(&token.token_type) &&
-      ![separator, TokenType::LeftParenthesis, TokenType::RightParenthesis].contains(
+      TYPES.contains(&token.token_type) ||
+      [separator, TokenType::LeftParenthesis, TokenType::RightParenthesis].contains(
         &token.token_type
       )
     {
-      break;
-    }
-    *index += 1;
-    if
-      (last_token_type.is_none() || last_token_type.unwrap() == separator) &&
-      TYPES.contains(&token.token_type)
-    {
-      last_token_type = Some(token.token_type);
-      result.push(OptionalTypeResult::Single(token.to_owned()));
-      continue;
-    }
-    if last_token_type.is_some() {
-      if last_token_type.unwrap() == separator {
-        if token.token_type == TokenType::LeftParenthesis {
-          result.push(parse_type(tokens, index));
+      *index += 1;
+      if last_token_type.is_none() || last_token_type.unwrap() == separator {
+        if TYPES.contains(&token.token_type) {
+          last_token_type = Some(token.token_type);
+          let loc = token.get_range_location();
+          result.push(TypeNode::new(false, token.value.to_owned(), loc));
+          continue;
+        } else if token.token_type == TokenType::LeftParenthesis {
+          result.push(parse_type(tokens, index)?);
+        }
+      } else if last_token_type.is_some() && last_token_type.unwrap() != separator {
+        if token.token_type == separator {
+          last_token_type = Some(token.token_type);
+          continue;
         } else if token.token_type == TokenType::RightParenthesis {
           break;
+        } else {
+          *index -= 1;
         }
-      } else if token.token_type == separator {
-        last_token_type = Some(token.token_type);
-        continue;
       }
     }
     break;

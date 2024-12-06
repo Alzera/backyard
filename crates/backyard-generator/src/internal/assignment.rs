@@ -6,7 +6,7 @@ pub struct AssignmentGenerator;
 
 impl AssignmentGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Assignment, &node.node);
+    let node = cast_node!(Assignment, &node.node);
     generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
     builder.push(format!(" {} ", node.operator).as_str());
     let mut right = generator.generate_node_new(&node.right);

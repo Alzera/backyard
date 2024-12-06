@@ -6,7 +6,7 @@ pub struct EvalGenerator;
 
 impl EvalGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Eval, &node.node);
+    let node = cast_node!(Eval, &node.node);
     builder.push("eval(");
     generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
     builder.push(")");

@@ -31,10 +31,7 @@ impl WhileParser {
       let condition = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("while", &[], &[TokenType::RightParenthesis])
-        )?,
-        {
-          return Err(ParserError::internal("While", args));
-        }
+        )?
       );
       parser.position += 1;
       let (is_short, body) = BlockParser::new_or_short_or_single(
@@ -44,6 +41,6 @@ impl WhileParser {
       )?;
       return Ok(WhileNode::new(condition, body, is_short, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("While", args))
+    Err(ParserError::Internal)
   }
 }

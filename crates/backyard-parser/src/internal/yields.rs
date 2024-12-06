@@ -34,10 +34,7 @@ impl YieldParser {
               &[],
               &args.breakers.combine(args.separators)
             )
-          )?,
-          {
-            return Err(ParserError::internal("Yield", args));
-          }
+          )?
         );
         return Ok(YieldFromNode::new(expr, parser.gen_loc(start_loc)));
       }
@@ -52,11 +49,7 @@ impl YieldParser {
         return Ok(YieldNode::new(None, None, parser.gen_loc(start_loc)));
       }
       let mut key = None;
-      if
-        guard!(parser.tokens.get(parser.position), {
-          return Err(ParserError::internal("Yield", args));
-        }).token_type == TokenType::Arrow
-      {
+      if guard!(parser.tokens.get(parser.position)).token_type == TokenType::Arrow {
         key = Some(value.unwrap());
         parser.position += 1;
         value = Some(
@@ -67,15 +60,12 @@ impl YieldParser {
                 &args.separators.combine(&[]),
                 &args.breakers.combine(&[TokenType::Semicolon])
               )
-            )?,
-            {
-              return Err(ParserError::internal("Yield", args));
-            }
+            )?
           )
         );
       }
       return Ok(YieldNode::new(key, value, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Yield", args))
+    Err(ParserError::Internal)
   }
 }

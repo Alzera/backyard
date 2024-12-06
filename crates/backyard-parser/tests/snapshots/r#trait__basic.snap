@@ -243,6 +243,7 @@ children:
           leadings: []
           trailings: []
         - node_type: const_property
+          const_type: ~
           visibilities:
             - Public
           items:
@@ -367,8 +368,8 @@ children:
               offset: 196
             end:
               line: 9
-              column: 32
-              offset: 226
+              column: 31
+              offset: 225
           leadings: []
           trailings: []
       loc:

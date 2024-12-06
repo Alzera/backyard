@@ -6,7 +6,7 @@ pub struct StaticLookupGenerator;
 
 impl StaticLookupGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::StaticLookup, &node.node);
+    let node = cast_node!(StaticLookup, &node.node);
     generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
     builder.push("::");
     if node.right.node_type == NodeType::ClassKeyword {

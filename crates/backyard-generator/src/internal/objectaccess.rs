@@ -6,7 +6,7 @@ pub struct ObjectAccessGenerator;
 
 impl ObjectAccessGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::ObjectAccess, &node.node);
+    let node = cast_node!(ObjectAccess, &node.node);
     generator.generate_node(builder, &node.object, &mut GeneratorArgument::default());
     if node.is_nullsafe {
       builder.push("?");

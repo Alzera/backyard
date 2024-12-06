@@ -28,13 +28,13 @@ impl FunctionGenerator {
   }
 
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Function, &node.node);
+    let node = cast_node!(Function, &node.node);
     builder.push("function ");
     if node.is_ref {
       builder.push("&");
     }
     let mut parameters = if node.name.node_type == NodeType::Magic {
-      let name = cast_node!(NodeWrapper::Magic, &node.name.node);
+      let name = cast_node!(Magic, &node.name.node);
       builder.push(&name.name);
       if name.name == "__construct" {
         generator.generate_nodes_new(
@@ -47,7 +47,7 @@ impl FunctionGenerator {
         Self::get_parameters(generator, &node.parameters)
       }
     } else {
-      let name = cast_node!(NodeWrapper::Identifier, &node.name.node);
+      let name = cast_node!(Identifier, &node.name.node);
       builder.push(&name.name);
       Self::get_parameters(generator, &node.parameters)
     };
@@ -79,7 +79,7 @@ impl FunctionGenerator {
   }
 
   pub fn generate_anonymous(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::AnonymousFunction, &node.node);
+    let node = cast_node!(AnonymousFunction, &node.node);
     builder.push("function ");
     if node.is_ref {
       builder.push("&");
@@ -133,7 +133,7 @@ impl FunctionGenerator {
   }
 
   pub fn generate_arrow(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::ArrowFunction, &node.node);
+    let node = cast_node!(ArrowFunction, &node.node);
     builder.push("fn ");
     if node.is_ref {
       builder.push("&");
@@ -169,7 +169,7 @@ impl FunctionGenerator {
     builder: &mut Builder,
     node: &Box<Node>
   ) {
-    let node = cast_node!(NodeWrapper::ConstructorParameter, &node.node);
+    let node = cast_node!(ConstructorParameter, &node.node);
     for visibility in &node.visibilities {
       builder.push(&format!("{} ", visibility));
     }
@@ -180,7 +180,7 @@ impl FunctionGenerator {
   }
 
   pub fn generate_parameter(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Parameter, &node.node);
+    let node = cast_node!(Parameter, &node.node);
     if let Some(n) = &node.variable_type {
       generator.generate_node(builder, n, &mut GeneratorArgument::default());
       builder.push(" ");

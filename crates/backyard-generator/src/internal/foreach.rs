@@ -8,7 +8,7 @@ pub struct ForeachGenerator;
 
 impl ForeachGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Foreach, &node.node);
+    let node = cast_node!(Foreach, &node.node);
 
     builder.push("foreach (");
     generator.generate_node(builder, &node.source, &mut GeneratorArgument::default());

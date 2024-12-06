@@ -7,14 +7,13 @@ use backyard_nodes::node::{
   Node,
   NowDocNode,
   Quote,
-  RangeLocation,
   StringNode,
 };
 
 use crate::{
   error::ParserError,
   guard,
-  parser::{ LocationExtension, LocationHelper, LoopArgument, Parser },
+  parser::{ LocationHelper, LoopArgument, Parser },
   utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
@@ -50,9 +49,7 @@ impl StringParser {
       if let LookupResultWrapper::Equal(string_type) = &string_type.wrapper {
         if string_type.token_type == TokenType::NowDocOpen {
           let label = string_type.value.to_owned();
-          let text = guard!(parser.tokens.get(parser.position), {
-            return Err(ParserError::internal("NowDoc", args));
-          }).value.to_owned();
+          let text = guard!(parser.tokens.get(parser.position)).value.to_owned();
           if let Some(next) = parser.tokens.get(parser.position + 1) {
             if next.token_type == TokenType::NowDocClose {
               parser.position += 2;
@@ -82,7 +79,7 @@ impl StringParser {
         }
       }
     }
-    Err(ParserError::internal("String", args))
+    Err(ParserError::Internal)
   }
 
   #[allow(unused_variables, unreachable_patterns)]
@@ -100,12 +97,7 @@ impl StringParser {
           break;
         }
         TokenType::EncapsedString => {
-          let start_loc = i.get_location().unwrap();
-          let end_loc = start_loc.gen_end_loc(i.value.len());
-          let loc = Some(RangeLocation {
-            start: start_loc,
-            end: end_loc,
-          });
+          let loc = i.get_range_location();
           values.push(
             EncapsedPartNode::new(
               false,
@@ -123,10 +115,7 @@ impl StringParser {
           let value = guard!(
             parser.get_statement(
               &mut LoopArgument::with_tokens("string", &[TokenType::AdvanceInterpolationClose], &[])
-            )?,
-            {
-              continue;
-            }
+            )?
           );
           parser.position += 1;
           values.push(EncapsedPartNode::new(true, value, parser.gen_loc(start_loc)));

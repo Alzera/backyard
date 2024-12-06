@@ -53,6 +53,6 @@ impl ForParser {
       }
       return Ok(ForNode::new(inits, tests, increments, body, body_type, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("For", args))
+    Err(ParserError::Internal)
   }
 }

@@ -23,12 +23,12 @@ impl PostParser {
   ) -> Result<Box<Node>, ParserError> {
     if let [operator] = matched.as_slice() {
       if args.last_expr.is_none() {
-        return Err(ParserError::internal("Post", args));
+        return Err(ParserError::Internal);
       }
       let operator = if let LookupResultWrapper::Equal(operator) = &operator.wrapper {
         operator
       } else {
-        return Err(ParserError::internal("Post", args));
+        return Err(ParserError::Internal);
       };
       return Ok(
         PostNode::new(
@@ -38,6 +38,6 @@ impl PostParser {
         )
       );
     }
-    Err(ParserError::internal("Post", args))
+    Err(ParserError::Internal)
   }
 }

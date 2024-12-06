@@ -40,7 +40,7 @@ impl AttributeParser {
         return Ok(expr);
       }
     }
-    Err(ParserError::internal("Attribute", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -52,7 +52,7 @@ impl AttributeItemParser {
     match_pattern(
       tokens,
       &[
-        Lookup::Equal(&[TokenType::Identifier, TokenType::Name]),
+        Lookup::Equal(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set]),
         Lookup::Optional(&[TokenType::LeftParenthesis]),
       ]
     )
@@ -62,13 +62,13 @@ impl AttributeItemParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name, has_argument] = matched.as_slice() {
       let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
         name.value.to_owned()
       } else {
-        return Err(ParserError::internal("ArrayItem", args));
+        return Err(ParserError::Internal);
       };
       let mut arguments = vec![];
       if !has_argument.is_empty() {
@@ -76,6 +76,6 @@ impl AttributeItemParser {
       }
       return Ok(AttributeItemNode::new(name, arguments, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("ArrayItem", args))
+    Err(ParserError::Internal)
   }
 }

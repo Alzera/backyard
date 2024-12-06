@@ -50,7 +50,7 @@ impl PreParser {
       let operator = if let LookupResultWrapper::Equal(operator) = &operator.wrapper {
         operator
       } else {
-        return Err(ParserError::internal("Pre", args));
+        return Err(ParserError::Internal);
       };
       let argument = parser.get_statement(
         &mut LoopArgument::safe("pre", args.separators, args.breakers, &DEFAULT_PARSERS)
@@ -58,9 +58,7 @@ impl PreParser {
       if operator.token_type == TokenType::Ellipsis {
         return Ok(VariadicNode::new(argument, parser.gen_loc(start_loc)));
       }
-      let argument = guard!(argument, {
-        return Err(ParserError::internal("Pre", args));
-      });
+      let argument = guard!(argument);
       return match operator.token_type {
         | TokenType::PreIncrement
         | TokenType::PreDecrement
@@ -70,9 +68,9 @@ impl PreParser {
         TokenType::BooleanNegate => Ok(NegateNode::new(argument, parser.gen_loc(start_loc))),
         TokenType::AtSign => Ok(SilentNode::new(argument, parser.gen_loc(start_loc))),
         TokenType::BitwiseAnd => Ok(ReferenceNode::new(argument, parser.gen_loc(start_loc))),
-        _ => Err(ParserError::internal("Pre", args)),
+        _ => Err(ParserError::Internal),
       };
     }
-    Err(ParserError::internal("Pre", args))
+    Err(ParserError::Internal)
   }
 }

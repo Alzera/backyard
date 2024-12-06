@@ -65,7 +65,7 @@ impl ClassParser {
     match matched.len() {
       6 => Self::parse_basic(parser, matched, start_loc, args),
       2 => Self::parse_anonymous(parser, matched, start_loc, args),
-      _ => { Err(ParserError::internal("Class", args)) }
+      _ => { Err(ParserError::Internal) }
     }
   }
 
@@ -73,7 +73,7 @@ impl ClassParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, has_parameter] = matched.as_slice() {
       let parameters = if let LookupResultWrapper::Optional(Some(_)) = has_parameter.wrapper {
@@ -91,13 +91,7 @@ impl ClassParser {
       if let Some(t) = parser.tokens.get(parser.position) {
         if t.token_type == TokenType::Extends {
           parser.position += 1;
-          extends = Some(
-            IdentifierParser::from_token(
-              guard!(parser.tokens.get(parser.position), {
-                return Err(ParserError::internal("Class: failed to parse", args));
-              })
-            )
-          );
+          extends = Some(IdentifierParser::from_token(guard!(parser.tokens.get(parser.position))));
           parser.position += 1;
         }
       }
@@ -146,14 +140,14 @@ impl ClassParser {
         )
       );
     }
-    Err(ParserError::internal("Class: failed to parse", args))
+    Err(ParserError::Internal)
   }
 
   fn parse_basic(
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [modifiers, _, name, _, extends, has_implements] = matched.as_slice() {
       let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
@@ -230,6 +224,6 @@ impl ClassParser {
         )
       );
     }
-    Err(ParserError::internal("Class: failed to parse", args))
+    Err(ParserError::Internal)
   }
 }

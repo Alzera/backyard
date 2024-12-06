@@ -29,7 +29,7 @@ impl StaticsParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       parser.position -= 1;
@@ -46,6 +46,6 @@ impl StaticsParser {
       )?;
       return Ok(StaticNode::new(items, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("StaticLookup", args))
+    Err(ParserError::Internal)
   }
 }

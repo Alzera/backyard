@@ -8,7 +8,7 @@ pub struct IfGenerator;
 
 impl IfGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::If, &node.node);
+    let node = cast_node!(If, &node.node);
 
     builder.push("if (");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
@@ -40,7 +40,7 @@ impl IfGenerator {
   }
 
   pub fn generate_else(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Else, &node.node);
+    let node = cast_node!(Else, &node.node);
 
     builder.push("else");
     match node.body.node_type {

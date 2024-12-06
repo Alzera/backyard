@@ -90,8 +90,8 @@ children:
                   loc:
                     start:
                       line: 2
-                      column: 44
-                      offset: 54
+                      column: 30
+                      offset: 40
                     end:
                       line: 2
                       column: 44
@@ -135,8 +135,8 @@ children:
                     loc:
                       start:
                         line: 2
-                        column: 64
-                        offset: 74
+                        column: 58
+                        offset: 68
                       end:
                         line: 2
                         column: 64
@@ -176,8 +176,8 @@ children:
                   loc:
                     start:
                       line: 2
-                      column: 65
-                      offset: 75
+                      column: 48
+                      offset: 58
                     end:
                       line: 2
                       column: 74

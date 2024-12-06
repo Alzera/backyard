@@ -189,19 +189,6 @@ impl<'a> LoopArgument<'a> {
       should_fail: true,
     }
   }
-
-  pub fn print(&self) -> String {
-    let last_statement = self.statements.last().map(|last| &last.node_type);
-    let last_expr = self.last_expr.as_ref().map(|last| &last.node_type);
-    format!(
-      "LoopArgument {{ context: {}, separators: {:?}, breakers: {:?}, last_expr: {:?}, last_statements: {:?} }}",
-      self.context,
-      self.separators,
-      self.breakers,
-      last_expr,
-      last_statement
-    )
-  }
 }
 
 pub struct Parser<'a> {
@@ -317,29 +304,26 @@ impl<'a> Parser<'a> {
 
     for (test, parse) in args.parsers {
       if let Some(matched) = test(tokens, args) {
-        let start_loc = tokens.first().unwrap().get_location().unwrap();
-        self.position += matched
-          .iter()
-          .map(|x| x.size)
-          .sum::<usize>();
-        let parsed = parse(self, matched, start_loc, args)?;
-        return Ok(Some(parsed));
+        if let Some(start_loc) = tokens.first().map(|x| x.get_location().unwrap()) {
+          self.position += matched
+            .iter()
+            .map(|x| x.size)
+            .sum::<usize>();
+          if let Ok(parsed) = parse(self, matched, start_loc, args) {
+            return Ok(Some(parsed));
+          } else {
+            break;
+          }
+        } else {
+          return Err(ParserError::Eof);
+        }
       }
     }
     if args.should_fail {
-      if let Some(token) = tokens.first() {
-        Err(
-          ParserError::Failed(
-            format!(
-              "Unexpected character '{}' at line {}, column {}",
-              token.value,
-              token.line,
-              token.column
-            )
-          )
-        )
+      if let Some(token) = self.tokens.get(self.position) {
+        Err(ParserError::UnexpectedToken(token.to_owned()))
       } else {
-        Err(ParserError::Failed("Unexpected end of file".to_string()))
+        Err(ParserError::Eof)
       }
     } else {
       Ok(None)
@@ -361,35 +345,41 @@ impl<'a> Parser<'a> {
   }
 }
 
-pub trait LocationExtension {
-  fn gen_end_loc(&self, len: usize) -> Location;
-}
-
-impl LocationExtension for Location {
-  fn gen_end_loc(&self, len: usize) -> Location {
-    Location { line: self.line, column: self.column + len, offset: self.offset + len }
-  }
-}
-
 pub trait LocationHelper {
   fn get_location(&self) -> Option<Location>;
+  fn get_range_location(&self) -> Option<RangeLocation>;
 }
 
 impl LocationHelper for &Node {
   fn get_location(&self) -> Option<Location> {
     self.loc.as_ref().map(|loc| loc.start.clone())
   }
-}
 
-impl LocationHelper for Token {
-  fn get_location(&self) -> Option<Location> {
-    Some(Location { line: self.line, column: self.column, offset: self.offset })
+  fn get_range_location(&self) -> Option<RangeLocation> {
+    self.loc.clone()
   }
 }
 
 impl LocationHelper for &Token {
   fn get_location(&self) -> Option<Location> {
     Some(Location { line: self.line, column: self.column, offset: self.offset })
+  }
+
+  fn get_range_location(&self) -> Option<RangeLocation> {
+    if let Some(start_loc) = self.get_location() {
+      let len = self.value.len();
+      let end_loc = Location {
+        line: start_loc.line,
+        column: start_loc.column + len,
+        offset: start_loc.offset + len,
+      };
+      Some(RangeLocation {
+        start: start_loc,
+        end: end_loc,
+      })
+    } else {
+      None
+    }
   }
 }
 

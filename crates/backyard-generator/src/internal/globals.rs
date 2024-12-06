@@ -2,20 +2,18 @@ use backyard_nodes::{ cast_node, node::{ Node, NodeType, NodeWrapper } };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
-use super::property::PropertyGenerator;
+use super::variable::VariableGenerator;
 
 pub struct GlobalGenerator;
 
 impl GlobalGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Global, &node.node);
+    let node = cast_node!(Global, &node.node);
 
     builder.push("global ");
     let mut items = generator.generate_nodes_new(
       &node.items,
-      &mut GeneratorArgument::for_parameter(
-        &[(NodeType::PropertyItem, PropertyGenerator::generate_item)]
-      )
+      &mut GeneratorArgument::for_parameter(&[(NodeType::Variable, VariableGenerator::generate)])
     );
     if
       Generator::check_nodes_has_comments(&node.items) ||

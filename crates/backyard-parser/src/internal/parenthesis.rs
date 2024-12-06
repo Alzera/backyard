@@ -46,10 +46,7 @@ impl ParenthesisParser {
               let expression = guard!(
                 parser.get_statement(
                   &mut LoopArgument::safe("cast", args.separators, args.breakers, &DEFAULT_PARSERS)
-                )?,
-                {
-                  return Err(ParserError::internal("Cast", args));
-                }
+                )?
               );
               return Ok(
                 CastNode::new(token.value.to_owned(), expression, parser.gen_loc(start_loc))
@@ -61,14 +58,11 @@ impl ParenthesisParser {
       let statement = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("parenthesis", &[], &[TokenType::RightParenthesis])
-        )?,
-        {
-          return Err(ParserError::internal("Parenthesis", args));
-        }
+        )?
       );
       parser.position += 1;
       return Ok(ParenthesisNode::new(statement, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Parenthesis", args))
+    Err(ParserError::Internal)
   }
 }

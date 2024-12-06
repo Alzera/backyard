@@ -88,8 +88,8 @@ children:
                     loc:
                       start:
                         line: 2
-                        column: 34
-                        offset: 44
+                        column: 33
+                        offset: 43
                       end:
                         line: 2
                         column: 39
@@ -116,8 +116,8 @@ children:
                   loc:
                     start:
                       line: 2
-                      column: 40
-                      offset: 50
+                      column: 23
+                      offset: 33
                     end:
                       line: 2
                       column: 41

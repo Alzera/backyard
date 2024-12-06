@@ -96,8 +96,8 @@ children:
               offset: 12
             end:
               line: 2
-              column: 39
-              offset: 54
+              column: 38
+              offset: 53
           leadings: []
           trailings: []
         - node_type: property
@@ -169,8 +169,8 @@ children:
                 loc:
                   start:
                     line: 3
-                    column: 19
-                    offset: 75
+                    column: 18
+                    offset: 74
                   end:
                     line: 3
                     column: 33
@@ -202,6 +202,47 @@ children:
                   offset: 95
               leadings: []
               trailings: []
+            - node_type: property_item
+              name:
+                node_type: identifier
+                name: c
+                loc:
+                  start:
+                    line: 3
+                    column: 42
+                    offset: 98
+                  end:
+                    line: 3
+                    column: 43
+                    offset: 99
+                leadings: []
+                trailings: []
+              variable_type: ~
+              value:
+                node_type: number
+                value: "6"
+                loc:
+                  start:
+                    line: 3
+                    column: 47
+                    offset: 103
+                  end:
+                    line: 3
+                    column: 47
+                    offset: 103
+                leadings: []
+                trailings: []
+              loc:
+                start:
+                  line: 3
+                  column: 42
+                  offset: 98
+                end:
+                  line: 3
+                  column: 47
+                  offset: 103
+              leadings: []
+              trailings: []
           loc:
             start:
               line: 3
@@ -209,8 +250,8 @@ children:
               offset: 58
             end:
               line: 3
-              column: 40
-              offset: 96
+              column: 48
+              offset: 104
           leadings: []
           trailings: []
         - node_type: property
@@ -230,60 +271,60 @@ children:
                       node_type: variable
                       name:
                         node_type: identifier
-                        name: a
+                        name: e
                         loc:
                           start:
                             line: 4
                             column: 35
-                            offset: 133
+                            offset: 141
                           end:
                             line: 4
                             column: 36
-                            offset: 134
+                            offset: 142
                         leadings: []
                         trailings: []
                       loc:
                         start:
                           line: 4
                           column: 35
-                          offset: 133
+                          offset: 141
                         end:
                           line: 4
                           column: 36
-                          offset: 134
+                          offset: 142
                       leadings: []
                       trailings: []
                     loc:
                       start:
                         line: 4
                         column: 28
-                        offset: 126
+                        offset: 134
                       end:
                         line: 4
                         column: 35
-                        offset: 133
+                        offset: 141
                     leadings: []
                     trailings: []
                 loc:
                   start:
                     line: 4
                     column: 26
-                    offset: 124
+                    offset: 132
                   end:
                     line: 4
                     column: 39
-                    offset: 137
+                    offset: 145
                 leadings: []
                 trailings: []
               loc:
                 start:
                   line: 4
                   column: 21
-                  offset: 119
+                  offset: 127
                 end:
                   line: 4
                   column: 39
-                  offset: 137
+                  offset: 145
               leadings: []
               trailings: []
             - node_type: property_hook
@@ -301,22 +342,22 @@ children:
                           start:
                             line: 4
                             column: 45
-                            offset: 143
+                            offset: 151
                           end:
                             line: 4
                             column: 48
-                            offset: 146
+                            offset: 154
                         leadings: []
                         trailings: []
                     loc:
                       start:
                         line: 4
-                        column: 48
-                        offset: 146
+                        column: 45
+                        offset: 151
                       end:
                         line: 4
                         column: 48
-                        offset: 146
+                        offset: 154
                     leadings: []
                     trailings: []
                   is_ref: true
@@ -328,77 +369,77 @@ children:
                       start:
                         line: 4
                         column: 53
-                        offset: 151
+                        offset: 159
                       end:
                         line: 4
                         column: 54
-                        offset: 152
+                        offset: 160
                     leadings: []
                     trailings: []
                   value: ~
                   loc:
                     start:
                       line: 4
-                      column: 49
-                      offset: 147
+                      column: 45
+                      offset: 151
                     end:
                       line: 4
                       column: 53
-                      offset: 151
+                      offset: 159
                   leadings: []
                   trailings: []
               body:
                 node_type: variable
                 name:
                   node_type: identifier
-                  name: a
+                  name: f
                   loc:
                     start:
                       line: 4
                       column: 60
-                      offset: 158
+                      offset: 166
                     end:
                       line: 4
                       column: 61
-                      offset: 159
+                      offset: 167
                   leadings: []
                   trailings: []
                 loc:
                   start:
                     line: 4
                     column: 60
-                    offset: 158
+                    offset: 166
                   end:
                     line: 4
                     column: 61
-                    offset: 159
+                    offset: 167
                 leadings: []
                 trailings: []
               loc:
                 start:
                   line: 4
                   column: 41
-                  offset: 139
+                  offset: 147
                 end:
                   line: 4
                   column: 62
-                  offset: 160
+                  offset: 168
               leadings: []
               trailings: []
           items:
             - node_type: property_item
               name:
                 node_type: identifier
-                name: a
+                name: d
                 loc:
                   start:
                     line: 4
                     column: 16
-                    offset: 114
+                    offset: 122
                   end:
                     line: 4
                     column: 17
-                    offset: 115
+                    offset: 123
                 leadings: []
                 trailings: []
               variable_type:
@@ -409,11 +450,11 @@ children:
                   start:
                     line: 4
                     column: 9
-                    offset: 107
+                    offset: 115
                   end:
                     line: 4
                     column: 15
-                    offset: 113
+                    offset: 121
                 leadings: []
                 trailings: []
               value: ~
@@ -421,22 +462,22 @@ children:
                 start:
                   line: 4
                   column: 16
-                  offset: 114
+                  offset: 122
                 end:
                   line: 4
                   column: 16
-                  offset: 114
+                  offset: 122
               leadings: []
               trailings: []
           loc:
             start:
               line: 4
               column: 2
-              offset: 100
+              offset: 108
             end:
               line: 4
               column: 64
-              offset: 162
+              offset: 170
           leadings: []
           trailings: []
       loc:
@@ -447,7 +488,7 @@ children:
         end:
           line: 5
           column: 0
-          offset: 165
+          offset: 173
       leadings: []
       trailings: []
     is_readonly: false
@@ -459,7 +500,7 @@ children:
       end:
         line: 5
         column: 0
-        offset: 165
+        offset: 173
     leadings: []
     trailings: []
 loc:
@@ -470,6 +511,6 @@ loc:
   end:
     line: 5
     column: 0
-    offset: 165
+    offset: 173
 leadings: []
 trailings: []

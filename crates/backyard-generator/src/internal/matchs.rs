@@ -6,7 +6,7 @@ pub struct MatchGenerator;
 
 impl MatchGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Match, &node.node);
+    let node = cast_node!(Match, &node.node);
     builder.push("match(");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
     builder.push(") {");
@@ -24,7 +24,7 @@ impl MatchGenerator {
   }
 
   pub fn generate_arm(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::MatchArm, &node.node);
+    let node = cast_node!(MatchArm, &node.node);
     if !node.conditions.is_empty() {
       let conditions = generator.generate_nodes_new(
         &node.conditions,

@@ -6,7 +6,7 @@ pub struct BinGenerator;
 
 impl BinGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Bin, &node.node);
+    let node = cast_node!(Bin, &node.node);
     generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
     let mut expr = generator.generate_node_new(&node.right);
     if builder.last_len() + expr.first_len() + node.operator.len() > generator.max_length {

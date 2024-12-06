@@ -36,7 +36,7 @@ impl StaticLookupParser {
             parser.position += 1;
             VariableParser::parse(parser, m, t.get_location().unwrap(), args)?
           } else {
-            return Err(ParserError::internal("StaticLookup 1", args));
+            return Err(ParserError::Internal);
           }
         } else if t.token_type == TokenType::LeftCurlyBracket {
           parser.position += 1;
@@ -47,7 +47,7 @@ impl StaticLookupParser {
           if let Some(expr) = expr {
             return Ok(StaticLookupNode::new(left, expr, true, parser.gen_loc(start_loc)));
           } else {
-            return Err(ParserError::internal("StaticLookup 2", args));
+            return Err(ParserError::Internal);
           }
         } else {
           parser.position += 1;
@@ -56,6 +56,6 @@ impl StaticLookupParser {
         return Ok(StaticLookupNode::new(left, expr, false, parser.gen_loc(start_loc)));
       };
     }
-    Err(ParserError::internal("StaticLookup 3", args))
+    Err(ParserError::Internal)
   }
 }

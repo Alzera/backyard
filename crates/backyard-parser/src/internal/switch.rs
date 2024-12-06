@@ -25,22 +25,16 @@ impl SwitchParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let condition = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("switch", &[], &[TokenType::RightParenthesis])
-        )?,
-        {
-          return Err(ParserError::internal("Switch", args));
-        }
+        )?
       );
       parser.position += 1;
-      let is_short =
-        guard!(parser.tokens.get(parser.position), {
-          return Err(ParserError::internal("Switch", args));
-        }).token_type == TokenType::Colon;
+      let is_short = guard!(parser.tokens.get(parser.position)).token_type == TokenType::Colon;
       let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
       parser.position += 1;
       let statements = parser.get_children(
@@ -63,7 +57,7 @@ impl SwitchParser {
         )
       );
     }
-    Err(ParserError::internal("Switch", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -79,7 +73,7 @@ impl CaseParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [is_default] = matched.as_slice() {
       let condition = if let LookupResultWrapper::Equal(is_default) = &is_default.wrapper {
@@ -91,13 +85,11 @@ impl CaseParser {
           )?
         }
       } else {
-        return Err(ParserError::internal("TraitUseAlias", args));
+        return Err(ParserError::Internal);
       };
       parser.position += 1;
       let statements = {
-        let token = guard!(parser.tokens.get(parser.position), {
-          return Err(ParserError::internal("Switch", args));
-        }).token_type;
+        let token = guard!(parser.tokens.get(parser.position)).token_type;
         if token == TokenType::LeftCurlyBracket {
           BlockParser::new(parser)?
         } else {
@@ -120,6 +112,6 @@ impl CaseParser {
       };
       return Ok(CaseNode::new(condition, statements, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Case", args))
+    Err(ParserError::Internal)
   }
 }

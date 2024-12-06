@@ -8,23 +8,23 @@ impl PreGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
     let (operator, expr) = match node.node_type {
       NodeType::Variadic => {
-        let node = cast_node!(NodeWrapper::Variadic, &node.node);
+        let node = cast_node!(Variadic, &node.node);
         ("...", node.statement.to_owned())
       }
       NodeType::Negate => {
-        let node = cast_node!(NodeWrapper::Negate, &node.node);
+        let node = cast_node!(Negate, &node.node);
         ("!", Some(node.statement.to_owned()))
       }
       NodeType::Silent => {
-        let node = cast_node!(NodeWrapper::Silent, &node.node);
+        let node = cast_node!(Silent, &node.node);
         ("@", Some(node.statement.to_owned()))
       }
       NodeType::Reference => {
-        let node = cast_node!(NodeWrapper::Reference, &node.node);
+        let node = cast_node!(Reference, &node.node);
         ("&", Some(node.statement.to_owned()))
       }
       NodeType::Pre => {
-        let node = cast_node!(NodeWrapper::Pre, &node.node);
+        let node = cast_node!(Pre, &node.node);
         (node.operator.as_str(), Some(node.statement.to_owned()))
       }
       _ => {

@@ -13,25 +13,24 @@ pub struct ArrayLookupParser;
 
 impl ArrayLookupParser {
   pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    let last_expr = guard!(&args.last_expr, {
-      return None;
-    });
-    if
-      ![
-        NodeType::This,
-        NodeType::Variable,
-        NodeType::StaticLookup,
-        NodeType::ArrayLookup,
-        NodeType::Call,
-        NodeType::Match,
-        NodeType::Array,
-        NodeType::ObjectAccess,
-        NodeType::Parenthesis,
-      ].contains(&last_expr.node_type)
-    {
-      return None;
+    if let Some(last_expr) = &args.last_expr {
+      if
+        [
+          NodeType::This,
+          NodeType::Variable,
+          NodeType::StaticLookup,
+          NodeType::ArrayLookup,
+          NodeType::Call,
+          NodeType::Match,
+          NodeType::Array,
+          NodeType::ObjectAccess,
+          NodeType::Parenthesis,
+        ].contains(&last_expr.node_type)
+      {
+        return match_pattern(tokens, &[Lookup::Equal(&[TokenType::LeftSquareBracket])]);
+      }
     }
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::LeftSquareBracket])])
+    None
   }
 
   pub fn parse(
@@ -41,15 +40,13 @@ impl ArrayLookupParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
-      let on = guard!(args.last_expr.to_owned(), {
-        return Err(ParserError::internal("ArrayLookup", args));
-      });
+      let on = guard!(args.last_expr.to_owned());
       let target = parser.get_statement(
         &mut LoopArgument::with_tokens("arraylookup", &[], &[TokenType::RightSquareBracket])
       )?;
       parser.position += 1;
       return Ok(ArrayLookupNode::new(on, target, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("ArrayLookup", args))
+    Err(ParserError::Internal)
   }
 }

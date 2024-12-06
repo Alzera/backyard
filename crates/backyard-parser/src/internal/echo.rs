@@ -38,6 +38,6 @@ impl EchoParser {
       }
       return Ok(EchoNode::new(items, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Echo", args))
+    Err(ParserError::Internal)
   }
 }

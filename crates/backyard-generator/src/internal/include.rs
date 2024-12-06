@@ -6,7 +6,7 @@ pub struct IncludeGenerator;
 
 impl IncludeGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Include, &node.node);
+    let node = cast_node!(Include, &node.node);
     if node.is_require {
       builder.push("require");
     } else {

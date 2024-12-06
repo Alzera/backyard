@@ -1,7 +1,7 @@
 mod internal;
 mod parser;
 mod utils;
-mod guards;
+mod macros;
 pub mod error;
 
 use backyard_lexer::{ error::LexError, lex, lex_eval, token::Token };
@@ -21,7 +21,7 @@ fn parse_base(tokens: Result<Vec<Token>, LexError>) -> Result<Box<Node>, ParserE
   match tokens {
     Ok(tokens) => {
       if tokens.is_empty() {
-        return Err(ParserError::Failed("Empty tokens".to_string()));
+        return Err(ParserError::Eof);
       }
       let mut parser = Parser::new(&tokens);
       let parsed = parser.get_children(&mut LoopArgument::default("main"))?;

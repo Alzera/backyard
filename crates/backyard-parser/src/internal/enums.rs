@@ -13,7 +13,6 @@ use super::{
   consts::ConstPropertyParser,
   identifier::IdentifierParser,
   method::MethodParser,
-  types::TypesParser,
 };
 
 #[derive(Debug, Clone)]
@@ -39,24 +38,20 @@ impl EnumParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [_, name, has_type, enum_type, has_implements, implements, _] = matched.as_slice() {
+    if let [_, name, _, enum_type, has_implements, implements, _] = matched.as_slice() {
+      let enum_type = if
+        let LookupResultWrapper::OptionalType(enum_type) = enum_type.wrapper.to_owned()
+      {
+        enum_type
+      } else {
+        return Err(ParserError::Internal);
+      };
       let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
         IdentifierParser::from_token(name)
       } else {
-        return Err(ParserError::internal("Enum", args));
-      };
-      let enum_type = if !has_type.is_empty() {
-        let types = TypesParser::parse(
-          parser,
-          vec![enum_type.to_owned()],
-          Location { line: 0, column: 0, offset: 0 },
-          args
-        )?;
-        Some(types)
-      } else {
-        None
+        return Err(ParserError::Internal);
       };
       let implements = if !has_implements.is_empty() {
         if let LookupResultWrapper::Optional(Some(implements)) = &implements.wrapper {
@@ -83,7 +78,7 @@ impl EnumParser {
       )?;
       return Ok(EnumNode::new(name, enum_type, implements, items, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Enum", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -99,7 +94,7 @@ impl EnumItemParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       if
@@ -114,6 +109,6 @@ impl EnumItemParser {
         return Ok(EnumItemNode::new(value, parser.gen_loc(start_loc)));
       }
     }
-    Err(ParserError::internal("EnumItem", args))
+    Err(ParserError::Internal)
   }
 }

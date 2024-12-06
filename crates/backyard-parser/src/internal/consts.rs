@@ -2,6 +2,7 @@ use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ ConstNode, ConstPropertyNode, Location, Node, Visibility };
 
 use crate::{
+  cast_lookup_result,
   error::ParserError,
   parser::{ LoopArgument, Parser },
   utils::{
@@ -47,12 +48,12 @@ impl ConstParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       return Ok(ConstNode::new(ConstParser::get_consts(parser)?, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Const", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -63,7 +64,11 @@ impl ConstPropertyParser {
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
     match_pattern(
       tokens,
-      &[Lookup::Modifiers(&[ModifierLookup::Visibility]), Lookup::Equal(&[TokenType::Const])]
+      &[
+        Lookup::Modifiers(&[ModifierLookup::Visibility]),
+        Lookup::Equal(&[TokenType::Const]),
+        Lookup::OptionalType,
+      ]
     )
   }
 
@@ -71,9 +76,9 @@ impl ConstPropertyParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [modifiers, _] = matched.as_slice() {
+    if let [modifiers, _, const_type] = matched.as_slice() {
       let mut visibilities = vec![];
       if let LookupResultWrapper::Modifier(modifiers) = &modifiers.wrapper {
         if let [ModifierResult::Visibility(visibilities_modifier)] = modifiers.as_slice() {
@@ -83,14 +88,16 @@ impl ConstPropertyParser {
             .collect();
         }
       }
+      let const_type = cast_lookup_result!(OptionalType, &const_type.wrapper);
       return Ok(
         ConstPropertyNode::new(
+          const_type.to_owned(),
           visibilities,
           ConstParser::get_consts(parser)?,
           parser.gen_loc(start_loc)
         )
       );
     }
-    Err(ParserError::internal("ConstProperty", args))
+    Err(ParserError::Internal)
   }
 }

@@ -6,7 +6,7 @@ pub struct ListGenerator;
 
 impl ListGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::List, &node.node);
+    let node = cast_node!(List, &node.node);
     builder.push("list(");
     let mut values = generator.generate_nodes_new(
       &node.items,

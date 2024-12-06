@@ -6,7 +6,7 @@ pub struct YieldGenerator;
 
 impl YieldGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Yield, &node.node);
+    let node = cast_node!(Yield, &node.node);
 
     builder.push("yield");
     if let Some(key) = &node.key {
@@ -21,7 +21,7 @@ impl YieldGenerator {
   }
 
   pub fn generate_from(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::YieldFrom, &node.node);
+    let node = cast_node!(YieldFrom, &node.node);
 
     builder.push("yield from ");
     generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());

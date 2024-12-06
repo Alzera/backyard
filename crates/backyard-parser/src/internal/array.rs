@@ -58,7 +58,7 @@ impl ArrayParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     match matched.len() {
       1 => {
@@ -85,7 +85,7 @@ impl ArrayParser {
       }
       _ => {}
     }
-    Err(ParserError::internal("Array", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -107,14 +107,11 @@ impl ArrayItemParser {
       let value = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("array_item", &[], &args.breakers.combine(args.separators))
-        )?,
-        {
-          return Err(ParserError::internal("ArrayItem", args));
-        }
+        )?
       );
       let key = args.last_expr.to_owned();
       return Ok(ArrayItemNode::new(key, value, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("ArrayItem", args))
+    Err(ParserError::Internal)
   }
 }

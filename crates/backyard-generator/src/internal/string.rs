@@ -6,12 +6,12 @@ pub struct StringGenerator;
 
 impl StringGenerator {
   pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::String, &node.node);
+    let node = cast_node!(String, &node.node);
     builder.push(&format!("{}{}{}", node.quote, node.value, node.quote));
   }
 
   pub fn generate_encapsed(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Encapsed, &node.node);
+    let node = cast_node!(Encapsed, &node.node);
     let quote = format!("{}", node.quote);
     builder.push(&quote);
     let parts = generator
@@ -29,9 +29,9 @@ impl StringGenerator {
     builder: &mut Builder,
     node: &Box<Node>
   ) {
-    let node = cast_node!(NodeWrapper::EncapsedPart, &node.node);
+    let node = cast_node!(EncapsedPart, &node.node);
     if node.value.node_type == NodeType::String {
-      let value = cast_node!(NodeWrapper::String, &node.value.node);
+      let value = cast_node!(String, &node.value.node);
       builder.push(&value.value);
       return;
     }
@@ -44,7 +44,7 @@ impl StringGenerator {
   }
 
   pub fn generate_nowdoc(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::NowDoc, &node.node);
+    let node = cast_node!(NowDoc, &node.node);
     builder.push(&format!("<<<'{}'", node.label));
     builder.push(&node.value);
     if let Some(last) = node.value.split('\n').last() {
@@ -56,7 +56,7 @@ impl StringGenerator {
   }
 
   pub fn generate_heredoc(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::HereDoc, &node.node);
+    let node = cast_node!(HereDoc, &node.node);
     builder.push(&format!("<<<{}", node.label));
     let parts = generator.generate_nodes_new(
       &node.values,

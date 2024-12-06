@@ -12,7 +12,7 @@ fn items() {
     "class A {
   use Loggable, Usable {
     log as public;
-    log as private alias;
+    get as private alias;
     Loggable::log as aliasLoggable;
     Usable insteadof Loggable;
     Usable::useResource insteadof Loggable;

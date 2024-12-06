@@ -30,13 +30,13 @@ impl InterfaceParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, name] = matched.as_slice() {
       let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
         IdentifierParser::from_token(name)
       } else {
-        return Err(ParserError::internal("Interface", args));
+        return Err(ParserError::Internal);
       };
       let extends = if let Some(t) = parser.tokens.get(parser.position) {
         if t.token_type == TokenType::Extends {
@@ -84,6 +84,6 @@ impl InterfaceParser {
         )
       );
     }
-    Err(ParserError::internal("Interface", args))
+    Err(ParserError::Internal)
   }
 }

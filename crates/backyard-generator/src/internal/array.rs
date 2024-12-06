@@ -5,7 +5,7 @@ pub struct ArrayGenerator;
 
 impl ArrayGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Array, &node.node);
+    let node = cast_node!(Array, &node.node);
 
     let items = generator.generate_nodes_new(
       &node.items,
@@ -41,7 +41,7 @@ impl ArrayGenerator {
   }
 
   pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::ArrayItem, &node.node);
+    let node = cast_node!(ArrayItem, &node.node);
     if let Some(key) = &node.key {
       generator.generate_node(builder, key, &mut GeneratorArgument::default());
       builder.push(" => ");

@@ -15,7 +15,7 @@ pub struct ClassGenerator;
 
 impl ClassGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Class, &node.node);
+    let node = cast_node!(Class, &node.node);
     if node.is_readonly {
       builder.push("readonly ");
     }
@@ -56,7 +56,7 @@ impl ClassGenerator {
   }
 
   pub fn generate_anonymous(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::AnonymousClass, &node.node);
+    let node = cast_node!(AnonymousClass, &node.node);
     builder.push("class");
     if !node.parameters.is_empty() {
       builder.push("(");

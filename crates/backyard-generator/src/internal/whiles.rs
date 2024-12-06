@@ -8,7 +8,7 @@ pub struct WhileGenerator;
 
 impl WhileGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::While, &node.node);
+    let node = cast_node!(While, &node.node);
 
     builder.push("while (");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());

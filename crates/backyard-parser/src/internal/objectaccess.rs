@@ -31,22 +31,19 @@ impl ObjectAccessParser {
       let is_nullsafe = if let LookupResultWrapper::Equal(access_type) = &access_type.wrapper {
         access_type.token_type == TokenType::NullsafeObjectAccess
       } else {
-        return Err(ParserError::internal("ObjectAccess", args));
+        return Err(ParserError::Internal);
       };
       let is_bracket = if let Some(next_token) = parser.tokens.get(parser.position) {
         next_token.token_type == TokenType::LeftCurlyBracket
       } else {
-        return Err(ParserError::internal("ObjectAccess", args));
+        return Err(ParserError::Internal);
       };
       let expr = if is_bracket {
         parser.position += 1;
         let t = guard!(
           parser.get_statement(
             &mut LoopArgument::with_tokens("objectaccess", &[], &[TokenType::RightCurlyBracket])
-          )?,
-          {
-            return Err(ParserError::internal("ObjectAccess", args));
-          }
+          )?
         );
         parser.position += 1;
         t
@@ -61,7 +58,7 @@ impl ObjectAccessParser {
         parser.position += 1;
         IdentifierParser::from_token(token)
       } else {
-        return Err(ParserError::internal("ObjectAccess", args));
+        return Err(ParserError::Internal);
       };
       return Ok(
         ObjectAccessNode::new(
@@ -73,6 +70,6 @@ impl ObjectAccessParser {
         )
       );
     }
-    Err(ParserError::internal("ObjectAccess", args))
+    Err(ParserError::Internal)
   }
 }

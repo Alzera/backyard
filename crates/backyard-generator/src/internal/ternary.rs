@@ -5,7 +5,7 @@ pub struct TernaryGenerator;
 
 impl TernaryGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Ternary, &node.node);
+    let node = cast_node!(Ternary, &node.node);
 
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
     builder.push(" ? ");

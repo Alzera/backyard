@@ -6,7 +6,7 @@ pub struct IdentifierGenerator;
 
 impl IdentifierGenerator {
   pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Identifier, &node.node);
+    let node = cast_node!(Identifier, &node.node);
     builder.push(&node.name);
   }
 }

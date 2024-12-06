@@ -1,5 +1,6 @@
 ---
 source: crates/backyard-parser/tests/traituse.rs
+assertion_line: 22
 expression: asts
 snapshot_kind: text
 ---
@@ -88,7 +89,7 @@ children:
               trait_name: ~
               method:
                 node_type: identifier
-                name: log
+                name: get
                 loc:
                   start:
                     line: 4

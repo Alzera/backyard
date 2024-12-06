@@ -29,10 +29,7 @@ impl TernaryParser {
       let valid = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("ternary_valid", &[], &[TokenType::Colon])
-        )?,
-        {
-          return Err(ParserError::internal("Ternary", args));
-        }
+        )?
       );
       parser.position += 1;
       let invalid = guard!(
@@ -43,13 +40,10 @@ impl TernaryParser {
             &args.breakers.combine(args.separators).combine(&[TokenType::Semicolon]),
             &DEFAULT_PARSERS
           )
-        )?,
-        {
-          return Err(ParserError::internal("Ternary", args));
-        }
+        )?
       );
       return Ok(TernaryNode::new(left, valid, invalid, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Ternary", args))
+    Err(ParserError::Internal)
   }
 }

@@ -22,7 +22,7 @@ impl DoWhileParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       let body = BlockParser::new(parser)?;
@@ -37,15 +37,12 @@ impl DoWhileParser {
               (CommentParser::test, CommentParser::parse),
             ]
           )
-        )?,
-        {
-          return Err(ParserError::internal("DoWhile", args));
-        }
+        )?
       );
       parser.position += 1;
       return Ok(DoWhileNode::new(condition, body, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("DoWhile", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -64,19 +61,16 @@ impl DoWhileConditionParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let condition = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens("do_while_condition", &[], &[TokenType::RightParenthesis])
-        )?,
-        {
-          return Err(ParserError::internal("DoWhileCondition", args));
-        }
+        )?
       );
       return Ok(DoWhileConditionNode::new(condition, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("DoWhileCondition", args))
+    Err(ParserError::Internal)
   }
 }

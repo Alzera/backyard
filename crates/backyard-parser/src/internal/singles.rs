@@ -87,7 +87,7 @@ impl SinglesParser {
             TokenType::Null => Ok(NullNode::new(parser.gen_loc(start_loc))),
             TokenType::Inline =>
               Ok(InlineNode::new(key.value.to_owned(), parser.gen_loc(start_loc))),
-            _ => Err(ParserError::internal("Single: first group", args)),
+            _ => Err(ParserError::Internal),
           };
         }
         let argument = parser.get_statement(
@@ -110,7 +110,7 @@ impl SinglesParser {
           _ => {}
         }
         if argument.is_none() {
-          return Err(ParserError::internal("Single: second group", args));
+          return Err(ParserError::Internal);
         }
         let argument = argument.unwrap();
         return match key.token_type {
@@ -119,10 +119,10 @@ impl SinglesParser {
           TokenType::Throw => Ok(ThrowNode::new(argument, parser.gen_loc(start_loc))),
           TokenType::Clone => Ok(CloneNode::new(argument, parser.gen_loc(start_loc))),
           TokenType::Goto => Ok(GotoNode::new(argument, parser.gen_loc(start_loc))),
-          _ => Err(ParserError::internal("Single: third group", args)),
+          _ => Err(ParserError::Internal),
         };
       }
     }
-    Err(ParserError::internal("Single", args))
+    Err(ParserError::Internal)
   }
 }

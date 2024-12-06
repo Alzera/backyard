@@ -13,7 +13,7 @@ pub struct EnumGenerator;
 
 impl EnumGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Enum, &node.node);
+    let node = cast_node!(Enum, &node.node);
     builder.push("enum ");
     IdentifierGenerator::generate(generator, builder, &node.name);
     if let Some(n) = &node.enum_type {
@@ -43,7 +43,7 @@ impl EnumGenerator {
   }
 
   pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::EnumItem, &node.node);
+    let node = cast_node!(EnumItem, &node.node);
     builder.push("case ");
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());
   }

@@ -35,7 +35,7 @@ impl CommentParser {
       let comment = if let LookupResultWrapper::Equal(comment) = &comment.wrapper {
         comment
       } else {
-        return Err(ParserError::internal("Comment: failed to get type", args));
+        return Err(ParserError::Internal);
       };
       let comment: Box<Node> = match comment.token_type {
         TokenType::CommentLine =>
@@ -45,7 +45,7 @@ impl CommentParser {
         TokenType::CommentDoc =>
           CommentDocNode::new(comment.value.to_owned(), parser.gen_loc(start_loc)),
         _ => {
-          return Err(ParserError::internal("Comment: failed creating node", args));
+          return Err(ParserError::Internal);
         }
       };
       let expr = parser.get_statement(
@@ -100,6 +100,6 @@ impl CommentParser {
       }
       return Ok(comment);
     }
-    Err(ParserError::internal("Comment", args))
+    Err(ParserError::Internal)
   }
 }

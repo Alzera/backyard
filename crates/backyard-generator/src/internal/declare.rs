@@ -8,7 +8,7 @@ pub struct DeclareGenerator;
 
 impl DeclareGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Declare, &node.node);
+    let node = cast_node!(Declare, &node.node);
     builder.push("declare");
     let mut arguments = generator.generate_nodes_new(
       &node.arguments,
@@ -44,7 +44,7 @@ impl DeclareGenerator {
   }
 
   pub fn generate_argument(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::DeclareArgument, &node.node);
+    let node = cast_node!(DeclareArgument, &node.node);
     IdentifierGenerator::generate(generator, builder, &node.name);
     builder.push(" = ");
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());

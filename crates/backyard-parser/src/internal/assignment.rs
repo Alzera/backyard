@@ -67,6 +67,6 @@ impl AssignmentParser {
         }
       }
     }
-    Err(ParserError::internal("Assignment", args))
+    Err(ParserError::Internal)
   }
 }

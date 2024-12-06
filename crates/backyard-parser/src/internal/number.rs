@@ -22,16 +22,16 @@ impl NumberParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [number] = matched.as_slice() {
       let number = if let LookupResultWrapper::Equal(number) = &number.wrapper {
         number.value.to_owned()
       } else {
-        return Err(ParserError::internal("Number", args));
+        return Err(ParserError::Internal);
       };
       return Ok(NumberNode::new(number, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Number", args))
+    Err(ParserError::Internal)
   }
 }

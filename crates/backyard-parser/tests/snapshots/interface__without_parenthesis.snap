@@ -52,6 +52,7 @@ children:
       node_type: block
       statements:
         - node_type: const_property
+          const_type: ~
           visibilities: []
           items:
             - node_type: assignment
@@ -165,8 +166,8 @@ children:
                 loc:
                   start:
                     line: 3
-                    column: 24
-                    offset: 91
+                    column: 20
+                    offset: 87
                   end:
                     line: 3
                     column: 24
@@ -222,8 +223,8 @@ children:
                 loc:
                   start:
                     line: 3
-                    column: 32
-                    offset: 99
+                    column: 28
+                    offset: 95
                   end:
                     line: 3
                     column: 37

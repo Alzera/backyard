@@ -24,7 +24,7 @@ impl DeclareParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let arguments = parser.get_children(
@@ -56,7 +56,7 @@ impl DeclareParser {
       };
       return Ok(DeclareNode::new(arguments, body, body_type, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Declare", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -75,13 +75,13 @@ impl DeclareArgumentParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name, _] = matched.as_slice() {
       let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
         IdentifierParser::from_token(name)
       } else {
-        return Err(ParserError::internal("DeclareArgument", args));
+        return Err(ParserError::Internal);
       };
       if
         let Some(value) = parser.get_statement(
@@ -95,6 +95,6 @@ impl DeclareArgumentParser {
         return Ok(DeclareArgumentNode::new(name, value, parser.gen_loc(start_loc)));
       }
     }
-    Err(ParserError::internal("DeclareArgument", args))
+    Err(ParserError::Internal)
   }
 }

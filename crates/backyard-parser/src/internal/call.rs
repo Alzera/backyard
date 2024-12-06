@@ -52,7 +52,7 @@ impl CallParser {
         )
       );
     }
-    Err(ParserError::internal("Call", args))
+    Err(ParserError::Internal)
   }
 }
 
@@ -97,7 +97,7 @@ impl ArgumentParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name, has_name] = matched.as_slice() {
       let name = if let LookupResultWrapper::Optional(_) = &has_name.wrapper {
@@ -107,7 +107,7 @@ impl ArgumentParser {
           None
         }
       } else {
-        return Err(ParserError::internal("Argument", args));
+        return Err(ParserError::Internal);
       };
       let value = guard!(
         parser.get_statement(
@@ -116,13 +116,10 @@ impl ArgumentParser {
             &[TokenType::Comma, TokenType::RightParenthesis],
             &[]
           )
-        )?,
-        {
-          return Err(ParserError::internal("Argument: failed to get value", args));
-        }
+        )?
       );
       return Ok(CallArgumentNode::new(name, value, parser.gen_loc(start_loc)));
     }
-    Err(ParserError::internal("Argument", args))
+    Err(ParserError::Internal)
   }
 }

@@ -15,7 +15,7 @@ pub struct TraitGenerator;
 
 impl TraitGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Trait, &node.node);
+    let node = cast_node!(Trait, &node.node);
     builder.push("trait ");
     IdentifierGenerator::generate(generator, builder, &node.name);
     BlockGenerator::generate_specific(

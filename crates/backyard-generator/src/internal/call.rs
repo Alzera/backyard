@@ -6,7 +6,7 @@ pub struct CallGenerator;
 
 impl CallGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Call, &node.node);
+    let node = cast_node!(Call, &node.node);
     generator.generate_node(builder, &node.name, &mut GeneratorArgument::default());
     let mut arguments = generator.generate_nodes_new(
       &node.arguments,
@@ -27,7 +27,7 @@ impl CallGenerator {
   }
 
   pub fn generate_argument(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::CallArgument, &node.node);
+    let node = cast_node!(CallArgument, &node.node);
     if let Some(name) = &node.name {
       generator.generate_node(builder, name, &mut GeneratorArgument::default());
       builder.push(": ");

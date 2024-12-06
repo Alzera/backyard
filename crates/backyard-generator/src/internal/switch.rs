@@ -8,7 +8,7 @@ pub struct SwitchGenerator;
 
 impl SwitchGenerator {
   pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Switch, &node.node);
+    let node = cast_node!(Switch, &node.node);
 
     builder.push("switch (");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
@@ -24,7 +24,7 @@ impl SwitchGenerator {
   }
 
   pub fn generate_case(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
-    let node = cast_node!(NodeWrapper::Case, &node.node);
+    let node = cast_node!(Case, &node.node);
 
     if let Some(n) = &node.condition {
       builder.push("case ");

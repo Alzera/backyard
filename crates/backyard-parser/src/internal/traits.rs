@@ -32,13 +32,13 @@ impl TraitParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, name] = matched.as_slice() {
       let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
         IdentifierParser::from_token(name)
       } else {
-        return Err(ParserError::internal("Trait", args));
+        return Err(ParserError::Internal);
       };
       let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
       parser.position += 1;
@@ -65,6 +65,6 @@ impl TraitParser {
         )
       );
     }
-    Err(ParserError::internal("Trait", args))
+    Err(ParserError::Internal)
   }
 }

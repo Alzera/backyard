@@ -15,21 +15,23 @@ pub struct BlockParser;
 
 impl BlockParser {
   pub fn new(parser: &mut Parser) -> Result<Box<Node>, ParserError> {
-    Ok(
-      parser
-        .get_statement(
-          &mut LoopArgument::safe(
-            "block_parser",
-            &[],
-            &[],
-            &[
-              (CommentParser::test, CommentParser::parse),
-              (BlockParser::test, BlockParser::parse),
-            ]
-          )
-        )?
-        .unwrap()
-    )
+    if
+      let Some(block) = parser.get_statement(
+        &mut LoopArgument::safe(
+          "block_parser",
+          &[],
+          &[],
+          &[
+            (CommentParser::test, CommentParser::parse),
+            (BlockParser::test, BlockParser::parse),
+          ]
+        )
+      )?
+    {
+      Ok(block)
+    } else {
+      Err(ParserError::Internal)
+    }
   }
 
   pub fn new_short(parser: &mut Parser, breakers: &[TokenType]) -> Result<Box<Node>, ParserError> {
@@ -48,22 +50,22 @@ impl BlockParser {
   pub fn new_or_short(
     parser: &mut Parser,
     breakers: &[TokenType],
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<(bool, Box<Node>), ParserError> {
     if let Some(start) = parser.tokens.get(parser.position) {
       return match start.token_type {
         TokenType::Colon => Ok((true, BlockParser::new_short(parser, breakers)?)),
         TokenType::LeftCurlyBracket => Ok((false, BlockParser::new(parser)?)),
-        _ => Err(ParserError::internal("Block", args)),
+        _ => Err(ParserError::Internal),
       };
     }
-    Err(ParserError::internal("Block", args))
+    Err(ParserError::Internal)
   }
 
   pub fn new_or_short_or_single(
     parser: &mut Parser,
     breakers: &[TokenType],
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<(bool, Box<Node>), ParserError> {
     if let Some(start) = parser.tokens.get(parser.position) {
       return match start.token_type {
@@ -73,10 +75,7 @@ impl BlockParser {
           let expr = guard!(
             parser.get_statement(
               &mut LoopArgument::safe("block_expr", &[], &[TokenType::Semicolon], &DEFAULT_PARSERS)
-            )?,
-            {
-              return Err(ParserError::internal("Block", args));
-            }
+            )?
           );
           if let Some(token) = parser.tokens.get(parser.position) {
             if token.token_type == TokenType::Semicolon {
@@ -87,7 +86,7 @@ impl BlockParser {
         }
       };
     }
-    Err(ParserError::internal("Block", args))
+    Err(ParserError::Internal)
   }
 
   pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
@@ -98,7 +97,7 @@ impl BlockParser {
     parser: &mut Parser,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
+    _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_] = matched.as_slice() {
       return Ok(
@@ -108,6 +107,6 @@ impl BlockParser {
         )
       );
     }
-    Err(ParserError::internal("Exit", args))
+    Err(ParserError::Internal)
   }
 }
