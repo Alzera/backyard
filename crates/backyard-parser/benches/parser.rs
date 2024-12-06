@@ -94,7 +94,7 @@ BAR;
 fn criterion_benchmark(c: &mut Criterion) {
   c.bench_function("parser_basic", |b| {
     b.iter(|| {
-      let _ = parse(black_box(&CONTENT));
+      let _ = parse(black_box(CONTENT));
     });
   });
 }

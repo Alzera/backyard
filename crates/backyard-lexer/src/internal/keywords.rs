@@ -172,7 +172,7 @@ impl KeywordToken {
       "protected" => [TokenType::Protected, TokenType::ProtectedGet, TokenType::ProtectedSet],
       "public" => [TokenType::Public, TokenType::PublicGet, TokenType::PublicSet],
       _ => {
-        return Err(lexer.control.error_unrecognized(&input.to_owned()));
+        return Err(lexer.control.error_unrecognized(input));
       }
     };
     if let Some(pos) = lexer.control.peek_char_n(None, 5) {

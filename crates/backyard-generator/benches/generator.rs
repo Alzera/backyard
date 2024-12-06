@@ -92,7 +92,7 @@ BAR;
 }";
 
 fn criterion_benchmark(c: &mut Criterion) {
-  let asts = parse(&CONTENT).unwrap();
+  let asts = parse(CONTENT).unwrap();
   c.bench_function("generator_basic", |b| {
     b.iter(|| {
       let _ = generate(black_box(&asts));

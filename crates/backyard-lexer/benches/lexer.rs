@@ -94,7 +94,7 @@ BAR;
 fn criterion_benchmark(c: &mut Criterion) {
   c.bench_function("lexer_basic", |b| {
     b.iter(|| {
-      let _ = lex(black_box(&CONTENT));
+      let _ = lex(black_box(CONTENT));
     });
   });
 }

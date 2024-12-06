@@ -76,7 +76,7 @@ impl PropertyParser {
         {
           let item_start_loc = name.get_location().unwrap();
           PropertyItemNode::new(
-            IdentifierParser::from_token(&name),
+            IdentifierParser::from_token(name),
             prop_type.to_owned(),
             Some(value),
             parser.gen_loc(item_start_loc)
@@ -87,7 +87,7 @@ impl PropertyParser {
       } else {
         let item_start_loc = name.get_location().unwrap();
         PropertyItemNode::new(
-          IdentifierParser::from_token(&name),
+          IdentifierParser::from_token(name),
           prop_type.to_owned(),
           None,
           parser.gen_loc(item_start_loc)

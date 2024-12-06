@@ -198,24 +198,22 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
                 assigned = true;
                 break;
               }
-            } else {
-              if
-                [
-                  TokenType::Private,
-                  TokenType::PrivateGet,
-                  TokenType::PrivateSet,
-                  TokenType::Protected,
-                  TokenType::ProtectedGet,
-                  TokenType::ProtectedSet,
-                  TokenType::Public,
-                  TokenType::PublicGet,
-                  TokenType::PublicSet,
-                ].contains(&token.token_type)
-              {
-                modifiers[i].push(token.to_owned());
-                assigned = true;
-                break;
-              }
+            } else if
+              [
+                TokenType::Private,
+                TokenType::PrivateGet,
+                TokenType::PrivateSet,
+                TokenType::Protected,
+                TokenType::ProtectedGet,
+                TokenType::ProtectedSet,
+                TokenType::Public,
+                TokenType::PublicGet,
+                TokenType::PublicSet,
+              ].contains(&token.token_type)
+            {
+              modifiers[i].push(token.to_owned());
+              assigned = true;
+              break;
             }
           }
           if !assigned {
@@ -233,7 +231,7 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
             if let ModifierLookup::Visibility = modifiers_rule[i] {
               ModifierResult::Visibility(x.to_owned())
             } else {
-              ModifierResult::Custom(x.get(0).cloned())
+              ModifierResult::Custom(x.first().cloned())
             }
           })
           .collect();
@@ -250,23 +248,18 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
   Some(result)
 }
 
-fn get_range_location_from_vec_node(vec_node: &Vec<Box<Node>>) -> Option<RangeLocation> {
+fn get_range_location_from_vec_node(vec_node: &[Box<Node>]) -> Option<RangeLocation> {
   if
     let Some(start_loc) = vec_node
       .first()
       .map(|x| x.loc.as_ref().map(|loc| loc.start.clone()))
       .unwrap_or_default()
   {
-    if
-      let Some(end_loc) = vec_node
-        .last()
-        .map(|x| x.loc.as_ref().map(|loc| loc.end.clone()))
-        .unwrap_or_default()
-    {
-      Some(RangeLocation { start: start_loc, end: end_loc })
-    } else {
-      None
-    }
+    vec_node
+      .last()
+      .map(|x| x.loc.as_ref().map(|loc| loc.end.clone()))
+      .unwrap_or_default()
+      .map(|end_loc| RangeLocation { start: start_loc, end: end_loc })
   } else {
     None
   }

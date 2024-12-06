@@ -13,7 +13,7 @@ macro_rules! guard {
 #[macro_export]
 macro_rules! cast_lookup_result {
   ($enum_variant:ident, $value:expr) => {
-    if let crate::utils::LookupResultWrapper::$enum_variant(n) = $value {
+    if let $crate::utils::LookupResultWrapper::$enum_variant(n) = $value {
       n
     } else {
       return Err(ParserError::Internal);

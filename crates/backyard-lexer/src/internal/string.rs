@@ -90,9 +90,9 @@ impl StringToken {
     });
     lexer.control.next_char();
 
-    return Ok(
+    Ok(
       vec![Token::new(TokenType::String, format!("{}{}{}", breaker, text, breaker), snapshot)]
-    );
+    )
   }
 
   pub fn lex(lexer: &mut Lexer, breaker: char, snapshot: &ControlSnapshot) -> LexResult {
@@ -155,9 +155,9 @@ impl StringToken {
       let text = text[..text.len() - clean_label.len() - 1].to_string();
       Ok(
         vec![
-          Token::new(TokenType::NowDocOpen, &clean_label, snapshot),
+          Token::new(TokenType::NowDocOpen, clean_label, snapshot),
           Token::new(TokenType::EncapsedString, text, &content_snapshot),
-          Token::new(TokenType::NowDocClose, &clean_label, lexer.control.get_last_snapshot())
+          Token::new(TokenType::NowDocClose, clean_label, lexer.control.get_last_snapshot())
         ]
       )
     } else {
