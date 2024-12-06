@@ -27,7 +27,7 @@ impl FunctionGenerator {
     (return_type, return_type_len)
   }
 
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(Function, &node.node);
     builder.push("function ");
     if node.is_ref {
@@ -78,7 +78,7 @@ impl FunctionGenerator {
     }
   }
 
-  pub fn generate_anonymous(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate_anonymous(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(AnonymousFunction, &node.node);
     builder.push("function ");
     if node.is_ref {
@@ -132,7 +132,7 @@ impl FunctionGenerator {
     BlockGenerator::generate(generator, builder, &node.body, None);
   }
 
-  pub fn generate_arrow(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate_arrow(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(ArrowFunction, &node.node);
     builder.push("fn ");
     if node.is_ref {
@@ -167,7 +167,7 @@ impl FunctionGenerator {
   pub fn generate_constructor_parameter(
     generator: &mut Generator,
     builder: &mut Builder,
-    node: &Box<Node>
+    node: &Node
   ) {
     let node = cast_node!(ConstructorParameter, &node.node);
     for visibility in &node.visibilities {
@@ -179,7 +179,7 @@ impl FunctionGenerator {
     Self::generate_parameter(generator, builder, &node.parameter);
   }
 
-  pub fn generate_parameter(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate_parameter(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(Parameter, &node.node);
     if let Some(n) = &node.variable_type {
       generator.generate_node(builder, n, &mut GeneratorArgument::default());

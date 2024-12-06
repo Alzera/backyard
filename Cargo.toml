@@ -9,6 +9,19 @@ version = "0.1.5"
 repository = "https://github.com/Alzera/backyard"
 license = "MIT"
 
+[workspace.lints.rust]
+# unused_must_use = "deny"
+
+[workspace.lints.clippy]
+borrowed_box = "allow"
+vec_box = "allow"
+new_ret_no_self = "allow"
+boxed_local = "allow"
+
+# unwrap_used = "deny"
+# expect_used = "deny"
+# panic = "deny"
+
 [workspace.dependencies]
 backyard-lexer = { version = "0.1.5", path = "crates/backyard-lexer" }
 backyard-nodes = { version = "0.1.5", path = "crates/backyard-nodes" }

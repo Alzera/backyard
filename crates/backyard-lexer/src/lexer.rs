@@ -148,9 +148,7 @@ impl<'a> SeriesChecker<'a> {
       let label = *self.againsts.first().unwrap();
       return if text.trim() == label { Some(label) } else { None };
     }
-    let valid = self.againsts.iter().find(|i| text.ends_with(*i));
-    if valid.is_some() {
-      let valid = valid.unwrap();
+    if let Some(valid) = self.againsts.iter().find(|i| text.ends_with(*i)) {
       if !self.is_escaped(self.list.len() - valid.len()) {
         return Some(valid);
       }

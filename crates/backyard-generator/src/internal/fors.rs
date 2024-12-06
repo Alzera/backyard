@@ -7,7 +7,7 @@ use super::block::BlockGenerator;
 pub struct ForGenerator;
 
 impl ForGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(For, &node.node);
 
     builder.push("for (");

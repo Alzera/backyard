@@ -5,7 +5,7 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct CallGenerator;
 
 impl CallGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(Call, &node.node);
     generator.generate_node(builder, &node.name, &mut GeneratorArgument::default());
     let mut arguments = generator.generate_nodes_new(
@@ -26,7 +26,7 @@ impl CallGenerator {
     builder.push(")");
   }
 
-  pub fn generate_argument(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate_argument(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(CallArgument, &node.node);
     if let Some(name) = &node.name {
       generator.generate_node(builder, name, &mut GeneratorArgument::default());

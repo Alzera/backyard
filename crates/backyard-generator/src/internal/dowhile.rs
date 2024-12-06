@@ -7,7 +7,7 @@ use super::block::BlockGenerator;
 pub struct DoWhileGenerator;
 
 impl DoWhileGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(DoWhile, &node.node);
 
     builder.push("do");
@@ -18,7 +18,7 @@ impl DoWhileGenerator {
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
   }
 
-  pub fn generate_condition(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate_condition(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(DoWhileCondition, &node.node);
 
     builder.push("while (");

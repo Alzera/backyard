@@ -14,7 +14,7 @@ use super::{
 pub struct TraitGenerator;
 
 impl TraitGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(Trait, &node.node);
     builder.push("trait ");
     IdentifierGenerator::generate(generator, builder, &node.name);

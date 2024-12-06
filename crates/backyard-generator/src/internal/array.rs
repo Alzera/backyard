@@ -4,7 +4,7 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct ArrayGenerator;
 
 impl ArrayGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(Array, &node.node);
 
     let items = generator.generate_nodes_new(
@@ -40,7 +40,7 @@ impl ArrayGenerator {
     }
   }
 
-  pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(ArrayItem, &node.node);
     if let Some(key) = &node.key {
       generator.generate_node(builder, key, &mut GeneratorArgument::default());

@@ -7,6 +7,9 @@ version.workspace = true
 repository.workspace = true
 license.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 backyard-lexer = { workspace = true }
 backyard-nodes = { workspace = true }

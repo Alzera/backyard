@@ -5,7 +5,7 @@ use crate::generator::{ Builder, Generator };
 pub struct TypeGenerator;
 
 impl TypeGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     match node.node_type {
       NodeType::Type => Self::generate_basic(generator, builder, node),
       NodeType::UnionType => Self::generate_union(generator, builder, node),
@@ -14,7 +14,7 @@ impl TypeGenerator {
     }
   }
 
-  fn generate_basic(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  fn generate_basic(_: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(Type, &node.node);
     if node.is_nullable {
       builder.push("?");
@@ -22,13 +22,13 @@ impl TypeGenerator {
     builder.push(&node.name);
   }
 
-  fn generate_union(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  fn generate_union(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(UnionType, &node.node);
     let types = Self::map_types(generator, &node.types);
     builder.push(&types.join("|"));
   }
 
-  fn generate_intersection(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  fn generate_intersection(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(IntersectionType, &node.node);
     let types = Self::map_types(generator, &node.types);
 

@@ -5,7 +5,7 @@ use crate::generator::{ Builder, Generator };
 pub struct MagicGenerator;
 
 impl MagicGenerator {
-  pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(Magic, &node.node);
     builder.push(&node.name)
   }

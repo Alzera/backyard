@@ -5,7 +5,7 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct PreGenerator;
 
 impl PreGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let (operator, expr) = match node.node_type {
       NodeType::Variadic => {
         let node = cast_node!(Variadic, &node.node);

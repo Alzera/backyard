@@ -5,7 +5,7 @@ use crate::generator::{ Builder, EndMode, Generator, GeneratorArgument, DEFAULT_
 pub struct MatchGenerator;
 
 impl MatchGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(Match, &node.node);
     builder.push("match(");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
@@ -23,7 +23,7 @@ impl MatchGenerator {
     builder.push("}");
   }
 
-  pub fn generate_arm(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate_arm(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(MatchArm, &node.node);
     if !node.conditions.is_empty() {
       let conditions = generator.generate_nodes_new(

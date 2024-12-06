@@ -2,7 +2,7 @@ use backyard_nodes::node::{ Node, NodeType };
 
 use crate::internal::{ attribute::AttributeGenerator, comment::CommentGenerator };
 
-pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Box<Node>);
+pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Node);
 
 pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 79] = [
   (NodeType::AnonymousClass, super::internal::class::ClassGenerator::generate_anonymous),
@@ -345,7 +345,7 @@ impl<'a> Generator<'a> {
     }
   }
 
-  pub fn generate_node_new(&mut self, node: &Box<Node>) -> Builder {
+  pub fn generate_node_new(&mut self, node: &Node) -> Builder {
     let mut builder = Builder::new();
     builder.new_line();
     self.generate_node(&mut builder, node, &mut GeneratorArgument::default());
@@ -355,7 +355,7 @@ impl<'a> Generator<'a> {
   pub fn generate_node(
     &mut self,
     builder: &mut Builder,
-    node: &Box<Node>,
+    node: &Node,
     args: &mut GeneratorArgument
   ) {
     for (node_type, generator) in args.generators.iter() {

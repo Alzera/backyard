@@ -7,7 +7,7 @@ use super::{ block::BlockGenerator, identifier::IdentifierGenerator };
 pub struct DeclareGenerator;
 
 impl DeclareGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(Declare, &node.node);
     builder.push("declare");
     let mut arguments = generator.generate_nodes_new(
@@ -43,7 +43,7 @@ impl DeclareGenerator {
     }
   }
 
-  pub fn generate_argument(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate_argument(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(DeclareArgument, &node.node);
     IdentifierGenerator::generate(generator, builder, &node.name);
     builder.push(" = ");

@@ -7,6 +7,9 @@ version.workspace = true
 repository.workspace = true
 license.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 ts-rs = { workspace = true }
 serde = { workspace = true }

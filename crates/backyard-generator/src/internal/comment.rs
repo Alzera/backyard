@@ -5,13 +5,13 @@ use crate::generator::{ Builder, Generator };
 pub struct CommentGenerator;
 
 impl CommentGenerator {
-  pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(CommentLine, &node.node);
     builder.push("//");
     builder.push(&node.comment);
   }
 
-  pub fn generate_block(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate_block(_: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(CommentBlock, &node.node);
     builder.push("/*");
     builder.new_line();
@@ -32,7 +32,7 @@ impl CommentGenerator {
     builder.push(" */");
   }
 
-  pub fn generate_doc(_: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate_doc(_: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(CommentDoc, &node.node);
     builder.push("/**");
     builder.new_line();

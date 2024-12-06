@@ -12,7 +12,7 @@ use crate::generator::{
 pub struct BlockGenerator;
 
 impl BlockGenerator {
-  pub fn generate_single(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate_single(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     builder.push("{");
     let mut block = Self::generate_base(generator, node, &DEFAULT_GENERATORS);
     block.indent();

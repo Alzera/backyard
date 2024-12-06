@@ -7,7 +7,7 @@ use super::block::BlockGenerator;
 pub struct IfGenerator;
 
 impl IfGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(If, &node.node);
 
     builder.push("if (");
@@ -39,7 +39,7 @@ impl IfGenerator {
     }
   }
 
-  pub fn generate_else(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate_else(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(Else, &node.node);
 
     builder.push("else");

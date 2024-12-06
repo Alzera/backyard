@@ -6,7 +6,7 @@ use super::call::CallGenerator;
 pub struct AttributeGenerator;
 
 impl AttributeGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(Attribute, &node.node);
 
     builder.push("#[");
@@ -18,7 +18,7 @@ impl AttributeGenerator {
     builder.push("]");
   }
 
-  pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(AttributeItem, &node.node);
     builder.push(&node.name);
     if !node.arguments.is_empty() {

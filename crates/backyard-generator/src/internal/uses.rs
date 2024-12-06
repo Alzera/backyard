@@ -7,7 +7,7 @@ use super::identifier::IdentifierGenerator;
 pub struct UseGenerator;
 
 impl UseGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(Use, &node.node);
     builder.push("use ");
 
@@ -42,7 +42,7 @@ impl UseGenerator {
     }
   }
 
-  pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(UseItem, &node.node);
     if let Some(n) = &node.modifier {
       builder.push(format!("{} ", n).as_str());

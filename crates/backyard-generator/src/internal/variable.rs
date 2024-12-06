@@ -7,7 +7,7 @@ use super::identifier::IdentifierGenerator;
 pub struct VariableGenerator;
 
 impl VariableGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Box<Node>) {
+  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(Variable, &node.node);
     builder.push("$");
     if let NodeType::Identifier = node.name.node_type {
