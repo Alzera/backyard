@@ -4,7 +4,7 @@ use backyard_nodes::node::{ BodyType, Location, Node, DeclareArgumentNode, Decla
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 use super::{ block::BlockParser, comment::CommentParser, identifier::IdentifierParser };
@@ -78,11 +78,7 @@ impl DeclareArgumentParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name, _] = matched.as_slice() {
-      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
-        IdentifierParser::from_token(name)
-      } else {
-        return Err(ParserError::Internal);
-      };
+      let name = IdentifierParser::from_token(name.as_equal()?);
       if
         let Some(value) = parser.get_statement(
           &mut LoopArgument::with_tokens(

@@ -4,7 +4,7 @@ use backyard_nodes::node::{ EnumItemNode, EnumNode, Location, Node };
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 use super::{
@@ -41,27 +41,11 @@ impl EnumParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, name, _, enum_type, has_implements, implements, _] = matched.as_slice() {
-      let enum_type = if
-        let LookupResultWrapper::OptionalType(enum_type) = enum_type.wrapper.to_owned()
-      {
-        enum_type
-      } else {
-        return Err(ParserError::Internal);
-      };
-      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
-        IdentifierParser::from_token(name)
-      } else {
-        return Err(ParserError::Internal);
-      };
-      let implements = if !has_implements.is_empty() {
-        if let LookupResultWrapper::Optional(Some(implements)) = &implements.wrapper {
-          Some(IdentifierParser::from_token(implements))
-        } else {
-          None
-        }
-      } else {
-        None
-      };
+      let name = IdentifierParser::from_token(name.as_equal()?);
+      let implements = has_implements
+        .as_optional()
+        .map(|__construct| implements.as_optional().map(IdentifierParser::from_token))
+        .unwrap_or_default();
       let items = parser.get_children(
         &mut LoopArgument::new(
           "enum",
@@ -76,7 +60,15 @@ impl EnumParser {
           ]
         )
       )?;
-      return Ok(EnumNode::loc(name, enum_type, implements, items, parser.gen_loc(start_loc)));
+      return Ok(
+        EnumNode::loc(
+          name,
+          enum_type.as_optional_type(),
+          implements,
+          items,
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::Internal)
   }

@@ -2,9 +2,9 @@ use backyard_nodes::node::{ Inheritance, Modifier, Node, Quote, UseItemModifier,
 
 #[test]
 fn use_item_modifier() {
-  assert_eq!(UseItemModifier::try_parse("const"), Some(UseItemModifier::Const));
-  assert_eq!(UseItemModifier::try_parse("function"), Some(UseItemModifier::Function));
-  assert_eq!(UseItemModifier::try_parse("none"), None);
+  assert_eq!(UseItemModifier::try_from("const"), Ok(UseItemModifier::Const));
+  assert_eq!(UseItemModifier::try_from("function"), Ok(UseItemModifier::Function));
+  assert!(UseItemModifier::try_from("none").is_err());
 
   assert_eq!("const", format!("{}", UseItemModifier::Const));
   assert_eq!("function", format!("{}", UseItemModifier::Function));
@@ -12,9 +12,9 @@ fn use_item_modifier() {
 
 #[test]
 fn modifier() {
-  assert_eq!(Modifier::try_parse("static"), Some(Modifier::Static));
-  assert_eq!(Modifier::try_parse("readonly"), Some(Modifier::Readonly));
-  assert_eq!(Modifier::try_parse("none"), None);
+  assert_eq!(Modifier::try_from("static"), Ok(Modifier::Static));
+  assert_eq!(Modifier::try_from("readonly"), Ok(Modifier::Readonly));
+  assert!(Modifier::try_from("none").is_err());
 
   assert_eq!("static", format!("{}", Modifier::Static));
   assert_eq!("readonly", format!("{}", Modifier::Readonly));
@@ -22,10 +22,10 @@ fn modifier() {
 
 #[test]
 fn quote() {
-  assert_eq!(Quote::try_parse("'"), Some(Quote::Single));
-  assert_eq!(Quote::try_parse("\""), Some(Quote::Double));
-  assert_eq!(Quote::try_parse("`"), Some(Quote::Backtick));
-  assert_eq!(Quote::try_parse("none"), None);
+  assert_eq!(Quote::try_from("'"), Ok(Quote::Single));
+  assert_eq!(Quote::try_from("\""), Ok(Quote::Double));
+  assert_eq!(Quote::try_from("`"), Ok(Quote::Backtick));
+  assert!(Quote::try_from("none").is_err());
 
   assert_eq!("'", format!("{}", Quote::Single));
   assert_eq!("\"", format!("{}", Quote::Double));
@@ -34,9 +34,9 @@ fn quote() {
 
 #[test]
 fn inheritance() {
-  assert_eq!(Inheritance::try_parse("abstract"), Some(Inheritance::Abstract));
-  assert_eq!(Inheritance::try_parse("final"), Some(Inheritance::Final));
-  assert_eq!(Inheritance::try_parse("none"), None);
+  assert_eq!(Inheritance::try_from("abstract"), Ok(Inheritance::Abstract));
+  assert_eq!(Inheritance::try_from("final"), Ok(Inheritance::Final));
+  assert!(Inheritance::try_from("none").is_err());
 
   assert_eq!("abstract", format!("{}", Inheritance::Abstract));
   assert_eq!("final", format!("{}", Inheritance::Final));
@@ -44,16 +44,16 @@ fn inheritance() {
 
 #[test]
 fn visibility() {
-  assert_eq!(Visibility::try_parse("private"), Some(Visibility::Private));
-  assert_eq!(Visibility::try_parse("private(get)"), Some(Visibility::PrivateGet));
-  assert_eq!(Visibility::try_parse("private(set)"), Some(Visibility::PrivateSet));
-  assert_eq!(Visibility::try_parse("protected"), Some(Visibility::Protected));
-  assert_eq!(Visibility::try_parse("protected(get)"), Some(Visibility::ProtectedGet));
-  assert_eq!(Visibility::try_parse("protected(set)"), Some(Visibility::ProtectedSet));
-  assert_eq!(Visibility::try_parse("public"), Some(Visibility::Public));
-  assert_eq!(Visibility::try_parse("public(get)"), Some(Visibility::PublicGet));
-  assert_eq!(Visibility::try_parse("public(set)"), Some(Visibility::PublicSet));
-  assert_eq!(Visibility::try_parse("none"), None);
+  assert_eq!(Visibility::try_from("private"), Ok(Visibility::Private));
+  assert_eq!(Visibility::try_from("private(get)"), Ok(Visibility::PrivateGet));
+  assert_eq!(Visibility::try_from("private(set)"), Ok(Visibility::PrivateSet));
+  assert_eq!(Visibility::try_from("protected"), Ok(Visibility::Protected));
+  assert_eq!(Visibility::try_from("protected(get)"), Ok(Visibility::ProtectedGet));
+  assert_eq!(Visibility::try_from("protected(set)"), Ok(Visibility::ProtectedSet));
+  assert_eq!(Visibility::try_from("public"), Ok(Visibility::Public));
+  assert_eq!(Visibility::try_from("public(get)"), Ok(Visibility::PublicGet));
+  assert_eq!(Visibility::try_from("public(set)"), Ok(Visibility::PublicSet));
+  assert!(Visibility::try_from("none").is_err());
 
   assert_eq!("private", format!("{}", Visibility::Private));
   assert_eq!("private(get)", format!("{}", Visibility::PrivateGet));

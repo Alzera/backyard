@@ -4,7 +4,7 @@ use backyard_nodes::node::{ BlockNode, InterfaceNode, Location, Node };
 use crate::{
   error::ParserError,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 use super::{
@@ -33,11 +33,7 @@ impl InterfaceParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, name] = matched.as_slice() {
-      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
-        IdentifierParser::from_token(name)
-      } else {
-        return Err(ParserError::Internal);
-      };
+      let name = IdentifierParser::from_token(name.as_equal()?);
       let extends = if let Some(t) = parser.tokens.get(parser.position) {
         if t.token_type == TokenType::Extends {
           parser.position += 1;

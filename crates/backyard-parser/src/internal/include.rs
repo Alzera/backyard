@@ -5,7 +5,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser, TokenTypeArrayCombine },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 #[derive(Debug, Clone)]
@@ -31,12 +31,12 @@ impl IncludeParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [keyword, use_parenthesis] = matched.as_slice() {
-      let mut is_require = false;
-      let mut is_once = false;
-      if let LookupResultWrapper::Equal(t) = &keyword.wrapper {
-        is_require = t.token_type == TokenType::Require || t.token_type == TokenType::RequireOnce;
-        is_once = t.token_type == TokenType::RequireOnce || t.token_type == TokenType::IncludeOnce;
-      }
+      let keyword = keyword.as_equal()?;
+      let is_require =
+        keyword.token_type == TokenType::Require || keyword.token_type == TokenType::RequireOnce;
+      let is_once =
+        keyword.token_type == TokenType::RequireOnce ||
+        keyword.token_type == TokenType::IncludeOnce;
       let use_parenthesis = !use_parenthesis.is_empty();
       let argument = guard!(
         if use_parenthesis {

@@ -5,14 +5,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{
-    match_pattern,
-    Lookup,
-    LookupResult,
-    LookupResultWrapper,
-    ModifierLookup,
-    ModifierResult,
-  },
+  utils::{ match_pattern, Lookup, LookupResult, ModifierLookup },
 };
 
 use super::{
@@ -76,7 +69,7 @@ impl ClassParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, has_parameter] = matched.as_slice() {
-      let parameters = if let LookupResultWrapper::Optional(Some(_)) = has_parameter.wrapper {
+      let parameters = if !has_parameter.is_empty() {
         parser.get_children(
           &mut LoopArgument::with_tokens(
             "class_anonymous_parameter",
@@ -150,17 +143,9 @@ impl ClassParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [modifiers, _, name, _, extends, has_implements] = matched.as_slice() {
-      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
-        Some(IdentifierParser::from_token(name))
-      } else {
-        None
-      };
-      let extends = if let LookupResultWrapper::Optional(Some(extends)) = &extends.wrapper {
-        Some(IdentifierParser::from_token(extends))
-      } else {
-        None
-      };
-      let implements = if let LookupResultWrapper::Optional(Some(_)) = has_implements.wrapper {
+      let name = IdentifierParser::from_token(name.as_equal()?);
+      let extends = extends.as_optional().map(IdentifierParser::from_token);
+      let implements = if !has_implements.is_empty() {
         let t = parser.get_children(
           &mut LoopArgument::new(
             "class_implements",
@@ -196,26 +181,14 @@ impl ClassParser {
       )?;
       let mut inheritance = None;
       let mut is_readonly = false;
-      if let LookupResultWrapper::Modifier(modifiers) = &modifiers.wrapper {
-        if
-          let [
-            ModifierResult::Custom(readonly_modifier),
-            ModifierResult::Custom(inheritance_modifier),
-          ] = modifiers.as_slice()
-        {
-          is_readonly = readonly_modifier.is_some();
-          inheritance = Inheritance::try_parse(
-            &inheritance_modifier
-              .as_ref()
-              .map(|i| i.value.to_owned())
-              .unwrap_or_default()
-          );
-        }
+      if let Some([m0, m1]) = modifiers.as_modifier() {
+        is_readonly = m0.as_custom(|x| Ok(x == "readonly")).unwrap_or(false);
+        inheritance = m1.as_custom(|x| Inheritance::try_from(x));
       }
       return Ok(
         ClassNode::loc(
           inheritance,
-          name,
+          Some(name),
           extends,
           implements,
           BlockNode::loc(body, parser.gen_loc(body_loc)),

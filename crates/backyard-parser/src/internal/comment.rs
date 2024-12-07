@@ -11,7 +11,7 @@ use backyard_nodes::node::{
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 #[derive(Debug, Clone)]
@@ -32,11 +32,7 @@ impl CommentParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [comment] = matched.as_slice() {
-      let comment = if let LookupResultWrapper::Equal(comment) = &comment.wrapper {
-        comment
-      } else {
-        return Err(ParserError::Internal);
-      };
+      let comment = comment.as_equal()?;
       let comment: Box<Node> = match comment.token_type {
         TokenType::CommentLine =>
           CommentLineNode::loc(comment.value.to_owned(), parser.gen_loc(start_loc)),

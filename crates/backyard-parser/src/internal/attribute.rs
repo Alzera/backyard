@@ -4,7 +4,7 @@ use backyard_nodes::node::{ AttributeItemNode, AttributeNode, Location, Node };
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 use super::call::CallParser;
@@ -65,15 +65,12 @@ impl AttributeItemParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name, has_argument] = matched.as_slice() {
-      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
-        name.value.to_owned()
+      let name = name.as_equal()?.value.to_owned();
+      let arguments = if !has_argument.is_empty() {
+        CallParser::get_arguments(parser)?
       } else {
-        return Err(ParserError::Internal);
+        vec![]
       };
-      let mut arguments = vec![];
-      if !has_argument.is_empty() {
-        arguments = CallParser::get_arguments(parser)?;
-      }
       return Ok(AttributeItemNode::loc(name, arguments, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)

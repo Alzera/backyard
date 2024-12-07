@@ -4,7 +4,7 @@ use backyard_nodes::node::{ BlockNode, Location, NamespaceNode, Node };
 use crate::{
   error::ParserError,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 #[derive(Debug, Clone)]
@@ -28,11 +28,7 @@ impl NamespaceParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, name] = matched.as_slice() {
-      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
-        name.value.to_owned()
-      } else {
-        return Err(ParserError::Internal);
-      };
+      let name = name.as_equal()?.value.to_owned();
       let is_bracket = if let Some(t) = parser.tokens.get(parser.position) {
         t.token_type == TokenType::LeftCurlyBracket
       } else {

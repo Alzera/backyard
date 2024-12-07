@@ -4,7 +4,7 @@ use backyard_nodes::node::{ Location, Node, RangeLocation, VariableNode };
 use crate::{
   error::ParserError,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 use super::identifier::IdentifierParser;
@@ -36,24 +36,23 @@ impl VariableParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name] = matched.as_slice() {
-      if let LookupResultWrapper::Equal(name) = &name.wrapper {
-        if name.token_type == TokenType::VariableBracketOpen {
-          let expr = parser.get_statement(
-            &mut LoopArgument::with_tokens("variable", &[], &[TokenType::VariableBracketClose])
-          )?;
-          parser.position += 1;
-          if let Some(expr) = expr {
-            let end_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
-            return Ok(
-              VariableParser::new_bracked(
-                expr,
-                Some(RangeLocation { start: start_loc, end: end_loc })
-              )
-            );
-          }
-        } else {
-          return Ok(VariableParser::from_token(name));
+      let name = name.as_equal()?;
+      if name.token_type == TokenType::VariableBracketOpen {
+        let expr = parser.get_statement(
+          &mut LoopArgument::with_tokens("variable", &[], &[TokenType::VariableBracketClose])
+        )?;
+        parser.position += 1;
+        if let Some(expr) = expr {
+          let end_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
+          return Ok(
+            VariableParser::new_bracked(
+              expr,
+              Some(RangeLocation { start: start_loc, end: end_loc })
+            )
+          );
         }
+      } else {
+        return Ok(VariableParser::from_token(name));
       }
     }
     Err(ParserError::Internal)

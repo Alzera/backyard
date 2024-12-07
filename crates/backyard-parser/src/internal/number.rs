@@ -4,7 +4,7 @@ use backyard_nodes::node::{ Location, Node, NumberNode };
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 #[derive(Debug, Clone)]
@@ -25,12 +25,7 @@ impl NumberParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [number] = matched.as_slice() {
-      let number = if let LookupResultWrapper::Equal(number) = &number.wrapper {
-        number.value.to_owned()
-      } else {
-        return Err(ParserError::Internal);
-      };
-      return Ok(NumberNode::loc(number, parser.gen_loc(start_loc)));
+      return Ok(NumberNode::loc(number.as_equal()?.value.to_owned(), parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

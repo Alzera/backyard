@@ -13,7 +13,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 #[derive(Debug, Clone)]
@@ -47,11 +47,7 @@ impl PreParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [operator] = matched.as_slice() {
-      let operator = if let LookupResultWrapper::Equal(operator) = &operator.wrapper {
-        operator
-      } else {
-        return Err(ParserError::Internal);
-      };
+      let operator = operator.as_equal()?;
       let argument = parser.get_statement(
         &mut LoopArgument::safe("pre", args.separators, args.breakers, &DEFAULT_PARSERS)
       )?;

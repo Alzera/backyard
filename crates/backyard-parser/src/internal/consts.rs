@@ -1,18 +1,10 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ ConstNode, ConstPropertyNode, Location, Node, Visibility };
+use backyard_nodes::node::{ ConstNode, ConstPropertyNode, Location, Node };
 
 use crate::{
-  cast_lookup_result,
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{
-    match_pattern,
-    Lookup,
-    LookupResult,
-    LookupResultWrapper,
-    ModifierLookup,
-    ModifierResult,
-  },
+  utils::{ match_pattern, Lookup, LookupResult, ModifierLookup },
 };
 
 use super::{ assignment::AssignmentParser, comment::CommentParser, identifier::IdentifierParser };
@@ -79,19 +71,14 @@ impl ConstPropertyParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [modifiers, _, const_type] = matched.as_slice() {
-      let mut visibilities = vec![];
-      if let LookupResultWrapper::Modifier(modifiers) = &modifiers.wrapper {
-        if let [ModifierResult::Visibility(visibilities_modifier)] = modifiers.as_slice() {
-          visibilities = visibilities_modifier
-            .iter()
-            .filter_map(|x| Visibility::try_parse(&x.value))
-            .collect();
-        }
-      }
-      let const_type = cast_lookup_result!(OptionalType, &const_type.wrapper);
+      let visibilities = if let Some([m0]) = modifiers.as_modifier() {
+        m0.as_visibilities()
+      } else {
+        vec![]
+      };
       return Ok(
         ConstPropertyNode::loc(
-          const_type.to_owned(),
+          const_type.as_optional_type(),
           visibilities,
           ConstParser::get_consts(parser)?,
           parser.gen_loc(start_loc)

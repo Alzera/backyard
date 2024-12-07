@@ -9,12 +9,14 @@ pub enum UseItemModifier {
   Const,
 }
 
-impl UseItemModifier {
-  pub fn try_parse(s: &str) -> Option<Self> {
-    match s {
-      "function" => Some(UseItemModifier::Function),
-      "const" => Some(UseItemModifier::Const),
-      _ => None,
+impl TryFrom<&str> for UseItemModifier {
+  type Error = String;
+
+  fn try_from(value: &str) -> Result<Self, Self::Error> {
+    match value {
+      "function" => Ok(UseItemModifier::Function),
+      "const" => Ok(UseItemModifier::Const),
+      _ => Err(format!("Invalid use item modifier: {}", value)),
     }
   }
 }
@@ -34,12 +36,14 @@ pub enum Modifier {
   Readonly,
 }
 
-impl Modifier {
-  pub fn try_parse(s: &str) -> Option<Self> {
-    match s {
-      "static" => Some(Modifier::Static),
-      "readonly" => Some(Modifier::Readonly),
-      _ => None,
+impl TryFrom<&str> for Modifier {
+  type Error = String;
+
+  fn try_from(value: &str) -> Result<Self, Self::Error> {
+    match value {
+      "static" => Ok(Modifier::Static),
+      "readonly" => Ok(Modifier::Readonly),
+      _ => Err(format!("Invalid modifier: {}", value)),
     }
   }
 }
@@ -60,13 +64,15 @@ pub enum Quote {
   Backtick,
 }
 
-impl Quote {
-  pub fn try_parse(s: &str) -> Option<Self> {
-    match s {
-      "'" => Some(Quote::Single),
-      "\"" => Some(Quote::Double),
-      "`" => Some(Quote::Backtick),
-      _ => None,
+impl TryFrom<&str> for Quote {
+  type Error = String;
+
+  fn try_from(value: &str) -> Result<Self, Self::Error> {
+    match value {
+      "'" => Ok(Quote::Single),
+      "\"" => Ok(Quote::Double),
+      "`" => Ok(Quote::Backtick),
+      _ => Err(format!("Invalid quote: {}", value)),
     }
   }
 }
@@ -87,12 +93,14 @@ pub enum Inheritance {
   Final,
 }
 
-impl Inheritance {
-  pub fn try_parse(s: &str) -> Option<Self> {
-    match s {
-      "abstract" => Some(Inheritance::Abstract),
-      "final" => Some(Inheritance::Final),
-      _ => None,
+impl TryFrom<&str> for Inheritance {
+  type Error = String;
+
+  fn try_from(value: &str) -> Result<Self, Self::Error> {
+    match value {
+      "abstract" => Ok(Inheritance::Abstract),
+      "final" => Ok(Inheritance::Final),
+      _ => Err(format!("Invalid inheritance: {}", value)),
     }
   }
 }
@@ -119,19 +127,21 @@ pub enum Visibility {
   ProtectedSet,
 }
 
-impl Visibility {
-  pub fn try_parse(s: &str) -> Option<Self> {
-    match s {
-      "public" => Some(Visibility::Public),
-      "public(get)" => Some(Visibility::PublicGet),
-      "public(set)" => Some(Visibility::PublicSet),
-      "private" => Some(Visibility::Private),
-      "private(get)" => Some(Visibility::PrivateGet),
-      "private(set)" => Some(Visibility::PrivateSet),
-      "protected" => Some(Visibility::Protected),
-      "protected(get)" => Some(Visibility::ProtectedGet),
-      "protected(set)" => Some(Visibility::ProtectedSet),
-      _ => None,
+impl TryFrom<&str> for Visibility {
+  type Error = String;
+
+  fn try_from(value: &str) -> Result<Self, Self::Error> {
+    match value {
+      "public" => Ok(Visibility::Public),
+      "public(get)" => Ok(Visibility::PublicGet),
+      "public(set)" => Ok(Visibility::PublicSet),
+      "private" => Ok(Visibility::Private),
+      "private(get)" => Ok(Visibility::PrivateGet),
+      "private(set)" => Ok(Visibility::PrivateSet),
+      "protected" => Ok(Visibility::Protected),
+      "protected(get)" => Ok(Visibility::ProtectedGet),
+      "protected(set)" => Ok(Visibility::ProtectedSet),
+      _ => Err(format!("Invalid visibility: {}", value)),
     }
   }
 }

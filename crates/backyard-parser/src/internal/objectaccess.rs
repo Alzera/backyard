@@ -6,7 +6,7 @@ use crate::{
   guard,
   internal::{ identifier::IdentifierParser, variable::VariableParser },
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 #[derive(Debug, Clone)]
@@ -28,11 +28,7 @@ impl ObjectAccessParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [access_type] = matched.as_slice() {
-      let is_nullsafe = if let LookupResultWrapper::Equal(access_type) = &access_type.wrapper {
-        access_type.token_type == TokenType::NullsafeObjectAccess
-      } else {
-        return Err(ParserError::Internal);
-      };
+      let is_nullsafe = access_type.as_equal()?.token_type == TokenType::NullsafeObjectAccess;
       let is_bracket = if let Some(next_token) = parser.tokens.get(parser.position) {
         next_token.token_type == TokenType::LeftCurlyBracket
       } else {

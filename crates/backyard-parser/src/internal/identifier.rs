@@ -4,7 +4,7 @@ use backyard_nodes::node::{ IdentifierNode, Location, Node };
 use crate::{
   error::ParserError,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 #[derive(Debug, Clone)]
@@ -30,9 +30,7 @@ impl IdentifierParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [identifier] = matched.as_slice() {
-      if let LookupResultWrapper::Equal(identifier) = &identifier.wrapper {
-        return Ok(Self::from_token(identifier));
-      }
+      return Ok(Self::from_token(identifier.as_equal()?));
     }
     Err(ParserError::Internal)
   }

@@ -5,7 +5,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 use super::{ comment::CommentParser, identifier::IdentifierParser };
@@ -103,20 +103,12 @@ impl UseItemParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [modifier, name] = matched.as_slice() {
-      let modifier = if let LookupResultWrapper::Optional(modifier) = &modifier.wrapper {
-        modifier
-          .as_ref()
-          .map(|i| i.value.to_owned())
-          .unwrap_or_default()
-      } else {
-        "".into()
-      };
-      let modifier = UseItemModifier::try_parse(&modifier);
-      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
-        name.value.to_owned()
-      } else {
-        return Err(ParserError::Internal);
-      };
+      let modifier = modifier
+        .as_optional()
+        .map(|i| i.value.to_owned())
+        .unwrap_or_default();
+      let modifier = UseItemModifier::try_from(modifier.as_str()).ok();
+      let name = name.as_equal()?.value.to_owned();
       let mut alias = None;
       if let Some(last) = parser.tokens.get(parser.position) {
         if last.token_type == TokenType::As {

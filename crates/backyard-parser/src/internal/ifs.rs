@@ -80,8 +80,8 @@ impl ElseParser {
     start_loc: Location,
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
-    if let [keyword_result] = matched.as_slice() {
-      if let LookupResultWrapper::Equal(keyword) = &keyword_result.wrapper {
+    if let [keyword] = matched.as_slice() {
+      if let Ok(keyword) = keyword.as_equal() {
         if keyword.token_type == TokenType::ElseIf {
           let token = parser.tokens.get(parser.position).unwrap();
           let loc = token.get_location().unwrap();

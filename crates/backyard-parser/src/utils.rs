@@ -6,9 +6,10 @@ use backyard_nodes::node::{
   RangeLocation,
   TypeNode,
   UnionTypeNode,
+  Visibility,
 };
 
-use crate::parser::LocationHelper;
+use crate::{ error::ParserError, parser::LocationHelper };
 
 #[derive(Debug, Clone)]
 pub enum Lookup<'a> {
@@ -35,6 +36,30 @@ impl LookupResult {
   pub fn is_empty(&self) -> bool {
     self.size == 0
   }
+
+  pub fn as_equal(&self) -> Result<&Token, ParserError> {
+    if let LookupResultWrapper::Equal(v) = &self.wrapper {
+      Ok(v)
+    } else {
+      Err(ParserError::Internal)
+    }
+  }
+
+  pub fn as_optional(&self) -> Option<&Token> {
+    if let LookupResultWrapper::Optional(Some(v)) = &self.wrapper { Some(v) } else { None }
+  }
+
+  pub fn as_optional_type(&self) -> Option<Box<Node>> {
+    if let LookupResultWrapper::OptionalType(Some(v)) = &self.wrapper {
+      Some(v.to_owned())
+    } else {
+      None
+    }
+  }
+
+  pub fn as_modifier(&self) -> Option<&[ModifierResult]> {
+    if let LookupResultWrapper::Modifier(v) = &self.wrapper { Some(v.as_slice()) } else { None }
+  }
 }
 
 #[derive(Debug, Clone)]
@@ -50,6 +75,31 @@ pub enum LookupResultWrapper {
 pub enum ModifierResult {
   Visibility(Vec<Token>),
   Custom(Option<Token>),
+}
+
+impl ModifierResult {
+  pub fn as_visibilities(&self) -> Vec<Visibility> {
+    if let ModifierResult::Visibility(v) = self {
+      v.iter()
+        .filter_map(|x| Visibility::try_from(x.value.as_ref()).ok())
+        .collect::<Vec<Visibility>>()
+    } else {
+      vec![]
+    }
+  }
+
+  pub fn as_custom<T, C>(&self, callback: C) -> Option<T> where C: FnOnce(&str) -> Result<T, String> {
+    if let ModifierResult::Custom(v) = self {
+      callback(
+        v
+          .as_ref()
+          .map(|x| x.value.as_str())
+          .unwrap_or("")
+      ).ok()
+    } else {
+      None
+    }
+  }
 }
 
 const TYPES: [TokenType; 11] = [

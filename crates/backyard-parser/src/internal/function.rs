@@ -12,18 +12,10 @@ use backyard_nodes::node::{
 };
 
 use crate::{
-  cast_lookup_result,
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser, TokenTypeArrayCombine },
-  utils::{
-    match_pattern,
-    Lookup,
-    LookupResult,
-    LookupResultWrapper,
-    ModifierLookup,
-    ModifierResult,
-  },
+  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper, ModifierLookup },
 };
 
 use super::{
@@ -85,12 +77,11 @@ impl FunctionParser {
       4 => FunctionParser::parse_basic(parser, matched, start_loc),
       3 => {
         if let Some(f) = matched.first() {
-          if let LookupResultWrapper::Equal(f) = &f.wrapper {
-            if f.token_type == TokenType::Fn {
-              return FunctionParser::parse_arrow(parser, matched, start_loc, args);
-            } else if f.token_type == TokenType::Function {
-              return FunctionParser::parse_anonymous(parser, matched, start_loc);
-            }
+          let f = f.as_equal()?;
+          if f.token_type == TokenType::Fn {
+            return FunctionParser::parse_arrow(parser, matched, start_loc, args);
+          } else if f.token_type == TokenType::Function {
+            return FunctionParser::parse_anonymous(parser, matched, start_loc);
           }
         }
         Err(ParserError::Internal)
@@ -298,12 +289,6 @@ impl ConstructorParameterParser {
     if
       let [modifiers, has_var, prop_type, is_ref, is_variadic, name, has_value] = matched.as_slice()
     {
-      let modifiers = cast_lookup_result!(Modifier, &modifiers.wrapper);
-      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
-        IdentifierParser::from_token(name)
-      } else {
-        return Err(ParserError::Internal);
-      };
       let value = if !has_value.is_empty() {
         parser.get_statement(
           &mut LoopArgument::with_tokens(
@@ -315,35 +300,19 @@ impl ConstructorParameterParser {
       } else {
         None
       };
-      let prop_type = cast_lookup_result!(OptionalType, &prop_type.wrapper);
       let item = ParameterNode::loc(
-        prop_type.to_owned(),
+        prop_type.as_optional_type(),
         !is_ref.is_empty(),
         !is_variadic.is_empty(),
-        name,
+        IdentifierParser::from_token(name.as_equal()?),
         value,
         parser.gen_loc(start_loc.clone())
       );
       let mut visibilities = vec![];
       let mut modifier = None;
-      if !modifiers.is_empty() {
-        if
-          let [
-            ModifierResult::Visibility(visibilities_modifier),
-            ModifierResult::Custom(modifier_modifier),
-          ] = modifiers.as_slice()
-        {
-          visibilities = visibilities_modifier
-            .iter()
-            .filter_map(|x| Visibility::try_parse(&x.value))
-            .collect();
-          modifier = Modifier::try_parse(
-            &modifier_modifier
-              .as_ref()
-              .map(|i| i.value.to_owned())
-              .unwrap_or_default()
-          );
-        }
+      if let Some([m0, m1]) = modifiers.as_modifier() {
+        visibilities = m0.as_visibilities();
+        modifier = m1.as_custom(|x| Modifier::try_from(x));
       }
       if visibilities.is_empty() && !has_var.is_empty() {
         visibilities.push(Visibility::Public);
@@ -380,11 +349,7 @@ impl ParameterParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [prop_type, is_ref, is_ellipsis, name, has_value] = matched.as_slice() {
-      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
-        IdentifierParser::from_token(name)
-      } else {
-        return Err(ParserError::Internal);
-      };
+      let name = IdentifierParser::from_token(name.as_equal()?);
       let value = if !has_value.is_empty() {
         parser.get_statement(
           &mut LoopArgument::with_tokens(
@@ -396,10 +361,9 @@ impl ParameterParser {
       } else {
         None
       };
-      let prop_type = cast_lookup_result!(OptionalType, &prop_type.wrapper);
       return Ok(
         ParameterNode::loc(
-          prop_type.to_owned(),
+          prop_type.as_optional_type(),
           !is_ref.is_empty(),
           !is_ellipsis.is_empty(),
           name,

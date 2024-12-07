@@ -22,7 +22,7 @@ use backyard_nodes::node::{
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser, TokenTypeArrayCombine },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 #[derive(Debug, Clone)]
@@ -64,64 +64,62 @@ impl SinglesParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [key] = matched.as_slice() {
-      if let LookupResultWrapper::Equal(key) = &key.wrapper {
-        if
-          [
-            TokenType::Parent,
-            TokenType::Static,
-            TokenType::This,
-            TokenType::SelfKeyword,
-            TokenType::True,
-            TokenType::False,
-            TokenType::Null,
-            TokenType::Inline,
-          ].contains(&key.token_type)
-        {
-          return match key.token_type {
-            TokenType::Parent => Ok(ParentNode::loc(parser.gen_loc(start_loc))),
-            TokenType::Static => Ok(StaticKeywordNode::loc(parser.gen_loc(start_loc))),
-            TokenType::This => Ok(ThisNode::loc(parser.gen_loc(start_loc))),
-            TokenType::SelfKeyword => Ok(SelfNode::loc(parser.gen_loc(start_loc))),
-            TokenType::True => Ok(BooleanNode::loc(true, parser.gen_loc(start_loc))),
-            TokenType::False => Ok(BooleanNode::loc(false, parser.gen_loc(start_loc))),
-            TokenType::Null => Ok(NullNode::loc(parser.gen_loc(start_loc))),
-            TokenType::Inline =>
-              Ok(InlineNode::loc(key.value.to_owned(), parser.gen_loc(start_loc))),
-            _ => Err(ParserError::Internal),
-          };
-        }
-        let argument = parser.get_statement(
-          &mut LoopArgument::with_tokens(
-            "singles",
-            &args.separators.combine(&[TokenType::Semicolon]),
-            &args.breakers.combine(&[TokenType::RightCurlyBracket])
-          )
-        )?;
-        match key.token_type {
-          TokenType::Break => {
-            return Ok(BreakNode::loc(argument.to_owned(), parser.gen_loc(start_loc)));
-          }
-          TokenType::Continue => {
-            return Ok(ContinueNode::loc(argument.to_owned(), parser.gen_loc(start_loc)));
-          }
-          TokenType::Return => {
-            return Ok(ReturnNode::loc(argument.to_owned(), parser.gen_loc(start_loc)));
-          }
-          _ => {}
-        }
-        if argument.is_none() {
-          return Err(ParserError::Internal);
-        }
-        let argument = argument.unwrap();
+      let key = key.as_equal()?;
+      if
+        [
+          TokenType::Parent,
+          TokenType::Static,
+          TokenType::This,
+          TokenType::SelfKeyword,
+          TokenType::True,
+          TokenType::False,
+          TokenType::Null,
+          TokenType::Inline,
+        ].contains(&key.token_type)
+      {
         return match key.token_type {
-          TokenType::New => Ok(NewNode::loc(argument, parser.gen_loc(start_loc))),
-          TokenType::Print => Ok(PrintNode::loc(argument, parser.gen_loc(start_loc))),
-          TokenType::Throw => Ok(ThrowNode::loc(argument, parser.gen_loc(start_loc))),
-          TokenType::Clone => Ok(CloneNode::loc(argument, parser.gen_loc(start_loc))),
-          TokenType::Goto => Ok(GotoNode::loc(argument, parser.gen_loc(start_loc))),
+          TokenType::Parent => Ok(ParentNode::loc(parser.gen_loc(start_loc))),
+          TokenType::Static => Ok(StaticKeywordNode::loc(parser.gen_loc(start_loc))),
+          TokenType::This => Ok(ThisNode::loc(parser.gen_loc(start_loc))),
+          TokenType::SelfKeyword => Ok(SelfNode::loc(parser.gen_loc(start_loc))),
+          TokenType::True => Ok(BooleanNode::loc(true, parser.gen_loc(start_loc))),
+          TokenType::False => Ok(BooleanNode::loc(false, parser.gen_loc(start_loc))),
+          TokenType::Null => Ok(NullNode::loc(parser.gen_loc(start_loc))),
+          TokenType::Inline => Ok(InlineNode::loc(key.value.to_owned(), parser.gen_loc(start_loc))),
           _ => Err(ParserError::Internal),
         };
       }
+      let argument = parser.get_statement(
+        &mut LoopArgument::with_tokens(
+          "singles",
+          &args.separators.combine(&[TokenType::Semicolon]),
+          &args.breakers.combine(&[TokenType::RightCurlyBracket])
+        )
+      )?;
+      match key.token_type {
+        TokenType::Break => {
+          return Ok(BreakNode::loc(argument.to_owned(), parser.gen_loc(start_loc)));
+        }
+        TokenType::Continue => {
+          return Ok(ContinueNode::loc(argument.to_owned(), parser.gen_loc(start_loc)));
+        }
+        TokenType::Return => {
+          return Ok(ReturnNode::loc(argument.to_owned(), parser.gen_loc(start_loc)));
+        }
+        _ => {}
+      }
+      if argument.is_none() {
+        return Err(ParserError::Internal);
+      }
+      let argument = argument.unwrap();
+      return match key.token_type {
+        TokenType::New => Ok(NewNode::loc(argument, parser.gen_loc(start_loc))),
+        TokenType::Print => Ok(PrintNode::loc(argument, parser.gen_loc(start_loc))),
+        TokenType::Throw => Ok(ThrowNode::loc(argument, parser.gen_loc(start_loc))),
+        TokenType::Clone => Ok(CloneNode::loc(argument, parser.gen_loc(start_loc))),
+        TokenType::Goto => Ok(GotoNode::loc(argument, parser.gen_loc(start_loc))),
+        _ => Err(ParserError::Internal),
+      };
     }
     Err(ParserError::Internal)
   }

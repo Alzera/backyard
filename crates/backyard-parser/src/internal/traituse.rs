@@ -91,43 +91,24 @@ impl TraitUseAliasParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [trait_name, double_colon, name, _, visibility, alias] = matched.as_slice() {
-      let has_trait = !double_colon.is_empty();
-      let trait_name = if let LookupResultWrapper::Equal(trait_name) = &trait_name.wrapper {
-        IdentifierParser::from_token(trait_name)
+      let trait_name = IdentifierParser::from_token(trait_name.as_equal()?);
+      let name = name.as_optional().map(IdentifierParser::from_token);
+      let (trait_name_parsed, name_parsed) = if !double_colon.is_empty() {
+        (Some(trait_name), name.unwrap())
       } else {
-        return Err(ParserError::Internal);
+        (None, trait_name)
       };
-      let name = if let LookupResultWrapper::Optional(name) = &name.wrapper {
-        name.to_owned().map(|x| IdentifierParser::from_token(&x))
-      } else {
-        return Err(ParserError::Internal);
-      };
-      let mut trait_name_parsed = None;
-      let name_parsed = if has_trait {
-        trait_name_parsed = Some(trait_name);
-        name.unwrap()
-      } else {
-        trait_name
-      };
-      let alias = if let LookupResultWrapper::Optional(Some(alias)) = &alias.wrapper {
-        Some(IdentifierParser::from_token(alias))
-      } else {
-        None
-      };
-      let visibility = if let LookupResultWrapper::Optional(visibility) = &visibility.wrapper {
-        visibility
-          .as_ref()
-          .map(|i| i.value.to_owned())
-          .unwrap_or_default()
-      } else {
-        "".into()
-      };
+      let alias = alias.as_optional().map(IdentifierParser::from_token);
+      let visibility = visibility
+        .as_optional()
+        .map(|x| x.value.to_owned())
+        .unwrap_or_default();
       return Ok(
         TraitUseAliasNode::loc(
           trait_name_parsed,
           name_parsed,
           alias,
-          Visibility::try_parse(&visibility),
+          Visibility::try_from(visibility.as_str()).ok(),
           parser.gen_loc(start_loc)
         )
       );
@@ -160,20 +141,8 @@ impl TraitUsePrecedenceParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [trait_name, _, method, _, instead] = matched.as_slice() {
-      let instead = if let LookupResultWrapper::Equal(instead) = &instead.wrapper {
-        IdentifierParser::from_token(instead)
-      } else {
-        return Err(ParserError::Internal);
-      };
-      let mut trait_name_parsed = Some(
-        IdentifierParser::from_token(
-          if let LookupResultWrapper::Equal(trait_name) = &trait_name.wrapper {
-            trait_name
-          } else {
-            return Err(ParserError::Internal);
-          }
-        )
-      );
+      let instead = IdentifierParser::from_token(instead.as_equal()?);
+      let mut trait_name_parsed = Some(IdentifierParser::from_token(trait_name.as_equal()?));
       let method = if let LookupResultWrapper::Optional(Some(method)) = &method.wrapper {
         IdentifierParser::from_token(method)
       } else {

@@ -4,7 +4,7 @@ use backyard_nodes::node::{ Location, MagicNode, Node };
 use crate::{
   error::ParserError,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 #[derive(Debug, Clone)]
@@ -27,9 +27,7 @@ impl MagicParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [text] = matched.as_slice() {
-      if let LookupResultWrapper::Equal(text) = &text.wrapper {
-        return Ok(MagicNode::loc(text.value.to_owned(), parser.gen_loc(start_loc)));
-      };
+      return Ok(MagicNode::loc(text.as_equal()?.value.to_owned(), parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

@@ -4,7 +4,7 @@ use backyard_nodes::node::{ Location, Node, AssignmentNode };
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser, TokenTypeArrayCombine, DEFAULT_PARSERS },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 #[derive(Debug, Clone)]
@@ -46,25 +46,24 @@ impl AssignmentParser {
     args: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [operator] = matched.as_slice() {
-      if let LookupResultWrapper::Equal(operator) = &operator.wrapper {
-        let left = args.last_expr.to_owned().unwrap();
-        args.last_expr = None;
-        if
-          let Some(right) = parser.get_statement(
-            &mut LoopArgument::safe(
-              "assignment",
-              &[],
-              &args.breakers
-                .combine(args.separators)
-                .combine(&[TokenType::Semicolon, TokenType::Comma]),
-              &DEFAULT_PARSERS
-            )
-          )?
-        {
-          return Ok(
-            AssignmentNode::loc(left, operator.value.to_owned(), right, parser.gen_loc(start_loc))
-          );
-        }
+      let operator = operator.as_equal()?;
+      let left = args.last_expr.to_owned().unwrap();
+      args.last_expr = None;
+      if
+        let Some(right) = parser.get_statement(
+          &mut LoopArgument::safe(
+            "assignment",
+            &[],
+            &args.breakers
+              .combine(args.separators)
+              .combine(&[TokenType::Semicolon, TokenType::Comma]),
+            &DEFAULT_PARSERS
+          )
+        )?
+      {
+        return Ok(
+          AssignmentNode::loc(left, operator.value.to_owned(), right, parser.gen_loc(start_loc))
+        );
       }
     }
     Err(ParserError::Internal)

@@ -4,7 +4,7 @@ use backyard_nodes::node::{ Location, Node };
 use crate::{
   error::ParserError,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 #[derive(Debug, Clone)]
@@ -30,7 +30,7 @@ impl TypesParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [types] = matched.as_slice() {
-      if let LookupResultWrapper::OptionalType(Some(types)) = &types.wrapper {
+      if let Some(types) = types.as_optional_type() {
         return Ok(types.to_owned());
       }
     }

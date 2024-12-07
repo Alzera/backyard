@@ -5,14 +5,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser },
-  utils::{
-    match_pattern,
-    Lookup,
-    LookupResult,
-    LookupResultWrapper,
-    ModifierLookup,
-    ModifierResult,
-  },
+  utils::{ match_pattern, Lookup, LookupResult, ModifierLookup },
 };
 
 use super::{ comment::CommentParser, function::FunctionParser };
@@ -62,28 +55,10 @@ impl MethodParser {
       let mut visibility = None;
       let mut inheritance = None;
       let mut is_static = false;
-      if let LookupResultWrapper::Modifier(modifiers) = &modifiers.wrapper {
-        if
-          let [
-            ModifierResult::Custom(visibility_modifier),
-            ModifierResult::Custom(inheritance_modifier),
-            ModifierResult::Custom(static_modifier),
-          ] = modifiers.as_slice()
-        {
-          visibility = Visibility::try_parse(
-            &visibility_modifier
-              .as_ref()
-              .map(|i| i.value.to_owned())
-              .unwrap_or_default()
-          );
-          inheritance = Inheritance::try_parse(
-            &inheritance_modifier
-              .as_ref()
-              .map(|i| i.value.to_owned())
-              .unwrap_or_default()
-          );
-          is_static = static_modifier.is_some();
-        }
+      if let Some([m0, m1, m2]) = modifiers.as_modifier() {
+        visibility = m0.as_custom(|x| Visibility::try_from(x));
+        inheritance = m1.as_custom(|x| Inheritance::try_from(x));
+        is_static = m2.as_custom(|x| Ok(x == "static")).unwrap_or(false);
       }
       return Ok(
         MethodNode::loc(visibility, inheritance, is_static, function, parser.gen_loc(start_loc))

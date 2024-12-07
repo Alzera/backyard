@@ -100,15 +100,10 @@ impl ArgumentParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [name, has_name] = matched.as_slice() {
-      let name = if let LookupResultWrapper::Optional(_) = &has_name.wrapper {
-        if let LookupResultWrapper::Optional(Some(name)) = &name.wrapper {
-          Some(IdentifierParser::from_token(name))
-        } else {
-          None
-        }
-      } else {
-        return Err(ParserError::Internal);
-      };
+      let name = has_name
+        .as_optional()
+        .map(|_| name.as_optional().map(IdentifierParser::from_token))
+        .unwrap_or_default();
       let value = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens(

@@ -4,7 +4,7 @@ use backyard_nodes::node::{ BlockNode, Location, Node, TraitNode };
 use crate::{
   error::ParserError,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 use super::{
@@ -35,11 +35,7 @@ impl TraitParser {
     _: &mut LoopArgument
   ) -> Result<Box<Node>, ParserError> {
     if let [_, name] = matched.as_slice() {
-      let name = if let LookupResultWrapper::Equal(name) = &name.wrapper {
-        IdentifierParser::from_token(name)
-      } else {
-        return Err(ParserError::Internal);
-      };
+      let name = IdentifierParser::from_token(name.as_equal()?);
       let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
       parser.position += 1;
       let body = parser.get_children(

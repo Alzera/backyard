@@ -40,6 +40,11 @@ fn main() {
   }
 }
 
+// equal: unwrap or return error
+// optional: unwrap or none
+// optional type: unwrap or none
+// any: unwrap or return error
+
 // // globalize argument and parameter
 
 // unwrap, clone, to_string, Arc?
