@@ -1,7 +1,5 @@
 use std::fmt::{ Display, Formatter };
 
-use crate::token::Token;
-
 #[derive(Debug, Clone, PartialEq)]
 pub enum LexError {
   Unrecognized {
@@ -22,4 +20,4 @@ impl Display for LexError {
   }
 }
 
-pub type LexResult = Result<Vec<Token>, LexError>;
+pub type LexResult = Result<(), LexError>;

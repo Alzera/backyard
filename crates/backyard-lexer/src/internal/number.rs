@@ -13,17 +13,17 @@ impl NumberToken {
         lexer.control.next_char();
         let t = lexer.control.next_char_until(|_, ch, _| !ch.is_alphanumeric());
         let n = format_compact!("0x{}", t);
-        return Ok(vec![Token::new(TokenType::NumberHex, n, snapshot)]);
+        return Ok(lexer.tokens.push(Token::new(TokenType::NumberHex, n, snapshot)));
       }
       if next == 'b' {
         lexer.control.next_char();
         let t = lexer.control.next_char_until(|_, ch, _| !(*ch == '0' || *ch == '1' || *ch == '_'));
         let n = format_compact!("0b{}", t);
-        return Ok(vec![Token::new(TokenType::NumberBinary, n, snapshot)]);
+        return Ok(lexer.tokens.push(Token::new(TokenType::NumberBinary, n, snapshot)));
       }
     }
     let mut t = lexer.control.next_char_until(|_, ch, _| !(ch.is_ascii_digit() || *ch == '.'));
     t.insert(0, current_char);
-    Ok(vec![Token::new(TokenType::Number, t, snapshot)])
+    Ok(lexer.tokens.push(Token::new(TokenType::Number, t, snapshot)))
   }
 }

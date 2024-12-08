@@ -6,7 +6,6 @@ pub struct InlineToken;
 
 impl InlineToken {
   pub fn lex(lexer: &mut Lexer, snapshot: &ControlSnapshot) -> LexResult {
-    let mut result = vec![];
     let mut checker = SeriesChecker::new(&["<?php", "<?=", "<%"], SeriesCheckerMode::Inline);
     let max_index = lexer.control.get_len().saturating_sub(1);
     let mut no_breaker = false;
@@ -22,17 +21,17 @@ impl InlineToken {
     lexer.control.next_char();
     if no_breaker {
       if !inline.is_empty() {
-        result.push(Token::new(TokenType::Inline, inline, snapshot));
+        lexer.tokens.push(Token::new(TokenType::Inline, inline, snapshot));
       }
     } else if let Some(breaker) = checker.check() {
       inline = inline[..inline.len() - breaker[..breaker.len() - 1].len()].into();
       if !inline.is_empty() {
-        result.push(Token::new(TokenType::Inline, inline, snapshot));
+        lexer.tokens.push(Token::new(TokenType::Inline, inline, snapshot));
       }
       if breaker == "<?=" {
-        result.push(Token::new(TokenType::Echo, "echo".into(), snapshot));
+        lexer.tokens.push(Token::new(TokenType::Echo, "echo".into(), snapshot));
       }
     }
-    Ok(result)
+    Ok(())
   }
 }

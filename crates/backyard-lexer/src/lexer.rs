@@ -1,3 +1,4 @@
+use bumpalo::Bump;
 use compact_str::CompactString;
 
 use crate::error::{ LexError, LexResult };
@@ -47,7 +48,9 @@ impl Control {
   }
 
   pub(crate) fn consume(&mut self, len: usize) {
-    self.position += len;
+    for _ in 0..len {
+      self.next_char();
+    }
   }
 
   pub(crate) fn get_snapshot(&self) -> ControlSnapshot {
@@ -175,22 +178,38 @@ impl<'a> SeriesChecker<'a> {
 }
 
 #[derive(Debug)]
-pub struct Lexer {
+pub struct Lexer<'a> {
+  pub(crate) tokens: bumpalo::collections::Vec<'a, Token>,
   pub(crate) control: Control,
 }
 
-impl Lexer {
-  pub fn new(input: &str) -> Self {
+impl<'a> Lexer<'a> {
+  pub fn new(arena: &'a Bump, input: &str) -> Self {
     Lexer {
+      tokens: bumpalo::collections::Vec::new_in(arena),
       control: Control::new(input),
     }
   }
 
-  pub fn start(&mut self) -> LexResult {
-    let mut tokens = Vec::new();
+  pub fn next_tokens_until_right_bracket(&mut self) -> LexResult {
+    let mut level = 1;
     loop {
+      let next_first_token_index = self.tokens.len();
       match self.next_tokens(true) {
-        Ok(token) => tokens.extend(token),
+        Ok(_) => {
+          if let Some(token) = self.tokens.get(next_first_token_index) {
+            if [TokenType::LeftCurlyBracket].contains(&token.token_type) {
+              level += 1;
+            } else if [TokenType::RightCurlyBracket].contains(&token.token_type) {
+              level -= 1;
+              if level == 0 {
+                break;
+              }
+            }
+          } else {
+            break;
+          }
+        }
         Err(err) => {
           if err == LexError::Eof {
             break;
@@ -199,7 +218,26 @@ impl Lexer {
         }
       }
     }
-    Ok(tokens)
+    Ok(())
+  }
+
+  fn until<F>(&mut self, ch: char, mut callback: F) -> CompactString where F: FnMut(&char) -> bool {
+    let mut next_chars = self.control.next_char_until(|_, ch, _| callback(ch));
+    next_chars.insert(0, ch);
+    next_chars
+  }
+
+  pub fn start(&mut self) -> LexResult {
+    loop {
+      let result = self.next_tokens(true);
+      if let Err(err) = result {
+        if err == LexError::Eof {
+          break;
+        }
+        return Err(err);
+      }
+    }
+    Ok(())
   }
 
   pub fn next_tokens(&mut self, skip_whitespace: bool) -> LexResult {
@@ -232,7 +270,7 @@ impl Lexer {
             "__PROPERTY__",
           ].contains(&t.as_str())
         {
-          Ok(vec![Token::new(TokenType::Magic, t, snapshot)])
+          Ok(self.tokens.push(Token::new(TokenType::Magic, t, snapshot)))
         } else if
           [
             "__construct",
@@ -254,7 +292,7 @@ impl Lexer {
             "__debugInfo",
           ].contains(&t.as_str())
         {
-          Ok(vec![Token::new(TokenType::MagicMethod, t, snapshot)])
+          Ok(self.tokens.push(Token::new(TokenType::MagicMethod, t, snapshot)))
         } else if
           [
             // "array",
@@ -273,48 +311,56 @@ impl Lexer {
             // "null",
           ].contains(&t.as_str())
         {
-          Ok(vec![Token::new(TokenType::Type, t, snapshot)])
+          Ok(self.tokens.push(Token::new(TokenType::Type, t, snapshot)))
         } else if KeywordToken::is_keyword(&t) {
           KeywordToken::lex(self, &t, snapshot)
         } else {
-          Ok(vec![Token::new(TokenType::Identifier, t, snapshot)])
+          Ok(self.tokens.push(Token::new(TokenType::Identifier, t, snapshot)))
         }
       }
       '=' => {
         let t = self.until(current_char, |ch| !['=', '>', '&'].contains(ch));
         match t.as_str() {
-          "===" => Ok(vec![Token::new(TokenType::IsIdentical, "===".into(), snapshot)]),
-          "==" => Ok(vec![Token::new(TokenType::IsEqual, "==".into(), snapshot)]),
-          "=" => Ok(vec![Token::new(TokenType::Assignment, "=".into(), snapshot)]),
-          "=>" => Ok(vec![Token::new(TokenType::Arrow, "=>".into(), snapshot)]),
-          "=&" => Ok(vec![Token::new(TokenType::ReferenceAssignment, "=&".into(), snapshot)]),
+          "===" => Ok(self.tokens.push(Token::new(TokenType::IsIdentical, "===".into(), snapshot))),
+          "==" => Ok(self.tokens.push(Token::new(TokenType::IsEqual, "==".into(), snapshot))),
+          "=" => Ok(self.tokens.push(Token::new(TokenType::Assignment, "=".into(), snapshot))),
+          "=>" => Ok(self.tokens.push(Token::new(TokenType::Arrow, "=>".into(), snapshot))),
+          "=&" =>
+            Ok(self.tokens.push(Token::new(TokenType::ReferenceAssignment, "=&".into(), snapshot))),
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '&' => {
         let t = self.until(current_char, |ch| !['&', '='].contains(ch));
         match t.as_str() {
-          "&=" => Ok(vec![Token::new(TokenType::BitwiseAndAssignment, "&=".into(), snapshot)]),
-          "&&" => Ok(vec![Token::new(TokenType::BooleanAnd, "&&".into(), snapshot)]),
-          "&" => Ok(vec![Token::new(TokenType::BitwiseAnd, "&".into(), snapshot)]),
+          "&=" =>
+            Ok(
+              self.tokens.push(Token::new(TokenType::BitwiseAndAssignment, "&=".into(), snapshot))
+            ),
+          "&&" => Ok(self.tokens.push(Token::new(TokenType::BooleanAnd, "&&".into(), snapshot))),
+          "&" => Ok(self.tokens.push(Token::new(TokenType::BitwiseAnd, "&".into(), snapshot))),
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '#' => {
         let t = self.until(current_char, |ch| !['#', '['].contains(ch));
         match t.as_str() {
-          "#[" => Ok(vec![Token::new(TokenType::Attribute, "#[".into(), snapshot)]),
+          "#[" => Ok(self.tokens.push(Token::new(TokenType::Attribute, "#[".into(), snapshot))),
           _ => CommentToken::lex_line(self, &t[1..], snapshot),
         }
       }
       '?' => {
         let t = self.until(current_char, |ch| !['?', '>', '=', '-', ':'].contains(ch));
         match t.as_str() {
-          "?:" => Ok(vec![Token::new(TokenType::Elvis, "?:".into(), snapshot)]),
-          "?->" => Ok(vec![Token::new(TokenType::NullsafeObjectAccess, "?->".into(), snapshot)]),
-          "??=" => Ok(vec![Token::new(TokenType::CoalesceAssignment, "??=".into(), snapshot)]),
-          "??" => Ok(vec![Token::new(TokenType::Coalesce, "??".into(), snapshot)]),
-          "?" => Ok(vec![Token::new(TokenType::QuestionMark, "?".into(), snapshot)]),
+          "?:" => Ok(self.tokens.push(Token::new(TokenType::Elvis, "?:".into(), snapshot))),
+          "?->" =>
+            Ok(
+              self.tokens.push(Token::new(TokenType::NullsafeObjectAccess, "?->".into(), snapshot))
+            ),
+          "??=" =>
+            Ok(self.tokens.push(Token::new(TokenType::CoalesceAssignment, "??=".into(), snapshot))),
+          "??" => Ok(self.tokens.push(Token::new(TokenType::Coalesce, "??".into(), snapshot))),
+          "?" => Ok(self.tokens.push(Token::new(TokenType::QuestionMark, "?".into(), snapshot))),
           c if c.starts_with("?>") => {
             if t.len() > 2 {
               self.control.position -= t.len() - 2;
@@ -327,16 +373,20 @@ impl Lexer {
       '%' => {
         let t = self.until(current_char, |ch| !['%', '='].contains(ch));
         match t.as_str() {
-          "%=" => Ok(vec![Token::new(TokenType::ModulusAssignment, "%=".into(), snapshot)]),
-          "%" => Ok(vec![Token::new(TokenType::Modulus, "%".into(), snapshot)]),
+          "%=" =>
+            Ok(self.tokens.push(Token::new(TokenType::ModulusAssignment, "%=".into(), snapshot))),
+          "%" => Ok(self.tokens.push(Token::new(TokenType::Modulus, "%".into(), snapshot))),
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '^' => {
         let t = self.until(current_char, |ch| !['^', '='].contains(ch));
         match t.as_str() {
-          "^=" => Ok(vec![Token::new(TokenType::BitwiseXorAssignment, "^=".into(), snapshot)]),
-          "^" => Ok(vec![Token::new(TokenType::BitwiseXor, "^".into(), snapshot)]),
+          "^=" =>
+            Ok(
+              self.tokens.push(Token::new(TokenType::BitwiseXorAssignment, "^=".into(), snapshot))
+            ),
+          "^" => Ok(self.tokens.push(Token::new(TokenType::BitwiseXor, "^".into(), snapshot))),
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
@@ -344,36 +394,52 @@ impl Lexer {
         let t = self.until(current_char, |ch| !['*', '='].contains(ch));
         match t.as_str() {
           "**=" =>
-            Ok(vec![Token::new(TokenType::ExponentiationAssignment, "**=".into(), snapshot)]),
-          "*=" => Ok(vec![Token::new(TokenType::MultiplicationAssignment, "*=".into(), snapshot)]),
-          "**" => Ok(vec![Token::new(TokenType::Exponentiation, "**".into(), snapshot)]),
-          "*" => Ok(vec![Token::new(TokenType::Multiplication, "*".into(), snapshot)]),
+            Ok(
+              self.tokens.push(
+                Token::new(TokenType::ExponentiationAssignment, "**=".into(), snapshot)
+              )
+            ),
+          "*=" =>
+            Ok(
+              self.tokens.push(
+                Token::new(TokenType::MultiplicationAssignment, "*=".into(), snapshot)
+              )
+            ),
+          "**" =>
+            Ok(self.tokens.push(Token::new(TokenType::Exponentiation, "**".into(), snapshot))),
+          "*" => Ok(self.tokens.push(Token::new(TokenType::Multiplication, "*".into(), snapshot))),
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '/' => {
         let t = self.until(current_char, |ch| !['/', '*', '='].contains(ch));
         match t.as_str() {
-          "/=" => Ok(vec![Token::new(TokenType::DivisionAssignment, "/=".into(), snapshot)]),
+          "/=" =>
+            Ok(self.tokens.push(Token::new(TokenType::DivisionAssignment, "/=".into(), snapshot))),
           c if c.starts_with("/**") => CommentToken::lex_doc(self, &t[3..], snapshot),
           c if c.starts_with("/*") => CommentToken::lex_block(self, &t[2..], snapshot),
           c if c.starts_with("//") => CommentToken::lex_line(self, &t[2..], snapshot),
-          "/" => Ok(vec![Token::new(TokenType::Division, "/".into(), snapshot)]),
+          "/" => Ok(self.tokens.push(Token::new(TokenType::Division, "/".into(), snapshot))),
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '.' => {
         let t = self.until(current_char, |ch| !['.', '='].contains(ch));
         match t.as_str() {
-          ".=" => Ok(vec![Token::new(TokenType::ConcatenationAssignment, ".=".into(), snapshot)]),
-          "..." => Ok(vec![Token::new(TokenType::Ellipsis, "...".into(), snapshot)]),
+          ".=" =>
+            Ok(
+              self.tokens.push(
+                Token::new(TokenType::ConcatenationAssignment, ".=".into(), snapshot)
+              )
+            ),
+          "..." => Ok(self.tokens.push(Token::new(TokenType::Ellipsis, "...".into(), snapshot))),
           "." => {
             let mut t = self.control.next_char_until(|_, ch, _| !ch.is_ascii_digit());
             if t.is_empty() {
-              Ok(vec![Token::new(TokenType::Concatenation, ".".into(), snapshot)])
+              Ok(self.tokens.push(Token::new(TokenType::Concatenation, ".".into(), snapshot)))
             } else {
               t.insert(0, '.');
-              Ok(vec![Token::new(TokenType::Number, t, snapshot)])
+              Ok(self.tokens.push(Token::new(TokenType::Number, t, snapshot)))
             }
           }
           _ => Err(self.control.error_unrecognized(&t)),
@@ -382,29 +448,33 @@ impl Lexer {
       '|' => {
         let t = self.until(current_char, |ch| !['|', '='].contains(ch));
         match t.as_str() {
-          "|=" => Ok(vec![Token::new(TokenType::BitwiseOrAssignment, "|=".into(), snapshot)]),
-          "||" => Ok(vec![Token::new(TokenType::BooleanOr, "||".into(), snapshot)]),
-          "|" => Ok(vec![Token::new(TokenType::BitwiseOr, "|".into(), snapshot)]),
+          "|=" =>
+            Ok(self.tokens.push(Token::new(TokenType::BitwiseOrAssignment, "|=".into(), snapshot))),
+          "||" => Ok(self.tokens.push(Token::new(TokenType::BooleanOr, "||".into(), snapshot))),
+          "|" => Ok(self.tokens.push(Token::new(TokenType::BitwiseOr, "|".into(), snapshot))),
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '-' => {
         let t = self.until(current_char, |ch| !['-', '=', '>'].contains(ch));
         match t.as_str() {
-          "-=" => Ok(vec![Token::new(TokenType::SubtractionAssignment, "-=".into(), snapshot)]),
-          "->" => Ok(vec![Token::new(TokenType::ObjectAccess, "->".into(), snapshot)]),
+          "-=" =>
+            Ok(
+              self.tokens.push(Token::new(TokenType::SubtractionAssignment, "-=".into(), snapshot))
+            ),
+          "->" => Ok(self.tokens.push(Token::new(TokenType::ObjectAccess, "->".into(), snapshot))),
           "--" => {
             let is_post = match self.control.peek_char(None) {
               Some(t) => t.is_whitespace() || [';', ',', ')', ']', '}', '?'].contains(&t),
               None => true,
             };
             if is_post {
-              Ok(vec![Token::new(TokenType::PostDecrement, "--".into(), snapshot)])
+              Ok(self.tokens.push(Token::new(TokenType::PostDecrement, "--".into(), snapshot)))
             } else {
-              Ok(vec![Token::new(TokenType::PreDecrement, "--".into(), snapshot)])
+              Ok(self.tokens.push(Token::new(TokenType::PreDecrement, "--".into(), snapshot)))
             }
           }
-          "-" => Ok(vec![Token::new(TokenType::Subtraction, "-".into(), snapshot)]),
+          "-" => Ok(self.tokens.push(Token::new(TokenType::Subtraction, "-".into(), snapshot))),
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
@@ -412,45 +482,58 @@ impl Lexer {
         let t = self.until(current_char, |ch| !['>', '='].contains(ch));
         match t.as_str() {
           ">>=" =>
-            Ok(vec![Token::new(TokenType::BitwiseShiftRightAssignment, ">>=".into(), snapshot)]),
-          ">=" => Ok(vec![Token::new(TokenType::IsGreaterOrEqual, ">=".into(), snapshot)]),
-          ">>" => Ok(vec![Token::new(TokenType::BitwiseShiftRight, ">>".into(), snapshot)]),
-          ">" => Ok(vec![Token::new(TokenType::IsGreater, ">".into(), snapshot)]),
+            Ok(
+              self.tokens.push(
+                Token::new(TokenType::BitwiseShiftRightAssignment, ">>=".into(), snapshot)
+              )
+            ),
+          ">=" =>
+            Ok(self.tokens.push(Token::new(TokenType::IsGreaterOrEqual, ">=".into(), snapshot))),
+          ">>" =>
+            Ok(self.tokens.push(Token::new(TokenType::BitwiseShiftRight, ">>".into(), snapshot))),
+          ">" => Ok(self.tokens.push(Token::new(TokenType::IsGreater, ">".into(), snapshot))),
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '<' => {
         let t = self.until(current_char, |ch| !['<', '=', '>'].contains(ch));
         match t.as_str() {
-          "<=>" => Ok(vec![Token::new(TokenType::Spaceship, "<=>".into(), snapshot)]),
-          "<>" => Ok(vec![Token::new(TokenType::IsNotEqual, "<>".into(), snapshot)]),
-          "<=" => Ok(vec![Token::new(TokenType::IsLesserOrEqual, "<=".into(), snapshot)]),
+          "<=>" => Ok(self.tokens.push(Token::new(TokenType::Spaceship, "<=>".into(), snapshot))),
+          "<>" => Ok(self.tokens.push(Token::new(TokenType::IsNotEqual, "<>".into(), snapshot))),
+          "<=" =>
+            Ok(self.tokens.push(Token::new(TokenType::IsLesserOrEqual, "<=".into(), snapshot))),
           "<<=" =>
-            Ok(vec![Token::new(TokenType::BitwiseShiftLeftAssignment, "<<=".into(), snapshot)]),
+            Ok(
+              self.tokens.push(
+                Token::new(TokenType::BitwiseShiftLeftAssignment, "<<=".into(), snapshot)
+              )
+            ),
           "<<<" => StringToken::lex_doc(self, snapshot),
-          "<<" => Ok(vec![Token::new(TokenType::BitwiseShiftLeft, "<<".into(), snapshot)]),
-          "<" => Ok(vec![Token::new(TokenType::IsLesser, "<".into(), snapshot)]),
+          "<<" =>
+            Ok(self.tokens.push(Token::new(TokenType::BitwiseShiftLeft, "<<".into(), snapshot))),
+          "<" => Ok(self.tokens.push(Token::new(TokenType::IsLesser, "<".into(), snapshot))),
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       ':' => {
         let t = self.until(current_char, |ch| ![':'].contains(ch));
         match t.as_str() {
-          "::" => Ok(vec![Token::new(TokenType::DoubleColon, "::".into(), snapshot)]),
-          ":" => Ok(vec![Token::new(TokenType::Colon, ":".into(), snapshot)]),
+          "::" => Ok(self.tokens.push(Token::new(TokenType::DoubleColon, "::".into(), snapshot))),
+          ":" => Ok(self.tokens.push(Token::new(TokenType::Colon, ":".into(), snapshot))),
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '!' => {
         let t = self.until(current_char, |ch| !['!', '='].contains(ch));
         match t.as_str() {
-          "!==" => Ok(vec![Token::new(TokenType::IsNotIdentical, "!==".into(), snapshot)]),
-          "!=" => Ok(vec![Token::new(TokenType::IsNotEqual, "!=".into(), snapshot)]),
+          "!==" =>
+            Ok(self.tokens.push(Token::new(TokenType::IsNotIdentical, "!==".into(), snapshot))),
+          "!=" => Ok(self.tokens.push(Token::new(TokenType::IsNotEqual, "!=".into(), snapshot))),
           c if c.starts_with('!') => {
             if t.len() > 1 {
               self.control.position -= t.len() - 1;
             }
-            Ok(vec![Token::new(TokenType::BooleanNegate, "!".into(), snapshot)])
+            Ok(self.tokens.push(Token::new(TokenType::BooleanNegate, "!".into(), snapshot)))
           }
           _ => Err(self.control.error_unrecognized(&t)),
         }
@@ -458,81 +541,41 @@ impl Lexer {
       '+' => {
         let t = self.until(current_char, |ch| !['+', '='].contains(ch));
         match t.as_str() {
-          "+=" => Ok(vec![Token::new(TokenType::AdditionAssignment, "+=".into(), snapshot)]),
+          "+=" =>
+            Ok(self.tokens.push(Token::new(TokenType::AdditionAssignment, "+=".into(), snapshot))),
           "++" => {
             let is_post = match self.control.peek_char(None) {
               Some(t) => t.is_whitespace() || [';', ',', ')', ']', '}', '?'].contains(&t),
               None => true,
             };
             if is_post {
-              Ok(vec![Token::new(TokenType::PostIncrement, "++".into(), snapshot)])
+              Ok(self.tokens.push(Token::new(TokenType::PostIncrement, "++".into(), snapshot)))
             } else {
-              Ok(vec![Token::new(TokenType::PreIncrement, "++".into(), snapshot)])
+              Ok(self.tokens.push(Token::new(TokenType::PreIncrement, "++".into(), snapshot)))
             }
           }
-          "+" => Ok(vec![Token::new(TokenType::Addition, "+".into(), snapshot)]),
+          "+" => Ok(self.tokens.push(Token::new(TokenType::Addition, "+".into(), snapshot))),
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
-      '(' => Ok(vec![Token::new(TokenType::LeftParenthesis, "(".into(), snapshot)]),
-      ')' => Ok(vec![Token::new(TokenType::RightParenthesis, ")".into(), snapshot)]),
-      '{' => Ok(vec![Token::new(TokenType::LeftCurlyBracket, "{".into(), snapshot)]),
-      '}' => Ok(vec![Token::new(TokenType::RightCurlyBracket, "}".into(), snapshot)]),
-      '[' => Ok(vec![Token::new(TokenType::LeftSquareBracket, "[".into(), snapshot)]),
-      ']' => Ok(vec![Token::new(TokenType::RightSquareBracket, "]".into(), snapshot)]),
+      '(' => Ok(self.tokens.push(Token::new(TokenType::LeftParenthesis, "(".into(), snapshot))),
+      ')' => Ok(self.tokens.push(Token::new(TokenType::RightParenthesis, ")".into(), snapshot))),
+      '{' => Ok(self.tokens.push(Token::new(TokenType::LeftCurlyBracket, "{".into(), snapshot))),
+      '}' => Ok(self.tokens.push(Token::new(TokenType::RightCurlyBracket, "}".into(), snapshot))),
+      '[' => Ok(self.tokens.push(Token::new(TokenType::LeftSquareBracket, "[".into(), snapshot))),
+      ']' => Ok(self.tokens.push(Token::new(TokenType::RightSquareBracket, "]".into(), snapshot))),
       '`' => StringToken::lex(self, "`", snapshot),
       '"' => StringToken::lex(self, "\"", snapshot),
       '\'' => StringToken::lex_basic(self, "\'", snapshot),
       '\\' => {
         let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_' || *ch == '\\'));
-        Ok(vec![Token::new(TokenType::Name, t, snapshot)])
+        Ok(self.tokens.push(Token::new(TokenType::Name, t, snapshot)))
       }
-      ',' => Ok(vec![Token::new(TokenType::Comma, ",".into(), snapshot)]),
-      ';' => Ok(vec![Token::new(TokenType::Semicolon, ";".into(), snapshot)]),
-      '~' => Ok(vec![Token::new(TokenType::BooleanNegate, "~".into(), snapshot)]),
-      '@' => Ok(vec![Token::new(TokenType::AtSign, "@".into(), snapshot)]),
+      ',' => Ok(self.tokens.push(Token::new(TokenType::Comma, ",".into(), snapshot))),
+      ';' => Ok(self.tokens.push(Token::new(TokenType::Semicolon, ";".into(), snapshot))),
+      '~' => Ok(self.tokens.push(Token::new(TokenType::BooleanNegate, "~".into(), snapshot))),
+      '@' => Ok(self.tokens.push(Token::new(TokenType::AtSign, "@".into(), snapshot))),
       _ => Err(self.control.error_unrecognized(&current_char.to_string())),
     }
-  }
-
-  pub fn next_tokens_until_right_bracket(&mut self) -> Vec<Token> {
-    self.next_tokens_level(
-      1,
-      [TokenType::LeftCurlyBracket].to_vec(),
-      [TokenType::RightCurlyBracket].to_vec()
-    )
-  }
-
-  pub fn next_tokens_level(
-    &mut self,
-    start_level: usize,
-    level_ups: Vec<TokenType>,
-    level_downs: Vec<TokenType>
-  ) -> Vec<Token> {
-    let mut result: Vec<Token> = Vec::new();
-    let mut level = start_level;
-    loop {
-      if let Ok(tokens) = self.next_tokens(true) {
-        if let Some(token) = tokens.first() {
-          if level_ups.contains(&token.token_type) {
-            level += 1;
-          } else if level_downs.contains(&token.token_type) {
-            level -= 1;
-            if level == 0 {
-              break result;
-            }
-          }
-        }
-        result.extend(tokens);
-      } else {
-        break result;
-      }
-    }
-  }
-
-  fn until<F>(&mut self, ch: char, mut callback: F) -> CompactString where F: FnMut(&char) -> bool {
-    let mut next_chars = self.control.next_char_until(|_, ch, _| callback(ch));
-    next_chars.insert(0, ch);
-    next_chars
   }
 }

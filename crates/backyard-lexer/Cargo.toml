@@ -11,7 +11,9 @@ license.workspace = true
 workspace = true
 
 [dependencies]
+bumpalo = { workspace = true }
 compact_str = { workspace = true }
+
 serde = { workspace = true }
 wasm-bindgen = { workspace = true }
 
