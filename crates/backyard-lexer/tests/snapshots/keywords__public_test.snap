@@ -17,5 +17,5 @@ snapshot_kind: text
 - token_type: PublicSet
   value: public(set)
   line: 1
-  column: 14
+  column: 19
   offset: 19

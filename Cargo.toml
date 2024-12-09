@@ -5,7 +5,7 @@ members = ["crates/*", "tests"]
 [workspace.package]
 edition = "2021"
 authors = ["Alzera Cita <alzeracita23@gmail.com>"]
-version = "0.1.6"
+version = "0.1.7"
 keywords = ["php", "parser"]
 repository = "https://github.com/Alzera/backyard"
 license = "MIT"

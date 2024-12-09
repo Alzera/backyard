@@ -17,5 +17,5 @@ snapshot_kind: text
 - token_type: ProtectedSet
   value: protected(set)
   line: 1
-  column: 20
+  column: 25
   offset: 25

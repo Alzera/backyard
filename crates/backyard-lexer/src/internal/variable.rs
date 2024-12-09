@@ -11,6 +11,7 @@ impl VariableToken {
         lexer.control.next_char();
         lexer.tokens.push(Token::new(TokenType::VariableBracketOpen, "${".into(), snapshot));
         lexer.next_tokens_until_right_bracket()?;
+        lexer.control.next_char();
         lexer.tokens.push(
           Token::new(TokenType::VariableBracketClose, "}".into(), lexer.control.get_last_snapshot())
         );

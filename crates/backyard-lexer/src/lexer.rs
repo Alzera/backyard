@@ -194,28 +194,25 @@ impl<'a> Lexer<'a> {
   pub fn next_tokens_until_right_bracket(&mut self) -> LexResult {
     let mut level = 1;
     loop {
-      let next_first_token_index = self.tokens.len();
-      match self.next_tokens(true) {
-        Ok(_) => {
-          if let Some(token) = self.tokens.get(next_first_token_index) {
-            if [TokenType::LeftCurlyBracket].contains(&token.token_type) {
-              level += 1;
-            } else if [TokenType::RightCurlyBracket].contains(&token.token_type) {
-              level -= 1;
-              if level == 0 {
-                break;
-              }
+      if let Some(next_token) = self.control.peek_char(None) {
+        match next_token {
+          '{' => {
+            level += 1;
+            self.next_tokens(true)?;
+          }
+          '}' => {
+            level -= 1;
+            if level == 0 {
+              break;
             }
-          } else {
-            break;
+            self.next_tokens(true)?;
+          }
+          _ => {
+            self.next_tokens(true)?;
           }
         }
-        Err(err) => {
-          if err == LexError::Eof {
-            break;
-          }
-          return Err(err);
-        }
+      } else {
+        break;
       }
     }
     Ok(())

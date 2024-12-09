@@ -41,11 +41,11 @@ children:
                 loc:
                   start:
                     line: 2
-                    column: 33
+                    column: 38
                     offset: 48
                   end:
                     line: 2
-                    column: 34
+                    column: 39
                     offset: 49
                 leadings: []
                 trailings: []
@@ -56,11 +56,11 @@ children:
                 loc:
                   start:
                     line: 2
-                    column: 30
+                    column: 35
                     offset: 45
                   end:
                     line: 2
-                    column: 32
+                    column: 37
                     offset: 47
                 leadings: []
                 trailings: []
@@ -70,22 +70,22 @@ children:
                 loc:
                   start:
                     line: 2
-                    column: 38
+                    column: 43
                     offset: 53
                   end:
                     line: 2
-                    column: 38
+                    column: 43
                     offset: 53
                 leadings: []
                 trailings: []
               loc:
                 start:
                   line: 2
-                  column: 33
+                  column: 38
                   offset: 48
                 end:
                   line: 2
-                  column: 38
+                  column: 43
                   offset: 53
               leadings: []
               trailings: []
@@ -96,7 +96,7 @@ children:
               offset: 12
             end:
               line: 2
-              column: 38
+              column: 43
               offset: 53
           leadings: []
           trailings: []

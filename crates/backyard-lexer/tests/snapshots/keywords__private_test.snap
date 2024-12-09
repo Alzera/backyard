@@ -17,5 +17,5 @@ snapshot_kind: text
 - token_type: PrivateSet
   value: private(set)
   line: 1
-  column: 16
+  column: 21
   offset: 21

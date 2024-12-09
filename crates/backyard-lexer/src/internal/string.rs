@@ -1,6 +1,6 @@
 use compact_str::{ format_compact, CompactString, ToCompactString };
 
-use crate::error::LexResult;
+use crate::error::{ LexError, LexResult };
 use crate::internal::variable::VariableToken;
 use crate::lexer::{ ControlSnapshot, Lexer, SeriesChecker, SeriesCheckerMode };
 use crate::token::{ Token, TokenType };
@@ -8,7 +8,12 @@ use crate::token::{ Token, TokenType };
 pub struct StringToken;
 
 impl StringToken {
-  fn get_parts(lexer: &mut Lexer, breaker: &str, mode: SeriesCheckerMode) -> LexResult {
+  fn get_parts(
+    lexer: &mut Lexer,
+    breaker: &str,
+    mode: SeriesCheckerMode
+  ) -> Result<bool, LexError> {
+    let mut token_count = 0;
     let againsts = [breaker];
     let mut checker = SeriesChecker::new(&againsts, mode);
     let mut need_check_condition: Vec<char> = breaker.chars().collect();
@@ -47,6 +52,7 @@ impl StringToken {
         }
         false
       });
+      token_count += 1;
       let current = if let Some(current) = lexer.control.peek_char(None) {
         current
       } else {
@@ -73,6 +79,7 @@ impl StringToken {
         lexer.control.next_char();
         lexer.tokens.push(Token::new(TokenType::AdvanceInterpolationOpen, "{".into(), &snapshot));
         lexer.next_tokens_until_right_bracket()?;
+        lexer.control.next_char();
         lexer.tokens.push(
           Token::new(
             TokenType::AdvanceInterpolationClose,
@@ -82,7 +89,7 @@ impl StringToken {
         );
       }
     }
-    Ok(())
+    Ok(token_count == 1)
   }
 
   pub fn lex_basic(lexer: &mut Lexer, breaker: &str, snapshot: &ControlSnapshot) -> LexResult {
@@ -104,19 +111,21 @@ impl StringToken {
     let breaker = breaker.to_compact_string();
     lexer.tokens.push(Token::new(TokenType::EncapsedStringOpen, breaker.clone(), snapshot));
 
-    Self::get_parts(lexer, &breaker, SeriesCheckerMode::String)?;
+    let is_without_encapsed = Self::get_parts(lexer, &breaker, SeriesCheckerMode::String)?;
 
-    // if result.len() < 3 {
-    //   let t = if let Some(t) = result.get(1) {
-    //     t.value.to_owned()
-    //   } else {
-    //     CompactString::const_new("")
-    //   };
-    //   lexer.tokens.push(
-    //     Token::new(TokenType::String, format_compact!("{}{}{}", breaker, t, breaker), snapshot)
-    //   );
-    //   return Ok(());
-    // }
+    if is_without_encapsed {
+      if let Some(string_token) = lexer.tokens.pop() {
+        lexer.tokens.pop();
+        lexer.tokens.push(
+          Token::new(
+            TokenType::String,
+            format_compact!("{}{}{}", breaker, string_token.value, breaker),
+            snapshot
+          )
+        );
+        return Ok(());
+      }
+    }
 
     lexer.tokens.push(
       Token::new(TokenType::EncapsedStringClose, breaker, lexer.control.get_last_snapshot())
