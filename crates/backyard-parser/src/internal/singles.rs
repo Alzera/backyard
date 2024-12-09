@@ -98,13 +98,13 @@ impl SinglesParser {
       )?;
       match key.token_type {
         TokenType::Break => {
-          return Ok(BreakNode::loc(argument.to_owned(), parser.gen_loc(start_loc)));
+          return Ok(BreakNode::loc(argument, parser.gen_loc(start_loc)));
         }
         TokenType::Continue => {
-          return Ok(ContinueNode::loc(argument.to_owned(), parser.gen_loc(start_loc)));
+          return Ok(ContinueNode::loc(argument, parser.gen_loc(start_loc)));
         }
         TokenType::Return => {
-          return Ok(ReturnNode::loc(argument.to_owned(), parser.gen_loc(start_loc)));
+          return Ok(ReturnNode::loc(argument, parser.gen_loc(start_loc)));
         }
         _ => {}
       }

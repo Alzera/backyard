@@ -193,26 +193,22 @@ impl<'a> Lexer<'a> {
 
   pub fn next_tokens_until_right_bracket(&mut self) -> LexResult {
     let mut level = 1;
-    loop {
-      if let Some(next_token) = self.control.peek_char(None) {
-        match next_token {
-          '{' => {
-            level += 1;
-            self.next_tokens(true)?;
-          }
-          '}' => {
-            level -= 1;
-            if level == 0 {
-              break;
-            }
-            self.next_tokens(true)?;
-          }
-          _ => {
-            self.next_tokens(true)?;
-          }
+    while let Some(next_token) = self.control.peek_char(None) {
+      match next_token {
+        '{' => {
+          level += 1;
+          self.next_tokens(true)?;
         }
-      } else {
-        break;
+        '}' => {
+          level -= 1;
+          if level == 0 {
+            break;
+          }
+          self.next_tokens(true)?;
+        }
+        _ => {
+          self.next_tokens(true)?;
+        }
       }
     }
     Ok(())
@@ -267,7 +263,8 @@ impl<'a> Lexer<'a> {
             "__PROPERTY__",
           ].contains(&t.as_str())
         {
-          Ok(self.tokens.push(Token::new(TokenType::Magic, t, snapshot)))
+          self.tokens.push(Token::new(TokenType::Magic, t, snapshot));
+          Ok(())
         } else if
           [
             "__construct",
@@ -289,7 +286,8 @@ impl<'a> Lexer<'a> {
             "__debugInfo",
           ].contains(&t.as_str())
         {
-          Ok(self.tokens.push(Token::new(TokenType::MagicMethod, t, snapshot)))
+          self.tokens.push(Token::new(TokenType::MagicMethod, t, snapshot));
+          Ok(())
         } else if
           [
             // "array",
@@ -308,56 +306,92 @@ impl<'a> Lexer<'a> {
             // "null",
           ].contains(&t.as_str())
         {
-          Ok(self.tokens.push(Token::new(TokenType::Type, t, snapshot)))
+          self.tokens.push(Token::new(TokenType::Type, t, snapshot));
+          Ok(())
         } else if KeywordToken::is_keyword(&t) {
           KeywordToken::lex(self, &t, snapshot)
         } else {
-          Ok(self.tokens.push(Token::new(TokenType::Identifier, t, snapshot)))
+          self.tokens.push(Token::new(TokenType::Identifier, t, snapshot));
+          Ok(())
         }
       }
       '=' => {
         let t = self.until(current_char, |ch| !['=', '>', '&'].contains(ch));
         match t.as_str() {
-          "===" => Ok(self.tokens.push(Token::new(TokenType::IsIdentical, "===".into(), snapshot))),
-          "==" => Ok(self.tokens.push(Token::new(TokenType::IsEqual, "==".into(), snapshot))),
-          "=" => Ok(self.tokens.push(Token::new(TokenType::Assignment, "=".into(), snapshot))),
-          "=>" => Ok(self.tokens.push(Token::new(TokenType::Arrow, "=>".into(), snapshot))),
-          "=&" =>
-            Ok(self.tokens.push(Token::new(TokenType::ReferenceAssignment, "=&".into(), snapshot))),
+          "===" => {
+            self.tokens.push(Token::new(TokenType::IsIdentical, "===".into(), snapshot));
+            Ok(())
+          }
+          "==" => {
+            self.tokens.push(Token::new(TokenType::IsEqual, "==".into(), snapshot));
+            Ok(())
+          }
+          "=" => {
+            self.tokens.push(Token::new(TokenType::Assignment, "=".into(), snapshot));
+            Ok(())
+          }
+          "=>" => {
+            self.tokens.push(Token::new(TokenType::Arrow, "=>".into(), snapshot));
+            Ok(())
+          }
+          "=&" => {
+            self.tokens.push(Token::new(TokenType::ReferenceAssignment, "=&".into(), snapshot));
+            Ok(())
+          }
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '&' => {
         let t = self.until(current_char, |ch| !['&', '='].contains(ch));
         match t.as_str() {
-          "&=" =>
-            Ok(
-              self.tokens.push(Token::new(TokenType::BitwiseAndAssignment, "&=".into(), snapshot))
-            ),
-          "&&" => Ok(self.tokens.push(Token::new(TokenType::BooleanAnd, "&&".into(), snapshot))),
-          "&" => Ok(self.tokens.push(Token::new(TokenType::BitwiseAnd, "&".into(), snapshot))),
+          "&=" => {
+            self.tokens.push(Token::new(TokenType::BitwiseAndAssignment, "&=".into(), snapshot));
+            Ok(())
+          }
+          "&&" => {
+            self.tokens.push(Token::new(TokenType::BooleanAnd, "&&".into(), snapshot));
+            Ok(())
+          }
+          "&" => {
+            self.tokens.push(Token::new(TokenType::BitwiseAnd, "&".into(), snapshot));
+            Ok(())
+          }
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '#' => {
         let t = self.until(current_char, |ch| !['#', '['].contains(ch));
         match t.as_str() {
-          "#[" => Ok(self.tokens.push(Token::new(TokenType::Attribute, "#[".into(), snapshot))),
+          "#[" => {
+            self.tokens.push(Token::new(TokenType::Attribute, "#[".into(), snapshot));
+            Ok(())
+          }
           _ => CommentToken::lex_line(self, &t[1..], snapshot),
         }
       }
       '?' => {
         let t = self.until(current_char, |ch| !['?', '>', '=', '-', ':'].contains(ch));
         match t.as_str() {
-          "?:" => Ok(self.tokens.push(Token::new(TokenType::Elvis, "?:".into(), snapshot))),
-          "?->" =>
-            Ok(
-              self.tokens.push(Token::new(TokenType::NullsafeObjectAccess, "?->".into(), snapshot))
-            ),
-          "??=" =>
-            Ok(self.tokens.push(Token::new(TokenType::CoalesceAssignment, "??=".into(), snapshot))),
-          "??" => Ok(self.tokens.push(Token::new(TokenType::Coalesce, "??".into(), snapshot))),
-          "?" => Ok(self.tokens.push(Token::new(TokenType::QuestionMark, "?".into(), snapshot))),
+          "?:" => {
+            self.tokens.push(Token::new(TokenType::Elvis, "?:".into(), snapshot));
+            Ok(())
+          }
+          "?->" => {
+            self.tokens.push(Token::new(TokenType::NullsafeObjectAccess, "?->".into(), snapshot));
+            Ok(())
+          }
+          "??=" => {
+            self.tokens.push(Token::new(TokenType::CoalesceAssignment, "??=".into(), snapshot));
+            Ok(())
+          }
+          "??" => {
+            self.tokens.push(Token::new(TokenType::Coalesce, "??".into(), snapshot));
+            Ok(())
+          }
+          "?" => {
+            self.tokens.push(Token::new(TokenType::QuestionMark, "?".into(), snapshot));
+            Ok(())
+          }
           c if c.starts_with("?>") => {
             if t.len() > 2 {
               self.control.position -= t.len() - 2;
@@ -370,73 +404,94 @@ impl<'a> Lexer<'a> {
       '%' => {
         let t = self.until(current_char, |ch| !['%', '='].contains(ch));
         match t.as_str() {
-          "%=" =>
-            Ok(self.tokens.push(Token::new(TokenType::ModulusAssignment, "%=".into(), snapshot))),
-          "%" => Ok(self.tokens.push(Token::new(TokenType::Modulus, "%".into(), snapshot))),
+          "%=" => {
+            self.tokens.push(Token::new(TokenType::ModulusAssignment, "%=".into(), snapshot));
+            Ok(())
+          }
+          "%" => {
+            self.tokens.push(Token::new(TokenType::Modulus, "%".into(), snapshot));
+            Ok(())
+          }
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '^' => {
         let t = self.until(current_char, |ch| !['^', '='].contains(ch));
         match t.as_str() {
-          "^=" =>
-            Ok(
-              self.tokens.push(Token::new(TokenType::BitwiseXorAssignment, "^=".into(), snapshot))
-            ),
-          "^" => Ok(self.tokens.push(Token::new(TokenType::BitwiseXor, "^".into(), snapshot))),
+          "^=" => {
+            self.tokens.push(Token::new(TokenType::BitwiseXorAssignment, "^=".into(), snapshot));
+            Ok(())
+          }
+          "^" => {
+            self.tokens.push(Token::new(TokenType::BitwiseXor, "^".into(), snapshot));
+            Ok(())
+          }
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '*' => {
         let t = self.until(current_char, |ch| !['*', '='].contains(ch));
         match t.as_str() {
-          "**=" =>
-            Ok(
-              self.tokens.push(
-                Token::new(TokenType::ExponentiationAssignment, "**=".into(), snapshot)
-              )
-            ),
-          "*=" =>
-            Ok(
-              self.tokens.push(
-                Token::new(TokenType::MultiplicationAssignment, "*=".into(), snapshot)
-              )
-            ),
-          "**" =>
-            Ok(self.tokens.push(Token::new(TokenType::Exponentiation, "**".into(), snapshot))),
-          "*" => Ok(self.tokens.push(Token::new(TokenType::Multiplication, "*".into(), snapshot))),
+          "**=" => {
+            self.tokens.push(
+              Token::new(TokenType::ExponentiationAssignment, "**=".into(), snapshot)
+            );
+            Ok(())
+          }
+          "*=" => {
+            self.tokens.push(
+              Token::new(TokenType::MultiplicationAssignment, "*=".into(), snapshot)
+            );
+            Ok(())
+          }
+          "**" => {
+            self.tokens.push(Token::new(TokenType::Exponentiation, "**".into(), snapshot));
+            Ok(())
+          }
+          "*" => {
+            self.tokens.push(Token::new(TokenType::Multiplication, "*".into(), snapshot));
+            Ok(())
+          }
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '/' => {
         let t = self.until(current_char, |ch| !['/', '*', '='].contains(ch));
         match t.as_str() {
-          "/=" =>
-            Ok(self.tokens.push(Token::new(TokenType::DivisionAssignment, "/=".into(), snapshot))),
+          "/=" => {
+            self.tokens.push(Token::new(TokenType::DivisionAssignment, "/=".into(), snapshot));
+            Ok(())
+          }
           c if c.starts_with("/**") => CommentToken::lex_doc(self, &t[3..], snapshot),
           c if c.starts_with("/*") => CommentToken::lex_block(self, &t[2..], snapshot),
           c if c.starts_with("//") => CommentToken::lex_line(self, &t[2..], snapshot),
-          "/" => Ok(self.tokens.push(Token::new(TokenType::Division, "/".into(), snapshot))),
+          "/" => {
+            self.tokens.push(Token::new(TokenType::Division, "/".into(), snapshot));
+            Ok(())
+          }
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '.' => {
         let t = self.until(current_char, |ch| !['.', '='].contains(ch));
         match t.as_str() {
-          ".=" =>
-            Ok(
-              self.tokens.push(
-                Token::new(TokenType::ConcatenationAssignment, ".=".into(), snapshot)
-              )
-            ),
-          "..." => Ok(self.tokens.push(Token::new(TokenType::Ellipsis, "...".into(), snapshot))),
+          ".=" => {
+            self.tokens.push(Token::new(TokenType::ConcatenationAssignment, ".=".into(), snapshot));
+            Ok(())
+          }
+          "..." => {
+            self.tokens.push(Token::new(TokenType::Ellipsis, "...".into(), snapshot));
+            Ok(())
+          }
           "." => {
             let mut t = self.control.next_char_until(|_, ch, _| !ch.is_ascii_digit());
             if t.is_empty() {
-              Ok(self.tokens.push(Token::new(TokenType::Concatenation, ".".into(), snapshot)))
+              self.tokens.push(Token::new(TokenType::Concatenation, ".".into(), snapshot));
+              Ok(())
             } else {
               t.insert(0, '.');
-              Ok(self.tokens.push(Token::new(TokenType::Number, t, snapshot)))
+              self.tokens.push(Token::new(TokenType::Number, t, snapshot));
+              Ok(())
             }
           }
           _ => Err(self.control.error_unrecognized(&t)),
@@ -445,92 +500,140 @@ impl<'a> Lexer<'a> {
       '|' => {
         let t = self.until(current_char, |ch| !['|', '='].contains(ch));
         match t.as_str() {
-          "|=" =>
-            Ok(self.tokens.push(Token::new(TokenType::BitwiseOrAssignment, "|=".into(), snapshot))),
-          "||" => Ok(self.tokens.push(Token::new(TokenType::BooleanOr, "||".into(), snapshot))),
-          "|" => Ok(self.tokens.push(Token::new(TokenType::BitwiseOr, "|".into(), snapshot))),
+          "|=" => {
+            self.tokens.push(Token::new(TokenType::BitwiseOrAssignment, "|=".into(), snapshot));
+            Ok(())
+          }
+          "||" => {
+            self.tokens.push(Token::new(TokenType::BooleanOr, "||".into(), snapshot));
+            Ok(())
+          }
+          "|" => {
+            self.tokens.push(Token::new(TokenType::BitwiseOr, "|".into(), snapshot));
+            Ok(())
+          }
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '-' => {
         let t = self.until(current_char, |ch| !['-', '=', '>'].contains(ch));
         match t.as_str() {
-          "-=" =>
-            Ok(
-              self.tokens.push(Token::new(TokenType::SubtractionAssignment, "-=".into(), snapshot))
-            ),
-          "->" => Ok(self.tokens.push(Token::new(TokenType::ObjectAccess, "->".into(), snapshot))),
+          "-=" => {
+            self.tokens.push(Token::new(TokenType::SubtractionAssignment, "-=".into(), snapshot));
+            Ok(())
+          }
+          "->" => {
+            self.tokens.push(Token::new(TokenType::ObjectAccess, "->".into(), snapshot));
+            Ok(())
+          }
           "--" => {
             let is_post = match self.control.peek_char(None) {
               Some(t) => t.is_whitespace() || [';', ',', ')', ']', '}', '?'].contains(&t),
               None => true,
             };
             if is_post {
-              Ok(self.tokens.push(Token::new(TokenType::PostDecrement, "--".into(), snapshot)))
+              self.tokens.push(Token::new(TokenType::PostDecrement, "--".into(), snapshot));
+              Ok(())
             } else {
-              Ok(self.tokens.push(Token::new(TokenType::PreDecrement, "--".into(), snapshot)))
+              self.tokens.push(Token::new(TokenType::PreDecrement, "--".into(), snapshot));
+              Ok(())
             }
           }
-          "-" => Ok(self.tokens.push(Token::new(TokenType::Subtraction, "-".into(), snapshot))),
+          "-" => {
+            self.tokens.push(Token::new(TokenType::Subtraction, "-".into(), snapshot));
+            Ok(())
+          }
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '>' => {
         let t = self.until(current_char, |ch| !['>', '='].contains(ch));
         match t.as_str() {
-          ">>=" =>
-            Ok(
-              self.tokens.push(
-                Token::new(TokenType::BitwiseShiftRightAssignment, ">>=".into(), snapshot)
-              )
-            ),
-          ">=" =>
-            Ok(self.tokens.push(Token::new(TokenType::IsGreaterOrEqual, ">=".into(), snapshot))),
-          ">>" =>
-            Ok(self.tokens.push(Token::new(TokenType::BitwiseShiftRight, ">>".into(), snapshot))),
-          ">" => Ok(self.tokens.push(Token::new(TokenType::IsGreater, ">".into(), snapshot))),
+          ">>=" => {
+            self.tokens.push(
+              Token::new(TokenType::BitwiseShiftRightAssignment, ">>=".into(), snapshot)
+            );
+            Ok(())
+          }
+          ">=" => {
+            self.tokens.push(Token::new(TokenType::IsGreaterOrEqual, ">=".into(), snapshot));
+            Ok(())
+          }
+          ">>" => {
+            self.tokens.push(Token::new(TokenType::BitwiseShiftRight, ">>".into(), snapshot));
+            Ok(())
+          }
+          ">" => {
+            self.tokens.push(Token::new(TokenType::IsGreater, ">".into(), snapshot));
+            Ok(())
+          }
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '<' => {
         let t = self.until(current_char, |ch| !['<', '=', '>'].contains(ch));
         match t.as_str() {
-          "<=>" => Ok(self.tokens.push(Token::new(TokenType::Spaceship, "<=>".into(), snapshot))),
-          "<>" => Ok(self.tokens.push(Token::new(TokenType::IsNotEqual, "<>".into(), snapshot))),
-          "<=" =>
-            Ok(self.tokens.push(Token::new(TokenType::IsLesserOrEqual, "<=".into(), snapshot))),
-          "<<=" =>
-            Ok(
-              self.tokens.push(
-                Token::new(TokenType::BitwiseShiftLeftAssignment, "<<=".into(), snapshot)
-              )
-            ),
+          "<=>" => {
+            self.tokens.push(Token::new(TokenType::Spaceship, "<=>".into(), snapshot));
+            Ok(())
+          }
+          "<>" => {
+            self.tokens.push(Token::new(TokenType::IsNotEqual, "<>".into(), snapshot));
+            Ok(())
+          }
+          "<=" => {
+            self.tokens.push(Token::new(TokenType::IsLesserOrEqual, "<=".into(), snapshot));
+            Ok(())
+          }
+          "<<=" => {
+            self.tokens.push(
+              Token::new(TokenType::BitwiseShiftLeftAssignment, "<<=".into(), snapshot)
+            );
+            Ok(())
+          }
           "<<<" => StringToken::lex_doc(self, snapshot),
-          "<<" =>
-            Ok(self.tokens.push(Token::new(TokenType::BitwiseShiftLeft, "<<".into(), snapshot))),
-          "<" => Ok(self.tokens.push(Token::new(TokenType::IsLesser, "<".into(), snapshot))),
+          "<<" => {
+            self.tokens.push(Token::new(TokenType::BitwiseShiftLeft, "<<".into(), snapshot));
+            Ok(())
+          }
+          "<" => {
+            self.tokens.push(Token::new(TokenType::IsLesser, "<".into(), snapshot));
+            Ok(())
+          }
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       ':' => {
         let t = self.until(current_char, |ch| ![':'].contains(ch));
         match t.as_str() {
-          "::" => Ok(self.tokens.push(Token::new(TokenType::DoubleColon, "::".into(), snapshot))),
-          ":" => Ok(self.tokens.push(Token::new(TokenType::Colon, ":".into(), snapshot))),
+          "::" => {
+            self.tokens.push(Token::new(TokenType::DoubleColon, "::".into(), snapshot));
+            Ok(())
+          }
+          ":" => {
+            self.tokens.push(Token::new(TokenType::Colon, ":".into(), snapshot));
+            Ok(())
+          }
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
       '!' => {
         let t = self.until(current_char, |ch| !['!', '='].contains(ch));
         match t.as_str() {
-          "!==" =>
-            Ok(self.tokens.push(Token::new(TokenType::IsNotIdentical, "!==".into(), snapshot))),
-          "!=" => Ok(self.tokens.push(Token::new(TokenType::IsNotEqual, "!=".into(), snapshot))),
+          "!==" => {
+            self.tokens.push(Token::new(TokenType::IsNotIdentical, "!==".into(), snapshot));
+            Ok(())
+          }
+          "!=" => {
+            self.tokens.push(Token::new(TokenType::IsNotEqual, "!=".into(), snapshot));
+            Ok(())
+          }
           c if c.starts_with('!') => {
             if t.len() > 1 {
               self.control.position -= t.len() - 1;
             }
-            Ok(self.tokens.push(Token::new(TokenType::BooleanNegate, "!".into(), snapshot)))
+            self.tokens.push(Token::new(TokenType::BooleanNegate, "!".into(), snapshot));
+            Ok(())
           }
           _ => Err(self.control.error_unrecognized(&t)),
         }
@@ -538,40 +641,78 @@ impl<'a> Lexer<'a> {
       '+' => {
         let t = self.until(current_char, |ch| !['+', '='].contains(ch));
         match t.as_str() {
-          "+=" =>
-            Ok(self.tokens.push(Token::new(TokenType::AdditionAssignment, "+=".into(), snapshot))),
+          "+=" => {
+            self.tokens.push(Token::new(TokenType::AdditionAssignment, "+=".into(), snapshot));
+            Ok(())
+          }
           "++" => {
             let is_post = match self.control.peek_char(None) {
               Some(t) => t.is_whitespace() || [';', ',', ')', ']', '}', '?'].contains(&t),
               None => true,
             };
             if is_post {
-              Ok(self.tokens.push(Token::new(TokenType::PostIncrement, "++".into(), snapshot)))
+              self.tokens.push(Token::new(TokenType::PostIncrement, "++".into(), snapshot));
+              Ok(())
             } else {
-              Ok(self.tokens.push(Token::new(TokenType::PreIncrement, "++".into(), snapshot)))
+              self.tokens.push(Token::new(TokenType::PreIncrement, "++".into(), snapshot));
+              Ok(())
             }
           }
-          "+" => Ok(self.tokens.push(Token::new(TokenType::Addition, "+".into(), snapshot))),
+          "+" => {
+            self.tokens.push(Token::new(TokenType::Addition, "+".into(), snapshot));
+            Ok(())
+          }
           _ => Err(self.control.error_unrecognized(&t)),
         }
       }
-      '(' => Ok(self.tokens.push(Token::new(TokenType::LeftParenthesis, "(".into(), snapshot))),
-      ')' => Ok(self.tokens.push(Token::new(TokenType::RightParenthesis, ")".into(), snapshot))),
-      '{' => Ok(self.tokens.push(Token::new(TokenType::LeftCurlyBracket, "{".into(), snapshot))),
-      '}' => Ok(self.tokens.push(Token::new(TokenType::RightCurlyBracket, "}".into(), snapshot))),
-      '[' => Ok(self.tokens.push(Token::new(TokenType::LeftSquareBracket, "[".into(), snapshot))),
-      ']' => Ok(self.tokens.push(Token::new(TokenType::RightSquareBracket, "]".into(), snapshot))),
+      '(' => {
+        self.tokens.push(Token::new(TokenType::LeftParenthesis, "(".into(), snapshot));
+        Ok(())
+      }
+      ')' => {
+        self.tokens.push(Token::new(TokenType::RightParenthesis, ")".into(), snapshot));
+        Ok(())
+      }
+      '{' => {
+        self.tokens.push(Token::new(TokenType::LeftCurlyBracket, "{".into(), snapshot));
+        Ok(())
+      }
+      '}' => {
+        self.tokens.push(Token::new(TokenType::RightCurlyBracket, "}".into(), snapshot));
+        Ok(())
+      }
+      '[' => {
+        self.tokens.push(Token::new(TokenType::LeftSquareBracket, "[".into(), snapshot));
+        Ok(())
+      }
+      ']' => {
+        self.tokens.push(Token::new(TokenType::RightSquareBracket, "]".into(), snapshot));
+        Ok(())
+      }
       '`' => StringToken::lex(self, "`", snapshot),
       '"' => StringToken::lex(self, "\"", snapshot),
       '\'' => StringToken::lex_basic(self, "\'", snapshot),
       '\\' => {
         let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_' || *ch == '\\'));
-        Ok(self.tokens.push(Token::new(TokenType::Name, t, snapshot)))
+        self.tokens.push(Token::new(TokenType::Name, t, snapshot));
+        Ok(())
       }
-      ',' => Ok(self.tokens.push(Token::new(TokenType::Comma, ",".into(), snapshot))),
-      ';' => Ok(self.tokens.push(Token::new(TokenType::Semicolon, ";".into(), snapshot))),
-      '~' => Ok(self.tokens.push(Token::new(TokenType::BooleanNegate, "~".into(), snapshot))),
-      '@' => Ok(self.tokens.push(Token::new(TokenType::AtSign, "@".into(), snapshot))),
+      ',' => {
+        self.tokens.push(Token::new(TokenType::Comma, ",".into(), snapshot));
+        Ok(())
+      }
+      ';' => {
+        self.tokens.push(Token::new(TokenType::Semicolon, ";".into(), snapshot));
+        Ok(())
+      }
+      '~' => {
+        self.tokens.push(Token::new(TokenType::BooleanNegate, "~".into(), snapshot));
+        Ok(())
+      }
+      '@' => {
+        self.tokens.push(Token::new(TokenType::AtSign, "@".into(), snapshot));
+        Ok(())
+      }
       _ => Err(self.control.error_unrecognized(&current_char.to_string())),
     }
   }

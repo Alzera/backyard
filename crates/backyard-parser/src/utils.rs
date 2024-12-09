@@ -117,7 +117,7 @@ const TYPES: [TokenType; 11] = [
 ];
 
 pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupResult>> {
-  let mut result: Vec<LookupResult> = Vec::new();
+  let mut result = Vec::with_capacity(pattern.len());
   let mut check_position = 0;
 
   for p in pattern.iter() {
@@ -291,9 +291,6 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
         });
       }
     }
-  }
-  if result.len() != pattern.len() {
-    panic!("match_pattern fail");
   }
   Some(result)
 }

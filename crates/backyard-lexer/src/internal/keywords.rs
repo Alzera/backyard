@@ -184,14 +184,20 @@ impl KeywordToken {
     if let Some(pos) = lexer.control.peek_char_n(None, 5) {
       if pos == "(get)" {
         lexer.control.consume(5);
-        return Ok(
-          lexer.tokens.push(Token::new(token_type[1], format_compact!("{}(get)", input), snapshot))
-        );
+        return {
+            lexer.tokens.push(Token::new(token_type[1], format_compact!("{}(get)", input), snapshot));
+            Ok(
+              ()
+            )
+        };
       } else if pos == "(set)" {
         lexer.control.consume(5);
-        return Ok(
-          lexer.tokens.push(Token::new(token_type[2], format_compact!("{}(set)", input), snapshot))
-        );
+        return {
+            lexer.tokens.push(Token::new(token_type[2], format_compact!("{}(set)", input), snapshot));
+            Ok(
+              ()
+            )
+        };
       }
     }
     lexer.tokens.push(Token::new(token_type[0], input.into(), snapshot));

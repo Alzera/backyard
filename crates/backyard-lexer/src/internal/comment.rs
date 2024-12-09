@@ -26,19 +26,21 @@ impl CommentToken {
 
   pub fn lex_doc(lexer: &mut Lexer, t: &str, snapshot: &ControlSnapshot) -> LexResult {
     let comment = CommentToken::parse(lexer);
+    lexer.tokens.push(
+      Token::new(TokenType::CommentDoc, format_compact!("{}{}", t, comment), snapshot)
+    );
     Ok(
-      lexer.tokens.push(
-        Token::new(TokenType::CommentDoc, format_compact!("{}{}", t, comment), snapshot)
-      )
+      ()
     )
   }
 
   pub fn lex_block(lexer: &mut Lexer, t: &str, snapshot: &ControlSnapshot) -> LexResult {
     let comment = CommentToken::parse(lexer);
+    lexer.tokens.push(
+      Token::new(TokenType::CommentBlock, format_compact!("{}{}", t, comment), snapshot)
+    );
     Ok(
-      lexer.tokens.push(
-        Token::new(TokenType::CommentBlock, format_compact!("{}{}", t, comment), snapshot)
-      )
+      ()
     )
   }
 
@@ -56,10 +58,11 @@ impl CommentToken {
         false
       })
     };
+    lexer.tokens.push(
+      Token::new(TokenType::CommentLine, format_compact!("{}{}", t, comment), snapshot)
+    );
     Ok(
-      lexer.tokens.push(
-        Token::new(TokenType::CommentLine, format_compact!("{}{}", t, comment), snapshot)
-      )
+      ()
     )
   }
 }

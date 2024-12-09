@@ -31,7 +31,7 @@ impl TypesParser {
   ) -> Result<Box<Node>, ParserError> {
     if let [types] = matched.as_slice() {
       if let Some(types) = types.as_optional_type() {
-        return Ok(types.to_owned());
+        return Ok(types);
       }
     }
     Err(ParserError::Internal)

@@ -115,7 +115,7 @@ pub static DEFAULT_PARSERS: [InternalParser; 46] = [
   (BlockParser::test, BlockParser::parse),
 ];
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct LoopArgument<'a> {
   #[allow(dead_code)]
   pub context: &'a str,

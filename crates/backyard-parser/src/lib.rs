@@ -30,7 +30,7 @@ pub fn parse_base(
       if tokens.is_empty() {
         return Err(ParserError::Eof);
       }
-      let mut parser = Parser::new(&tokens);
+      let mut parser = Parser::new(tokens);
       let parsed = parser.get_children(&mut LoopArgument::default("main"))?;
       let wrapped = ProgramNode::loc(
         parsed,

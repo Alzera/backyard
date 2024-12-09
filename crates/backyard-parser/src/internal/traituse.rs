@@ -146,7 +146,7 @@ impl TraitUsePrecedenceParser {
       let method = if let LookupResultWrapper::Optional(Some(method)) = &method.wrapper {
         IdentifierParser::from_token(method)
       } else {
-        let t = trait_name_parsed.to_owned().unwrap();
+        let t = trait_name_parsed.unwrap();
         trait_name_parsed = None;
         t
       };

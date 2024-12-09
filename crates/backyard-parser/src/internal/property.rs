@@ -80,7 +80,7 @@ impl PropertyParser {
         let item_start_loc = name.get_location().unwrap();
         PropertyItemNode::loc(
           IdentifierParser::from_token(name),
-          prop_type.to_owned(),
+          prop_type,
           None,
           parser.gen_loc(item_start_loc)
         )
