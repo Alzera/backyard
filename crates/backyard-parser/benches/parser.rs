@@ -1,5 +1,7 @@
 use std::hint::black_box;
-use backyard_parser::parse;
+use backyard_lexer::arena_lex;
+use backyard_parser::parse_base;
+use bumpalo::Bump;
 use criterion::{ criterion_group, criterion_main, Criterion };
 
 const CONTENT: &str =
@@ -92,9 +94,11 @@ BAR;
 }";
 
 fn criterion_benchmark(c: &mut Criterion) {
+  let arena = Bump::new();
+  let tokens = arena_lex(&arena, CONTENT);
   c.bench_function("parser_basic", |b| {
     b.iter(|| {
-      let _ = parse(black_box(CONTENT));
+      let _ = parse_base(black_box(&tokens));
     });
   });
 }
