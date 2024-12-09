@@ -28,6 +28,7 @@ backyard-generator = { version = "0.1.5", path = "crates/backyard-generator" }
 backyard = { version = "0.1.5", path = "crates/backyard" }
 
 compact_str = { version = "0.8.0", features = ["serde"] }
+bumpalo = { version = "3.16.0" }
 
 # serializer / deserializer
 ts-rs = "10.0"

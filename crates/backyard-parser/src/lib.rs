@@ -4,20 +4,27 @@ mod utils;
 mod macros;
 pub mod error;
 
-use backyard_lexer::{ error::LexError, lex, lex_eval, token::Token };
+use backyard_lexer::{ arena_lex, arena_lex_eval, error::LexError, token::Token };
 use backyard_nodes::node::{ Location, Node, ProgramNode, RangeLocation };
+use bumpalo::Bump;
 use error::ParserError;
 use parser::{ LocationHelper, LoopArgument, Parser };
 
 pub fn parse(input: &str) -> Result<Node, ParserError> {
-  parse_base(lex(input))
+  let arena = Bump::new();
+  let tokens = arena_lex(&arena, input);
+  parse_base(&tokens)
 }
 
 pub fn parse_eval(input: &str) -> Result<Node, ParserError> {
-  parse_base(lex_eval(input))
+  let arena = Bump::new();
+  let tokens = arena_lex_eval(&arena, input);
+  parse_base(&tokens)
 }
 
-fn parse_base(tokens: Result<Vec<Token>, LexError>) -> Result<Node, ParserError> {
+pub fn parse_base(
+  tokens: &Result<bumpalo::collections::Vec<Token>, LexError>
+) -> Result<Node, ParserError> {
   match tokens {
     Ok(tokens) => {
       if tokens.is_empty() {
@@ -34,6 +41,6 @@ fn parse_base(tokens: Result<Vec<Token>, LexError>) -> Result<Node, ParserError>
       );
       Ok(*wrapped)
     }
-    Err(err) => Err(ParserError::LexError(err)),
+    Err(err) => Err(ParserError::LexError(err.to_owned())),
   }
 }
