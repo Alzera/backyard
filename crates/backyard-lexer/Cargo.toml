@@ -4,6 +4,7 @@ description = "Generating tokens representation of PHP code."
 authors.workspace = true
 edition.workspace = true
 version.workspace = true
+keywords.workspace = true
 repository.workspace = true
 license.workspace = true
 

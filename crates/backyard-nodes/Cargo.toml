@@ -4,6 +4,7 @@ description = "Nodes representing PHP code AST."
 authors.workspace = true
 edition.workspace = true
 version.workspace = true
+keywords.workspace = true
 repository.workspace = true
 license.workspace = true
 

@@ -12,9 +12,6 @@ PHP parser for NodeJs written with rust.
 ## todo
 
 - [ ] AST Visit API
-- [ ] Improve unit testing
-- [ ] Benchmarking
-- [ ] Split base code, so it can be ported to another environtment _(if anyone can help me with this, reference link or something, I would be gratefull)_
 
 ## installation
 

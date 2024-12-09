@@ -35,6 +35,12 @@ Resulting this result:
       Token { token_type: RightCurlyBracket, value: "}", line: 4, column: 4, offset: 65 }
     ])
 
+## ecosystem
+
+- [backyard-generator](https://crates.io/crates/backyard-generator)
+- [backyard-nodes](https://crates.io/crates/backyard-nodes)
+- [backyard-parser](https://crates.io/crates/backyard-parser)
+
 ## heavily inspired by
 
 - [nikic/PHP-Parser](https://github.com/nikic/PHP-Parser)

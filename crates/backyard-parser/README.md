@@ -241,6 +241,12 @@ Resulting this result:
       })
     })
 
+## ecosystem
+
+- [backyard-generator](https://crates.io/crates/backyard-generator)
+- [backyard-lexer](https://crates.io/crates/backyard-lexer)
+- [backyard-nodes](https://crates.io/crates/backyard-nodes)
+
 ## heavily inspired by
 
 - [nikic/PHP-Parser](https://github.com/nikic/PHP-Parser)

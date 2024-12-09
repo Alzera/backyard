@@ -25,6 +25,12 @@ Resulting this code:
       var_dump($foo);
     }
 
+## ecosystem
+
+- [backyard-lexer](https://crates.io/crates/backyard-lexer)
+- [backyard-nodes](https://crates.io/crates/backyard-nodes)
+- [backyard-parser](https://crates.io/crates/backyard-parser)
+
 ## heavily inspired by
 
 - [nikic/PHP-Parser](https://github.com/nikic/PHP-Parser)
