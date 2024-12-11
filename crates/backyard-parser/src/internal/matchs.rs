@@ -42,7 +42,7 @@ impl MatchParser {
       parser.position += 2;
       let arms = parser.get_children(
         &mut LoopArgument::new(
-          &parser.arena,
+          parser.arena,
           "match_arm",
           &[TokenType::Comma],
           &[TokenType::RightCurlyBracket],
@@ -53,7 +53,7 @@ impl MatchParser {
         )
       )?;
       return Ok(
-        MatchNode::loc(condition.into_boxed(&parser.arena), arms, parser.gen_loc(start_loc))
+        MatchNode::loc(condition.into_boxed(parser.arena), arms, parser.gen_loc(start_loc))
       );
     }
     Err(ParserError::Internal)
@@ -108,6 +108,6 @@ impl MatchArmParser {
         parser.position += 1;
       }
     }
-    Ok(MatchArmNode::loc(conditions, body.into_boxed(&parser.arena), parser.gen_loc(start_loc)))
+    Ok(MatchArmNode::loc(conditions, body.into_boxed(parser.arena), parser.gen_loc(start_loc)))
   }
 }

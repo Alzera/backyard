@@ -4,8 +4,8 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct TernaryGenerator;
 
 impl TernaryGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

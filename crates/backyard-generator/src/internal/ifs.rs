@@ -7,8 +7,8 @@ use super::block::BlockGenerator;
 pub struct IfGenerator;
 
 impl IfGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -43,8 +43,8 @@ impl IfGenerator {
     }
   }
 
-  pub fn generate_else<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_else<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

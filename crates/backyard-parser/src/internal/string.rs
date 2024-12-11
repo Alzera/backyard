@@ -119,16 +119,16 @@ impl StringParser {
             EncapsedPartNode::loc(
               false,
               StringNode::loc(Quote::Single, i.value.to_owned(), loc.clone()).into_boxed(
-                &parser.arena
+                parser.arena
               ),
               loc
             )
           );
         }
         TokenType::Variable => {
-          let parsed = VariableParser::from_token(&parser.arena, i);
+          let parsed = VariableParser::from_token(parser.arena, i);
           let loc = parsed.loc.clone();
-          values.push(EncapsedPartNode::loc(false, parsed.into_boxed(&parser.arena), loc));
+          values.push(EncapsedPartNode::loc(false, parsed.into_boxed(parser.arena), loc));
         }
         TokenType::AdvanceInterpolationOpen => {
           let value = guard!(
@@ -143,7 +143,7 @@ impl StringParser {
           );
           parser.position += 1;
           values.push(
-            EncapsedPartNode::loc(true, value.into_boxed(&parser.arena), parser.gen_loc(start_loc))
+            EncapsedPartNode::loc(true, value.into_boxed(parser.arena), parser.gen_loc(start_loc))
           );
         }
         _ => {

@@ -7,8 +7,8 @@ use super::{ block::BlockGenerator, identifier::IdentifierGenerator };
 pub struct DeclareGenerator;
 
 impl DeclareGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -47,8 +47,8 @@ impl DeclareGenerator {
     }
   }
 
-  pub fn generate_argument<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_argument<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

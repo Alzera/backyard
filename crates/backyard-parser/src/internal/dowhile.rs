@@ -50,8 +50,8 @@ impl DoWhileParser {
       parser.position += 1;
       return Ok(
         DoWhileNode::loc(
-          condition.into_boxed(&parser.arena),
-          body.into_boxed(&parser.arena),
+          condition.into_boxed(parser.arena),
+          body.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );
@@ -94,7 +94,7 @@ impl DoWhileConditionParser {
         )?
       );
       return Ok(
-        DoWhileConditionNode::loc(condition.into_boxed(&parser.arena), parser.gen_loc(start_loc))
+        DoWhileConditionNode::loc(condition.into_boxed(parser.arena), parser.gen_loc(start_loc))
       );
     }
     Err(ParserError::Internal)

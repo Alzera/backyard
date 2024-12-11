@@ -68,8 +68,8 @@ impl ObjectAccessParser {
       };
       return Ok(
         ObjectAccessNode::loc(
-          args.last_expr.take().unwrap().into_boxed(&parser.arena),
-          expr.into_boxed(&parser.arena),
+          args.last_expr.take().unwrap().into_boxed(parser.arena),
+          expr.into_boxed(parser.arena),
           is_bracket,
           is_nullsafe,
           parser.gen_loc(start_loc)

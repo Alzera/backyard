@@ -33,7 +33,7 @@ impl PostParser {
     if let [operator] = matched.as_slice() {
       return Ok(
         PostNode::loc(
-          args.last_expr.take().unwrap().into_boxed(&parser.arena),
+          args.last_expr.take().unwrap().into_boxed(parser.arena),
           operator.as_equal()?.value.to_owned(),
           parser.gen_loc(start_loc)
         )

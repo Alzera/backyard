@@ -22,7 +22,7 @@ impl ConstParser {
   ) -> Result<Vec<'arena, Node<'arena>>, ParserError> {
     let consts = parser.get_children(
       &mut LoopArgument::new(
-        &parser.arena,
+        parser.arena,
         "const",
         &[TokenType::Comma],
         &[TokenType::Semicolon],

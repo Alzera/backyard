@@ -7,8 +7,8 @@ use super::block::BlockGenerator;
 pub struct TryGenerator;
 
 impl TryGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -26,8 +26,8 @@ impl TryGenerator {
     }
   }
 
-  pub fn generate_catch<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_catch<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

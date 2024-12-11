@@ -15,6 +15,7 @@ license = "MIT"
 
 [workspace.lints.clippy]
 vec_box = "allow"
+needless_lifetimes = "allow"
 
 # unwrap_used = "deny"
 # expect_used = "deny"

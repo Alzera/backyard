@@ -43,13 +43,13 @@ impl ArrayParser {
               let leadings = i.leadings.take();
               let trailings = i.trailings.take();
               let loc = i.loc.take();
-              let mut a = ArrayItemNode::loc(None, i.into_boxed(&parser.arena), loc);
+              let mut a = ArrayItemNode::loc(None, i.into_boxed(parser.arena), loc);
               a.leadings = leadings;
               a.trailings = trailings;
               a
             }
           }),
-        &parser.arena
+        parser.arena
       )
     )
   }
@@ -138,8 +138,8 @@ impl ArrayItemParser {
       let key = args.last_expr.take();
       return Ok(
         ArrayItemNode::loc(
-          key.into_boxed(&parser.arena),
-          value.into_boxed(&parser.arena),
+          key.into_boxed(parser.arena),
+          value.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );

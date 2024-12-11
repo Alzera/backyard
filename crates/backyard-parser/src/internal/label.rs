@@ -37,7 +37,7 @@ impl LabelParser {
       } else {
         start_loc
       };
-      return Ok(LabelNode::loc(name.into_boxed(&parser.arena), parser.gen_loc(name_loc)));
+      return Ok(LabelNode::loc(name.into_boxed(parser.arena), parser.gen_loc(name_loc)));
     }
     Err(ParserError::Internal)
   }

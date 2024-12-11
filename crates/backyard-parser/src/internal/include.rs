@@ -71,7 +71,7 @@ impl IncludeParser {
           use_parenthesis,
           is_require,
           is_once,
-          argument.into_boxed(&parser.arena),
+          argument.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );

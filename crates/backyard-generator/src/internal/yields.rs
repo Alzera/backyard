@@ -5,8 +5,8 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct YieldGenerator;
 
 impl YieldGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -24,8 +24,8 @@ impl YieldGenerator {
     }
   }
 
-  pub fn generate_from<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_from<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

@@ -7,8 +7,8 @@ use super::{ block::BlockGenerator, function::FunctionGenerator, identifier::Ide
 pub struct PropertyGenerator;
 
 impl PropertyGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -46,8 +46,8 @@ impl PropertyGenerator {
     }
   }
 
-  pub fn generate_item<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_item<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -64,8 +64,8 @@ impl PropertyGenerator {
     }
   }
 
-  pub fn generate_hook<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_hook<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

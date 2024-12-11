@@ -55,7 +55,7 @@ impl UseParser {
               parser.position += 1;
               items = parser.get_children(
                 &mut LoopArgument::new(
-                  &parser.arena,
+                  parser.arena,
                   "uses_items",
                   &[TokenType::Comma],
                   &[TokenType::RightCurlyBracket],
@@ -136,7 +136,7 @@ impl UseItemParser {
         }
       }
       return Ok(
-        UseItemNode::loc(modifier, name, alias.into_boxed(&parser.arena), parser.gen_loc(start_loc))
+        UseItemNode::loc(modifier, name, alias.into_boxed(parser.arena), parser.gen_loc(start_loc))
       );
     }
     Err(ParserError::Internal)

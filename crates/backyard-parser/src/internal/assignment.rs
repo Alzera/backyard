@@ -69,9 +69,9 @@ impl AssignmentParser {
       {
         return Ok(
           AssignmentNode::loc(
-            left.into_boxed(&parser.arena),
+            left.into_boxed(parser.arena),
             operator.value.to_owned(),
-            right.into_boxed(&parser.arena),
+            right.into_boxed(parser.arena),
             parser.gen_loc(start_loc)
           )
         );

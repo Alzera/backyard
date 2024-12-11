@@ -7,8 +7,8 @@ use super::variable::VariableGenerator;
 pub struct GlobalGenerator;
 
 impl GlobalGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

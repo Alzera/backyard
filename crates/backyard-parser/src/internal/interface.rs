@@ -72,7 +72,7 @@ impl InterfaceParser {
       parser.position += 1;
       let body = parser.get_children(
         &mut LoopArgument::new(
-          &parser.arena,
+          parser.arena,
           "interface_body",
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
@@ -86,9 +86,9 @@ impl InterfaceParser {
       )?;
       return Ok(
         InterfaceNode::loc(
-          name.into_boxed(&parser.arena),
+          name.into_boxed(parser.arena),
           extends,
-          BlockNode::loc(body, parser.gen_loc(block_loc)).into_boxed(&parser.arena),
+          BlockNode::loc(body, parser.gen_loc(block_loc)).into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );

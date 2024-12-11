@@ -7,8 +7,8 @@ use super::block::BlockGenerator;
 pub struct DoWhileGenerator;
 
 impl DoWhileGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -22,8 +22,8 @@ impl DoWhileGenerator {
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
   }
 
-  pub fn generate_condition<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_condition<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

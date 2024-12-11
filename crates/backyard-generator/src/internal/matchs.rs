@@ -5,8 +5,8 @@ use crate::generator::{ Builder, EndMode, Generator, GeneratorArgument, DEFAULT_
 pub struct MatchGenerator;
 
 impl MatchGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -27,8 +27,8 @@ impl MatchGenerator {
     builder.push("}");
   }
 
-  pub fn generate_arm<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_arm<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

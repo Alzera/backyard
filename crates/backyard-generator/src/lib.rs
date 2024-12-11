@@ -6,7 +6,7 @@ pub mod error;
 mod generator;
 mod internal;
 
-pub fn generate<'arena>(node: &Node<'arena>) -> Result<String, GeneratorError> {
+pub fn generate(node: &Node<'_>) -> Result<String, GeneratorError> {
   if let NodeWrapper::Program(program) = &node.node {
     let mut generator = Generator::new(&program.children);
     Ok(generator.start())

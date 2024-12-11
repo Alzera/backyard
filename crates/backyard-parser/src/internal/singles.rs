@@ -100,13 +100,13 @@ impl SinglesParser {
       let argument = parser
         .get_statement(
           &mut LoopArgument::with_tokens(
-            &parser.arena,
+            parser.arena,
             "singles",
             &args.separators.combine(&[TokenType::Semicolon]),
             &args.breakers.combine(&[TokenType::RightCurlyBracket])
           )
         )?
-        .into_boxed(&parser.arena);
+        .into_boxed(parser.arena);
       match key.token_type {
         TokenType::Break => {
           return Ok(BreakNode::loc(argument, parser.gen_loc(start_loc)));

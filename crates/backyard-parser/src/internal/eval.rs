@@ -36,7 +36,7 @@ impl EvalParser {
         )?
       {
         parser.position += 1;
-        return Ok(EvalNode::loc(argument.into_boxed(&parser.arena), parser.gen_loc(start_loc)));
+        return Ok(EvalNode::loc(argument.into_boxed(parser.arena), parser.gen_loc(start_loc)));
       }
     }
     Err(ParserError::Internal)

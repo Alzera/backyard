@@ -5,8 +5,8 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct CallGenerator;
 
 impl CallGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -30,8 +30,8 @@ impl CallGenerator {
     builder.push(")");
   }
 
-  pub fn generate_argument<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_argument<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

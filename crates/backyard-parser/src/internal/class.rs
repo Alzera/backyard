@@ -131,7 +131,7 @@ impl ClassParser {
       parser.position += 1;
       let body = parser.get_children(
         &mut LoopArgument::new(
-          &parser.arena,
+          parser.arena,
           "class_anonymous_body",
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
@@ -148,9 +148,9 @@ impl ClassParser {
       return Ok(
         AnonymousClassNode::loc(
           parameters,
-          extends.into_boxed(&parser.arena),
+          extends.into_boxed(parser.arena),
           implements,
-          BlockNode::loc(body, parser.gen_loc(body_loc)).into_boxed(&parser.arena),
+          BlockNode::loc(body, parser.gen_loc(body_loc)).into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );
@@ -189,7 +189,7 @@ impl ClassParser {
       parser.position += 1;
       let body = parser.get_children(
         &mut LoopArgument::new(
-          &parser.arena,
+          parser.arena,
           "class_body",
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
@@ -212,10 +212,10 @@ impl ClassParser {
       return Ok(
         ClassNode::loc(
           inheritance,
-          Some(name.into_boxed(&parser.arena)),
+          Some(name.into_boxed(parser.arena)),
           extends.into_boxed(parser.arena),
           implements,
-          BlockNode::loc(body, parser.gen_loc(body_loc)).into_boxed(&parser.arena),
+          BlockNode::loc(body, parser.gen_loc(body_loc)).into_boxed(parser.arena),
           is_readonly,
           parser.gen_loc(start_loc)
         )

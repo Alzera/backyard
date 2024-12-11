@@ -35,7 +35,7 @@ impl TraitUseParser {
     if let [_] = matched.as_slice() {
       let traits = parser.get_children(
         &mut LoopArgument::new(
-          &parser.arena,
+          parser.arena,
           "traituse",
           &[TokenType::Comma],
           &[TokenType::Semicolon, TokenType::LeftCurlyBracket],
@@ -113,9 +113,9 @@ impl TraitUseAliasParser {
         .unwrap_or_default();
       return Ok(
         TraitUseAliasNode::loc(
-          trait_name_parsed.into_boxed(&parser.arena),
-          name_parsed.into_boxed(&parser.arena),
-          alias.into_boxed(&parser.arena),
+          trait_name_parsed.into_boxed(parser.arena),
+          name_parsed.into_boxed(parser.arena),
+          alias.into_boxed(parser.arena),
           Visibility::try_from(visibility.as_str()).ok(),
           parser.gen_loc(start_loc)
         )
@@ -165,9 +165,9 @@ impl TraitUsePrecedenceParser {
       };
       return Ok(
         TraitUsePrecedenceNode::loc(
-          trait_name_parsed.into_boxed(&parser.arena),
-          method.into_boxed(&parser.arena),
-          instead.into_boxed(&parser.arena),
+          trait_name_parsed.into_boxed(parser.arena),
+          method.into_boxed(parser.arena),
+          instead.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );

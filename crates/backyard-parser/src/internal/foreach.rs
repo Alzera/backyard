@@ -86,10 +86,10 @@ impl ForeachParser {
       )?;
       return Ok(
         ForeachNode::loc(
-          source.into_boxed(&parser.arena),
-          key.into_boxed(&parser.arena),
-          value.into_boxed(&parser.arena),
-          body.into_boxed(&parser.arena),
+          source.into_boxed(parser.arena),
+          key.into_boxed(parser.arena),
+          value.into_boxed(parser.arena),
+          body.into_boxed(parser.arena),
           is_short,
           parser.gen_loc(start_loc)
         )

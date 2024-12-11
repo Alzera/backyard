@@ -41,7 +41,7 @@ impl ExitParser {
         None
       };
       parser.position += 1;
-      return Ok(ExitNode::loc(argument.into_boxed(&parser.arena), parser.gen_loc(start_loc)));
+      return Ok(ExitNode::loc(argument.into_boxed(parser.arena), parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

@@ -28,7 +28,7 @@ impl EchoParser {
     if let [_] = matched.as_slice() {
       let items = parser.get_children(
         &mut LoopArgument::with_tokens(
-          &parser.arena,
+          parser.arena,
           "echo",
           &[TokenType::Comma],
           &args.breakers

@@ -43,14 +43,14 @@ impl<'a> LookupResult<'a> {
 
   pub fn as_equal(&self) -> Result<&Token, ParserError> {
     if let LookupResultWrapper::Equal(v) = &self.wrapper {
-      Ok(&v)
+      Ok(v)
     } else {
       Err(ParserError::Internal)
     }
   }
 
   pub fn as_optional(&self) -> Option<&Token> {
-    if let LookupResultWrapper::Optional(Some(v)) = &self.wrapper { Some(&v) } else { None }
+    if let LookupResultWrapper::Optional(Some(v)) = &self.wrapper { Some(v) } else { None }
   }
 
   pub fn as_optional_type<'arena>(&self, arena: &'arena Bump) -> Option<Node<'arena>> {

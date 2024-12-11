@@ -74,7 +74,7 @@ impl MethodParser {
           visibility,
           inheritance,
           is_static,
-          function.into_boxed(&parser.arena),
+          function.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );

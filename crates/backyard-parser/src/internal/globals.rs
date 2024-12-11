@@ -30,7 +30,7 @@ impl GlobalParser {
     if let [_] = matched.as_slice() {
       let items = parser.get_children(
         &mut LoopArgument::new(
-          &parser.arena,
+          parser.arena,
           "global",
           &[TokenType::Comma],
           &[TokenType::Semicolon],

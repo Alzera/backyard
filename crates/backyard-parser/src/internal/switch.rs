@@ -38,7 +38,7 @@ impl SwitchParser {
     if let [_, _] = matched.as_slice() {
       let condition = guard!(
         parser.get_statement(
-          &mut &mut LoopArgument::with_tokens(
+          &mut LoopArgument::with_tokens(
             parser.arena,
             "switch",
             &[],
@@ -52,7 +52,7 @@ impl SwitchParser {
       parser.position += 1;
       let statements = parser.get_children(
         &mut LoopArgument::new(
-          &parser.arena,
+          parser.arena,
           "switch_body",
           &[],
           &[TokenType::RightCurlyBracket, TokenType::EndSwitch],
@@ -64,8 +64,8 @@ impl SwitchParser {
       )?;
       return Ok(
         SwitchNode::loc(
-          condition.into_boxed(&parser.arena),
-          BlockNode::loc(statements, parser.gen_loc(block_loc)).into_boxed(&parser.arena),
+          condition.into_boxed(parser.arena),
+          BlockNode::loc(statements, parser.gen_loc(block_loc)).into_boxed(parser.arena),
           is_short,
           parser.gen_loc(start_loc)
         )
@@ -100,7 +100,7 @@ impl CaseParser {
         } else {
           parser.get_statement(
             &mut LoopArgument::with_tokens(
-              &parser.arena,
+              parser.arena,
               "switch_case_condition",
               &[],
               &[TokenType::Colon]
@@ -119,7 +119,7 @@ impl CaseParser {
           let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
           let s = parser.get_children(
             &mut LoopArgument::with_tokens(
-              &parser.arena,
+              parser.arena,
               "switch_case_body",
               &[TokenType::Semicolon],
               &[
@@ -136,8 +136,8 @@ impl CaseParser {
       };
       return Ok(
         CaseNode::loc(
-          condition.into_boxed(&parser.arena),
-          statements.into_boxed(&parser.arena),
+          condition.into_boxed(parser.arena),
+          statements.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );

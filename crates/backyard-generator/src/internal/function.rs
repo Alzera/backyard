@@ -7,8 +7,8 @@ use super::{ block::BlockGenerator, identifier::IdentifierGenerator };
 pub struct FunctionGenerator;
 
 impl FunctionGenerator {
-  pub fn get_parameters<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn get_parameters<'arena>(
+    generator: &mut Generator<'arena, '_>,
     parameters: &[Node<'arena>]
   ) -> Builder {
     generator.generate_nodes_new(
@@ -17,8 +17,8 @@ impl FunctionGenerator {
     )
   }
 
-  pub fn get_return_type<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn get_return_type<'arena>(
+    generator: &mut Generator<'arena, '_>,
     node: &Option<&Node<'arena>>
   ) -> (Option<Builder>, usize) {
     let return_type = node.as_ref().map(|n| generator.generate_node_new(n));
@@ -30,8 +30,8 @@ impl FunctionGenerator {
     (return_type, return_type_len)
   }
 
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -88,8 +88,8 @@ impl FunctionGenerator {
     }
   }
 
-  pub fn generate_anonymous<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_anonymous<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -149,8 +149,8 @@ impl FunctionGenerator {
     BlockGenerator::generate(generator, builder, &node.body, None);
   }
 
-  pub fn generate_arrow<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_arrow<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -188,8 +188,8 @@ impl FunctionGenerator {
     generator.generate_node(builder, &node.body, &mut GeneratorArgument::default());
   }
 
-  pub fn generate_constructor_parameter<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_constructor_parameter<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -203,8 +203,8 @@ impl FunctionGenerator {
     Self::generate_parameter(generator, builder, &node.parameter);
   }
 
-  pub fn generate_parameter<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_parameter<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

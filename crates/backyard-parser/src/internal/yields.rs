@@ -45,11 +45,11 @@ impl YieldParser {
             )
           )?
         );
-        return Ok(YieldFromNode::loc(expr.into_boxed(&parser.arena), parser.gen_loc(start_loc)));
+        return Ok(YieldFromNode::loc(expr.into_boxed(parser.arena), parser.gen_loc(start_loc)));
       }
       let mut value = parser.get_statement(
         &mut LoopArgument::with_tokens(
-          &parser.arena,
+          parser.arena,
           "yield",
           &[],
           &args.breakers.combine(args.separators).combine(&[TokenType::Arrow])
@@ -77,8 +77,8 @@ impl YieldParser {
       }
       return Ok(
         YieldNode::loc(
-          key.into_boxed(&parser.arena),
-          value.into_boxed(&parser.arena),
+          key.into_boxed(parser.arena),
+          value.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );

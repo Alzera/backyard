@@ -34,7 +34,7 @@ impl TypesParser {
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [types] = matched.as_slice() {
-      if let Some(types) = types.as_optional_type(&parser.arena) {
+      if let Some(types) = types.as_optional_type(parser.arena) {
         return Ok(types);
       }
     }

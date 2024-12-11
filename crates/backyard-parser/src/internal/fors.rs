@@ -34,7 +34,7 @@ impl ForParser {
     if let [_, _] = matched.as_slice() {
       let inits = parser.get_children(
         &mut LoopArgument::with_tokens(
-          &parser.arena,
+          parser.arena,
           "for_inits",
           &[TokenType::Comma],
           &[TokenType::Semicolon]
@@ -42,7 +42,7 @@ impl ForParser {
       )?;
       let tests = parser.get_children(
         &mut LoopArgument::with_tokens(
-          &parser.arena,
+          parser.arena,
           "for_tests",
           &[TokenType::Comma],
           &[TokenType::Semicolon]
@@ -50,7 +50,7 @@ impl ForParser {
       )?;
       let increments = parser.get_children(
         &mut LoopArgument::with_tokens(
-          &parser.arena,
+          parser.arena,
           "for_increments",
           &[TokenType::Comma],
           &[TokenType::RightParenthesis]
@@ -72,7 +72,7 @@ impl ForParser {
           inits,
           tests,
           increments,
-          body.into_boxed(&parser.arena),
+          body.into_boxed(parser.arena),
           body_type,
           parser.gen_loc(start_loc)
         )

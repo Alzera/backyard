@@ -31,7 +31,7 @@ impl AttributeParser {
     if let [_] = matched.as_slice() {
       let items = parser.get_children(
         &mut LoopArgument::new(
-          &parser.arena,
+          parser.arena,
           "attribute",
           &[TokenType::Comma],
           &[TokenType::RightSquareBracket],
@@ -48,7 +48,7 @@ impl AttributeParser {
         )
       )?;
       if let Some(mut expr) = expr {
-        expr.leadings_shift(&parser.arena, AttributeNode::loc(items, parser.gen_loc(start_loc)));
+        expr.leadings_shift(parser.arena, AttributeNode::loc(items, parser.gen_loc(start_loc)));
         return Ok(expr);
       }
     }

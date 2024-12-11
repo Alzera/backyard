@@ -50,7 +50,7 @@ impl NamespaceParser {
       return Ok(
         NamespaceNode::loc(
           name,
-          body.into_boxed(&parser.arena),
+          body.into_boxed(parser.arena),
           is_bracket,
           parser.gen_loc(start_loc)
         )

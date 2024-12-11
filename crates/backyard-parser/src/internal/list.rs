@@ -32,7 +32,7 @@ impl ListParser {
     if let [_, _] = matched.as_slice() {
       let values = parser.get_children(
         &mut LoopArgument::with_tokens(
-          &parser.arena,
+          parser.arena,
           "list",
           &[TokenType::Comma],
           &[TokenType::RightParenthesis]

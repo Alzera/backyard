@@ -5,8 +5,8 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct ParenthesisGenerator;
 
 impl ParenthesisGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -16,8 +16,8 @@ impl ParenthesisGenerator {
     builder.push(")");
   }
 
-  pub fn generate_cast<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_cast<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

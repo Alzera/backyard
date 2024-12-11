@@ -39,7 +39,7 @@ impl TryParser {
       let body = BlockParser::new_block(parser)?;
       let catches = parser.get_children(
         &mut LoopArgument::safe(
-          &parser.arena,
+          parser.arena,
           "try",
           &[],
           &[],
@@ -50,7 +50,7 @@ impl TryParser {
           ]
         )
       )?;
-      return Ok(TryNode::loc(body.into_boxed(&parser.arena), catches, parser.gen_loc(start_loc)));
+      return Ok(TryNode::loc(body.into_boxed(parser.arena), catches, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }
@@ -81,7 +81,7 @@ impl CatchParser {
     if let [_, _] = matched.as_slice() {
       let types = parser.get_children(
         &mut LoopArgument::new(
-          &parser.arena,
+          parser.arena,
           "catch_types",
           &[TokenType::BitwiseOr],
           &[TokenType::Variable, TokenType::VariableBracketOpen, TokenType::RightParenthesis],
@@ -114,8 +114,8 @@ impl CatchParser {
       return Ok(
         CatchNode::loc(
           types,
-          variable.into_boxed(&parser.arena),
-          body.into_boxed(&parser.arena),
+          variable.into_boxed(parser.arena),
+          body.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );
@@ -144,7 +144,7 @@ impl FinallyParser {
   ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
       let body = BlockParser::new_block(parser)?;
-      return Ok(FinallyNode::loc(body.into_boxed(&parser.arena), parser.gen_loc(start_loc)));
+      return Ok(FinallyNode::loc(body.into_boxed(parser.arena), parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

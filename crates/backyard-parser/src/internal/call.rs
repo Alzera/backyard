@@ -55,7 +55,7 @@ impl CallParser {
     if let [_] = matched.as_slice() {
       return Ok(
         CallNode::loc(
-          args.last_expr.take().unwrap().into_boxed(&parser.arena),
+          args.last_expr.take().unwrap().into_boxed(parser.arena),
           CallParser::get_arguments(parser)?,
           parser.gen_loc(start_loc)
         )
@@ -129,8 +129,8 @@ impl ArgumentParser {
       );
       return Ok(
         CallArgumentNode::loc(
-          name.into_boxed(&parser.arena),
-          value.into_boxed(&parser.arena),
+          name.into_boxed(parser.arena),
+          value.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );

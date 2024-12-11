@@ -7,8 +7,8 @@ use super::block::BlockGenerator;
 pub struct SwitchGenerator;
 
 impl SwitchGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -27,8 +27,8 @@ impl SwitchGenerator {
     );
   }
 
-  pub fn generate_case<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_case<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

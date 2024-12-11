@@ -40,7 +40,7 @@ impl StaticsParser {
       parser.position -= 1;
       let items = parser.get_children(
         &mut LoopArgument::new(
-          &parser.arena,
+          parser.arena,
           "static",
           &[TokenType::Comma],
           &[TokenType::Semicolon],

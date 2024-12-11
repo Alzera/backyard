@@ -52,7 +52,7 @@ impl IfParser {
       }
       let invalid = parser.get_statement(
         &mut LoopArgument::safe(
-          &parser.arena,
+          parser.arena,
           "if_invalid",
           &[],
           &[TokenType::RightCurlyBracket, TokenType::EndIf],
@@ -71,9 +71,9 @@ impl IfParser {
       }
       return Ok(
         IfNode::loc(
-          condition.into_boxed(&parser.arena),
-          valid.into_boxed(&parser.arena),
-          invalid.into_boxed(&parser.arena),
+          condition.into_boxed(parser.arena),
+          valid.into_boxed(parser.arena),
+          invalid.into_boxed(parser.arena),
           is_short,
           parser.gen_loc(start_loc)
         )
@@ -117,7 +117,7 @@ impl ElseParser {
             args
           )?;
           return Ok(
-            ElseNode::loc(expr.into_boxed(&parser.arena), false, parser.gen_loc(start_loc))
+            ElseNode::loc(expr.into_boxed(parser.arena), false, parser.gen_loc(start_loc))
           );
         }
       }
@@ -137,7 +137,7 @@ impl ElseParser {
             args
           )?;
           return Ok(
-            ElseNode::loc(expr.into_boxed(&parser.arena), false, parser.gen_loc(start_loc))
+            ElseNode::loc(expr.into_boxed(parser.arena), false, parser.gen_loc(start_loc))
           );
         }
       }
@@ -147,7 +147,7 @@ impl ElseParser {
         args
       )?;
       return Ok(
-        ElseNode::loc(valid.into_boxed(&parser.arena), is_short, parser.gen_loc(start_loc))
+        ElseNode::loc(valid.into_boxed(parser.arena), is_short, parser.gen_loc(start_loc))
       );
     }
     Err(ParserError::Internal)

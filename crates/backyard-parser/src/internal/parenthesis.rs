@@ -61,7 +61,7 @@ impl ParenthesisParser {
               return Ok(
                 CastNode::loc(
                   token.value.to_owned(),
-                  expression.into_boxed(&parser.arena),
+                  expression.into_boxed(parser.arena),
                   parser.gen_loc(start_loc)
                 )
               );
@@ -71,7 +71,7 @@ impl ParenthesisParser {
       }
       let statement = guard!(
         parser.get_statement(
-          &mut &mut LoopArgument::with_tokens(
+          &mut LoopArgument::with_tokens(
             parser.arena,
             "parenthesis",
             &[],
@@ -81,7 +81,7 @@ impl ParenthesisParser {
       );
       parser.position += 1;
       return Ok(
-        ParenthesisNode::loc(statement.into_boxed(&parser.arena), parser.gen_loc(start_loc))
+        ParenthesisNode::loc(statement.into_boxed(parser.arena), parser.gen_loc(start_loc))
       );
     }
     Err(ParserError::Internal)

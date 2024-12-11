@@ -56,7 +56,7 @@ impl EnumParser {
         .unwrap_or_default();
       let items = parser.get_children(
         &mut LoopArgument::new(
-          &parser.arena,
+          parser.arena,
           "enum",
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
@@ -71,9 +71,9 @@ impl EnumParser {
       )?;
       return Ok(
         EnumNode::loc(
-          name.into_boxed(&parser.arena),
-          enum_type.as_optional_type(&parser.arena).into_boxed(&parser.arena),
-          implements.into_boxed(&parser.arena),
+          name.into_boxed(parser.arena),
+          enum_type.as_optional_type(parser.arena).into_boxed(parser.arena),
+          implements.into_boxed(parser.arena),
           items,
           parser.gen_loc(start_loc)
         )
@@ -112,7 +112,7 @@ impl EnumItemParser {
           )
         )?
       {
-        return Ok(EnumItemNode::loc(value.into_boxed(&parser.arena), parser.gen_loc(start_loc)));
+        return Ok(EnumItemNode::loc(value.into_boxed(parser.arena), parser.gen_loc(start_loc)));
       }
     }
     Err(ParserError::Internal)

@@ -59,8 +59,8 @@ impl ArrayLookupParser {
       parser.position += 1;
       return Ok(
         ArrayLookupNode::loc(
-          on.into_boxed(&parser.arena),
-          target.into_boxed(&parser.arena),
+          on.into_boxed(parser.arena),
+          target.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );

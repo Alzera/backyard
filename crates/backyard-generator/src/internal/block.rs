@@ -12,8 +12,8 @@ use crate::generator::{
 pub struct BlockGenerator;
 
 impl BlockGenerator {
-  pub fn generate_single<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_single<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -25,8 +25,8 @@ impl BlockGenerator {
     builder.push("}");
   }
 
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>,
     short_close: Option<&str>
@@ -34,8 +34,8 @@ impl BlockGenerator {
     Self::generate_specific(generator, builder, node, short_close, &DEFAULT_GENERATORS)
   }
 
-  pub fn generate_specific<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_specific<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>,
     short_close: Option<&str>,
@@ -64,8 +64,8 @@ impl BlockGenerator {
     }
   }
 
-  fn print_block<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  fn print_block<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>,
     short_close: Option<&str>,
@@ -89,8 +89,8 @@ impl BlockGenerator {
     }
   }
 
-  pub fn generate_base<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_base<'arena>(
+    generator: &mut Generator<'arena, '_>,
     node: &Node<'arena>,
     generators: &[(NodeType, InternalGenerator)]
   ) -> Builder {

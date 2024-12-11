@@ -68,9 +68,9 @@ impl CommentParser {
           if let Some(expr_loc) = &expr.loc {
             if let Some(comment_loc) = &comment.loc {
               if expr_loc.start.offset < comment_loc.start.offset {
-                expr.trailings_push(&parser.arena, comment);
+                expr.trailings_push(parser.arena, comment);
               } else {
-                expr.leadings_shift(&parser.arena, comment);
+                expr.leadings_shift(parser.arena, comment);
               }
             }
           }
@@ -83,14 +83,14 @@ impl CommentParser {
             &last_expr.node_type
           )
         {
-          last_expr.trailings_push(&parser.arena, comment);
+          last_expr.trailings_push(parser.arena, comment);
           if let Some(next_expr) = expr {
             if
               [NodeType::CommentBlock, NodeType::CommentDoc, NodeType::CommentLine].contains(
                 &next_expr.node_type
               )
             {
-              last_expr.trailings_push(&parser.arena, next_expr);
+              last_expr.trailings_push(parser.arena, next_expr);
             }
           }
           return Ok(last_expr);

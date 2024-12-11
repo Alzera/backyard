@@ -7,8 +7,8 @@ use super::identifier::IdentifierGenerator;
 pub struct TraitUseGenerator;
 
 impl TraitUseGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -50,8 +50,8 @@ impl TraitUseGenerator {
     }
   }
 
-  pub fn generate_alias<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_alias<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -72,8 +72,8 @@ impl TraitUseGenerator {
     }
   }
 
-  pub fn generate_precedence<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_precedence<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

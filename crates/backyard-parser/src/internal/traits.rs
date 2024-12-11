@@ -45,7 +45,7 @@ impl TraitParser {
       parser.position += 1;
       let body = parser.get_children(
         &mut LoopArgument::new(
-          &parser.arena,
+          parser.arena,
           "trait_body",
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
@@ -61,8 +61,8 @@ impl TraitParser {
       )?;
       return Ok(
         TraitNode::loc(
-          name.into_boxed(&parser.arena),
-          BlockNode::loc(body, parser.gen_loc(block_loc)).into_boxed(&parser.arena),
+          name.into_boxed(parser.arena),
+          BlockNode::loc(body, parser.gen_loc(block_loc)).into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );

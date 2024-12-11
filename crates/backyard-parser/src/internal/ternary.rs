@@ -49,9 +49,9 @@ impl TernaryParser {
       );
       return Ok(
         TernaryNode::loc(
-          left.into_boxed(&parser.arena),
-          valid.into_boxed(&parser.arena),
-          invalid.into_boxed(&parser.arena),
+          left.into_boxed(parser.arena),
+          valid.into_boxed(parser.arena),
+          invalid.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );

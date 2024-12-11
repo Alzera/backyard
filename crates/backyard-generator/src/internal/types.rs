@@ -5,8 +5,8 @@ use crate::generator::{ Builder, Generator };
 pub struct TypeGenerator;
 
 impl TypeGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -26,8 +26,8 @@ impl TypeGenerator {
     builder.push(&node.name);
   }
 
-  fn generate_union<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  fn generate_union<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -36,8 +36,8 @@ impl TypeGenerator {
     builder.push(&types.join("|"));
   }
 
-  fn generate_intersection<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  fn generate_intersection<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -47,8 +47,8 @@ impl TypeGenerator {
     builder.push(&types.join("&"));
   }
 
-  fn map_types<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  fn map_types<'arena>(
+    generator: &mut Generator<'arena, '_>,
     types: &[Node<'arena>]
   ) -> Vec<String> {
     types

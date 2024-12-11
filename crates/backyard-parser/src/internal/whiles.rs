@@ -46,8 +46,8 @@ impl WhileParser {
       )?;
       return Ok(
         WhileNode::loc(
-          condition.into_boxed(&parser.arena),
-          body.into_boxed(&parser.arena),
+          condition.into_boxed(parser.arena),
+          body.into_boxed(parser.arena),
           is_short,
           parser.gen_loc(start_loc)
         )

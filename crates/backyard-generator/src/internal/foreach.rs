@@ -7,8 +7,8 @@ use super::block::BlockGenerator;
 pub struct ForeachGenerator;
 
 impl ForeachGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

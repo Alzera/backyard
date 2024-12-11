@@ -10,8 +10,8 @@ impl StringGenerator {
     builder.push(&format!("{}{}{}", node.quote, node.value, node.quote));
   }
 
-  pub fn generate_encapsed<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_encapsed<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -28,8 +28,8 @@ impl StringGenerator {
     builder.push(&quote);
   }
 
-  pub fn generate_encapsed_part<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_encapsed_part<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -59,8 +59,8 @@ impl StringGenerator {
     builder.push(&node.label);
   }
 
-  pub fn generate_heredoc<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_heredoc<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

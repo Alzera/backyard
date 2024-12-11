@@ -7,8 +7,8 @@ use super::identifier::IdentifierGenerator;
 pub struct UseGenerator;
 
 impl UseGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -46,8 +46,8 @@ impl UseGenerator {
     }
   }
 
-  pub fn generate_item<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate_item<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {

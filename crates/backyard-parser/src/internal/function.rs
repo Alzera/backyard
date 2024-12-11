@@ -128,7 +128,7 @@ impl FunctionParser {
           !is_ref.is_empty(),
           arguments,
           return_type,
-          body.into_boxed(&parser.arena),
+          body.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );
@@ -136,7 +136,7 @@ impl FunctionParser {
     Err(ParserError::Internal)
   }
 
-  pub fn parse_anonymous<'arena, 'a, 'b>(
+  pub fn parse_anonymous<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
     matched: std::vec::Vec<LookupResult>,
     start_loc: Location
@@ -149,7 +149,7 @@ impl FunctionParser {
           parser.position += 2;
           uses = parser.get_children(
             &mut LoopArgument::with_tokens(
-              &parser.arena,
+              parser.arena,
               "function_anonymous",
               &[TokenType::Comma],
               &[TokenType::RightParenthesis]
@@ -165,7 +165,7 @@ impl FunctionParser {
           arguments,
           uses,
           return_type,
-          body.into_boxed(&parser.arena),
+          body.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );
@@ -173,7 +173,7 @@ impl FunctionParser {
     Err(ParserError::Internal)
   }
 
-  pub fn parse_basic<'arena, 'a, 'b>(
+  pub fn parse_basic<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
     matched: std::vec::Vec<LookupResult>,
     start_loc: Location
@@ -219,10 +219,10 @@ impl FunctionParser {
       return Ok(
         FunctionNode::loc(
           !is_ref.is_empty(),
-          name.into_boxed(&parser.arena),
+          name.into_boxed(parser.arena),
           arguments,
           return_type,
-          body.into_boxed(&parser.arena),
+          body.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );
@@ -268,7 +268,7 @@ impl FunctionParser {
             )
           )?
         {
-          return Ok(return_type.into_boxed(&parser.arena));
+          return Ok(return_type.into_boxed(parser.arena));
         }
       }
     }
@@ -327,11 +327,11 @@ impl ConstructorParameterParser {
         None
       };
       let item = ParameterNode::loc(
-        prop_type.as_optional_type(parser.arena).into_boxed(&parser.arena),
+        prop_type.as_optional_type(parser.arena).into_boxed(parser.arena),
         !is_ref.is_empty(),
         !is_variadic.is_empty(),
-        IdentifierParser::from_token(name.as_equal()?).into_boxed(&parser.arena),
-        value.into_boxed(&parser.arena),
+        IdentifierParser::from_token(name.as_equal()?).into_boxed(parser.arena),
+        value.into_boxed(parser.arena),
         parser.gen_loc(start_loc.clone())
       );
       let mut visibilities = std::vec![];
@@ -347,7 +347,7 @@ impl ConstructorParameterParser {
         ConstructorParameterNode::loc(
           visibilities,
           modifier,
-          item.into_boxed(&parser.arena),
+          item.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );
@@ -400,11 +400,11 @@ impl ParameterParser {
       };
       return Ok(
         ParameterNode::loc(
-          prop_type.as_optional_type(&parser.arena).into_boxed(&parser.arena),
+          prop_type.as_optional_type(parser.arena).into_boxed(parser.arena),
           !is_ref.is_empty(),
           !is_ellipsis.is_empty(),
-          name.into_boxed(&parser.arena),
-          value.into_boxed(&parser.arena),
+          name.into_boxed(parser.arena),
+          value.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );

@@ -58,7 +58,7 @@ impl PreParser {
             &DEFAULT_PARSERS
           )
         )?
-        .into_boxed(&parser.arena);
+        .into_boxed(parser.arena);
       if operator.token_type == TokenType::Ellipsis {
         return Ok(VariadicNode::loc(argument, parser.gen_loc(start_loc)));
       }

@@ -49,7 +49,7 @@ impl StaticLookupParser {
           parser.position += 1;
           let expr = parser.get_statement(
             &mut LoopArgument::with_tokens(
-              &parser.arena,
+              parser.arena,
               "staticlookup",
               &[],
               &[TokenType::RightCurlyBracket]
@@ -59,8 +59,8 @@ impl StaticLookupParser {
           if let Some(expr) = expr {
             return Ok(
               StaticLookupNode::loc(
-                left.into_boxed(&parser.arena),
-                expr.into_boxed(&parser.arena),
+                left.into_boxed(parser.arena),
+                expr.into_boxed(parser.arena),
                 true,
                 parser.gen_loc(start_loc)
               )
@@ -74,8 +74,8 @@ impl StaticLookupParser {
         };
         return Ok(
           StaticLookupNode::loc(
-            left.into_boxed(&parser.arena),
-            expr.into_boxed(&parser.arena),
+            left.into_boxed(parser.arena),
+            expr.into_boxed(parser.arena),
             false,
             parser.gen_loc(start_loc)
           )

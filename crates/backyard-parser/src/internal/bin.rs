@@ -81,9 +81,9 @@ impl BinParser {
       {
         return Ok(
           BinNode::loc(
-            left.into_boxed(&parser.arena),
+            left.into_boxed(parser.arena),
             operator,
-            right.into_boxed(&parser.arena),
+            right.into_boxed(parser.arena),
             parser.gen_loc(start_loc)
           )
         );

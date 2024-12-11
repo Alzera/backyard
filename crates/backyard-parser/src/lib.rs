@@ -11,13 +11,13 @@ use error::ParserError;
 use parser::{ LocationHelper, LoopArgument, Parser };
 
 pub fn parse<'arena>(arena: &'arena Bump, input: &str) -> Result<Node<'arena>, ParserError> {
-  let tokens = lex(&arena, input);
-  parse_base(&arena, &tokens)
+  let tokens = lex(arena, input);
+  parse_base(arena, &tokens)
 }
 
 pub fn parse_eval<'arena>(arena: &'arena Bump, input: &str) -> Result<Node<'arena>, ParserError> {
-  let tokens = lex_eval(&arena, input);
-  parse_base(&arena, &tokens)
+  let tokens = lex_eval(arena, input);
+  parse_base(arena, &tokens)
 }
 
 pub fn parse_base<'arena>(

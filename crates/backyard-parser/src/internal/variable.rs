@@ -64,14 +64,14 @@ impl VariableParser {
           let end_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
           return Ok(
             VariableParser::new_bracked(
-              &parser.arena,
+              parser.arena,
               expr,
               Some(RangeLocation { start: start_loc, end: end_loc })
             )
           );
         }
       } else {
-        return Ok(VariableParser::from_token(&parser.arena, name));
+        return Ok(VariableParser::from_token(parser.arena, name));
       }
     }
     Err(ParserError::Internal)

@@ -5,8 +5,8 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct SinglesGenerator;
 
 impl SinglesGenerator {
-  pub fn generate<'arena, 'a>(
-    generator: &mut Generator<'arena, 'a>,
+  pub fn generate<'arena>(
+    generator: &mut Generator<'arena, '_>,
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
@@ -15,28 +15,28 @@ impl SinglesGenerator {
         builder.push("break");
         if let Some(node) = &cast_node!(Break, &node.node).statement {
           builder.push(" ");
-          generator.generate_node(builder, &node, &mut GeneratorArgument::default());
+          generator.generate_node(builder, node, &mut GeneratorArgument::default());
         }
       }
       NodeType::Continue => {
         builder.push("continue");
         if let Some(node) = &cast_node!(Continue, &node.node).statement {
           builder.push(" ");
-          generator.generate_node(builder, &node, &mut GeneratorArgument::default());
+          generator.generate_node(builder, node, &mut GeneratorArgument::default());
         }
       }
       NodeType::Return => {
         builder.push("return");
         if let Some(node) = &cast_node!(Return, &node.node).statement {
           builder.push(" ");
-          generator.generate_node(builder, &node, &mut GeneratorArgument::default());
+          generator.generate_node(builder, node, &mut GeneratorArgument::default());
         }
       }
       NodeType::Clone => {
         builder.push("clone ");
         generator.generate_node(
           builder,
-          &&cast_node!(Clone, &node.node).statement,
+          &cast_node!(Clone, &node.node).statement,
           &mut GeneratorArgument::default()
         );
       }
@@ -44,7 +44,7 @@ impl SinglesGenerator {
         builder.push("new ");
         generator.generate_node(
           builder,
-          &&cast_node!(New, &node.node).statement,
+          &cast_node!(New, &node.node).statement,
           &mut GeneratorArgument::default()
         );
       }
@@ -52,7 +52,7 @@ impl SinglesGenerator {
         builder.push("print ");
         generator.generate_node(
           builder,
-          &&cast_node!(Print, &node.node).statement,
+          &cast_node!(Print, &node.node).statement,
           &mut GeneratorArgument::default()
         );
       }
@@ -60,7 +60,7 @@ impl SinglesGenerator {
         builder.push("throw ");
         generator.generate_node(
           builder,
-          &&cast_node!(Throw, &node.node).statement,
+          &cast_node!(Throw, &node.node).statement,
           &mut GeneratorArgument::default()
         );
       }
@@ -101,8 +101,7 @@ impl SinglesGenerator {
         builder.push("static");
       }
       _ => {
-        return;
       }
-    };
+    }
   }
 }

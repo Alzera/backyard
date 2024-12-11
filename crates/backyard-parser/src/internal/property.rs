@@ -55,13 +55,13 @@ impl PropertyParser {
     if let [modifiers, has_var, prop_type, name] = matched.as_slice() {
       let next_token = guard!(parser.tokens.get(parser.position));
       let name = name.as_equal()?;
-      let prop_type = prop_type.as_optional_type(&parser.arena).into_boxed(&parser.arena);
+      let prop_type = prop_type.as_optional_type(parser.arena).into_boxed(parser.arena);
       let first_prop = if next_token.token_type == TokenType::Assignment {
         parser.position += 1;
         if
           let Some(value) = parser.get_statement(
             &mut LoopArgument::with_tokens(
-              &parser.arena,
+              parser.arena,
               "property",
               &[TokenType::Comma, TokenType::Semicolon, TokenType::LeftCurlyBracket],
               &[]
@@ -70,9 +70,9 @@ impl PropertyParser {
         {
           let item_start_loc = name.get_location().unwrap();
           PropertyItemNode::loc(
-            IdentifierParser::from_token(name).into_boxed(&parser.arena),
+            IdentifierParser::from_token(name).into_boxed(parser.arena),
             prop_type,
-            Some(value.into_boxed(&parser.arena)),
+            Some(value.into_boxed(parser.arena)),
             parser.gen_loc(item_start_loc)
           )
         } else {
@@ -81,7 +81,7 @@ impl PropertyParser {
       } else {
         let item_start_loc = name.get_location().unwrap();
         PropertyItemNode::loc(
-          IdentifierParser::from_token(name).into_boxed(&parser.arena),
+          IdentifierParser::from_token(name).into_boxed(parser.arena),
           prop_type,
           None,
           parser.gen_loc(item_start_loc)
@@ -173,9 +173,9 @@ impl PropertyItemParser {
       };
       return Ok(
         PropertyItemNode::loc(
-          name.into_boxed(&parser.arena),
-          args.last_expr.take().into_boxed(&parser.arena),
-          value.into_boxed(&parser.arena),
+          name.into_boxed(parser.arena),
+          args.last_expr.take().into_boxed(parser.arena),
+          value.into_boxed(parser.arena),
           parser.gen_loc(start_loc)
         )
       );
@@ -240,7 +240,7 @@ impl HookParser {
             is_get,
             !is_ref.is_empty(),
             params,
-            body.into_boxed(&parser.arena),
+            body.into_boxed(parser.arena),
             parser.gen_loc(start_loc)
           )
         );

@@ -37,7 +37,7 @@ impl DeclareParser {
     if let [_, _] = matched.as_slice() {
       let arguments = parser.get_children(
         &mut LoopArgument::new(
-          &parser.arena,
+          parser.arena,
           "declare",
           &[TokenType::Comma],
           &[TokenType::RightParenthesis],
@@ -66,7 +66,7 @@ impl DeclareParser {
       return Ok(
         DeclareNode::loc(
           arguments,
-          body.into_boxed(&parser.arena),
+          body.into_boxed(parser.arena),
           body_type,
           parser.gen_loc(start_loc)
         )
@@ -112,8 +112,8 @@ impl DeclareArgumentParser {
       {
         return Ok(
           DeclareArgumentNode::loc(
-            name.into_boxed(&parser.arena),
-            value.into_boxed(&parser.arena),
+            name.into_boxed(parser.arena),
+            value.into_boxed(parser.arena),
             parser.gen_loc(start_loc)
           )
         );
