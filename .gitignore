@@ -198,3 +198,4 @@ Cargo.lock
 
 *.snap.new
 *.profraw
+profile.json
