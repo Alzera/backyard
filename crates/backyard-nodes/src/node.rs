@@ -478,7 +478,7 @@ macro_rules! new_node {
       fn populate_visits<'a>(&'a self) -> std::collections::VecDeque<&'a Node<'arena>> {
         let mut stack = std::collections::VecDeque::new();
         $(self.$field_name.map_into_visitor_stack(&mut stack);)*
-        stack
+        stack.into_iter().rev().collect::<std::collections::VecDeque<_>>()
       }
     }
   };
