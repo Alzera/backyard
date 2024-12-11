@@ -10,7 +10,7 @@ impl ExitGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Exit, &node.node);
+    let node = cast_node!(Exit, &node.wrapper);
     builder.push("exit");
     if let Some(argument) = &node.statement {
       builder.push("(");

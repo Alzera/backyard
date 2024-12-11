@@ -10,7 +10,7 @@ impl PostGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Post, &node.node);
+    let node = cast_node!(Post, &node.wrapper);
     generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
     builder.push(node.operator.as_str());
   }

@@ -12,7 +12,7 @@ impl VariableGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Variable, &node.node);
+    let node = cast_node!(Variable, &node.wrapper);
     builder.push("$");
     if let NodeType::Identifier = node.name.node_type {
       IdentifierGenerator::generate(generator, builder, &node.name);

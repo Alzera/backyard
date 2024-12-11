@@ -10,7 +10,7 @@ impl CallGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Call, &node.node);
+    let node = cast_node!(Call, &node.wrapper);
     generator.generate_node(builder, &node.name, &mut GeneratorArgument::default());
     let mut arguments = generator.generate_nodes_new(
       &node.arguments,
@@ -35,7 +35,7 @@ impl CallGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(CallArgument, &node.node);
+    let node = cast_node!(CallArgument, &node.wrapper);
     if let Some(name) = &node.name {
       generator.generate_node(builder, name, &mut GeneratorArgument::default());
       builder.push(": ");

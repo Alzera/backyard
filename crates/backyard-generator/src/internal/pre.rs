@@ -12,34 +12,33 @@ impl PreGenerator {
   ) {
     match node.node_type {
       NodeType::Variadic => {
-        let node = cast_node!(Variadic, &node.node);
+        let node = cast_node!(Variadic, &node.wrapper);
         builder.push("...");
         if let Some(expr) = &node.statement {
           generator.generate_node(builder, expr, &mut GeneratorArgument::default());
         }
       }
       NodeType::Negate => {
-        let node = cast_node!(Negate, &node.node);
+        let node = cast_node!(Negate, &node.wrapper);
         builder.push("!");
         generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
       }
       NodeType::Silent => {
-        let node = cast_node!(Silent, &node.node);
+        let node = cast_node!(Silent, &node.wrapper);
         builder.push("@");
         generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
       }
       NodeType::Reference => {
-        let node = cast_node!(Reference, &node.node);
+        let node = cast_node!(Reference, &node.wrapper);
         builder.push("&");
         generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
       }
       NodeType::Pre => {
-        let node = cast_node!(Pre, &node.node);
+        let node = cast_node!(Pre, &node.wrapper);
         builder.push(&node.operator);
         generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
       }
-      _ => {
-      }
+      _ => {}
     }
   }
 }

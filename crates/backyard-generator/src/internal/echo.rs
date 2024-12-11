@@ -10,7 +10,7 @@ impl EchoGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Echo, &node.node);
+    let node = cast_node!(Echo, &node.wrapper);
 
     builder.push("echo ");
     let mut items = generator.generate_nodes_new(

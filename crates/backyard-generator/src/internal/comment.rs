@@ -6,13 +6,13 @@ pub struct CommentGenerator;
 
 impl CommentGenerator {
   pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = cast_node!(CommentLine, &node.node);
+    let node = cast_node!(CommentLine, &node.wrapper);
     builder.push("//");
     builder.push(&node.comment);
   }
 
   pub fn generate_block(_: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = cast_node!(CommentBlock, &node.node);
+    let node = cast_node!(CommentBlock, &node.wrapper);
     builder.push("/*");
     builder.new_line();
     let comments = node.comment.split('\n');
@@ -33,7 +33,7 @@ impl CommentGenerator {
   }
 
   pub fn generate_doc(_: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = cast_node!(CommentDoc, &node.node);
+    let node = cast_node!(CommentDoc, &node.wrapper);
     builder.push("/**");
     builder.new_line();
     let comments = node.comment.split('\n');

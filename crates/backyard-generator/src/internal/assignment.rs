@@ -10,7 +10,7 @@ impl AssignmentGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Assignment, &node.node);
+    let node = cast_node!(Assignment, &node.wrapper);
     generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
     builder.push(format!(" {} ", node.operator).as_str());
     let mut right = generator.generate_node_new(&node.right);

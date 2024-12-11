@@ -17,7 +17,7 @@ impl EnumGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Enum, &node.node);
+    let node = cast_node!(Enum, &node.wrapper);
     builder.push("enum ");
     IdentifierGenerator::generate(generator, builder, &node.name);
     if let Some(n) = &node.enum_type {
@@ -51,7 +51,7 @@ impl EnumGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(EnumItem, &node.node);
+    let node = cast_node!(EnumItem, &node.wrapper);
     builder.push("case ");
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());
   }

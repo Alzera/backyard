@@ -12,7 +12,7 @@ impl DeclareGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Declare, &node.node);
+    let node = cast_node!(Declare, &node.wrapper);
     builder.push("declare");
     let mut arguments = generator.generate_nodes_new(
       &node.arguments,
@@ -52,7 +52,7 @@ impl DeclareGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(DeclareArgument, &node.node);
+    let node = cast_node!(DeclareArgument, &node.wrapper);
     IdentifierGenerator::generate(generator, builder, &node.name);
     builder.push(" = ");
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());

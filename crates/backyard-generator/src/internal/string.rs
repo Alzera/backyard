@@ -6,7 +6,7 @@ pub struct StringGenerator;
 
 impl StringGenerator {
   pub fn generate(_: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = cast_node!(String, &node.node);
+    let node = cast_node!(String, &node.wrapper);
     builder.push(&format!("{}{}{}", node.quote, node.value, node.quote));
   }
 
@@ -15,7 +15,7 @@ impl StringGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Encapsed, &node.node);
+    let node = cast_node!(Encapsed, &node.wrapper);
     let quote = format!("{}", node.quote);
     builder.push(&quote);
     let parts = generator
@@ -33,9 +33,9 @@ impl StringGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(EncapsedPart, &node.node);
+    let node = cast_node!(EncapsedPart, &node.wrapper);
     if node.value.node_type == NodeType::String {
-      let value = cast_node!(String, &node.value.node);
+      let value = cast_node!(String, &node.value.wrapper);
       builder.push(&value.value);
       return;
     }
@@ -48,7 +48,7 @@ impl StringGenerator {
   }
 
   pub fn generate_nowdoc(_: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = cast_node!(NowDoc, &node.node);
+    let node = cast_node!(NowDoc, &node.wrapper);
     builder.push(&format!("<<<'{}'", node.label));
     builder.push(&node.value);
     if let Some(last) = node.value.split('\n').last() {
@@ -64,7 +64,7 @@ impl StringGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(HereDoc, &node.node);
+    let node = cast_node!(HereDoc, &node.wrapper);
     builder.push(&format!("<<<{}", node.label));
     let parts = generator.generate_nodes_new(
       &node.values,

@@ -52,7 +52,7 @@ impl<'arena> CloneIn<'arena> for Node<'_> {
 
   #[inline]
   fn clone_in(&self, arena: &'arena Bump) -> Self::Cloned {
-    Node::new(self.node_type.clone(), self.node.clone_in(arena), self.loc.clone())
+    Node::new(self.node_type.clone(), self.wrapper.clone_in(arena), self.loc.clone())
   }
 }
 

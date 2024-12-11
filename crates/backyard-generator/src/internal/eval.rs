@@ -10,7 +10,7 @@ impl EvalGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Eval, &node.node);
+    let node = cast_node!(Eval, &node.wrapper);
     builder.push("eval(");
     generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
     builder.push(")");

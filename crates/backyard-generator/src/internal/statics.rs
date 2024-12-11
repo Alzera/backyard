@@ -12,7 +12,7 @@ impl StaticGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Static, &node.node);
+    let node = cast_node!(Static, &node.wrapper);
 
     builder.push("static ");
     let mut items = generator.generate_nodes_new(

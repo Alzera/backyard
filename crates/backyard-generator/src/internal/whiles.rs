@@ -12,7 +12,7 @@ impl WhileGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(While, &node.node);
+    let node = cast_node!(While, &node.wrapper);
 
     builder.push("while (");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());

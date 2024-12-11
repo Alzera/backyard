@@ -10,7 +10,7 @@ impl BinGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Bin, &node.node);
+    let node = cast_node!(Bin, &node.wrapper);
     generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
     let mut expr = generator.generate_node_new(&node.right);
     if builder.last_len() + expr.first_len() + node.operator.len() > generator.max_length {

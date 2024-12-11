@@ -19,7 +19,7 @@ impl TypeGenerator {
   }
 
   fn generate_basic(_: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = cast_node!(Type, &node.node);
+    let node = cast_node!(Type, &node.wrapper);
     if node.is_nullable {
       builder.push("?");
     }
@@ -31,7 +31,7 @@ impl TypeGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(UnionType, &node.node);
+    let node = cast_node!(UnionType, &node.wrapper);
     let types = Self::map_types(generator, &node.types);
     builder.push(&types.join("|"));
   }
@@ -41,7 +41,7 @@ impl TypeGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(IntersectionType, &node.node);
+    let node = cast_node!(IntersectionType, &node.wrapper);
     let types = Self::map_types(generator, &node.types);
 
     builder.push(&types.join("&"));

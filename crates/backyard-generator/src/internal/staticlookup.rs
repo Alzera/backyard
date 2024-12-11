@@ -10,7 +10,7 @@ impl StaticLookupGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(StaticLookup, &node.node);
+    let node = cast_node!(StaticLookup, &node.wrapper);
     generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
     builder.push("::");
     if node.right.node_type == NodeType::ClassKeyword {

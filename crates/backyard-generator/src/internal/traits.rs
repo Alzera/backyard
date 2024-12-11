@@ -19,7 +19,7 @@ impl TraitGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Trait, &node.node);
+    let node = cast_node!(Trait, &node.wrapper);
     builder.push("trait ");
     IdentifierGenerator::generate(generator, builder, &node.name);
     BlockGenerator::generate_specific(

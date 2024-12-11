@@ -12,7 +12,7 @@ impl TraitUseGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(TraitUse, &node.node);
+    let node = cast_node!(TraitUse, &node.wrapper);
     builder.push("use ");
     let mut traits = generator.generate_nodes_new(
       &node.traits,
@@ -55,7 +55,7 @@ impl TraitUseGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(TraitUseAlias, &node.node);
+    let node = cast_node!(TraitUseAlias, &node.wrapper);
     if let Some(trait_name) = &node.trait_name {
       IdentifierGenerator::generate(generator, builder, trait_name);
       builder.push("::");
@@ -77,7 +77,7 @@ impl TraitUseGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(TraitUsePrecedence, &node.node);
+    let node = cast_node!(TraitUsePrecedence, &node.wrapper);
     if let Some(trait_name) = &node.trait_name {
       IdentifierGenerator::generate(generator, builder, trait_name);
       builder.push("::");

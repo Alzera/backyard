@@ -12,7 +12,7 @@ impl SwitchGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Switch, &node.node);
+    let node = cast_node!(Switch, &node.wrapper);
 
     builder.push("switch (");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
@@ -32,7 +32,7 @@ impl SwitchGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Case, &node.node);
+    let node = cast_node!(Case, &node.wrapper);
 
     if let Some(n) = &node.condition {
       builder.push("case ");

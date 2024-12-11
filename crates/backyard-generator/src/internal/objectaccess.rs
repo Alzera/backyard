@@ -10,7 +10,7 @@ impl ObjectAccessGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(ObjectAccess, &node.node);
+    let node = cast_node!(ObjectAccess, &node.wrapper);
     generator.generate_node(builder, &node.object, &mut GeneratorArgument::default());
     if node.is_nullsafe {
       builder.push("?");

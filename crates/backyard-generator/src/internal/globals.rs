@@ -12,7 +12,7 @@ impl GlobalGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Global, &node.node);
+    let node = cast_node!(Global, &node.wrapper);
 
     builder.push("global ");
     let mut items = generator.generate_nodes_new(

@@ -19,7 +19,7 @@ impl ClassGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Class, &node.node);
+    let node = cast_node!(Class, &node.wrapper);
     if node.is_readonly {
       builder.push("readonly ");
     }
@@ -64,7 +64,7 @@ impl ClassGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(AnonymousClass, &node.node);
+    let node = cast_node!(AnonymousClass, &node.wrapper);
     builder.push("class");
     if !node.parameters.is_empty() {
       builder.push("(");

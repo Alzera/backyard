@@ -10,7 +10,7 @@ impl IncludeGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Include, &node.node);
+    let node = cast_node!(Include, &node.wrapper);
     if node.is_require {
       builder.push("require");
     } else {

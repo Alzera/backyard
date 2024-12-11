@@ -10,7 +10,7 @@ impl ParenthesisGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Parenthesis, &node.node);
+    let node = cast_node!(Parenthesis, &node.wrapper);
     builder.push("(");
     generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
     builder.push(")");
@@ -21,7 +21,7 @@ impl ParenthesisGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Cast, &node.node);
+    let node = cast_node!(Cast, &node.wrapper);
     builder.push("(");
     builder.push(&node.cast_type);
     builder.push(") ");

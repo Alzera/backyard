@@ -12,7 +12,7 @@ impl IfGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(If, &node.node);
+    let node = cast_node!(If, &node.wrapper);
 
     builder.push("if (");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
@@ -48,7 +48,7 @@ impl IfGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Else, &node.node);
+    let node = cast_node!(Else, &node.wrapper);
 
     builder.push("else");
     match node.body.node_type {

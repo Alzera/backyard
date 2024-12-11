@@ -4,7 +4,7 @@ use bumpalo::{ boxed::Box, collections::Vec, vec, Bump };
 use compact_str::CompactString;
 use serde::Serialize;
 
-use crate::utils::CloneIn;
+use crate::{ utils::CloneIn, visitor::{ Visitable, MapIntoVisitorStack } };
 
 #[derive(Debug, PartialEq, Clone, Serialize)]
 pub enum UseItemModifier {
@@ -189,15 +189,15 @@ pub struct Location {
 pub struct Node<'a> {
   pub node_type: NodeType,
   #[serde(flatten)]
-  pub node: NodeWrapper<'a>,
+  pub wrapper: NodeWrapper<'a>,
   pub loc: Option<RangeLocation>,
   pub leadings: Option<Vec<'a, Node<'a>>>,
   pub trailings: Option<Vec<'a, Node<'a>>>,
 }
 
 impl<'a> Node<'a> {
-  pub fn new(node_type: NodeType, node: NodeWrapper<'a>, loc: Option<RangeLocation>) -> Self {
-    Self { node_type, node, loc, leadings: None, trailings: None }
+  pub fn new(node_type: NodeType, wrapper: NodeWrapper<'a>, loc: Option<RangeLocation>) -> Self {
+    Self { node_type, wrapper, loc, leadings: None, trailings: None }
   }
 
   pub fn leadings_shift(&mut self, arena: &'a Bump, node: Node<'a>) {
@@ -455,7 +455,7 @@ macro_rules! new_node {
           leadings: None,
           trailings: None,
           node_type: NodeType::$node_type,
-          node: NodeWrapper::$node_type(
+          wrapper: NodeWrapper::$node_type(
             Self { $($field_name),* }
           ),
           loc
@@ -471,6 +471,14 @@ macro_rules! new_node {
         $struct_name {
           $($field_name: self.$field_name.clone_in(arena)),*
         }
+      }
+    }
+
+    impl<'arena> Visitable<'arena> for $struct_name<'arena> {
+      fn populate_visits<'a>(&'a self) -> std::collections::VecDeque<&'a Node<'arena>> {
+        let mut stack = std::collections::VecDeque::new();
+        $(self.$field_name.map_into_visitor_stack(&mut stack);)*
+        stack
       }
     }
   };
@@ -501,6 +509,12 @@ macro_rules! new_node {
         $struct_name {
           $($field_name: self.$field_name.clone()),*
         }
+      }
+    }
+
+    impl<'arena> Visitable<'arena> for $struct_name {
+      fn populate_visits<'a>(&'a self) -> std::collections::VecDeque<&'a Node<'arena>> {
+        std::collections::VecDeque::new()
       }
     }
   };

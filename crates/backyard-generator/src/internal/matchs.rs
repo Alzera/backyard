@@ -10,7 +10,7 @@ impl MatchGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Match, &node.node);
+    let node = cast_node!(Match, &node.wrapper);
     builder.push("match(");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
     builder.push(") {");
@@ -32,7 +32,7 @@ impl MatchGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(MatchArm, &node.node);
+    let node = cast_node!(MatchArm, &node.wrapper);
     if !node.conditions.is_empty() {
       let conditions = generator.generate_nodes_new(
         &node.conditions,

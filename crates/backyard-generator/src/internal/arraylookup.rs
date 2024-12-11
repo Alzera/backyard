@@ -10,7 +10,7 @@ impl ArrayLookupGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(ArrayLookup, &node.node);
+    let node = cast_node!(ArrayLookup, &node.wrapper);
     generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
     builder.push("[");
     if let Some(right) = &node.right {

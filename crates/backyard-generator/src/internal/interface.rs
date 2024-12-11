@@ -17,7 +17,7 @@ impl InterfaceGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Interface, &node.node);
+    let node = cast_node!(Interface, &node.wrapper);
     builder.push("interface ");
     IdentifierGenerator::generate(generator, builder, &node.name);
     if !node.extends.is_empty() {

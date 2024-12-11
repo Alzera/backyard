@@ -12,7 +12,7 @@ impl MethodGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Method, &node.node);
+    let node = cast_node!(Method, &node.wrapper);
     if let Some(n) = &node.visibility {
       builder.push(format!("{} ", n).as_str());
     }

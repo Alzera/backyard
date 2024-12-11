@@ -12,7 +12,7 @@ impl LabelGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Label, &node.node);
+    let node = cast_node!(Label, &node.wrapper);
 
     IdentifierGenerator::generate(generator, builder, &node.label);
     builder.push(":");

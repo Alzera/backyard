@@ -12,7 +12,7 @@ impl NamespaceGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Namespace, &node.node);
+    let node = cast_node!(Namespace, &node.wrapper);
     builder.push("namespace ");
     builder.push(&node.name);
     if node.is_bracket {

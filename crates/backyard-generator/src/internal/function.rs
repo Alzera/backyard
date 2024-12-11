@@ -35,13 +35,13 @@ impl FunctionGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Function, &node.node);
+    let node = cast_node!(Function, &node.wrapper);
     builder.push("function ");
     if node.is_ref {
       builder.push("&");
     }
     let mut parameters = if node.name.node_type == NodeType::Magic {
-      let name = cast_node!(Magic, &node.name.node);
+      let name = cast_node!(Magic, &node.name.wrapper);
       builder.push(&name.name);
       if name.name == "__construct" {
         generator.generate_nodes_new(
@@ -54,7 +54,7 @@ impl FunctionGenerator {
         Self::get_parameters(generator, &node.parameters)
       }
     } else {
-      let name = cast_node!(Identifier, &node.name.node);
+      let name = cast_node!(Identifier, &node.name.wrapper);
       builder.push(&name.name);
       Self::get_parameters(generator, &node.parameters)
     };
@@ -93,7 +93,7 @@ impl FunctionGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(AnonymousFunction, &node.node);
+    let node = cast_node!(AnonymousFunction, &node.wrapper);
     builder.push("function ");
     if node.is_ref {
       builder.push("&");
@@ -154,7 +154,7 @@ impl FunctionGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(ArrowFunction, &node.node);
+    let node = cast_node!(ArrowFunction, &node.wrapper);
     builder.push("fn ");
     if node.is_ref {
       builder.push("&");
@@ -193,7 +193,7 @@ impl FunctionGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(ConstructorParameter, &node.node);
+    let node = cast_node!(ConstructorParameter, &node.wrapper);
     for visibility in &node.visibilities {
       builder.push(&format!("{} ", visibility));
     }
@@ -208,7 +208,7 @@ impl FunctionGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Parameter, &node.node);
+    let node = cast_node!(Parameter, &node.wrapper);
     if let Some(n) = &node.variable_type {
       generator.generate_node(builder, n, &mut GeneratorArgument::default());
       builder.push(" ");

@@ -9,7 +9,7 @@ impl TernaryGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Ternary, &node.node);
+    let node = cast_node!(Ternary, &node.wrapper);
 
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());
     builder.push(" ? ");

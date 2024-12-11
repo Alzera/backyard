@@ -10,7 +10,7 @@ impl ListGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(List, &node.node);
+    let node = cast_node!(List, &node.wrapper);
     builder.push("list(");
     let mut values = generator.generate_nodes_new(
       &node.items,

@@ -12,7 +12,7 @@ impl UseGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Use, &node.node);
+    let node = cast_node!(Use, &node.wrapper);
     builder.push("use ");
 
     let mut items = generator.generate_nodes_new(
@@ -51,7 +51,7 @@ impl UseGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(UseItem, &node.node);
+    let node = cast_node!(UseItem, &node.wrapper);
     if let Some(n) = &node.modifier {
       builder.push(format!("{} ", n).as_str());
     }

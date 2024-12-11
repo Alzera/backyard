@@ -12,7 +12,7 @@ impl DoWhileGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(DoWhile, &node.node);
+    let node = cast_node!(DoWhile, &node.wrapper);
 
     builder.push("do");
     BlockGenerator::generate(generator, builder, &node.body, None);
@@ -27,7 +27,7 @@ impl DoWhileGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(DoWhileCondition, &node.node);
+    let node = cast_node!(DoWhileCondition, &node.wrapper);
 
     builder.push("while (");
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());

@@ -95,7 +95,7 @@ impl BlockGenerator {
     generators: &[(NodeType, InternalGenerator)]
   ) -> Builder {
     let mut block = Builder::new();
-    let node = if let NodeWrapper::Block(n) = &node.node {
+    let node = if let NodeWrapper::Block(n) = &node.wrapper {
       n
     } else {
       return block;

@@ -12,12 +12,12 @@ impl TryGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Try, &node.node);
+    let node = cast_node!(Try, &node.wrapper);
     builder.push("try");
     BlockGenerator::generate(generator, builder, &node.body, None);
     for catch in &node.catches {
       if catch.node_type == NodeType::Finally {
-        let node = cast_node!(Finally, &catch.node);
+        let node = cast_node!(Finally, &catch.wrapper);
         builder.push(" finally");
         BlockGenerator::generate(generator, builder, &node.body, None);
       } else {
@@ -31,7 +31,7 @@ impl TryGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Catch, &node.node);
+    let node = cast_node!(Catch, &node.wrapper);
     builder.push(" catch (");
     let types = generator.generate_nodes_new(&node.types, &mut GeneratorArgument::default());
     builder.push(&types.print(" | "));

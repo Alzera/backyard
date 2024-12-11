@@ -12,7 +12,7 @@ impl PropertyGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Property, &node.node);
+    let node = cast_node!(Property, &node.wrapper);
     for visibility in &node.visibilities {
       builder.push(&format!("{} ", visibility));
     }
@@ -51,7 +51,7 @@ impl PropertyGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(PropertyItem, &node.node);
+    let node = cast_node!(PropertyItem, &node.wrapper);
     if let Some(variable_type) = &node.variable_type {
       generator.generate_node(builder, variable_type, &mut GeneratorArgument::default());
       builder.push(" ");
@@ -69,7 +69,7 @@ impl PropertyGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(PropertyHook, &node.node);
+    let node = cast_node!(PropertyHook, &node.wrapper);
     if node.is_ref {
       builder.push("&");
     }

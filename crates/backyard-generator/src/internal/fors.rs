@@ -12,7 +12,7 @@ impl ForGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(For, &node.node);
+    let node = cast_node!(For, &node.wrapper);
 
     builder.push("for (");
     let mut inits = Builder::new();

@@ -11,7 +11,7 @@ impl AttributeGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Attribute, &node.node);
+    let node = cast_node!(Attribute, &node.wrapper);
     builder.push("#[");
     let items = generator.generate_nodes_new(
       &node.items,
@@ -26,7 +26,7 @@ impl AttributeGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(AttributeItem, &node.node);
+    let node = cast_node!(AttributeItem, &node.wrapper);
     builder.push(&node.name);
     if !node.arguments.is_empty() {
       builder.push("(");

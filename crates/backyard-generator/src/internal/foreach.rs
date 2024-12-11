@@ -12,7 +12,7 @@ impl ForeachGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Foreach, &node.node);
+    let node = cast_node!(Foreach, &node.wrapper);
 
     builder.push("foreach (");
     generator.generate_node(builder, &node.source, &mut GeneratorArgument::default());

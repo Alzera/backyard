@@ -9,7 +9,7 @@ impl ArrayGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Array, &node.node);
+    let node = cast_node!(Array, &node.wrapper);
 
     let items = generator.generate_nodes_new(
       &node.items,
@@ -49,7 +49,7 @@ impl ArrayGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(ArrayItem, &node.node);
+    let node = cast_node!(ArrayItem, &node.wrapper);
     if let Some(key) = &node.key {
       generator.generate_node(builder, key, &mut GeneratorArgument::default());
       builder.push(" => ");

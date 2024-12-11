@@ -10,7 +10,7 @@ impl YieldGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Yield, &node.node);
+    let node = cast_node!(Yield, &node.wrapper);
 
     builder.push("yield");
     if let Some(key) = &node.key {
@@ -29,7 +29,7 @@ impl YieldGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(YieldFrom, &node.node);
+    let node = cast_node!(YieldFrom, &node.wrapper);
 
     builder.push("yield from ");
     generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());

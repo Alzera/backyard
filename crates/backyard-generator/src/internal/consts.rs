@@ -10,7 +10,7 @@ impl ConstGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(Const, &node.node);
+    let node = cast_node!(Const, &node.wrapper);
 
     builder.push("const ");
     let mut consts = generator.generate_nodes_new(
@@ -33,7 +33,7 @@ impl ConstGenerator {
     builder: &mut Builder,
     node: &Node<'arena>
   ) {
-    let node = cast_node!(ConstProperty, &node.node);
+    let node = cast_node!(ConstProperty, &node.wrapper);
 
     for visibility in &node.visibilities {
       builder.push(&format!("{} ", visibility));
