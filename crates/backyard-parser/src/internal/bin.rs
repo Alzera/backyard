@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, BinNode };
+use backyard_nodes::{ node::{ BinNode, Location, Node }, utils::IntoBoxedNode };
 
 use crate::{
   error::ParserError,
@@ -11,9 +11,14 @@ use crate::{
 pub struct BinParser;
 
 impl BinParser {
-  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    args: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     args.last_expr.as_ref()?;
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Equal(
@@ -53,19 +58,20 @@ impl BinParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [operator] = matched.as_slice() {
       let operator = operator.as_equal()?.value.to_owned();
-      let left = args.last_expr.to_owned().unwrap();
+      let left = args.last_expr.take().unwrap();
       args.last_expr = None;
       if
         let Some(right) = parser.get_statement(
           &mut LoopArgument::safe(
+            parser.arena,
             "bin",
             &[],
             &args.breakers.combine(args.separators),
@@ -73,7 +79,14 @@ impl BinParser {
           )
         )?
       {
-        return Ok(BinNode::loc(left, operator, right, parser.gen_loc(start_loc)));
+        return Ok(
+          BinNode::loc(
+            left.into_boxed(&parser.arena),
+            operator,
+            right.into_boxed(&parser.arena),
+            parser.gen_loc(start_loc)
+          )
+        );
       }
     }
     Err(ParserError::Internal)

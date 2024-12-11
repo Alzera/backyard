@@ -1,3 +1,4 @@
+use bumpalo::vec;
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ AttributeItemNode, AttributeNode, Location, Node };
 
@@ -13,19 +14,24 @@ use super::call::CallParser;
 pub struct AttributeParser;
 
 impl AttributeParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Attribute])])
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
+    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Attribute])])
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
       let items = parser.get_children(
         &mut LoopArgument::new(
+          &parser.arena,
           "attribute",
           &[TokenType::Comma],
           &[TokenType::RightSquareBracket],
@@ -33,10 +39,16 @@ impl AttributeParser {
         )
       )?;
       let expr = parser.get_statement(
-        &mut LoopArgument::new("attribute", args.separators, args.breakers, args.parsers)
+        &mut LoopArgument::new(
+          parser.arena,
+          "attribute",
+          args.separators,
+          args.breakers,
+          args.parsers
+        )
       )?;
       if let Some(mut expr) = expr {
-        expr.leadings.insert(0, AttributeNode::loc(items, parser.gen_loc(start_loc)));
+        expr.leadings_shift(&parser.arena, AttributeNode::loc(items, parser.gen_loc(start_loc)));
         return Ok(expr);
       }
     }
@@ -48,8 +60,13 @@ impl AttributeParser {
 pub struct AttributeItemParser;
 
 impl AttributeItemParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Equal(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set]),
@@ -58,18 +75,18 @@ impl AttributeItemParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [name, has_argument] = matched.as_slice() {
       let name = name.as_equal()?.value.to_owned();
       let arguments = if !has_argument.is_empty() {
         CallParser::get_arguments(parser)?
       } else {
-        vec![]
+        vec![in parser.arena]
       };
       return Ok(AttributeItemNode::loc(name, arguments, parser.gen_loc(start_loc)));
     }

@@ -1,6 +1,5 @@
 ---
 source: crates/backyard-parser/tests/functions.rs
-assertion_line: 8
 expression: asts
 snapshot_kind: text
 ---
@@ -20,8 +19,8 @@ children:
           line: 1
           column: 11
           offset: 11
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     parameters:
       - node_type: parameter
         variable_type:
@@ -37,8 +36,8 @@ children:
               line: 1
               column: 16
               offset: 16
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         is_ref: false
         is_ellipsis: true
         name:
@@ -53,8 +52,8 @@ children:
               line: 1
               column: 21
               offset: 21
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         value:
           node_type: number
           value: "0"
@@ -67,8 +66,8 @@ children:
               line: 1
               column: 25
               offset: 25
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 1
@@ -78,8 +77,8 @@ children:
             line: 1
             column: 25
             offset: 25
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
       - node_type: parameter
         variable_type:
           node_type: intersection_type
@@ -96,8 +95,8 @@ children:
                   line: 1
                   column: 34
                   offset: 34
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
           loc:
             start:
               line: 1
@@ -107,8 +106,8 @@ children:
               line: 1
               column: 34
               offset: 34
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         is_ref: true
         is_ellipsis: false
         name:
@@ -123,8 +122,8 @@ children:
               line: 1
               column: 37
               offset: 37
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         value:
           node_type: array
           is_short: true
@@ -134,17 +133,9 @@ children:
               value:
                 node_type: number
                 value: "0.01"
-                loc:
-                  start:
-                    line: 1
-                    column: 42
-                    offset: 42
-                  end:
-                    line: 1
-                    column: 42
-                    offset: 42
-                leadings: []
-                trailings: []
+                loc: ~
+                leadings: ~
+                trailings: ~
               loc:
                 start:
                   line: 1
@@ -154,24 +145,16 @@ children:
                   line: 1
                   column: 42
                   offset: 42
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
             - node_type: array_item
               key: ~
               value:
                 node_type: number
                 value: "0x12"
-                loc:
-                  start:
-                    line: 1
-                    column: 48
-                    offset: 48
-                  end:
-                    line: 1
-                    column: 48
-                    offset: 48
-                leadings: []
-                trailings: []
+                loc: ~
+                leadings: ~
+                trailings: ~
               loc:
                 start:
                   line: 1
@@ -181,8 +164,8 @@ children:
                   line: 1
                   column: 48
                   offset: 48
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
           loc:
             start:
               line: 1
@@ -192,8 +175,8 @@ children:
               line: 1
               column: 52
               offset: 52
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 1
@@ -203,8 +186,8 @@ children:
             line: 1
             column: 52
             offset: 52
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
       - node_type: parameter
         variable_type:
           node_type: type
@@ -219,8 +202,8 @@ children:
               line: 1
               column: 59
               offset: 59
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         is_ref: false
         is_ellipsis: false
         name:
@@ -235,8 +218,8 @@ children:
               line: 1
               column: 61
               offset: 61
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         value: ~
         loc:
           start:
@@ -247,8 +230,8 @@ children:
             line: 1
             column: 60
             offset: 60
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
     return_type:
       node_type: type
       is_nullable: true
@@ -262,8 +245,8 @@ children:
           line: 1
           column: 69
           offset: 69
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     body:
       node_type: block
       statements: []
@@ -276,8 +259,8 @@ children:
           line: 2
           column: 0
           offset: 72
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     loc:
       start:
         line: 1
@@ -287,8 +270,8 @@ children:
         line: 2
         column: 0
         offset: 72
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -298,5 +281,5 @@ loc:
     line: 2
     column: 0
     offset: 72
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

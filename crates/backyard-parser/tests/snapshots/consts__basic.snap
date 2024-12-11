@@ -20,8 +20,8 @@ children:
               line: 1
               column: 7
               offset: 7
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         operator: "="
         right:
           node_type: number
@@ -35,8 +35,8 @@ children:
               line: 1
               column: 10
               offset: 10
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 1
@@ -46,8 +46,8 @@ children:
             line: 1
             column: 10
             offset: 10
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
       - node_type: assignment
         left:
           node_type: identifier
@@ -61,8 +61,8 @@ children:
               line: 1
               column: 14
               offset: 14
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         operator: "="
         right:
           node_type: number
@@ -76,8 +76,8 @@ children:
               line: 1
               column: 17
               offset: 17
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 1
@@ -87,8 +87,8 @@ children:
             line: 1
             column: 17
             offset: 17
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
     loc:
       start:
         line: 1
@@ -98,8 +98,8 @@ children:
         line: 1
         column: 17
         offset: 17
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -109,5 +109,5 @@ loc:
     line: 1
     column: 18
     offset: 18
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

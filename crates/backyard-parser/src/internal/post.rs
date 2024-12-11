@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, PostNode };
+use backyard_nodes::{ node::{ Location, Node, PostNode }, utils::IntoBoxedNode };
 
 use crate::{
   error::ParserError,
@@ -11,21 +11,29 @@ use crate::{
 pub struct PostParser;
 
 impl PostParser {
-  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    args: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     args.last_expr.as_ref()?;
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::PostIncrement, TokenType::PostDecrement])])
+    match_pattern(
+      parser,
+      tokens,
+      &[Lookup::Equal(&[TokenType::PostIncrement, TokenType::PostDecrement])]
+    )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [operator] = matched.as_slice() {
       return Ok(
         PostNode::loc(
-          args.last_expr.to_owned().unwrap(),
+          args.last_expr.take().unwrap().into_boxed(&parser.arena),
           operator.as_equal()?.value.to_owned(),
           parser.gen_loc(start_loc)
         )

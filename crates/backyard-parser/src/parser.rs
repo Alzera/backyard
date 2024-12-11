@@ -1,5 +1,6 @@
 use std::{ collections::HashSet, fmt::Debug };
 
+use bumpalo::{ vec, collections::Vec, Bump };
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::node::{ Location, Node, NodeType, RangeLocation };
 use crate::{
@@ -58,13 +59,17 @@ use super::internal::{
   yields::YieldParser,
 };
 
-type InternalParserTest = fn(&[Token], &mut LoopArgument) -> Option<Vec<LookupResult>>;
-type InternalParserParse = fn(
-  &mut Parser,
-  Vec<LookupResult>,
-  Location,
-  &mut LoopArgument
-) -> Result<Box<Node>, ParserError>;
+type InternalParserTest = for<'arena, 'a> fn(
+  parser: &mut Parser<'arena, 'a>,
+  tokens: &[Token],
+  args: &mut LoopArgument
+) -> Option<std::vec::Vec<LookupResult<'arena>>>;
+type InternalParserParse = for<'arena, 'a, 'b> fn(
+  parser: &mut Parser<'arena, 'a>,
+  matched: std::vec::Vec<LookupResult>,
+  start_loc: Location,
+  _: &mut LoopArgument<'arena, 'b>
+) -> Result<Node<'arena>, ParserError>;
 type InternalParser = (InternalParserTest, InternalParserParse);
 pub static DEFAULT_PARSERS: [InternalParser; 46] = [
   (CommentParser::test, CommentParser::parse),
@@ -116,19 +121,20 @@ pub static DEFAULT_PARSERS: [InternalParser; 46] = [
 ];
 
 #[derive(Debug)]
-pub struct LoopArgument<'a> {
+pub struct LoopArgument<'arena, 'a> {
   #[allow(dead_code)]
   pub context: &'a str,
   pub parsers: &'a [InternalParser],
   pub separators: &'a [TokenType],
   pub breakers: &'a [TokenType],
-  pub last_expr: Option<Box<Node>>,
-  pub statements: Vec<Box<Node>>,
+  pub last_expr: Option<Node<'arena>>,
+  pub statements: Option<Vec<'arena, Node<'arena>>>,
   pub should_fail: bool,
 }
 
-impl<'a> LoopArgument<'a> {
+impl<'arena, 'a> LoopArgument<'arena, 'a> {
   pub fn new(
+    arena: &'arena Bump,
     context: &'a str,
     separators: &'a [TokenType],
     breakers: &'a [TokenType],
@@ -140,12 +146,13 @@ impl<'a> LoopArgument<'a> {
       separators,
       breakers,
       last_expr: None,
-      statements: vec![],
+      statements: Some(vec![in arena]),
       should_fail: true,
     }
   }
 
   pub fn safe(
+    arena: &'arena Bump,
     context: &'a str,
     separators: &'a [TokenType],
     breakers: &'a [TokenType],
@@ -157,24 +164,25 @@ impl<'a> LoopArgument<'a> {
       separators,
       breakers,
       last_expr: None,
-      statements: vec![],
+      statements: Some(vec![in arena]),
       should_fail: false,
     }
   }
 
-  pub fn default(context: &'a str) -> Self {
+  pub fn default(arena: &'arena Bump, context: &'a str) -> Self {
     LoopArgument {
       context,
       parsers: &DEFAULT_PARSERS,
       separators: &[TokenType::Semicolon],
       breakers: &[TokenType::RightCurlyBracket],
       last_expr: None,
-      statements: vec![],
+      statements: Some(vec![in arena]),
       should_fail: true,
     }
   }
 
   pub fn with_tokens(
+    arena: &'arena Bump,
     context: &'a str,
     separators: &'a [TokenType],
     breakers: &'a [TokenType]
@@ -185,26 +193,31 @@ impl<'a> LoopArgument<'a> {
       separators,
       breakers,
       last_expr: None,
-      statements: vec![],
+      statements: Some(vec![in arena]),
       should_fail: true,
     }
   }
 }
 
-pub struct Parser<'a> {
+pub struct Parser<'arena, 'a> {
+  pub arena: &'arena Bump,
   pub tokens: &'a [Token],
   pub position: usize,
 }
 
-impl<'a> Parser<'a> {
-  pub fn new(tokens: &'a [Token]) -> Self {
+impl<'arena, 'a> Parser<'arena, 'a> {
+  pub fn new(arena: &'arena Bump, tokens: &'a [Token]) -> Self {
     Parser {
+      arena,
       tokens,
       position: 0,
     }
   }
 
-  pub fn get_children(&mut self, args: &mut LoopArgument) -> Result<Vec<Box<Node>>, ParserError> {
+  pub fn get_children<'b>(
+    &mut self,
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Vec<'arena, Node<'arena>>, ParserError> {
     while let Some(token) = self.tokens.get(self.position) {
       if args.breakers.contains(&token.token_type) {
         self.position += 1;
@@ -219,18 +232,18 @@ impl<'a> Parser<'a> {
         return Err(statement.err().unwrap());
       }
       if let Some(statement) = statement.unwrap() {
-        args.statements.push(statement);
+        args.statements.as_mut().unwrap().push(statement);
       } else {
         break;
       }
     }
-    Ok(args.statements.to_owned())
+    Ok(args.statements.take().unwrap())
   }
 
-  pub fn get_statement(
+  pub fn get_statement<'b>(
     &mut self,
-    args: &mut LoopArgument
-  ) -> Result<Option<Box<Node>>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Option<Node<'arena>>, ParserError> {
     while let Some(token) = self.tokens.get(self.position) {
       // println!("");
       // println!("context: {:?}", args.context);
@@ -294,16 +307,17 @@ impl<'a> Parser<'a> {
       }
     }
 
-    let last_expr = args.last_expr.to_owned();
-    args.last_expr = None;
-    Ok(last_expr.to_owned())
+    Ok(args.last_expr.take())
   }
 
-  pub fn find_match(&mut self, args: &mut LoopArgument) -> Result<Option<Box<Node>>, ParserError> {
+  pub fn find_match<'b>(
+    &mut self,
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Option<Node<'arena>>, ParserError> {
     let tokens = &self.tokens[self.position..];
 
     for (test, parse) in args.parsers {
-      if let Some(matched) = test(tokens, args) {
+      if let Some(matched) = test(self, tokens, args) {
         if let Some(start_loc) = tokens.first().map(|x| x.get_location().unwrap()) {
           self.position += matched
             .iter()
@@ -350,7 +364,7 @@ pub trait LocationHelper {
   fn get_range_location(&self) -> Option<RangeLocation>;
 }
 
-impl LocationHelper for &Node {
+impl<'a> LocationHelper for &Node<'a> {
   fn get_location(&self) -> Option<Location> {
     self.loc.as_ref().map(|loc| loc.start.clone())
   }
@@ -384,12 +398,12 @@ impl LocationHelper for &Token {
 }
 
 pub trait TokenTypeArrayCombine {
-  fn combine(self, tokens: &[TokenType]) -> Vec<TokenType>;
+  fn combine(self, tokens: &[TokenType]) -> std::vec::Vec<TokenType>;
 }
 
 impl TokenTypeArrayCombine for &[TokenType] {
-  fn combine(self, tokens: &[TokenType]) -> Vec<TokenType> {
-    let combined: Vec<TokenType> = [self, tokens].concat();
+  fn combine(self, tokens: &[TokenType]) -> std::vec::Vec<TokenType> {
+    let combined: std::vec::Vec<TokenType> = [self, tokens].concat();
     let unique: HashSet<_> = combined.into_iter().collect();
     unique.into_iter().collect()
   }

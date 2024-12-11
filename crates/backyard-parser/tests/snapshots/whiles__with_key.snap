@@ -18,8 +18,8 @@ children:
           line: 1
           column: 7
           offset: 7
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     body:
       node_type: block
       statements: []
@@ -32,8 +32,8 @@ children:
           line: 1
           column: 14
           offset: 14
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     is_short: true
     loc:
       start:
@@ -44,8 +44,8 @@ children:
         line: 1
         column: 14
         offset: 14
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -55,5 +55,5 @@ loc:
     line: 1
     column: 22
     offset: 22
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

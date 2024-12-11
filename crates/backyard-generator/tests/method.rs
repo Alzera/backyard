@@ -3,7 +3,9 @@ use backyard_parser::parse_eval;
 
 #[test]
 fn basic() {
+  let arena = bumpalo::Bump::new();
   let asts = parse_eval(
+    &arena,
     "abstract class A {
   public function a() {
   }
@@ -15,7 +17,8 @@ fn basic() {
 
 #[test]
 fn shuffle_modifier() {
-  let asts = parse_eval("abstract class A {
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "abstract class A {
   final static public function b();
 }").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());

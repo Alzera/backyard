@@ -3,7 +3,8 @@ use backyard_parser::parse_eval;
 
 #[test]
 fn basic() {
-  let asts = parse_eval("enum Suit {
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "enum Suit {
   case Hearts;
   case Spades;
 }").unwrap();
@@ -12,7 +13,8 @@ fn basic() {
 
 #[test]
 fn typed() {
-  let asts = parse_eval("enum Suit: int {
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "enum Suit: int {
   case Hearts = 5;
   case Spades = 6;
 }").unwrap();
@@ -21,7 +23,9 @@ fn typed() {
 
 #[test]
 fn content() {
+  let arena = bumpalo::Bump::new();
   let asts = parse_eval(
+    &arena,
     "enum Suit implements SuitInterface {
   case Hearts;
   case Spades;

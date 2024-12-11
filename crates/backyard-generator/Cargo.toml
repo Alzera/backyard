@@ -16,6 +16,7 @@ backyard-nodes = { workspace = true }
 backyard-parser = { workspace = true }
 
 [dev-dependencies]
+bumpalo = { workspace = true }
 insta = { workspace = true }
 criterion = { workspace = true }
 

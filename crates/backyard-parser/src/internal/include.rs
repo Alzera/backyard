@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, IncludeNode };
+use backyard_nodes::{ node::{ IncludeNode, Location, Node }, utils::IntoBoxedNode };
 
 use crate::{
   error::ParserError,
@@ -12,8 +12,13 @@ use crate::{
 pub struct IncludeParser;
 
 impl IncludeParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Equal(
@@ -24,12 +29,12 @@ impl IncludeParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [keyword, use_parenthesis] = matched.as_slice() {
       let keyword = keyword.as_equal()?;
       let is_require =
@@ -41,18 +46,34 @@ impl IncludeParser {
       let argument = guard!(
         if use_parenthesis {
           let a = parser.get_statement(
-            &mut LoopArgument::with_tokens("include", &[], &[TokenType::RightParenthesis])
+            &mut LoopArgument::with_tokens(
+              parser.arena,
+              "include",
+              &[],
+              &[TokenType::RightParenthesis]
+            )
           )?;
           parser.position += 1;
           a
         } else {
           parser.get_statement(
-            &mut LoopArgument::with_tokens("include", &[], &args.breakers.combine(args.separators))
+            &mut LoopArgument::with_tokens(
+              parser.arena,
+              "include",
+              &[],
+              &args.breakers.combine(args.separators)
+            )
           )?
         }
       );
       return Ok(
-        IncludeNode::loc(use_parenthesis, is_require, is_once, argument, parser.gen_loc(start_loc))
+        IncludeNode::loc(
+          use_parenthesis,
+          is_require,
+          is_once,
+          argument.into_boxed(&parser.arena),
+          parser.gen_loc(start_loc)
+        )
       );
     }
     Err(ParserError::Internal)

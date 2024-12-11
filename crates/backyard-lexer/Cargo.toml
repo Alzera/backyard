@@ -12,7 +12,7 @@ license.workspace = true
 workspace = true
 
 [dependencies]
-bumpalo = { workspace = true, features = ["collections"] }
+bumpalo = { workspace = true, features = ["collections", "serde"] }
 compact_str = { workspace = true }
 
 serde = { workspace = true }

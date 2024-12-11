@@ -12,8 +12,12 @@ pub struct TypesParser;
 
 impl TypesParser {
   #[allow(unused_assignments)]
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    if let Some(m) = match_pattern(tokens, &[Lookup::OptionalType]) {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
+    if let Some(m) = match_pattern(parser, tokens, &[Lookup::OptionalType]) {
       if let Some(types) = m.first() {
         if !types.is_empty() {
           return Some(m);
@@ -23,14 +27,14 @@ impl TypesParser {
     None
   }
 
-  pub fn parse(
-    _: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     _: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [types] = matched.as_slice() {
-      if let Some(types) = types.as_optional_type() {
+      if let Some(types) = types.as_optional_type(&parser.arena) {
         return Ok(types);
       }
     }

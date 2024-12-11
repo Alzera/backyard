@@ -5,7 +5,11 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct PostGenerator;
 
 impl PostGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Post, &node.node);
     generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
     builder.push(node.operator.as_str());

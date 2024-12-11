@@ -12,7 +12,11 @@ use crate::generator::{
 pub struct BlockGenerator;
 
 impl BlockGenerator {
-  pub fn generate_single(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate_single<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     builder.push("{");
     let mut block = Self::generate_base(generator, node, &DEFAULT_GENERATORS);
     block.indent();
@@ -21,42 +25,49 @@ impl BlockGenerator {
     builder.push("}");
   }
 
-  pub fn generate(
-    generator: &mut Generator,
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
     builder: &mut Builder,
-    node: &Node,
+    node: &Node<'arena>,
     short_close: Option<&str>
   ) {
     Self::generate_specific(generator, builder, node, short_close, &DEFAULT_GENERATORS)
   }
 
-  pub fn generate_specific(
-    generator: &mut Generator,
+  pub fn generate_specific<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
     builder: &mut Builder,
-    node: &Node,
+    node: &Node<'arena>,
     short_close: Option<&str>,
     generators: &[(NodeType, InternalGenerator)]
   ) {
     let leadings = &node.leadings;
     let trailings = &node.trailings;
-    if !leadings.is_empty() || !trailings.is_empty() {
+    if
+      (leadings.is_some() && !leadings.as_ref().unwrap().is_empty()) ||
+      (trailings.is_some() && !trailings.as_ref().unwrap().is_empty())
+    {
       let mut scoped_builder = Builder::new();
-      generator.handle_comments(&mut scoped_builder, leadings);
+      if let Some(leadings) = leadings {
+        generator.handle_comments(&mut scoped_builder, leadings);
+      }
       if scoped_builder.total_len() == 0 {
         scoped_builder.new_line();
       }
       Self::print_block(generator, &mut scoped_builder, node, short_close, generators);
-      generator.handle_comments(&mut scoped_builder, trailings);
+      if let Some(trailings) = trailings {
+        generator.handle_comments(&mut scoped_builder, trailings);
+      }
       builder.extend_first_line(scoped_builder);
     } else {
       Self::print_block(generator, builder, node, short_close, generators);
     }
   }
 
-  fn print_block(
-    generator: &mut Generator,
+  fn print_block<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
     builder: &mut Builder,
-    node: &Node,
+    node: &Node<'arena>,
     short_close: Option<&str>,
     generators: &[(NodeType, InternalGenerator)]
   ) {
@@ -68,7 +79,7 @@ impl BlockGenerator {
       builder.new_line();
       builder.push(close);
     } else {
-      if node.leadings.is_empty() {
+      if node.leadings.is_none() || node.leadings.as_ref().unwrap().is_empty() {
         builder.push(" ");
       }
       builder.push("{");
@@ -78,9 +89,9 @@ impl BlockGenerator {
     }
   }
 
-  pub fn generate_base(
-    generator: &mut Generator,
-    node: &Node,
+  pub fn generate_base<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    node: &Node<'arena>,
     generators: &[(NodeType, InternalGenerator)]
   ) -> Builder {
     let mut block = Builder::new();

@@ -1,6 +1,5 @@
 ---
 source: crates/backyard-parser/tests/trait.rs
-assertion_line: 17
 expression: asts
 snapshot_kind: text
 ---
@@ -19,8 +18,8 @@ children:
           line: 1
           column: 7
           offset: 7
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     body:
       node_type: block
       statements:
@@ -37,8 +36,8 @@ children:
                   line: 2
                   column: 9
                   offset: 19
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
           adaptations: []
           loc:
             start:
@@ -49,8 +48,8 @@ children:
               line: 2
               column: 6
               offset: 16
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         - node_type: trait_use
           traits:
             - node_type: identifier
@@ -64,8 +63,8 @@ children:
                   line: 3
                   column: 14
                   offset: 35
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
             - node_type: identifier
               name: Usable
               loc:
@@ -77,8 +76,8 @@ children:
                   line: 3
                   column: 22
                   offset: 43
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
           adaptations:
             - node_type: trait_use_alias
               trait_name: ~
@@ -94,8 +93,8 @@ children:
                     line: 4
                     column: 7
                     offset: 53
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               alias:
                 node_type: identifier
                 name: alias
@@ -108,8 +107,8 @@ children:
                     line: 4
                     column: 24
                     offset: 70
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               visibility: Private
               loc:
                 start:
@@ -120,8 +119,8 @@ children:
                   line: 4
                   column: 19
                   offset: 65
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
             - node_type: trait_use_alias
               trait_name:
                 node_type: identifier
@@ -135,8 +134,8 @@ children:
                     line: 5
                     column: 12
                     offset: 84
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               method:
                 node_type: identifier
                 name: log
@@ -149,8 +148,8 @@ children:
                     line: 5
                     column: 17
                     offset: 89
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               alias:
                 node_type: identifier
                 name: aliasLoggable
@@ -163,8 +162,8 @@ children:
                     line: 5
                     column: 34
                     offset: 106
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               visibility: ~
               loc:
                 start:
@@ -175,8 +174,8 @@ children:
                   line: 5
                   column: 21
                   offset: 93
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
             - node_type: trait_use_precedence
               trait_name:
                 node_type: identifier
@@ -190,8 +189,8 @@ children:
                     line: 6
                     column: 10
                     offset: 118
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               method:
                 node_type: identifier
                 name: useResource
@@ -204,8 +203,8 @@ children:
                     line: 6
                     column: 23
                     offset: 131
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               instead:
                 node_type: identifier
                 name: Loggable
@@ -218,8 +217,8 @@ children:
                     line: 6
                     column: 42
                     offset: 150
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               loc:
                 start:
                   line: 6
@@ -229,8 +228,8 @@ children:
                   line: 6
                   column: 34
                   offset: 142
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
           loc:
             start:
               line: 3
@@ -240,8 +239,8 @@ children:
               line: 7
               column: 2
               offset: 154
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         - node_type: const_property
           const_type: ~
           visibilities:
@@ -260,8 +259,8 @@ children:
                     line: 8
                     column: 23
                     offset: 179
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               operator: "="
               right:
                 node_type: string
@@ -276,8 +275,8 @@ children:
                     line: 8
                     column: 26
                     offset: 182
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               loc:
                 start:
                   line: 8
@@ -287,8 +286,8 @@ children:
                   line: 8
                   column: 26
                   offset: 182
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
           loc:
             start:
               line: 8
@@ -298,8 +297,8 @@ children:
               line: 8
               column: 26
               offset: 182
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         - node_type: property
           visibilities:
             - Public
@@ -319,8 +318,8 @@ children:
                     line: 9
                     column: 27
                     offset: 221
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               variable_type:
                 node_type: type
                 is_nullable: true
@@ -334,8 +333,8 @@ children:
                     line: 9
                     column: 18
                     offset: 212
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               value:
                 node_type: number
                 value: "4"
@@ -348,8 +347,8 @@ children:
                     line: 9
                     column: 31
                     offset: 225
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               loc:
                 start:
                   line: 9
@@ -359,8 +358,8 @@ children:
                   line: 9
                   column: 31
                   offset: 225
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
           loc:
             start:
               line: 9
@@ -370,8 +369,8 @@ children:
               line: 9
               column: 31
               offset: 225
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
       loc:
         start:
           line: 1
@@ -381,8 +380,8 @@ children:
           line: 10
           column: 0
           offset: 228
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     loc:
       start:
         line: 1
@@ -392,8 +391,8 @@ children:
         line: 10
         column: 0
         offset: 228
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -403,5 +402,5 @@ loc:
     line: 10
     column: 0
     offset: 228
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

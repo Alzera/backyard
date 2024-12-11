@@ -6,9 +6,12 @@ use super::call::CallGenerator;
 pub struct AttributeGenerator;
 
 impl AttributeGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Attribute, &node.node);
-
     builder.push("#[");
     let items = generator.generate_nodes_new(
       &node.items,
@@ -18,7 +21,11 @@ impl AttributeGenerator {
     builder.push("]");
   }
 
-  pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate_item<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(AttributeItem, &node.node);
     builder.push(&node.name);
     if !node.arguments.is_empty() {

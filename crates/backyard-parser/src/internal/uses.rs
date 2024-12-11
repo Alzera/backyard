@@ -1,5 +1,9 @@
+use bumpalo::vec;
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, UseItemModifier, UseItemNode, UseNode };
+use backyard_nodes::{
+  node::{ Location, Node, UseItemModifier, UseItemNode, UseNode },
+  utils::IntoBoxedOptionNode,
+};
 
 use crate::{
   error::ParserError,
@@ -14,16 +18,20 @@ use super::{ comment::CommentParser, identifier::IdentifierParser };
 pub struct UseParser;
 
 impl UseParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Use])])
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
+    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Use])])
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
       let mut p = parser.position;
       let mut has_bracket = false;
@@ -41,12 +49,13 @@ impl UseParser {
         parser.position += 1;
 
         let items = {
-          let mut items = vec![];
+          let mut items = vec![in parser.arena];
           if let Some(t) = parser.tokens.get(parser.position) {
             if t.token_type == TokenType::LeftCurlyBracket {
               parser.position += 1;
               items = parser.get_children(
                 &mut LoopArgument::new(
+                  &parser.arena,
                   "uses_items",
                   &[TokenType::Comma],
                   &[TokenType::RightCurlyBracket],
@@ -64,6 +73,7 @@ impl UseParser {
       } else {
         let items = parser.get_children(
           &mut LoopArgument::new(
+            parser.arena,
             "uses_items",
             &[TokenType::Comma],
             &[TokenType::Semicolon],
@@ -84,8 +94,13 @@ impl UseParser {
 pub struct UseItemParser;
 
 impl UseItemParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Optional(&[TokenType::Function, TokenType::Const]),
@@ -96,12 +111,12 @@ impl UseItemParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [modifier, name] = matched.as_slice() {
       let modifier = modifier
         .as_optional()
@@ -120,7 +135,9 @@ impl UseItemParser {
           }
         }
       }
-      return Ok(UseItemNode::loc(modifier, name, alias, parser.gen_loc(start_loc)));
+      return Ok(
+        UseItemNode::loc(modifier, name, alias.into_boxed(&parser.arena), parser.gen_loc(start_loc))
+      );
     }
     Err(ParserError::Internal)
   }

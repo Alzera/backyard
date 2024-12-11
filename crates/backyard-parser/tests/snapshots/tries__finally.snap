@@ -26,8 +26,8 @@ children:
                     line: 2
                     column: 17
                     offset: 23
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               arguments:
                 - node_type: call_argument
                   name: ~
@@ -44,8 +44,8 @@ children:
                         line: 2
                         column: 18
                         offset: 24
-                    leadings: []
-                    trailings: []
+                    leadings: ~
+                    trailings: ~
                   loc:
                     start:
                       line: 2
@@ -55,8 +55,8 @@ children:
                       line: 2
                       column: 18
                       offset: 24
-                  leadings: []
-                  trailings: []
+                  leadings: ~
+                  trailings: ~
               loc:
                 start:
                   line: 2
@@ -66,8 +66,8 @@ children:
                   line: 2
                   column: 41
                   offset: 47
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
             loc:
               start:
                 line: 2
@@ -77,8 +77,8 @@ children:
                 line: 2
                 column: 41
                 offset: 47
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
           loc:
             start:
               line: 2
@@ -88,8 +88,8 @@ children:
               line: 2
               column: 41
               offset: 47
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
       loc:
         start:
           line: 1
@@ -99,8 +99,8 @@ children:
           line: 3
           column: 0
           offset: 50
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     catches:
       - node_type: catch
         types:
@@ -115,8 +115,8 @@ children:
                 line: 3
                 column: 17
                 offset: 67
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
         variable:
           node_type: variable
           name:
@@ -131,8 +131,8 @@ children:
                 line: 3
                 column: 21
                 offset: 71
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
           loc:
             start:
               line: 3
@@ -142,8 +142,8 @@ children:
               line: 3
               column: 21
               offset: 71
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         body:
           node_type: block
           statements: []
@@ -156,8 +156,8 @@ children:
               line: 4
               column: 0
               offset: 76
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 3
@@ -167,8 +167,8 @@ children:
             line: 4
             column: 0
             offset: 76
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
       - node_type: catch
         types:
           - node_type: identifier
@@ -182,8 +182,8 @@ children:
                 line: 4
                 column: 18
                 offset: 94
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
           - node_type: identifier
             name: BarError
             loc:
@@ -195,8 +195,8 @@ children:
                 line: 4
                 column: 29
                 offset: 105
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
         variable:
           node_type: variable
           name:
@@ -211,8 +211,8 @@ children:
                 line: 4
                 column: 33
                 offset: 109
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
           loc:
             start:
               line: 4
@@ -222,8 +222,8 @@ children:
               line: 4
               column: 33
               offset: 109
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         body:
           node_type: block
           statements: []
@@ -236,8 +236,8 @@ children:
               line: 5
               column: 0
               offset: 114
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 4
@@ -247,8 +247,8 @@ children:
             line: 5
             column: 0
             offset: 114
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
       - node_type: finally
         body:
           node_type: block
@@ -262,8 +262,8 @@ children:
               line: 6
               column: 0
               offset: 126
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 5
@@ -273,8 +273,8 @@ children:
             line: 6
             column: 0
             offset: 126
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
     loc:
       start:
         line: 1
@@ -284,8 +284,8 @@ children:
         line: 6
         column: 0
         offset: 126
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -295,5 +295,5 @@ loc:
     line: 6
     column: 0
     offset: 126
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

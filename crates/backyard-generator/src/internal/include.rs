@@ -5,7 +5,11 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct IncludeGenerator;
 
 impl IncludeGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Include, &node.node);
     if node.is_require {
       builder.push("require");

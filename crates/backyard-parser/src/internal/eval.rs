@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, EvalNode };
+use backyard_nodes::{ node::{ EvalNode, Location, Node }, utils::IntoBoxedNode };
 
 use crate::{
   error::ParserError,
@@ -11,28 +11,33 @@ use crate::{
 pub struct EvalParser;
 
 impl EvalParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[Lookup::Equal(&[TokenType::Eval]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, _] = matched.as_slice() {
-      let argument = parser.get_statement(
-        &mut LoopArgument::with_tokens("eval", &[TokenType::RightParenthesis], &[])
-      )?;
-      parser.position += 1;
-      if argument.is_none() {
-        return Err(ParserError::Internal);
+      if
+        let Some(argument) = parser.get_statement(
+          &mut LoopArgument::with_tokens(parser.arena, "eval", &[TokenType::RightParenthesis], &[])
+        )?
+      {
+        parser.position += 1;
+        return Ok(EvalNode::loc(argument.into_boxed(&parser.arena), parser.gen_loc(start_loc)));
       }
-      return Ok(EvalNode::loc(argument.unwrap(), parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

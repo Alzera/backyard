@@ -7,7 +7,11 @@ use super::block::BlockGenerator;
 pub struct IfGenerator;
 
 impl IfGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(If, &node.node);
 
     builder.push("if (");
@@ -39,7 +43,11 @@ impl IfGenerator {
     }
   }
 
-  pub fn generate_else(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate_else<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Else, &node.node);
 
     builder.push("else");

@@ -1,5 +1,8 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ BodyType, Location, Node, DeclareArgumentNode, DeclareNode };
+use backyard_nodes::{
+  node::{ BodyType, DeclareArgumentNode, DeclareNode, Location, Node },
+  utils::{ IntoBoxedNode, IntoBoxedOptionNode },
+};
 
 use crate::{
   error::ParserError,
@@ -13,22 +16,28 @@ use super::{ block::BlockParser, comment::CommentParser, identifier::IdentifierP
 pub struct DeclareParser;
 
 impl DeclareParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[Lookup::Equal(&[TokenType::Declare]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let arguments = parser.get_children(
         &mut LoopArgument::new(
+          &parser.arena,
           "declare",
           &[TokenType::Comma],
           &[TokenType::RightParenthesis],
@@ -54,7 +63,14 @@ impl DeclareParser {
         BodyType::Basic => Some(BlockParser::new_block(parser)?),
         BodyType::Short => Some(BlockParser::new_short(parser, &[TokenType::EndDeclare])?),
       };
-      return Ok(DeclareNode::loc(arguments, body, body_type, parser.gen_loc(start_loc)));
+      return Ok(
+        DeclareNode::loc(
+          arguments,
+          body.into_boxed(&parser.arena),
+          body_type,
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::Internal)
   }
@@ -64,31 +80,43 @@ impl DeclareParser {
 pub struct DeclareArgumentParser;
 
 impl DeclareArgumentParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[Lookup::Equal(&[TokenType::Identifier]), Lookup::Equal(&[TokenType::Assignment])]
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [name, _] = matched.as_slice() {
       let name = IdentifierParser::from_token(name.as_equal()?);
       if
         let Some(value) = parser.get_statement(
           &mut LoopArgument::with_tokens(
+            parser.arena,
             "declare_argument",
             &[TokenType::Comma],
             &[TokenType::RightParenthesis]
           )
         )?
       {
-        return Ok(DeclareArgumentNode::loc(name, value, parser.gen_loc(start_loc)));
+        return Ok(
+          DeclareArgumentNode::loc(
+            name.into_boxed(&parser.arena),
+            value.into_boxed(&parser.arena),
+            parser.gen_loc(start_loc)
+          )
+        );
       }
     }
     Err(ParserError::Internal)

@@ -22,8 +22,8 @@ children:
                 line: 1
                 column: 6
                 offset: 6
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
           loc:
             start:
               line: 1
@@ -33,8 +33,8 @@ children:
               line: 1
               column: 6
               offset: 6
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         operator: "="
         right:
           node_type: number
@@ -48,8 +48,8 @@ children:
               line: 1
               column: 10
               offset: 10
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 1
@@ -59,8 +59,8 @@ children:
             line: 1
             column: 10
             offset: 10
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
     tests:
       - node_type: bin
         left:
@@ -77,8 +77,8 @@ children:
                 line: 1
                 column: 14
                 offset: 14
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
           loc:
             start:
               line: 1
@@ -88,8 +88,8 @@ children:
               line: 1
               column: 14
               offset: 14
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         operator: "<="
         right:
           node_type: number
@@ -103,8 +103,8 @@ children:
               line: 1
               column: 19
               offset: 19
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 1
@@ -114,8 +114,8 @@ children:
             line: 1
             column: 19
             offset: 19
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
     increments:
       - node_type: post
         statement:
@@ -132,8 +132,8 @@ children:
                 line: 1
                 column: 24
                 offset: 24
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
           loc:
             start:
               line: 1
@@ -143,8 +143,8 @@ children:
               line: 1
               column: 24
               offset: 24
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         operator: ++
         loc:
           start:
@@ -155,8 +155,8 @@ children:
             line: 1
             column: 25
             offset: 25
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
     body:
       node_type: block
       statements: []
@@ -169,8 +169,8 @@ children:
           line: 2
           column: 0
           offset: 31
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     body_type: Basic
     loc:
       start:
@@ -181,8 +181,8 @@ children:
         line: 2
         column: 0
         offset: 31
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -192,5 +192,5 @@ loc:
     line: 2
     column: 0
     offset: 31
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

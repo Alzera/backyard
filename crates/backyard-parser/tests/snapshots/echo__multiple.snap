@@ -19,8 +19,8 @@ children:
             line: 1
             column: 5
             offset: 5
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
       - node_type: string
         quote: Double
         value: World
@@ -33,8 +33,8 @@ children:
             line: 1
             column: 14
             offset: 14
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
     loc:
       start:
         line: 1
@@ -44,8 +44,8 @@ children:
         line: 1
         column: 14
         offset: 14
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -55,5 +55,5 @@ loc:
     line: 1
     column: 21
     offset: 21
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

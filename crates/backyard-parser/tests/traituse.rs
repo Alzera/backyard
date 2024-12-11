@@ -2,13 +2,16 @@ use backyard_parser::parse_eval;
 
 #[test]
 fn basic() {
-  let asts = parse_eval("class A { use Ale; }").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "class A { use Ale; }").unwrap();
   insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn items() {
+  let arena = bumpalo::Bump::new();
   let asts = parse_eval(
+    &arena,
     "class A {
   use Loggable, Usable {
     log as public;

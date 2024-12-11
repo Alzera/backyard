@@ -173,34 +173,57 @@ impl KeywordToken {
   }
 
   fn check_visibility(lexer: &mut Lexer, input: &str, snapshot: &ControlSnapshot) -> LexResult {
-    let token_type = match input {
-      "private" => [TokenType::Private, TokenType::PrivateGet, TokenType::PrivateSet],
-      "protected" => [TokenType::Protected, TokenType::ProtectedGet, TokenType::ProtectedSet],
-      "public" => [TokenType::Public, TokenType::PublicGet, TokenType::PublicSet],
-      _ => {
-        return Err(lexer.control.error_unrecognized(input));
-      }
-    };
     if let Some(pos) = lexer.control.peek_char_n(None, 5) {
       if pos == "(get)" {
         lexer.control.consume(5);
-        return {
-            lexer.tokens.push(Token::new(token_type[1], format_compact!("{}(get)", input), snapshot));
-            Ok(
-              ()
-            )
-        };
+        lexer.tokens.push(
+          Token::new(
+            match input {
+              "private" => TokenType::PrivateGet,
+              "protected" => TokenType::ProtectedGet,
+              "public" => TokenType::PublicGet,
+              _ => {
+                return Err(lexer.control.error_unrecognized(input));
+              }
+            },
+            format_compact!("{}(get)", input),
+            snapshot
+          )
+        );
+        return Ok(());
       } else if pos == "(set)" {
         lexer.control.consume(5);
-        return {
-            lexer.tokens.push(Token::new(token_type[2], format_compact!("{}(set)", input), snapshot));
-            Ok(
-              ()
-            )
-        };
+        lexer.tokens.push(
+          Token::new(
+            match input {
+              "private" => TokenType::PrivateSet,
+              "protected" => TokenType::ProtectedSet,
+              "public" => TokenType::PublicSet,
+              _ => {
+                return Err(lexer.control.error_unrecognized(input));
+              }
+            },
+            format_compact!("{}(set)", input),
+            snapshot
+          )
+        );
+        return Ok(());
       }
     }
-    lexer.tokens.push(Token::new(token_type[0], input.into(), snapshot));
+    lexer.tokens.push(
+      Token::new(
+        match input {
+          "private" => TokenType::Private,
+          "protected" => TokenType::Protected,
+          "public" => TokenType::Public,
+          _ => {
+            return Err(lexer.control.error_unrecognized(input));
+          }
+        },
+        input.into(),
+        snapshot
+      )
+    );
     Ok(())
   }
 }

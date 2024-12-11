@@ -1,5 +1,8 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ DoWhileConditionNode, DoWhileNode, Location, Node };
+use backyard_nodes::{
+  node::{ DoWhileConditionNode, DoWhileNode, Location, Node },
+  utils::IntoBoxedNode,
+};
 
 use crate::{
   error::ParserError,
@@ -14,21 +17,26 @@ use super::{ block::BlockParser, comment::CommentParser };
 pub struct DoWhileParser;
 
 impl DoWhileParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Do])])
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
+    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Do])])
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
       let body = BlockParser::new_block(parser)?;
       let condition = guard!(
         parser.get_statement(
           &mut LoopArgument::new(
+            parser.arena,
             "do_while",
             &[],
             &[TokenType::RightParenthesis],
@@ -40,7 +48,13 @@ impl DoWhileParser {
         )?
       );
       parser.position += 1;
-      return Ok(DoWhileNode::loc(condition, body, parser.gen_loc(start_loc)));
+      return Ok(
+        DoWhileNode::loc(
+          condition.into_boxed(&parser.arena),
+          body.into_boxed(&parser.arena),
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::Internal)
   }
@@ -50,26 +64,38 @@ impl DoWhileParser {
 pub struct DoWhileConditionParser;
 
 impl DoWhileConditionParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[Lookup::Equal(&[TokenType::While]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let condition = guard!(
         parser.get_statement(
-          &mut LoopArgument::with_tokens("do_while_condition", &[], &[TokenType::RightParenthesis])
+          &mut LoopArgument::with_tokens(
+            parser.arena,
+            "do_while_condition",
+            &[],
+            &[TokenType::RightParenthesis]
+          )
         )?
       );
-      return Ok(DoWhileConditionNode::loc(condition, parser.gen_loc(start_loc)));
+      return Ok(
+        DoWhileConditionNode::loc(condition.into_boxed(&parser.arena), parser.gen_loc(start_loc))
+      );
     }
     Err(ParserError::Internal)
   }

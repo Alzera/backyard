@@ -7,7 +7,11 @@ use super::identifier::IdentifierGenerator;
 pub struct TraitUseGenerator;
 
 impl TraitUseGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(TraitUse, &node.node);
     builder.push("use ");
     let mut traits = generator.generate_nodes_new(
@@ -46,7 +50,11 @@ impl TraitUseGenerator {
     }
   }
 
-  pub fn generate_alias(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate_alias<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(TraitUseAlias, &node.node);
     if let Some(trait_name) = &node.trait_name {
       IdentifierGenerator::generate(generator, builder, trait_name);
@@ -64,7 +72,11 @@ impl TraitUseGenerator {
     }
   }
 
-  pub fn generate_precedence(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate_precedence<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(TraitUsePrecedence, &node.node);
     if let Some(trait_name) = &node.trait_name {
       IdentifierGenerator::generate(generator, builder, trait_name);

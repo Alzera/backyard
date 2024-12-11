@@ -1,6 +1,5 @@
 ---
 source: crates/backyard-parser/tests/attribute.rs
-assertion_line: 16
 expression: asts
 snapshot_kind: text
 ---
@@ -20,8 +19,8 @@ children:
           line: 2
           column: 7
           offset: 20
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     extends: ~
     implements: []
     body:
@@ -36,8 +35,8 @@ children:
           line: 3
           column: 0
           offset: 23
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     is_readonly: false
     loc:
       start:
@@ -68,8 +67,8 @@ children:
                       line: 1
                       column: 7
                       offset: 7
-                  leadings: []
-                  trailings: []
+                  leadings: ~
+                  trailings: ~
                 loc:
                   start:
                     line: 1
@@ -79,8 +78,8 @@ children:
                     line: 1
                     column: 7
                     offset: 7
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
             loc:
               start:
                 line: 1
@@ -90,8 +89,8 @@ children:
                 line: 1
                 column: 10
                 offset: 10
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
         loc:
           start:
             line: 1
@@ -101,9 +100,9 @@ children:
             line: 3
             column: 0
             offset: 23
-        leadings: []
-        trailings: []
-    trailings: []
+        leadings: ~
+        trailings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -113,5 +112,5 @@ loc:
     line: 3
     column: 0
     offset: 23
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

@@ -7,7 +7,11 @@ use super::block::BlockGenerator;
 pub struct WhileGenerator;
 
 impl WhileGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(While, &node.node);
 
     builder.push("while (");

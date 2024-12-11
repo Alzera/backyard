@@ -1,5 +1,8 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ ElseNode, IfNode, Location, Node };
+use backyard_nodes::{
+  node::{ ElseNode, IfNode, Location, Node },
+  utils::{ IntoBoxedNode, IntoBoxedOptionNode },
+};
 
 use crate::{
   error::ParserError,
@@ -14,23 +17,28 @@ use super::{ block::BlockParser, comment::CommentParser };
 pub struct IfParser;
 
 impl IfParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[Lookup::Equal(&[TokenType::If]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let condition = guard!(
         parser.get_statement(
-          &mut LoopArgument::with_tokens("if", &[], &[TokenType::RightParenthesis])
+          &mut LoopArgument::with_tokens(parser.arena, "if", &[], &[TokenType::RightParenthesis])
         )?
       );
       parser.position += 1;
@@ -44,6 +52,7 @@ impl IfParser {
       }
       let invalid = parser.get_statement(
         &mut LoopArgument::safe(
+          &parser.arena,
           "if_invalid",
           &[],
           &[TokenType::RightCurlyBracket, TokenType::EndIf],
@@ -60,7 +69,15 @@ impl IfParser {
           }
         }
       }
-      return Ok(IfNode::loc(condition, valid, invalid, is_short, parser.gen_loc(start_loc)));
+      return Ok(
+        IfNode::loc(
+          condition.into_boxed(&parser.arena),
+          valid.into_boxed(&parser.arena),
+          invalid.into_boxed(&parser.arena),
+          is_short,
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::Internal)
   }
@@ -70,16 +87,20 @@ impl IfParser {
 pub struct ElseParser;
 
 impl ElseParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Else, TokenType::ElseIf])])
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
+    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Else, TokenType::ElseIf])])
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [keyword] = matched.as_slice() {
       if let Ok(keyword) = keyword.as_equal() {
         if keyword.token_type == TokenType::ElseIf {
@@ -95,7 +116,9 @@ impl ElseParser {
             loc,
             args
           )?;
-          return Ok(ElseNode::loc(expr, false, parser.gen_loc(start_loc)));
+          return Ok(
+            ElseNode::loc(expr.into_boxed(&parser.arena), false, parser.gen_loc(start_loc))
+          );
         }
       }
       if let Some(next_token) = parser.tokens.get(parser.position) {
@@ -113,7 +136,9 @@ impl ElseParser {
             loc,
             args
           )?;
-          return Ok(ElseNode::loc(expr, false, parser.gen_loc(start_loc)));
+          return Ok(
+            ElseNode::loc(expr.into_boxed(&parser.arena), false, parser.gen_loc(start_loc))
+          );
         }
       }
       let (is_short, valid) = BlockParser::new_or_short_or_single(
@@ -121,7 +146,9 @@ impl ElseParser {
         &[TokenType::ElseIf, TokenType::Else, TokenType::EndIf],
         args
       )?;
-      return Ok(ElseNode::loc(valid, is_short, parser.gen_loc(start_loc)));
+      return Ok(
+        ElseNode::loc(valid.into_boxed(&parser.arena), is_short, parser.gen_loc(start_loc))
+      );
     }
     Err(ParserError::Internal)
   }

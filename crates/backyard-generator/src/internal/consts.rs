@@ -5,7 +5,11 @@ use crate::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATOR
 pub struct ConstGenerator;
 
 impl ConstGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Const, &node.node);
 
     builder.push("const ");
@@ -24,7 +28,11 @@ impl ConstGenerator {
     }
   }
 
-  pub fn generate_property(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate_property<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(ConstProperty, &node.node);
 
     for visibility in &node.visibilities {

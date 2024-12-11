@@ -7,16 +7,19 @@ use super::{ block::BlockGenerator, identifier::IdentifierGenerator };
 pub struct FunctionGenerator;
 
 impl FunctionGenerator {
-  pub fn get_parameters(generator: &mut Generator, parameters: &[Box<Node>]) -> Builder {
+  pub fn get_parameters<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    parameters: &[Node<'arena>]
+  ) -> Builder {
     generator.generate_nodes_new(
       parameters,
       &mut GeneratorArgument::for_parameter(&[(NodeType::Parameter, Self::generate_parameter)])
     )
   }
 
-  pub fn get_return_type(
-    generator: &mut Generator,
-    node: &Option<Box<Node>>
+  pub fn get_return_type<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    node: &Option<&Node<'arena>>
   ) -> (Option<Builder>, usize) {
     let return_type = node.as_ref().map(|n| generator.generate_node_new(n));
     let return_type_len = if let Some(n) = &return_type {
@@ -27,7 +30,11 @@ impl FunctionGenerator {
     (return_type, return_type_len)
   }
 
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Function, &node.node);
     builder.push("function ");
     if node.is_ref {
@@ -51,7 +58,10 @@ impl FunctionGenerator {
       builder.push(&name.name);
       Self::get_parameters(generator, &node.parameters)
     };
-    let (return_type, return_type_len) = Self::get_return_type(generator, &node.return_type);
+    let (return_type, return_type_len) = Self::get_return_type(
+      generator,
+      &node.return_type.as_deref()
+    );
 
     builder.push("(");
     if
@@ -78,7 +88,11 @@ impl FunctionGenerator {
     }
   }
 
-  pub fn generate_anonymous(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate_anonymous<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(AnonymousFunction, &node.node);
     builder.push("function ");
     if node.is_ref {
@@ -90,7 +104,10 @@ impl FunctionGenerator {
       &mut GeneratorArgument::for_parameter(&DEFAULT_GENERATORS)
     );
     let uses_len = if node.uses.is_empty() { 0 } else { uses.total_len_with_separator(" ") + 7 };
-    let (return_type, return_type_len) = Self::get_return_type(generator, &node.return_type);
+    let (return_type, return_type_len) = Self::get_return_type(
+      generator,
+      &node.return_type.as_deref()
+    );
 
     builder.push("(");
     if
@@ -132,14 +149,21 @@ impl FunctionGenerator {
     BlockGenerator::generate(generator, builder, &node.body, None);
   }
 
-  pub fn generate_arrow(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate_arrow<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(ArrowFunction, &node.node);
     builder.push("fn ");
     if node.is_ref {
       builder.push("&");
     }
     let mut parameters = Self::get_parameters(generator, &node.parameters);
-    let (return_type, return_type_len) = Self::get_return_type(generator, &node.return_type);
+    let (return_type, return_type_len) = Self::get_return_type(
+      generator,
+      &node.return_type.as_deref()
+    );
 
     builder.push("(");
     if
@@ -164,10 +188,10 @@ impl FunctionGenerator {
     generator.generate_node(builder, &node.body, &mut GeneratorArgument::default());
   }
 
-  pub fn generate_constructor_parameter(
-    generator: &mut Generator,
+  pub fn generate_constructor_parameter<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
     builder: &mut Builder,
-    node: &Node
+    node: &Node<'arena>
   ) {
     let node = cast_node!(ConstructorParameter, &node.node);
     for visibility in &node.visibilities {
@@ -179,7 +203,11 @@ impl FunctionGenerator {
     Self::generate_parameter(generator, builder, &node.parameter);
   }
 
-  pub fn generate_parameter(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate_parameter<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Parameter, &node.node);
     if let Some(n) = &node.variable_type {
       generator.generate_node(builder, n, &mut GeneratorArgument::default());

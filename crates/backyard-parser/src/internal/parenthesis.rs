@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ CastNode, Location, Node, ParenthesisNode };
+use backyard_nodes::{ node::{ CastNode, Location, Node, ParenthesisNode }, utils::IntoBoxedNode };
 
 use crate::{
   error::ParserError,
@@ -12,16 +12,20 @@ use crate::{
 pub struct ParenthesisParser;
 
 impl ParenthesisParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::LeftParenthesis])])
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
+    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::LeftParenthesis])])
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
       if let Some(token) = parser.tokens.get(parser.position) {
         if
@@ -45,11 +49,21 @@ impl ParenthesisParser {
               parser.position += 2;
               let expression = guard!(
                 parser.get_statement(
-                  &mut LoopArgument::safe("cast", args.separators, args.breakers, &DEFAULT_PARSERS)
+                  &mut LoopArgument::safe(
+                    parser.arena,
+                    "cast",
+                    args.separators,
+                    args.breakers,
+                    &DEFAULT_PARSERS
+                  )
                 )?
               );
               return Ok(
-                CastNode::loc(token.value.to_owned(), expression, parser.gen_loc(start_loc))
+                CastNode::loc(
+                  token.value.to_owned(),
+                  expression.into_boxed(&parser.arena),
+                  parser.gen_loc(start_loc)
+                )
               );
             }
           }
@@ -57,11 +71,18 @@ impl ParenthesisParser {
       }
       let statement = guard!(
         parser.get_statement(
-          &mut LoopArgument::with_tokens("parenthesis", &[], &[TokenType::RightParenthesis])
+          &mut &mut LoopArgument::with_tokens(
+            parser.arena,
+            "parenthesis",
+            &[],
+            &[TokenType::RightParenthesis]
+          )
         )?
       );
       parser.position += 1;
-      return Ok(ParenthesisNode::loc(statement, parser.gen_loc(start_loc)));
+      return Ok(
+        ParenthesisNode::loc(statement.into_boxed(&parser.arena), parser.gen_loc(start_loc))
+      );
     }
     Err(ParserError::Internal)
   }

@@ -7,7 +7,11 @@ use super::variable::VariableGenerator;
 pub struct GlobalGenerator;
 
 impl GlobalGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Global, &node.node);
 
     builder.push("global ");

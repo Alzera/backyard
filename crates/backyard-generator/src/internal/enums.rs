@@ -12,7 +12,11 @@ use super::{
 pub struct EnumGenerator;
 
 impl EnumGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Enum, &node.node);
     builder.push("enum ");
     IdentifierGenerator::generate(generator, builder, &node.name);
@@ -42,7 +46,11 @@ impl EnumGenerator {
     builder.push("}");
   }
 
-  pub fn generate_item(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate_item<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(EnumItem, &node.node);
     builder.push("case ");
     generator.generate_node(builder, &node.value, &mut GeneratorArgument::default());

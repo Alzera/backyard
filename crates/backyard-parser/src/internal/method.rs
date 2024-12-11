@@ -1,5 +1,8 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Inheritance, Location, MethodNode, Node, Visibility };
+use backyard_nodes::{
+  node::{ Inheritance, Location, MethodNode, Node, Visibility },
+  utils::IntoBoxedNode,
+};
 
 use crate::{
   error::ParserError,
@@ -15,8 +18,13 @@ pub struct MethodParser;
 
 impl MethodParser {
   #[allow(unused_variables)]
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Modifiers(
@@ -31,17 +39,18 @@ impl MethodParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [modifiers, _] = matched.as_slice() {
       parser.position -= 1;
       let function = guard!(
         parser.get_statement(
           &mut LoopArgument::new(
+            parser.arena,
             "method",
             &[TokenType::RightCurlyBracket],
             &[],
@@ -61,7 +70,13 @@ impl MethodParser {
         is_static = m2.as_custom(|x| Ok(x == "static")).unwrap_or(false);
       }
       return Ok(
-        MethodNode::loc(visibility, inheritance, is_static, function, parser.gen_loc(start_loc))
+        MethodNode::loc(
+          visibility,
+          inheritance,
+          is_static,
+          function.into_boxed(&parser.arena),
+          parser.gen_loc(start_loc)
+        )
       );
     }
     Err(ParserError::Internal)

@@ -1,11 +1,8 @@
+use bumpalo::vec;
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{
-  Location,
-  Node,
-  TraitUseAliasNode,
-  TraitUseNode,
-  TraitUsePrecedenceNode,
-  Visibility,
+use backyard_nodes::{
+  node::{ Location, Node, TraitUseAliasNode, TraitUseNode, TraitUsePrecedenceNode, Visibility },
+  utils::{ IntoBoxedNode, IntoBoxedOptionNode },
 };
 
 use crate::{
@@ -21,19 +18,24 @@ use super::{ comment::CommentParser, identifier::IdentifierParser };
 pub struct TraitUseParser;
 
 impl TraitUseParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Use])])
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
+    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Use])])
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
       let traits = parser.get_children(
         &mut LoopArgument::new(
+          &parser.arena,
           "traituse",
           &[TokenType::Comma],
           &[TokenType::Semicolon, TokenType::LeftCurlyBracket],
@@ -43,12 +45,13 @@ impl TraitUseParser {
           ]
         )
       )?;
-      let mut adaptations = vec![];
+      let mut adaptations = vec![in parser.arena];
       if guard!(parser.tokens.get(parser.position - 1)).token_type == TokenType::Semicolon {
         parser.position -= 1;
       } else {
         adaptations = parser.get_children(
           &mut LoopArgument::new(
+            parser.arena,
             "traituse_body",
             &[TokenType::Semicolon],
             &[TokenType::RightCurlyBracket],
@@ -70,8 +73,13 @@ impl TraitUseParser {
 pub struct TraitUseAliasParser;
 
 impl TraitUseAliasParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Equal(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set]),
@@ -84,12 +92,12 @@ impl TraitUseAliasParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [trait_name, double_colon, name, _, visibility, alias] = matched.as_slice() {
       let trait_name = IdentifierParser::from_token(trait_name.as_equal()?);
       let name = name.as_optional().map(IdentifierParser::from_token);
@@ -105,9 +113,9 @@ impl TraitUseAliasParser {
         .unwrap_or_default();
       return Ok(
         TraitUseAliasNode::loc(
-          trait_name_parsed,
-          name_parsed,
-          alias,
+          trait_name_parsed.into_boxed(&parser.arena),
+          name_parsed.into_boxed(&parser.arena),
+          alias.into_boxed(&parser.arena),
           Visibility::try_from(visibility.as_str()).ok(),
           parser.gen_loc(start_loc)
         )
@@ -121,8 +129,13 @@ impl TraitUseAliasParser {
 pub struct TraitUsePrecedenceParser;
 
 impl TraitUsePrecedenceParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Equal(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set]),
@@ -134,12 +147,12 @@ impl TraitUsePrecedenceParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [trait_name, _, method, _, instead] = matched.as_slice() {
       let instead = IdentifierParser::from_token(instead.as_equal()?);
       let mut trait_name_parsed = Some(IdentifierParser::from_token(trait_name.as_equal()?));
@@ -151,7 +164,12 @@ impl TraitUsePrecedenceParser {
         t
       };
       return Ok(
-        TraitUsePrecedenceNode::loc(trait_name_parsed, method, instead, parser.gen_loc(start_loc))
+        TraitUsePrecedenceNode::loc(
+          trait_name_parsed.into_boxed(&parser.arena),
+          method.into_boxed(&parser.arena),
+          instead.into_boxed(&parser.arena),
+          parser.gen_loc(start_loc)
+        )
       );
     }
     Err(ParserError::Internal)

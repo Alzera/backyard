@@ -1,5 +1,8 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, ForeachNode };
+use backyard_nodes::{
+  node::{ ForeachNode, Location, Node },
+  utils::{ IntoBoxedNode, IntoBoxedOptionNode },
+};
 
 use crate::{
   error::ParserError,
@@ -14,10 +17,13 @@ use super::block::BlockParser;
 pub struct ForeachParser;
 
 impl ForeachParser {
-  fn get_key_value(parser: &mut Parser) -> Result<(Option<Box<Node>>, Box<Node>), ParserError> {
+  fn get_key_value<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>
+  ) -> Result<(Option<Node<'arena>>, Node<'arena>), ParserError> {
     let key_or_value = guard!(
       parser.get_statement(
         &mut LoopArgument::with_tokens(
+          parser.arena,
           "foreach_key_or_value",
           &[],
           &[TokenType::Arrow, TokenType::RightParenthesis]
@@ -31,7 +37,12 @@ impl ForeachParser {
     } else if has_key.token_type == TokenType::Arrow {
       let value = guard!(
         parser.get_statement(
-          &mut LoopArgument::with_tokens("foreach_value", &[], &[TokenType::RightParenthesis])
+          &mut LoopArgument::with_tokens(
+            parser.arena,
+            "foreach_value",
+            &[],
+            &[TokenType::RightParenthesis]
+          )
         )?
       );
       parser.position += 1;
@@ -42,23 +53,28 @@ impl ForeachParser {
 }
 
 impl ForeachParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[Lookup::Equal(&[TokenType::Foreach]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let source = guard!(
         parser.get_statement(
-          &mut LoopArgument::with_tokens("foreach_source", &[], &[TokenType::As])
+          &mut LoopArgument::with_tokens(parser.arena, "foreach_source", &[], &[TokenType::As])
         )?
       );
       parser.position += 1;
@@ -68,7 +84,16 @@ impl ForeachParser {
         &[TokenType::EndForeach],
         args
       )?;
-      return Ok(ForeachNode::loc(source, key, value, body, is_short, parser.gen_loc(start_loc)));
+      return Ok(
+        ForeachNode::loc(
+          source.into_boxed(&parser.arena),
+          key.into_boxed(&parser.arena),
+          value.into_boxed(&parser.arena),
+          body.into_boxed(&parser.arena),
+          is_short,
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::Internal)
   }

@@ -7,7 +7,11 @@ use super::block::BlockGenerator;
 pub struct ForeachGenerator;
 
 impl ForeachGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Foreach, &node.node);
 
     builder.push("foreach (");

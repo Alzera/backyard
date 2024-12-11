@@ -13,10 +13,15 @@ use super::{ comment::CommentParser, property::PropertyItemParser };
 pub struct StaticsParser;
 
 impl StaticsParser {
-  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    args: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     if let Some(last_expr) = &args.last_expr {
       if last_expr.node_type == NodeType::StaticKeyword {
         return match_pattern(
+          parser,
           tokens,
           &[Lookup::Equal(&[TokenType::Variable, TokenType::VariableBracketOpen])]
         );
@@ -25,16 +30,17 @@ impl StaticsParser {
     None
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
       parser.position -= 1;
       let items = parser.get_children(
         &mut LoopArgument::new(
+          &parser.arena,
           "static",
           &[TokenType::Comma],
           &[TokenType::Semicolon],

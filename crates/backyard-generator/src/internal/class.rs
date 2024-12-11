@@ -14,7 +14,11 @@ use super::{
 pub struct ClassGenerator;
 
 impl ClassGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Class, &node.node);
     if node.is_readonly {
       builder.push("readonly ");
@@ -55,7 +59,11 @@ impl ClassGenerator {
     );
   }
 
-  pub fn generate_anonymous(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate_anonymous<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(AnonymousClass, &node.node);
     builder.push("class");
     if !node.parameters.is_empty() {

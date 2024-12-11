@@ -5,7 +5,11 @@ use crate::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATOR
 pub struct EchoGenerator;
 
 impl EchoGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Echo, &node.node);
 
     builder.push("echo ");

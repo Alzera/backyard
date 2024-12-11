@@ -1,15 +1,19 @@
+use bumpalo::{ collections::Vec, Bump };
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{
-  IntersectionTypeNode,
-  Node,
-  NodeType,
-  RangeLocation,
-  TypeNode,
-  UnionTypeNode,
-  Visibility,
+use backyard_nodes::{
+  node::{
+    IntersectionTypeNode,
+    Node,
+    NodeType,
+    RangeLocation,
+    TypeNode,
+    UnionTypeNode,
+    Visibility,
+  },
+  utils::CloneIn,
 };
 
-use crate::{ error::ParserError, parser::LocationHelper };
+use crate::{ error::ParserError, parser::{ LocationHelper, Parser } };
 
 #[derive(Debug, Clone)]
 pub enum Lookup<'a> {
@@ -26,32 +30,32 @@ pub enum ModifierLookup<'a> {
   Custom(&'a [TokenType]),
 }
 
-#[derive(Debug, Clone)]
-pub struct LookupResult {
+#[derive(Debug)]
+pub struct LookupResult<'a> {
   pub size: usize,
-  pub wrapper: LookupResultWrapper,
+  pub wrapper: LookupResultWrapper<'a>,
 }
 
-impl LookupResult {
+impl<'a> LookupResult<'a> {
   pub fn is_empty(&self) -> bool {
     self.size == 0
   }
 
   pub fn as_equal(&self) -> Result<&Token, ParserError> {
     if let LookupResultWrapper::Equal(v) = &self.wrapper {
-      Ok(v)
+      Ok(&v)
     } else {
       Err(ParserError::Internal)
     }
   }
 
   pub fn as_optional(&self) -> Option<&Token> {
-    if let LookupResultWrapper::Optional(Some(v)) = &self.wrapper { Some(v) } else { None }
+    if let LookupResultWrapper::Optional(Some(v)) = &self.wrapper { Some(&v) } else { None }
   }
 
-  pub fn as_optional_type(&self) -> Option<Box<Node>> {
+  pub fn as_optional_type<'arena>(&self, arena: &'arena Bump) -> Option<Node<'arena>> {
     if let LookupResultWrapper::OptionalType(Some(v)) = &self.wrapper {
-      Some(v.to_owned())
+      Some(v.clone_in(arena))
     } else {
       None
     }
@@ -62,27 +66,27 @@ impl LookupResult {
   }
 }
 
-#[derive(Debug, Clone)]
-pub enum LookupResultWrapper {
+#[derive(Debug)]
+pub enum LookupResultWrapper<'a> {
   Equal(Token),
   Optional(Option<Token>),
   Any(Token),
-  OptionalType(Option<Box<Node>>),
-  Modifier(Vec<ModifierResult>),
+  OptionalType(Option<Node<'a>>),
+  Modifier(std::vec::Vec<ModifierResult>),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum ModifierResult {
-  Visibility(Vec<Token>),
+  Visibility(std::vec::Vec<Token>),
   Custom(Option<Token>),
 }
 
 impl ModifierResult {
-  pub fn as_visibilities(&self) -> Vec<Visibility> {
+  pub fn as_visibilities(&self) -> std::vec::Vec<Visibility> {
     if let ModifierResult::Visibility(v) = self {
       v.iter()
         .filter_map(|x| Visibility::try_from(x.value.as_ref()).ok())
-        .collect::<Vec<Visibility>>()
+        .collect()
     } else {
       vec![]
     }
@@ -116,8 +120,12 @@ const TYPES: [TokenType; 11] = [
   TokenType::Parent,
 ];
 
-pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupResult>> {
-  let mut result = Vec::with_capacity(pattern.len());
+pub fn match_pattern<'arena, 'b>(
+  parser: &Parser<'arena, 'b>,
+  tokens: &[Token],
+  pattern: &[Lookup]
+) -> Option<std::vec::Vec<LookupResult<'arena>>> {
+  let mut result = std::vec::Vec::with_capacity(pattern.len());
   let mut check_position = 0;
 
   for p in pattern.iter() {
@@ -210,7 +218,7 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
           continue;
         }
         let old_check_position = check_position;
-        let mut parsed = parse_type(tokens, &mut check_position);
+        let mut parsed = parse_type(parser, tokens, &mut check_position);
         if let Some(to_check) = &parsed {
           if to_check.node_type == NodeType::Type && cur.token_type == TokenType::Identifier {
             if let Some(next) = next {
@@ -227,7 +235,7 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
         });
       }
       Lookup::Modifiers(modifiers_rule) => {
-        let mut modifiers: Vec<Vec<Token>> = modifiers_rule
+        let mut modifiers: std::vec::Vec<std::vec::Vec<Token>> = modifiers_rule
           .iter()
           .map(|_| vec![])
           .collect();
@@ -295,7 +303,7 @@ pub fn match_pattern(tokens: &[Token], pattern: &[Lookup]) -> Option<Vec<LookupR
   Some(result)
 }
 
-fn get_range_location_from_vec_node(vec_node: &[Box<Node>]) -> Option<RangeLocation> {
+fn get_range_location_from_vec_node(vec_node: &[Node]) -> Option<RangeLocation> {
   if
     let Some(start_loc) = vec_node
       .first()
@@ -312,16 +320,25 @@ fn get_range_location_from_vec_node(vec_node: &[Box<Node>]) -> Option<RangeLocat
   }
 }
 
-fn parse_type(tokens: &[Token], index: &mut usize) -> Option<Box<Node>> {
+fn parse_type<'arena, 'a>(
+  parser: &Parser<'arena, 'a>,
+  tokens: &[Token],
+  index: &mut usize
+) -> Option<Node<'arena>> {
   let token = tokens.get(*index)?;
   if token.token_type == TokenType::LeftParenthesis {
     *index += 1;
-    let child = parse_type(tokens, index)?;
+    let child = parse_type(parser, tokens, index)?;
     let token = tokens.get(*index)?;
     if token.token_type == TokenType::BitwiseAnd {
       *index += 1;
       if
-        let Some(mut next) = parse_union_or_intersection_type(tokens, index, TokenType::BitwiseAnd)
+        let Some(mut next) = parse_union_or_intersection_type(
+          parser,
+          tokens,
+          index,
+          TokenType::BitwiseAnd
+        )
       {
         next.insert(0, child);
         let loc = get_range_location_from_vec_node(&next);
@@ -331,7 +348,14 @@ fn parse_type(tokens: &[Token], index: &mut usize) -> Option<Box<Node>> {
       }
     } else if token.token_type == TokenType::BitwiseOr {
       *index += 1;
-      if let Some(mut next) = parse_union_or_intersection_type(tokens, index, TokenType::BitwiseOr) {
+      if
+        let Some(mut next) = parse_union_or_intersection_type(
+          parser,
+          tokens,
+          index,
+          TokenType::BitwiseOr
+        )
+      {
         next.insert(0, child);
         let loc = get_range_location_from_vec_node(&next);
         return Some(UnionTypeNode::loc(next, loc));
@@ -345,12 +369,26 @@ fn parse_type(tokens: &[Token], index: &mut usize) -> Option<Box<Node>> {
   } else if TYPES.contains(&token.token_type) {
     let next_token = tokens.get(*index + 1)?;
     if next_token.token_type == TokenType::BitwiseAnd {
-      if let Some(child) = parse_union_or_intersection_type(tokens, index, TokenType::BitwiseAnd) {
+      if
+        let Some(child) = parse_union_or_intersection_type(
+          parser,
+          tokens,
+          index,
+          TokenType::BitwiseAnd
+        )
+      {
         let loc = get_range_location_from_vec_node(&child);
         return Some(IntersectionTypeNode::loc(child, loc));
       }
     } else if next_token.token_type == TokenType::BitwiseOr {
-      if let Some(child) = parse_union_or_intersection_type(tokens, index, TokenType::BitwiseOr) {
+      if
+        let Some(child) = parse_union_or_intersection_type(
+          parser,
+          tokens,
+          index,
+          TokenType::BitwiseOr
+        )
+      {
         let loc = get_range_location_from_vec_node(&child);
         return Some(UnionTypeNode::loc(child, loc));
       }
@@ -362,12 +400,13 @@ fn parse_type(tokens: &[Token], index: &mut usize) -> Option<Box<Node>> {
   None
 }
 
-fn parse_union_or_intersection_type(
+fn parse_union_or_intersection_type<'arena, 'b>(
+  parser: &Parser<'arena, 'b>,
   tokens: &[Token],
   index: &mut usize,
   separator: TokenType
-) -> Option<Vec<Box<Node>>> {
-  let mut result: Vec<Box<Node>> = vec![];
+) -> Option<Vec<'arena, Node<'arena>>> {
+  let mut result = bumpalo::vec![in parser.arena];
   let mut last_token_type = None;
   loop {
     let token = tokens.get(*index)?;
@@ -385,7 +424,7 @@ fn parse_union_or_intersection_type(
           result.push(TypeNode::loc(false, token.value.to_owned(), loc));
           continue;
         } else if token.token_type == TokenType::LeftParenthesis {
-          result.push(parse_type(tokens, index)?);
+          result.push(parse_type(parser, tokens, index)?);
         }
       } else if last_token_type.is_some() && last_token_type.unwrap() != separator {
         if token.token_type == separator {

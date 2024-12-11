@@ -19,8 +19,8 @@ children:
           line: 1
           column: 7
           offset: 7
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     extends: ~
     implements: []
     body:
@@ -39,8 +39,8 @@ children:
                   line: 1
                   column: 17
                   offset: 17
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
           adaptations: []
           loc:
             start:
@@ -51,8 +51,8 @@ children:
               line: 1
               column: 14
               offset: 14
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
       loc:
         start:
           line: 1
@@ -62,8 +62,8 @@ children:
           line: 1
           column: 19
           offset: 19
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     is_readonly: false
     loc:
       start:
@@ -74,8 +74,8 @@ children:
         line: 1
         column: 19
         offset: 19
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -85,5 +85,5 @@ loc:
     line: 1
     column: 19
     offset: 19
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

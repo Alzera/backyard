@@ -5,82 +5,104 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct SinglesGenerator;
 
 impl SinglesGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let node = match node.node_type {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
+    match node.node_type {
       NodeType::Break => {
         builder.push("break");
-        cast_node!(Break, node.node.to_owned()).statement
+        if let Some(node) = &cast_node!(Break, &node.node).statement {
+          builder.push(" ");
+          generator.generate_node(builder, &node, &mut GeneratorArgument::default());
+        }
       }
       NodeType::Continue => {
         builder.push("continue");
-        cast_node!(Continue, node.node.to_owned()).statement
+        if let Some(node) = &cast_node!(Continue, &node.node).statement {
+          builder.push(" ");
+          generator.generate_node(builder, &node, &mut GeneratorArgument::default());
+        }
       }
       NodeType::Return => {
         builder.push("return");
-        cast_node!(Return, node.node.to_owned()).statement
+        if let Some(node) = &cast_node!(Return, &node.node).statement {
+          builder.push(" ");
+          generator.generate_node(builder, &node, &mut GeneratorArgument::default());
+        }
       }
       NodeType::Clone => {
-        builder.push("clone");
-        Some(cast_node!(Clone, node.node.to_owned()).statement)
+        builder.push("clone ");
+        generator.generate_node(
+          builder,
+          &&cast_node!(Clone, &node.node).statement,
+          &mut GeneratorArgument::default()
+        );
       }
       NodeType::New => {
-        builder.push("new");
-        Some(cast_node!(New, node.node.to_owned()).statement)
+        builder.push("new ");
+        generator.generate_node(
+          builder,
+          &&cast_node!(New, &node.node).statement,
+          &mut GeneratorArgument::default()
+        );
       }
       NodeType::Print => {
-        builder.push("print");
-        Some(cast_node!(Print, node.node.to_owned()).statement)
+        builder.push("print ");
+        generator.generate_node(
+          builder,
+          &&cast_node!(Print, &node.node).statement,
+          &mut GeneratorArgument::default()
+        );
       }
       NodeType::Throw => {
-        builder.push("throw");
-        Some(cast_node!(Throw, node.node.to_owned()).statement)
+        builder.push("throw ");
+        generator.generate_node(
+          builder,
+          &&cast_node!(Throw, &node.node).statement,
+          &mut GeneratorArgument::default()
+        );
       }
       NodeType::Goto => {
-        builder.push("goto");
-        Some(cast_node!(Goto, node.node.to_owned()).label)
+        builder.push("goto ");
+        generator.generate_node(
+          builder,
+          &cast_node!(Goto, &node.node).label,
+          &mut GeneratorArgument::default()
+        );
       }
       NodeType::Inline => {
         builder.push(" ?>");
-        builder.push(&cast_node!(Inline, node.node.to_owned()).text);
+        builder.push(&cast_node!(Inline, &node.node).text);
         builder.push("<?php ");
-        None
       }
       NodeType::Boolean => {
-        let node = cast_node!(Boolean, node.node.to_owned());
+        let node = cast_node!(Boolean, &node.node);
         if node.is_true {
           builder.push("true");
         } else {
           builder.push("false");
         }
-        None
       }
       NodeType::This => {
         builder.push("$this");
-        None
       }
       NodeType::Null => {
         builder.push("null");
-        None
       }
       NodeType::SelfKeyword => {
         builder.push("self");
-        None
       }
       NodeType::Parent => {
         builder.push("parent");
-        None
       }
       NodeType::StaticKeyword => {
         builder.push("static");
-        None
       }
       _ => {
         return;
       }
     };
-    if let Some(node) = node {
-      builder.push(" ");
-      generator.generate_node(builder, &node, &mut GeneratorArgument::default());
-    }
   }
 }

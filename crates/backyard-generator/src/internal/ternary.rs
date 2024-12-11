@@ -4,7 +4,11 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct TernaryGenerator;
 
 impl TernaryGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Ternary, &node.node);
 
     generator.generate_node(builder, &node.condition, &mut GeneratorArgument::default());

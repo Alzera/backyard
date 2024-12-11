@@ -3,114 +3,133 @@ use backyard_parser::{ parse, parse_eval };
 
 #[test]
 fn test_break() {
-  let asts = parse_eval("break;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "break;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_break_with_argument() {
-  let asts = parse_eval("break 2;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "break 2;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_continue() {
-  let asts = parse_eval("continue;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "continue;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_continue_with_argument() {
-  let asts = parse_eval("continue 2;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "continue 2;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_goto() {
-  let asts = parse_eval("goto label;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "goto label;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_new() {
-  let asts = parse_eval("new Exception();").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "new Exception();").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_print() {
-  let asts = parse_eval("print \"Hello\";").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "print \"Hello\";").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_return() {
-  let asts = parse_eval("return;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "return;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_return_with_argument() {
-  let asts = parse_eval("return 4;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "return 4;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_throw() {
-  let asts = parse_eval("throw $a;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "throw $a;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_parent() {
-  let asts = parse_eval("parent::a").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "parent::a").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_static() {
-  let asts = parse_eval("static::a").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "static::a").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_clone() {
-  let asts = parse_eval("clone $a").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "clone $a").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_this() {
-  let asts = parse_eval("$this").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "$this").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_true() {
-  let asts = parse_eval("true").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "true").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_false() {
-  let asts = parse_eval("false").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "false").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_null() {
-  let asts = parse_eval("null").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "null").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_self() {
-  let asts = parse_eval("self::a").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "self::a").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_inline() {
-  let asts = parse("Hello <?= $world ?>").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse(&arena, "Hello <?= $world ?>").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }

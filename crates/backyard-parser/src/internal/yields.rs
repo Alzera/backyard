@@ -1,5 +1,8 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, YieldFromNode, YieldNode };
+use backyard_nodes::{
+  node::{ Location, Node, YieldFromNode, YieldNode },
+  utils::{ IntoBoxedNode, IntoBoxedOptionNode },
+};
 
 use crate::{
   error::ParserError,
@@ -12,34 +15,41 @@ use crate::{
 pub struct YieldParser;
 
 impl YieldParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[Lookup::Equal(&[TokenType::Yield]), Lookup::Optional(&[TokenType::From])]
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, has_from] = matched.as_slice() {
       if !has_from.is_empty() {
         let expr = guard!(
           parser.get_statement(
             &mut LoopArgument::with_tokens(
+              parser.arena,
               "yield_from",
               &[],
               &args.breakers.combine(args.separators)
             )
           )?
         );
-        return Ok(YieldFromNode::loc(expr, parser.gen_loc(start_loc)));
+        return Ok(YieldFromNode::loc(expr.into_boxed(&parser.arena), parser.gen_loc(start_loc)));
       }
       let mut value = parser.get_statement(
         &mut LoopArgument::with_tokens(
+          &parser.arena,
           "yield",
           &[],
           &args.breakers.combine(args.separators).combine(&[TokenType::Arrow])
@@ -56,6 +66,7 @@ impl YieldParser {
           guard!(
             parser.get_statement(
               &mut LoopArgument::with_tokens(
+                parser.arena,
                 "singles",
                 &args.separators.combine(&[]),
                 &args.breakers.combine(&[TokenType::Semicolon])
@@ -64,7 +75,13 @@ impl YieldParser {
           )
         );
       }
-      return Ok(YieldNode::loc(key, value, parser.gen_loc(start_loc)));
+      return Ok(
+        YieldNode::loc(
+          key.into_boxed(&parser.arena),
+          value.into_boxed(&parser.arena),
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::Internal)
   }

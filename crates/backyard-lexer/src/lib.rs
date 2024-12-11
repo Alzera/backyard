@@ -9,19 +9,7 @@ use internal::inline::InlineToken;
 use lexer::{ ControlSnapshot, Lexer };
 use token::Token;
 
-pub fn lex(input: &str) -> Result<Vec<Token>, LexError> {
-  let arena = Bump::new();
-  let result = arena_lex(&arena, input)?;
-  Ok(result.to_vec())
-}
-
-pub fn lex_eval(input: &str) -> Result<Vec<Token>, LexError> {
-  let arena = Bump::new();
-  let result = arena_lex_eval(&arena, input)?;
-  Ok(result.to_vec())
-}
-
-pub fn arena_lex<'a>(
+pub fn lex<'a>(
   arena: &'a Bump,
   input: &str
 ) -> Result<bumpalo::collections::Vec<'a, Token>, LexError> {
@@ -31,7 +19,7 @@ pub fn arena_lex<'a>(
   Ok(lexer.tokens)
 }
 
-pub fn arena_lex_eval<'a>(
+pub fn lex_eval<'a>(
   arena: &'a Bump,
   input: &str
 ) -> Result<bumpalo::collections::Vec<'a, Token>, LexError> {

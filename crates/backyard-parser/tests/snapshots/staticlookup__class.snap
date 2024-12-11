@@ -17,8 +17,8 @@ children:
           line: 1
           column: 0
           offset: 0
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     right:
       node_type: class_keyword
       loc:
@@ -30,8 +30,8 @@ children:
           line: 1
           column: 6
           offset: 6
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     use_bracket: false
     loc:
       start:
@@ -42,8 +42,8 @@ children:
         line: 1
         column: 6
         offset: 6
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -53,5 +53,5 @@ loc:
     line: 1
     column: 11
     offset: 11
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

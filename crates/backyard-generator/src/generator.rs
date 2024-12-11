@@ -2,7 +2,11 @@ use backyard_nodes::node::{ Node, NodeType };
 
 use crate::internal::{ attribute::AttributeGenerator, comment::CommentGenerator };
 
-pub type InternalGenerator = fn(&mut Generator, &mut Builder, &Node);
+pub type InternalGenerator = for<'arena, 'a> fn(
+  &mut Generator<'arena, 'a>,
+  &mut Builder,
+  &Node<'arena>
+);
 
 pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 79] = [
   (NodeType::AnonymousClass, super::internal::class::ClassGenerator::generate_anonymous),
@@ -294,13 +298,13 @@ impl<'a> GeneratorArgument<'a> {
   }
 }
 
-pub struct Generator<'a> {
+pub struct Generator<'arena, 'a> {
   pub max_length: usize,
-  nodes: &'a [Box<Node>],
+  nodes: &'a [Node<'arena>],
 }
 
-impl<'a> Generator<'a> {
-  pub fn new(nodes: &'a [Box<Node>]) -> Self {
+impl<'arena, 'a> Generator<'arena, 'a> {
+  pub fn new(nodes: &'a [Node<'arena>]) -> Self {
     Self { nodes, max_length: 100 }
   }
 
@@ -319,7 +323,7 @@ impl<'a> Generator<'a> {
 
   pub fn generate_nodes_new(
     &mut self,
-    nodes: &[Box<Node>],
+    nodes: &[Node<'arena>],
     args: &mut GeneratorArgument
   ) -> Builder {
     let mut builder = Builder::new();
@@ -330,7 +334,7 @@ impl<'a> Generator<'a> {
   pub fn generate_nodes(
     &mut self,
     builder: &mut Builder,
-    nodes: &[Box<Node>],
+    nodes: &[Node<'arena>],
     args: &mut GeneratorArgument
   ) {
     for (i, node) in nodes.iter().enumerate() {
@@ -345,7 +349,7 @@ impl<'a> Generator<'a> {
     }
   }
 
-  pub fn generate_node_new(&mut self, node: &Node) -> Builder {
+  pub fn generate_node_new(&mut self, node: &Node<'arena>) -> Builder {
     let mut builder = Builder::new();
     builder.new_line();
     self.generate_node(&mut builder, node, &mut GeneratorArgument::default());
@@ -355,16 +359,21 @@ impl<'a> Generator<'a> {
   pub fn generate_node(
     &mut self,
     builder: &mut Builder,
-    node: &Node,
+    node: &Node<'arena>,
     args: &mut GeneratorArgument
   ) {
     for (node_type, generator) in args.generators.iter() {
       if *node_type == node.node_type {
         let leadings = &node.leadings;
         let trailings = &node.trailings;
-        if !leadings.is_empty() || !trailings.is_empty() {
+        if
+          (leadings.is_some() && !leadings.as_ref().unwrap().is_empty()) ||
+          (trailings.is_some() && !trailings.as_ref().unwrap().is_empty())
+        {
           let mut scoped_builder = Builder::new();
-          self.handle_comments(&mut scoped_builder, leadings);
+          if let Some(leadings) = leadings {
+            self.handle_comments(&mut scoped_builder, leadings);
+          }
           if scoped_builder.total_len() == 0 {
             scoped_builder.new_line();
           }
@@ -372,7 +381,9 @@ impl<'a> Generator<'a> {
           if let Some(end) = args.get_end_statement(&node.node_type) {
             scoped_builder.push(end);
           }
-          self.handle_comments(&mut scoped_builder, trailings);
+          if let Some(trailings) = trailings {
+            self.handle_comments(&mut scoped_builder, trailings);
+          }
           if builder.last_len() == 0 {
             builder.extend_first_line(scoped_builder);
           } else {
@@ -395,7 +406,7 @@ impl<'a> Generator<'a> {
     println!("No generator for node: {:?}, {:?}", node.node_type, args.generators);
   }
 
-  pub fn handle_comments(&mut self, builder: &mut Builder, nodes: &[Box<Node>]) {
+  pub fn handle_comments(&mut self, builder: &mut Builder, nodes: &[Node<'arena>]) {
     if !nodes.is_empty() {
       for node in nodes.iter() {
         match &node.node_type {
@@ -424,7 +435,15 @@ impl<'a> Generator<'a> {
     }
   }
 
-  pub fn check_nodes_has_comments(nodes: &[Box<Node>]) -> bool {
-    nodes.iter().fold(false, |acc, i| (acc || !i.leadings.is_empty() || !i.trailings.is_empty()))
+  pub fn check_nodes_has_comments(nodes: &[Node<'arena>]) -> bool {
+    nodes
+      .iter()
+      .fold(
+        false,
+        |acc, i|
+          acc ||
+          (i.leadings.is_some() && !i.leadings.as_ref().unwrap().is_empty()) ||
+          (i.trailings.is_some() && !i.trailings.as_ref().unwrap().is_empty())
+      )
   }
 }

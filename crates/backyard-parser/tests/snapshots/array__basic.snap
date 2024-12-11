@@ -13,17 +13,9 @@ children:
         value:
           node_type: number
           value: "1"
-          loc:
-            start:
-              line: 1
-              column: 6
-              offset: 6
-            end:
-              line: 1
-              column: 6
-              offset: 6
-          leadings: []
-          trailings: []
+          loc: ~
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 1
@@ -33,24 +25,16 @@ children:
             line: 1
             column: 6
             offset: 6
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
       - node_type: array_item
         key: ~
         value:
           node_type: number
           value: "2"
-          loc:
-            start:
-              line: 1
-              column: 9
-              offset: 9
-            end:
-              line: 1
-              column: 9
-              offset: 9
-          leadings: []
-          trailings: []
+          loc: ~
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 1
@@ -60,8 +44,8 @@ children:
             line: 1
             column: 9
             offset: 9
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
     loc:
       start:
         line: 1
@@ -71,8 +55,8 @@ children:
         line: 1
         column: 10
         offset: 10
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -82,5 +66,5 @@ loc:
     line: 1
     column: 11
     offset: 11
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

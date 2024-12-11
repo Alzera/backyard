@@ -25,7 +25,8 @@ fn main() {
   for file in php_files {
     match read_to_string(&file) {
       Ok(content) => {
-        let parsed = parse(&content);
+        let arena = bumpalo::Bump::new();
+        let parsed = parse(&arena, &content);
         if let Err(err) = parsed {
           if let ParserError::Eof = err {
           } else {

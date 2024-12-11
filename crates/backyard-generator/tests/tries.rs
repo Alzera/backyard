@@ -3,7 +3,8 @@ use backyard_parser::parse_eval;
 
 #[test]
 fn basic() {
-  let asts = parse_eval("try {
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "try {
 } catch (Exception $e) {
 }").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
@@ -11,15 +12,21 @@ fn basic() {
 
 #[test]
 fn multiple_types() {
-  let asts = parse_eval("try {
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(
+    &arena,
+    "try {
 } catch (UnknownGetterException | ReflectionException) {
-}").unwrap();
+}"
+  ).unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn finally() {
+  let arena = bumpalo::Bump::new();
   let asts = parse_eval(
+    &arena,
     "try {
   throw new Error(\"Custom error occurred\");
 } catch (FooError $err) {

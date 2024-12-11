@@ -18,8 +18,8 @@ children:
           line: 1
           column: 4
           offset: 4
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     arguments:
       - node_type: call_argument
         name: ~
@@ -35,8 +35,8 @@ children:
               line: 1
               column: 5
               offset: 5
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 1
@@ -46,8 +46,8 @@ children:
             line: 1
             column: 5
             offset: 5
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
       - node_type: call_argument
         name: ~
         value:
@@ -62,8 +62,8 @@ children:
               line: 1
               column: 8
               offset: 8
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 1
@@ -73,8 +73,8 @@ children:
             line: 1
             column: 8
             offset: 8
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
     loc:
       start:
         line: 1
@@ -84,8 +84,8 @@ children:
         line: 1
         column: 9
         offset: 9
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -95,5 +95,5 @@ loc:
     line: 1
     column: 10
     offset: 10
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

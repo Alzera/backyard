@@ -1,5 +1,8 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ EnumItemNode, EnumNode, Location, Node };
+use backyard_nodes::{
+  node::{ EnumItemNode, EnumNode, Location, Node },
+  utils::{ IntoBoxedNode, IntoBoxedOptionNode },
+};
 
 use crate::{
   error::ParserError,
@@ -19,8 +22,13 @@ use super::{
 pub struct EnumParser;
 
 impl EnumParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Equal(&[TokenType::Enum]),
@@ -34,12 +42,12 @@ impl EnumParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, name, _, enum_type, has_implements, implements, _] = matched.as_slice() {
       let name = IdentifierParser::from_token(name.as_equal()?);
       let implements = has_implements
@@ -48,6 +56,7 @@ impl EnumParser {
         .unwrap_or_default();
       let items = parser.get_children(
         &mut LoopArgument::new(
+          &parser.arena,
           "enum",
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
@@ -62,9 +71,9 @@ impl EnumParser {
       )?;
       return Ok(
         EnumNode::loc(
-          name,
-          enum_type.as_optional_type(),
-          implements,
+          name.into_boxed(&parser.arena),
+          enum_type.as_optional_type(&parser.arena).into_boxed(&parser.arena),
+          implements.into_boxed(&parser.arena),
           items,
           parser.gen_loc(start_loc)
         )
@@ -78,27 +87,32 @@ impl EnumParser {
 pub struct EnumItemParser;
 
 impl EnumItemParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Case])])
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
+    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Case])])
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
       if
         let Some(value) = parser.get_statement(
           &mut LoopArgument::with_tokens(
+            parser.arena,
             "enum_item",
             &[],
             &[TokenType::Semicolon, TokenType::RightSquareBracket]
           )
         )?
       {
-        return Ok(EnumItemNode::loc(value, parser.gen_loc(start_loc)));
+        return Ok(EnumItemNode::loc(value.into_boxed(&parser.arena), parser.gen_loc(start_loc)));
       }
     }
     Err(ParserError::Internal)

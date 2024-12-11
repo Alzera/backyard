@@ -1,12 +1,8 @@
+use bumpalo::vec;
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{
-  Location,
-  Modifier,
-  Node,
-  PropertyHookNode,
-  PropertyItemNode,
-  PropertyNode,
-  Visibility,
+use backyard_nodes::{
+  node::{ Location, Modifier, Node, PropertyHookNode, PropertyItemNode, PropertyNode, Visibility },
+  utils::{ IntoBoxedNode, IntoBoxedOptionNode },
 };
 
 use crate::{
@@ -28,8 +24,13 @@ use super::{
 pub struct PropertyParser;
 
 impl PropertyParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Modifiers(
@@ -45,21 +46,22 @@ impl PropertyParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [modifiers, has_var, prop_type, name] = matched.as_slice() {
       let next_token = guard!(parser.tokens.get(parser.position));
       let name = name.as_equal()?;
-      let prop_type = prop_type.as_optional_type();
+      let prop_type = prop_type.as_optional_type(&parser.arena).into_boxed(&parser.arena);
       let first_prop = if next_token.token_type == TokenType::Assignment {
         parser.position += 1;
         if
           let Some(value) = parser.get_statement(
             &mut LoopArgument::with_tokens(
+              &parser.arena,
               "property",
               &[TokenType::Comma, TokenType::Semicolon, TokenType::LeftCurlyBracket],
               &[]
@@ -68,9 +70,9 @@ impl PropertyParser {
         {
           let item_start_loc = name.get_location().unwrap();
           PropertyItemNode::loc(
-            IdentifierParser::from_token(name),
+            IdentifierParser::from_token(name).into_boxed(&parser.arena),
             prop_type,
-            Some(value),
+            Some(value.into_boxed(&parser.arena)),
             parser.gen_loc(item_start_loc)
           )
         } else {
@@ -79,18 +81,19 @@ impl PropertyParser {
       } else {
         let item_start_loc = name.get_location().unwrap();
         PropertyItemNode::loc(
-          IdentifierParser::from_token(name),
+          IdentifierParser::from_token(name).into_boxed(&parser.arena),
           prop_type,
           None,
           parser.gen_loc(item_start_loc)
         )
       };
-      let mut items = vec![first_prop];
-      let mut hooks = vec![];
+      let mut items = vec![in parser.arena; first_prop];
+      let mut hooks = vec![in parser.arena];
       let next_token = guard!(parser.tokens.get(parser.position));
       if next_token.token_type == TokenType::Comma {
         let next_items = parser.get_children(
           &mut LoopArgument::new(
+            parser.arena,
             "property",
             &[TokenType::Comma],
             &[TokenType::Semicolon, TokenType::LeftCurlyBracket],
@@ -106,6 +109,7 @@ impl PropertyParser {
         parser.position += 1;
         hooks = parser.get_children(
           &mut LoopArgument::new(
+            parser.arena,
             "property",
             &[],
             &[TokenType::RightCurlyBracket],
@@ -116,7 +120,7 @@ impl PropertyParser {
           )
         )?;
       }
-      let mut visibilities = vec![];
+      let mut visibilities = std::vec![];
       let mut modifier = None;
       if let Some([m0, m1]) = modifiers.as_modifier() {
         visibilities = m0.as_visibilities();
@@ -135,24 +139,30 @@ impl PropertyParser {
 pub struct PropertyItemParser;
 
 impl PropertyItemParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[Lookup::Equal(&[TokenType::Variable]), Lookup::Optional(&[TokenType::Assignment])]
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [name, has_value] = matched.as_slice() {
       let name = IdentifierParser::from_token(name.as_equal()?);
       let value = if !has_value.is_empty() {
         parser.get_statement(
           &mut LoopArgument::with_tokens(
+            parser.arena,
             "property_item",
             &args.separators.combine(&[TokenType::Comma, TokenType::Semicolon]),
             args.breakers
@@ -162,7 +172,12 @@ impl PropertyItemParser {
         None
       };
       return Ok(
-        PropertyItemNode::loc(name, args.last_expr.to_owned(), value, parser.gen_loc(start_loc))
+        PropertyItemNode::loc(
+          name.into_boxed(&parser.arena),
+          args.last_expr.take().into_boxed(&parser.arena),
+          value.into_boxed(&parser.arena),
+          parser.gen_loc(start_loc)
+        )
       );
     }
     Err(ParserError::Internal)
@@ -173,8 +188,13 @@ impl PropertyItemParser {
 pub struct HookParser;
 
 impl HookParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Optional(&[TokenType::BitwiseAnd]),
@@ -184,18 +204,18 @@ impl HookParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [is_ref, name, has_param] = matched.as_slice() {
       let is_get = name.as_equal()?.token_type == TokenType::Get;
       let params = if !is_get && !has_param.is_empty() {
         FunctionParser::get_parameters(parser)?
       } else {
-        vec![]
+        vec![in parser.arena]
       };
       if let Some(next_token) = parser.tokens.get(parser.position) {
         let body = if next_token.token_type == TokenType::LeftCurlyBracket {
@@ -204,7 +224,7 @@ impl HookParser {
           parser.position += 1;
           if
             let Some(expr) = parser.get_statement(
-              &mut LoopArgument::with_tokens("set_hook", &[], &[TokenType::Semicolon])
+              &mut LoopArgument::with_tokens(parser.arena, "set_hook", &[], &[TokenType::Semicolon])
             )?
           {
             parser.position += 1;
@@ -216,7 +236,13 @@ impl HookParser {
           return Err(ParserError::Internal);
         };
         return Ok(
-          PropertyHookNode::loc(is_get, !is_ref.is_empty(), params, body, parser.gen_loc(start_loc))
+          PropertyHookNode::loc(
+            is_get,
+            !is_ref.is_empty(),
+            params,
+            body.into_boxed(&parser.arena),
+            parser.gen_loc(start_loc)
+          )
         );
       }
     }

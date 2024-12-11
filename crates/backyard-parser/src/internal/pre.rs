@@ -1,12 +1,7 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{
-  NegateNode,
-  Location,
-  Node,
-  PreNode,
-  ReferenceNode,
-  SilentNode,
-  VariadicNode,
+use backyard_nodes::{
+  node::{ Location, NegateNode, Node, PreNode, ReferenceNode, SilentNode, VariadicNode },
+  utils::IntoBoxedOptionNode,
 };
 
 use crate::{
@@ -20,8 +15,13 @@ use crate::{
 pub struct PreParser;
 
 impl PreParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Equal(
@@ -40,17 +40,25 @@ impl PreParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [operator] = matched.as_slice() {
       let operator = operator.as_equal()?;
-      let argument = parser.get_statement(
-        &mut LoopArgument::safe("pre", args.separators, args.breakers, &DEFAULT_PARSERS)
-      )?;
+      let argument = parser
+        .get_statement(
+          &mut LoopArgument::safe(
+            parser.arena,
+            "pre",
+            args.separators,
+            args.breakers,
+            &DEFAULT_PARSERS
+          )
+        )?
+        .into_boxed(&parser.arena);
       if operator.token_type == TokenType::Ellipsis {
         return Ok(VariadicNode::loc(argument, parser.gen_loc(start_loc)));
       }

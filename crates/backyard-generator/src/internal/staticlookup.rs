@@ -5,7 +5,11 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct StaticLookupGenerator;
 
 impl StaticLookupGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(StaticLookup, &node.node);
     generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
     builder.push("::");

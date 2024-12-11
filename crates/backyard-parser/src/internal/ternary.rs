@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, TernaryNode };
+use backyard_nodes::{ node::{ Location, Node, TernaryNode }, utils::IntoBoxedNode };
 
 use crate::{
   error::ParserError,
@@ -12,29 +12,34 @@ use crate::{
 pub struct TernaryParser;
 
 impl TernaryParser {
-  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    args: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     args.last_expr.as_ref()?;
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::QuestionMark])])
+    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::QuestionMark])])
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
-      let left = args.last_expr.to_owned().unwrap();
+      let left = args.last_expr.take().unwrap();
       args.last_expr = None;
       let valid = guard!(
         parser.get_statement(
-          &mut LoopArgument::with_tokens("ternary_valid", &[], &[TokenType::Colon])
+          &mut LoopArgument::with_tokens(parser.arena, "ternary_valid", &[], &[TokenType::Colon])
         )?
       );
       parser.position += 1;
       let invalid = guard!(
         parser.get_statement(
           &mut LoopArgument::safe(
+            parser.arena,
             "ternary_invalid",
             &[],
             &args.breakers.combine(args.separators).combine(&[TokenType::Semicolon]),
@@ -42,7 +47,14 @@ impl TernaryParser {
           )
         )?
       );
-      return Ok(TernaryNode::loc(left, valid, invalid, parser.gen_loc(start_loc)));
+      return Ok(
+        TernaryNode::loc(
+          left.into_boxed(&parser.arena),
+          valid.into_boxed(&parser.arena),
+          invalid.into_boxed(&parser.arena),
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::Internal)
   }

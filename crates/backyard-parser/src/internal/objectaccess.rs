@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, ObjectAccessNode };
+use backyard_nodes::{ node::{ Location, Node, ObjectAccessNode }, utils::IntoBoxedNode };
 
 use crate::{
   error::ParserError,
@@ -13,20 +13,25 @@ use crate::{
 pub struct ObjectAccessParser;
 
 impl ObjectAccessParser {
-  pub fn test(tokens: &[Token], args: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    args: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     args.last_expr.as_ref()?;
     match_pattern(
+      parser,
       tokens,
       &[Lookup::Equal(&[TokenType::ObjectAccess, TokenType::NullsafeObjectAccess])]
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [access_type] = matched.as_slice() {
       let is_nullsafe = access_type.as_equal()?.token_type == TokenType::NullsafeObjectAccess;
       let is_bracket = if let Some(next_token) = parser.tokens.get(parser.position) {
@@ -38,12 +43,17 @@ impl ObjectAccessParser {
         parser.position += 1;
         let t = guard!(
           parser.get_statement(
-            &mut LoopArgument::with_tokens("objectaccess", &[], &[TokenType::RightCurlyBracket])
+            &mut LoopArgument::with_tokens(
+              parser.arena,
+              "objectaccess",
+              &[],
+              &[TokenType::RightCurlyBracket]
+            )
           )?
         );
         parser.position += 1;
         t
-      } else if let Some(m) = VariableParser::test(&parser.tokens[parser.position..], args) {
+      } else if let Some(m) = VariableParser::test(parser, &parser.tokens[parser.position..], args) {
         let loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
         parser.position += m
           .iter()
@@ -58,8 +68,8 @@ impl ObjectAccessParser {
       };
       return Ok(
         ObjectAccessNode::loc(
-          args.last_expr.to_owned().unwrap(),
-          expr,
+          args.last_expr.take().unwrap().into_boxed(&parser.arena),
+          expr.into_boxed(&parser.arena),
           is_bracket,
           is_nullsafe,
           parser.gen_loc(start_loc)

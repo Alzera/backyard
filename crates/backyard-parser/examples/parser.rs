@@ -91,6 +91,7 @@ BAR;
 
 fn main() {
   for _ in 0..100 {
-    let _ = parse(CONTENT);
+    let arena = bumpalo::Bump::new();
+    let _ = parse(&arena, CONTENT);
   }
 }

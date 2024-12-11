@@ -7,7 +7,11 @@ use super::identifier::IdentifierGenerator;
 pub struct VariableGenerator;
 
 impl VariableGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Variable, &node.node);
     builder.push("$");
     if let NodeType::Identifier = node.name.node_type {

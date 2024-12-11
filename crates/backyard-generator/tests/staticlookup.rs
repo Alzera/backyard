@@ -3,24 +3,28 @@ use backyard_parser::parse_eval;
 
 #[test]
 fn basic() {
-  let asts = parse_eval("self::a;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "self::a;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn bracket() {
-  let asts = parse_eval("self::{$a};").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "self::{$a};").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_class() {
-  let asts = parse_eval("self::class;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "self::class;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn variable() {
-  let asts = parse_eval("self::$a;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "self::$a;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }

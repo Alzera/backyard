@@ -90,5 +90,6 @@ BAR;
 }";
 
 fn main() {
-  let _ = lex(CONTENT);
+  let arena = bumpalo::Bump::new();
+  let _ = lex(&arena, CONTENT);
 }

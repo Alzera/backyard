@@ -7,7 +7,11 @@ use super::function::FunctionGenerator;
 pub struct MethodGenerator;
 
 impl MethodGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Method, &node.node);
     if let Some(n) = &node.visibility {
       builder.push(format!("{} ", n).as_str());

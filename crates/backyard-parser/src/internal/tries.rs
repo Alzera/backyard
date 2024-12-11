@@ -1,5 +1,8 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ CatchNode, FinallyNode, Location, Node, TryNode };
+use backyard_nodes::{
+  node::{ CatchNode, FinallyNode, Location, Node, TryNode },
+  utils::{ IntoBoxedNode, IntoBoxedOptionNode },
+};
 
 use crate::{
   error::ParserError,
@@ -18,20 +21,25 @@ use super::{
 pub struct TryParser;
 
 impl TryParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Try])])
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
+    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Try])])
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
       let body = BlockParser::new_block(parser)?;
       let catches = parser.get_children(
         &mut LoopArgument::safe(
+          &parser.arena,
           "try",
           &[],
           &[],
@@ -42,7 +50,7 @@ impl TryParser {
           ]
         )
       )?;
-      return Ok(TryNode::loc(body, catches, parser.gen_loc(start_loc)));
+      return Ok(TryNode::loc(body.into_boxed(&parser.arena), catches, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }
@@ -52,22 +60,28 @@ impl TryParser {
 pub struct CatchParser;
 
 impl CatchParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[Lookup::Equal(&[TokenType::Catch]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let types = parser.get_children(
         &mut LoopArgument::new(
+          &parser.arena,
           "catch_types",
           &[TokenType::BitwiseOr],
           &[TokenType::Variable, TokenType::VariableBracketOpen, TokenType::RightParenthesis],
@@ -83,6 +97,7 @@ impl CatchParser {
         if last_token.token_type != TokenType::RightParenthesis {
           variable = parser.get_statement(
             &mut LoopArgument::new(
+              parser.arena,
               "catch_variable",
               &[],
               &[TokenType::RightParenthesis],
@@ -96,7 +111,14 @@ impl CatchParser {
       }
       parser.position += 1;
       let body = BlockParser::new_block(parser)?;
-      return Ok(CatchNode::loc(types, variable, body, parser.gen_loc(start_loc)));
+      return Ok(
+        CatchNode::loc(
+          types,
+          variable.into_boxed(&parser.arena),
+          body.into_boxed(&parser.arena),
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::Internal)
   }
@@ -106,19 +128,23 @@ impl CatchParser {
 pub struct FinallyParser;
 
 impl FinallyParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
-    match_pattern(tokens, &[Lookup::Equal(&[TokenType::Finally])])
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
+    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Finally])])
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
       let body = BlockParser::new_block(parser)?;
-      return Ok(FinallyNode::loc(body, parser.gen_loc(start_loc)));
+      return Ok(FinallyNode::loc(body.into_boxed(&parser.arena), parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

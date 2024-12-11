@@ -1,6 +1,5 @@
 ---
 source: crates/backyard-parser/tests/attribute.rs
-assertion_line: 24
 expression: asts
 snapshot_kind: text
 ---
@@ -20,8 +19,8 @@ children:
           line: 2
           column: 7
           offset: 23
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     extends: ~
     implements: []
     body:
@@ -36,8 +35,8 @@ children:
           line: 3
           column: 0
           offset: 26
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     is_readonly: false
     loc:
       start:
@@ -67,8 +66,8 @@ children:
                       line: 1
                       column: 8
                       offset: 8
-                  leadings: []
-                  trailings: []
+                  leadings: ~
+                  trailings: ~
                 value:
                   node_type: number
                   value: "123"
@@ -81,8 +80,8 @@ children:
                       line: 1
                       column: 10
                       offset: 10
-                  leadings: []
-                  trailings: []
+                  leadings: ~
+                  trailings: ~
                 loc:
                   start:
                     line: 1
@@ -92,8 +91,8 @@ children:
                     line: 1
                     column: 10
                     offset: 10
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
             loc:
               start:
                 line: 1
@@ -103,8 +102,8 @@ children:
                 line: 1
                 column: 13
                 offset: 13
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
         loc:
           start:
             line: 1
@@ -114,9 +113,9 @@ children:
             line: 3
             column: 0
             offset: 26
-        leadings: []
-        trailings: []
-    trailings: []
+        leadings: ~
+        trailings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -126,5 +125,5 @@ loc:
     line: 3
     column: 0
     offset: 26
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

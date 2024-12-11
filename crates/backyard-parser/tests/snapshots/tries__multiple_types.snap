@@ -18,8 +18,8 @@ children:
           line: 2
           column: 0
           offset: 6
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     catches:
       - node_type: catch
         types:
@@ -34,8 +34,8 @@ children:
                 line: 2
                 column: 31
                 offset: 37
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
           - node_type: identifier
             name: ReflectionException
             loc:
@@ -47,8 +47,8 @@ children:
                 line: 2
                 column: 53
                 offset: 59
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
         variable: ~
         body:
           node_type: block
@@ -62,8 +62,8 @@ children:
               line: 3
               column: 0
               offset: 63
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 2
@@ -73,8 +73,8 @@ children:
             line: 3
             column: 0
             offset: 63
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
     loc:
       start:
         line: 1
@@ -84,8 +84,8 @@ children:
         line: 3
         column: 0
         offset: 63
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -95,5 +95,5 @@ loc:
     line: 3
     column: 0
     offset: 63
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

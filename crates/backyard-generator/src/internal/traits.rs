@@ -14,7 +14,11 @@ use super::{
 pub struct TraitGenerator;
 
 impl TraitGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Trait, &node.node);
     builder.push("trait ");
     IdentifierGenerator::generate(generator, builder, &node.name);

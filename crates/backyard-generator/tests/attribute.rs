@@ -3,7 +3,8 @@ use backyard_parser::parse_eval;
 
 #[test]
 fn basic() {
-  let asts = parse_eval("#[Attr]
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "#[Attr]
 class A {
 }").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
@@ -11,7 +12,8 @@ class A {
 
 #[test]
 fn with_argument() {
-  let asts = parse_eval("#[Attr(123)]
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "#[Attr(123)]
 class A {
 }").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
@@ -19,7 +21,8 @@ class A {
 
 #[test]
 fn with_named_argument() {
-  let asts = parse_eval("#[Attr(a: 123)]
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "#[Attr(a: 123)]
 class A {
 }").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
@@ -27,7 +30,8 @@ class A {
 
 #[test]
 fn multiple_items() {
-  let asts = parse_eval("#[Attr(123), \\Attr(123)]
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "#[Attr(123), \\Attr(123)]
 class A {
 }").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
@@ -35,7 +39,8 @@ class A {
 
 #[test]
 fn multiple() {
-  let asts = parse_eval("#[\\Attr] 
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "#[\\Attr] 
 #[Attr(123), \\Attr(123)]
 class A {
 }").unwrap();

@@ -1,13 +1,17 @@
+use bumpalo::{ collections::Vec, vec };
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{
-  EncapsedNode,
-  EncapsedPartNode,
-  HereDocNode,
-  Location,
-  Node,
-  NowDocNode,
-  Quote,
-  StringNode,
+use backyard_nodes::{
+  node::{
+    EncapsedNode,
+    EncapsedPartNode,
+    HereDocNode,
+    Location,
+    Node,
+    NowDocNode,
+    Quote,
+    StringNode,
+  },
+  utils::IntoBoxedNode,
 };
 use compact_str::ToCompactString;
 
@@ -24,8 +28,13 @@ use super::variable::VariableParser;
 pub struct StringParser;
 
 impl StringParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Equal(
@@ -40,12 +49,12 @@ impl StringParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [string_type] = matched.as_slice() {
       let string_type = string_type.as_equal()?;
       if string_type.token_type == TokenType::NowDocOpen {
@@ -91,12 +100,12 @@ impl StringParser {
   }
 
   #[allow(unused_variables, unreachable_patterns)]
-  fn parse_encapsed(
-    parser: &mut Parser,
-    args: &mut LoopArgument,
+  fn parse_encapsed<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    args: &mut LoopArgument<'arena, 'b>,
     breaker: TokenType
-  ) -> Result<Vec<Box<Node>>, ParserError> {
-    let mut values: Vec<Box<Node>> = vec![];
+  ) -> Result<Vec<'arena, Node<'arena>>, ParserError> {
+    let mut values = vec![in parser.arena];
     while let Some(i) = parser.tokens.get(parser.position) {
       let start_loc = i.get_location().unwrap();
       parser.position += 1;
@@ -109,24 +118,33 @@ impl StringParser {
           values.push(
             EncapsedPartNode::loc(
               false,
-              StringNode::loc(Quote::Single, i.value.to_owned(), loc.clone()),
+              StringNode::loc(Quote::Single, i.value.to_owned(), loc.clone()).into_boxed(
+                &parser.arena
+              ),
               loc
             )
           );
         }
         TokenType::Variable => {
-          let parsed = VariableParser::from_token(i);
+          let parsed = VariableParser::from_token(&parser.arena, i);
           let loc = parsed.loc.clone();
-          values.push(EncapsedPartNode::loc(false, parsed, loc));
+          values.push(EncapsedPartNode::loc(false, parsed.into_boxed(&parser.arena), loc));
         }
         TokenType::AdvanceInterpolationOpen => {
           let value = guard!(
             parser.get_statement(
-              &mut LoopArgument::with_tokens("string", &[TokenType::AdvanceInterpolationClose], &[])
+              &mut LoopArgument::with_tokens(
+                parser.arena,
+                "string",
+                &[TokenType::AdvanceInterpolationClose],
+                &[]
+              )
             )?
           );
           parser.position += 1;
-          values.push(EncapsedPartNode::loc(true, value, parser.gen_loc(start_loc)));
+          values.push(
+            EncapsedPartNode::loc(true, value.into_boxed(&parser.arena), parser.gen_loc(start_loc))
+          );
         }
         _ => {
           continue;

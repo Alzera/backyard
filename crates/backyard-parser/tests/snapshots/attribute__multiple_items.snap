@@ -1,6 +1,5 @@
 ---
 source: crates/backyard-parser/tests/attribute.rs
-assertion_line: 32
 expression: asts
 snapshot_kind: text
 ---
@@ -20,8 +19,8 @@ children:
           line: 2
           column: 7
           offset: 32
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     extends: ~
     implements: []
     body:
@@ -36,8 +35,8 @@ children:
           line: 3
           column: 0
           offset: 35
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     is_readonly: false
     loc:
       start:
@@ -68,8 +67,8 @@ children:
                       line: 1
                       column: 7
                       offset: 7
-                  leadings: []
-                  trailings: []
+                  leadings: ~
+                  trailings: ~
                 loc:
                   start:
                     line: 1
@@ -79,8 +78,8 @@ children:
                     line: 1
                     column: 7
                     offset: 7
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
             loc:
               start:
                 line: 1
@@ -90,8 +89,8 @@ children:
                 line: 1
                 column: 10
                 offset: 10
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
           - node_type: attribute_item
             name: "\\Attr"
             arguments:
@@ -109,8 +108,8 @@ children:
                       line: 1
                       column: 19
                       offset: 19
-                  leadings: []
-                  trailings: []
+                  leadings: ~
+                  trailings: ~
                 loc:
                   start:
                     line: 1
@@ -120,8 +119,8 @@ children:
                     line: 1
                     column: 19
                     offset: 19
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
             loc:
               start:
                 line: 1
@@ -131,8 +130,8 @@ children:
                 line: 1
                 column: 22
                 offset: 22
-            leadings: []
-            trailings: []
+            leadings: ~
+            trailings: ~
         loc:
           start:
             line: 1
@@ -142,9 +141,9 @@ children:
             line: 3
             column: 0
             offset: 35
-        leadings: []
-        trailings: []
-    trailings: []
+        leadings: ~
+        trailings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -154,5 +153,5 @@ loc:
     line: 3
     column: 0
     offset: 35
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

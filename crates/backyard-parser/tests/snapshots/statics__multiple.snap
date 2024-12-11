@@ -1,6 +1,5 @@
 ---
 source: crates/backyard-parser/tests/statics.rs
-assertion_line: 18
 expression: asts
 snapshot_kind: text
 ---
@@ -21,8 +20,8 @@ children:
               line: 1
               column: 12
               offset: 12
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         variable_type: ~
         value:
           node_type: number
@@ -36,8 +35,8 @@ children:
               line: 1
               column: 16
               offset: 16
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 1
@@ -47,8 +46,8 @@ children:
             line: 1
             column: 16
             offset: 16
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
       - node_type: property_item
         name:
           node_type: identifier
@@ -62,8 +61,8 @@ children:
               line: 1
               column: 30
               offset: 30
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         variable_type: ~
         value: ~
         loc:
@@ -75,8 +74,8 @@ children:
             line: 1
             column: 19
             offset: 19
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
       - node_type: property_item
         name:
           node_type: identifier
@@ -90,8 +89,8 @@ children:
               line: 1
               column: 47
               offset: 47
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         variable_type: ~
         value: ~
         loc:
@@ -103,8 +102,8 @@ children:
             line: 1
             column: 33
             offset: 33
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
     loc:
       start:
         line: 1
@@ -114,8 +113,8 @@ children:
         line: 1
         column: 48
         offset: 48
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -125,5 +124,5 @@ loc:
     line: 1
     column: 48
     offset: 48
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

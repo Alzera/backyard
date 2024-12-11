@@ -1,5 +1,9 @@
+use bumpalo::vec;
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ AnonymousClassNode, BlockNode, ClassNode, Inheritance, Location, Node };
+use backyard_nodes::{
+  node::{ AnonymousClassNode, BlockNode, ClassNode, Inheritance, Location, Node },
+  utils::{ IntoBoxedNode, IntoBoxedOptionNode },
+};
 
 use crate::{
   error::ParserError,
@@ -22,9 +26,14 @@ use super::{
 pub struct ClassParser;
 
 impl ClassParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     if
       let Some(m) = match_pattern(
+        parser,
         tokens,
         &[
           Lookup::Modifiers(
@@ -44,17 +53,18 @@ impl ClassParser {
       return Some(m);
     }
     match_pattern(
+      parser,
       tokens,
       &[Lookup::Equal(&[TokenType::Class]), Lookup::Optional(&[TokenType::LeftParenthesis])]
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     match matched.len() {
       6 => Self::parse_basic(parser, matched, start_loc, args),
       2 => Self::parse_anonymous(parser, matched, start_loc, args),
@@ -62,23 +72,24 @@ impl ClassParser {
     }
   }
 
-  fn parse_anonymous(
-    parser: &mut Parser,
+  fn parse_anonymous<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, has_parameter] = matched.as_slice() {
       let parameters = if !has_parameter.is_empty() {
         parser.get_children(
           &mut LoopArgument::with_tokens(
+            parser.arena,
             "class_anonymous_parameter",
             &[TokenType::Comma],
             &[TokenType::RightParenthesis]
           )
         )?
       } else {
-        vec![]
+        vec![in parser.arena]
       };
       let mut extends = None;
       if let Some(t) = parser.tokens.get(parser.position) {
@@ -88,28 +99,39 @@ impl ClassParser {
           parser.position += 1;
         }
       }
-      let mut implements = vec![];
-      if let Some(t) = parser.tokens.get(parser.position) {
-        if t.token_type == TokenType::Implements {
-          parser.position += 1;
-          implements = parser.get_children(
-            &mut LoopArgument::new(
-              "class_anonymous_implements",
-              &[TokenType::Comma],
-              &[TokenType::LeftCurlyBracket],
-              &[
-                (IdentifierParser::test, IdentifierParser::parse),
-                (CommentParser::test, CommentParser::parse),
-              ]
-            )
-          )?;
-          parser.position -= 1;
+      let implements = {
+        let mut parsed = None;
+        if let Some(t) = parser.tokens.get(parser.position) {
+          if t.token_type == TokenType::Implements {
+            parser.position += 1;
+            parsed = Some(
+              parser.get_children(
+                &mut LoopArgument::new(
+                  parser.arena,
+                  "class_anonymous_implements",
+                  &[TokenType::Comma],
+                  &[TokenType::LeftCurlyBracket],
+                  &[
+                    (IdentifierParser::test, IdentifierParser::parse),
+                    (CommentParser::test, CommentParser::parse),
+                  ]
+                )
+              )?
+            );
+            parser.position -= 1;
+          }
         }
-      }
+        if let Some(parsed) = parsed {
+          parsed
+        } else {
+          vec![in parser.arena]
+        }
+      };
       let body_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
       parser.position += 1;
       let body = parser.get_children(
         &mut LoopArgument::new(
+          &parser.arena,
           "class_anonymous_body",
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
@@ -126,9 +148,9 @@ impl ClassParser {
       return Ok(
         AnonymousClassNode::loc(
           parameters,
-          extends,
+          extends.into_boxed(&parser.arena),
           implements,
-          BlockNode::loc(body, parser.gen_loc(body_loc)),
+          BlockNode::loc(body, parser.gen_loc(body_loc)).into_boxed(&parser.arena),
           parser.gen_loc(start_loc)
         )
       );
@@ -136,18 +158,19 @@ impl ClassParser {
     Err(ParserError::Internal)
   }
 
-  fn parse_basic(
-    parser: &mut Parser,
+  fn parse_basic<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
     matched: Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [modifiers, _, name, _, extends, has_implements] = matched.as_slice() {
       let name = IdentifierParser::from_token(name.as_equal()?);
       let extends = extends.as_optional().map(IdentifierParser::from_token);
       let implements = if !has_implements.is_empty() {
         let t = parser.get_children(
           &mut LoopArgument::new(
+            parser.arena,
             "class_implements",
             &[TokenType::Comma],
             &[TokenType::LeftCurlyBracket],
@@ -160,12 +183,13 @@ impl ClassParser {
         parser.position -= 1;
         t
       } else {
-        vec![]
+        vec![in parser.arena]
       };
       let body_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
       parser.position += 1;
       let body = parser.get_children(
         &mut LoopArgument::new(
+          &parser.arena,
           "class_body",
           &[TokenType::Semicolon],
           &[TokenType::RightCurlyBracket],
@@ -188,10 +212,10 @@ impl ClassParser {
       return Ok(
         ClassNode::loc(
           inheritance,
-          Some(name),
-          extends,
+          Some(name.into_boxed(&parser.arena)),
+          extends.into_boxed(parser.arena),
           implements,
-          BlockNode::loc(body, parser.gen_loc(body_loc)),
+          BlockNode::loc(body, parser.gen_loc(body_loc)).into_boxed(&parser.arena),
           is_readonly,
           parser.gen_loc(start_loc)
         )

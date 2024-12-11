@@ -11,24 +11,29 @@ use crate::{
 pub struct IdentifierParser;
 
 impl IdentifierParser {
-  pub fn from_token(id: &Token) -> Box<Node> {
+  pub fn from_token<'arena>(id: &Token) -> Node<'arena> {
     let loc = id.get_range_location();
     IdentifierNode::loc(id.value.to_owned(), loc)
   }
 
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[Lookup::Equal(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set])]
     )
   }
 
-  pub fn parse(
-    _: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    _: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     _: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [identifier] = matched.as_slice() {
       return Ok(Self::from_token(identifier.as_equal()?));
     }

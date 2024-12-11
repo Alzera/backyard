@@ -5,35 +5,42 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct PreGenerator;
 
 impl PreGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
-    let (operator, expr) = match node.node_type {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
+    match node.node_type {
       NodeType::Variadic => {
         let node = cast_node!(Variadic, &node.node);
-        ("...", node.statement.to_owned())
+        builder.push("...");
+        if let Some(expr) = &node.statement {
+          generator.generate_node(builder, expr, &mut GeneratorArgument::default());
+        }
       }
       NodeType::Negate => {
         let node = cast_node!(Negate, &node.node);
-        ("!", Some(node.statement.to_owned()))
+        builder.push("!");
+        generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
       }
       NodeType::Silent => {
         let node = cast_node!(Silent, &node.node);
-        ("@", Some(node.statement.to_owned()))
+        builder.push("@");
+        generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
       }
       NodeType::Reference => {
         let node = cast_node!(Reference, &node.node);
-        ("&", Some(node.statement.to_owned()))
+        builder.push("&");
+        generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
       }
       NodeType::Pre => {
         let node = cast_node!(Pre, &node.node);
-        (node.operator.as_str(), Some(node.statement.to_owned()))
+        builder.push(&node.operator);
+        generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
       }
       _ => {
         return;
       }
     };
-    builder.push(operator);
-    if let Some(expr) = expr {
-      generator.generate_node(builder, &expr, &mut GeneratorArgument::default());
-    }
   }
 }

@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ BodyType, Location, Node, ForNode };
+use backyard_nodes::{ node::{ BodyType, ForNode, Location, Node }, utils::IntoBoxedOptionNode };
 
 use crate::{
   error::ParserError,
@@ -13,28 +13,44 @@ use super::block::BlockParser;
 pub struct ForParser;
 
 impl ForParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[Lookup::Equal(&[TokenType::For]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let inits = parser.get_children(
-        &mut LoopArgument::with_tokens("for_inits", &[TokenType::Comma], &[TokenType::Semicolon])
+        &mut LoopArgument::with_tokens(
+          &parser.arena,
+          "for_inits",
+          &[TokenType::Comma],
+          &[TokenType::Semicolon]
+        )
       )?;
       let tests = parser.get_children(
-        &mut LoopArgument::with_tokens("for_tests", &[TokenType::Comma], &[TokenType::Semicolon])
+        &mut LoopArgument::with_tokens(
+          &parser.arena,
+          "for_tests",
+          &[TokenType::Comma],
+          &[TokenType::Semicolon]
+        )
       )?;
       let increments = parser.get_children(
         &mut LoopArgument::with_tokens(
+          &parser.arena,
           "for_increments",
           &[TokenType::Comma],
           &[TokenType::RightParenthesis]
@@ -51,7 +67,16 @@ impl ForParser {
         };
         body = Some(parsed_block);
       }
-      return Ok(ForNode::loc(inits, tests, increments, body, body_type, parser.gen_loc(start_loc)));
+      return Ok(
+        ForNode::loc(
+          inits,
+          tests,
+          increments,
+          body.into_boxed(&parser.arena),
+          body_type,
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::Internal)
   }

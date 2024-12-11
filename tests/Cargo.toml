@@ -7,5 +7,6 @@ repository.workspace = true
 license.workspace = true
 
 [dependencies]
+bumpalo = { workspace = true }
 backyard-parser = { workspace = true }
 walkdir = { workspace = true }

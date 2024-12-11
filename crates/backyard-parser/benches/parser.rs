@@ -1,5 +1,5 @@
 use std::hint::black_box;
-use backyard_lexer::arena_lex;
+use backyard_lexer::lex;
 use backyard_parser::parse_base;
 use bumpalo::Bump;
 use criterion::{ criterion_group, criterion_main, Criterion };
@@ -94,11 +94,12 @@ BAR;
 }";
 
 fn criterion_benchmark(c: &mut Criterion) {
-  let arena = Bump::new();
-  let tokens = arena_lex(&arena, CONTENT);
+  let lexer_arena = Bump::new();
+  let tokens = lex(&lexer_arena, CONTENT);
   c.bench_function("parser_basic", |b| {
     b.iter(|| {
-      let _ = parse_base(black_box(&tokens));
+      let arena = Bump::new();
+      let _ = parse_base(&arena, black_box(&tokens));
     });
   });
 }

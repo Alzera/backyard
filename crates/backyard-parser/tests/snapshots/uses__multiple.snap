@@ -23,8 +23,8 @@ children:
               line: 1
               column: 12
               offset: 12
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 1
@@ -34,8 +34,8 @@ children:
             line: 1
             column: 11
             offset: 11
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
       - node_type: use_item
         modifier: ~
         name: "B\\C"
@@ -51,8 +51,8 @@ children:
               line: 1
               column: 22
               offset: 22
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 1
@@ -62,8 +62,8 @@ children:
             line: 1
             column: 21
             offset: 21
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
     loc:
       start:
         line: 1
@@ -73,8 +73,8 @@ children:
         line: 1
         column: 22
         offset: 22
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -84,5 +84,5 @@ loc:
     line: 1
     column: 22
     offset: 22
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

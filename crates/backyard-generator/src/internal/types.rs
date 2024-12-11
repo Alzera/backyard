@@ -5,7 +5,11 @@ use crate::generator::{ Builder, Generator };
 pub struct TypeGenerator;
 
 impl TypeGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     match node.node_type {
       NodeType::Type => Self::generate_basic(generator, builder, node),
       NodeType::UnionType => Self::generate_union(generator, builder, node),
@@ -22,20 +26,31 @@ impl TypeGenerator {
     builder.push(&node.name);
   }
 
-  fn generate_union(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  fn generate_union<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(UnionType, &node.node);
     let types = Self::map_types(generator, &node.types);
     builder.push(&types.join("|"));
   }
 
-  fn generate_intersection(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  fn generate_intersection<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(IntersectionType, &node.node);
     let types = Self::map_types(generator, &node.types);
 
     builder.push(&types.join("&"));
   }
 
-  fn map_types(generator: &mut Generator, types: &[Box<Node>]) -> Vec<String> {
+  fn map_types<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    types: &[Node<'arena>]
+  ) -> Vec<String> {
     types
       .iter()
       .map(|x| {

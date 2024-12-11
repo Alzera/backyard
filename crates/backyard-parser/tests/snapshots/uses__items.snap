@@ -23,8 +23,8 @@ children:
               line: 2
               column: 40
               offset: 57
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 2
@@ -34,8 +34,8 @@ children:
             line: 2
             column: 28
             offset: 45
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
       - node_type: use_item
         modifier: ~
         name: "User\\UserTestingB"
@@ -51,8 +51,8 @@ children:
               line: 3
               column: 35
               offset: 94
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 3
@@ -62,8 +62,8 @@ children:
             line: 3
             column: 23
             offset: 82
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
       - node_type: use_item
         modifier: Function
         name: UserTestingC
@@ -77,8 +77,8 @@ children:
             line: 4
             column: 11
             offset: 107
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
     loc:
       start:
         line: 1
@@ -88,8 +88,8 @@ children:
         line: 5
         column: 0
         offset: 120
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -99,5 +99,5 @@ loc:
     line: 5
     column: 1
     offset: 121
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

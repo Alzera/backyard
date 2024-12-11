@@ -18,8 +18,8 @@ children:
           line: 1
           column: 4
           offset: 4
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     valid:
       node_type: block
       statements: []
@@ -32,7 +32,7 @@ children:
           line: 2
           column: 0
           offset: 13
-      leadings: []
+      leadings: ~
       trailings:
         - node_type: comment_line
           comment: " test"
@@ -45,8 +45,8 @@ children:
               line: 3
               column: 0
               offset: 15
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
     invalid: ~
     is_short: false
     loc:
@@ -58,8 +58,8 @@ children:
         line: 3
         column: 0
         offset: 15
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -69,5 +69,5 @@ loc:
     line: 3
     column: 0
     offset: 15
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

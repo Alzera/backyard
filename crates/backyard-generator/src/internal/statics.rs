@@ -7,7 +7,11 @@ use super::property::PropertyGenerator;
 pub struct StaticGenerator;
 
 impl StaticGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Static, &node.node);
 
     builder.push("static ");

@@ -3,18 +3,21 @@ use backyard_parser::parse_eval;
 
 #[test]
 fn basic() {
-  let asts = parse_eval("$;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "$;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn bracket() {
-  let asts = parse_eval("${$a} = 4;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "${$a} = 4;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn multiple() {
-  let asts = parse_eval("$$a = 4;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "$$a = 4;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }

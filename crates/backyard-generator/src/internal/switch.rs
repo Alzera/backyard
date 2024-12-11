@@ -7,7 +7,11 @@ use super::block::BlockGenerator;
 pub struct SwitchGenerator;
 
 impl SwitchGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Switch, &node.node);
 
     builder.push("switch (");
@@ -23,7 +27,11 @@ impl SwitchGenerator {
     );
   }
 
-  pub fn generate_case(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate_case<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Case, &node.node);
 
     if let Some(n) = &node.condition {

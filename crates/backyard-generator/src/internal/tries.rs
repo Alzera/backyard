@@ -7,7 +7,11 @@ use super::block::BlockGenerator;
 pub struct TryGenerator;
 
 impl TryGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Try, &node.node);
     builder.push("try");
     BlockGenerator::generate(generator, builder, &node.body, None);
@@ -22,7 +26,11 @@ impl TryGenerator {
     }
   }
 
-  pub fn generate_catch(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate_catch<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Catch, &node.node);
     builder.push(" catch (");
     let types = generator.generate_nodes_new(&node.types, &mut GeneratorArgument::default());

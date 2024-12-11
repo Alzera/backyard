@@ -1,22 +1,25 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{
-  BooleanNode,
-  BreakNode,
-  CloneNode,
-  ContinueNode,
-  GotoNode,
-  InlineNode,
-  NewNode,
-  Location,
-  Node,
-  NullNode,
-  ParentNode,
-  PrintNode,
-  ReturnNode,
-  SelfNode,
-  StaticKeywordNode,
-  ThisNode,
-  ThrowNode,
+use backyard_nodes::{
+  node::{
+    BooleanNode,
+    BreakNode,
+    CloneNode,
+    ContinueNode,
+    GotoNode,
+    InlineNode,
+    Location,
+    NewNode,
+    Node,
+    NullNode,
+    ParentNode,
+    PrintNode,
+    ReturnNode,
+    SelfNode,
+    StaticKeywordNode,
+    ThisNode,
+    ThrowNode,
+  },
+  utils::IntoBoxedOptionNode,
 };
 
 use crate::{
@@ -29,8 +32,13 @@ use crate::{
 pub struct SinglesParser;
 
 impl SinglesParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Equal(
@@ -57,12 +65,12 @@ impl SinglesParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [key] = matched.as_slice() {
       let key = key.as_equal()?;
       if
@@ -89,13 +97,16 @@ impl SinglesParser {
           _ => Err(ParserError::Internal),
         };
       }
-      let argument = parser.get_statement(
-        &mut LoopArgument::with_tokens(
-          "singles",
-          &args.separators.combine(&[TokenType::Semicolon]),
-          &args.breakers.combine(&[TokenType::RightCurlyBracket])
-        )
-      )?;
+      let argument = parser
+        .get_statement(
+          &mut LoopArgument::with_tokens(
+            &parser.arena,
+            "singles",
+            &args.separators.combine(&[TokenType::Semicolon]),
+            &args.breakers.combine(&[TokenType::RightCurlyBracket])
+          )
+        )?
+        .into_boxed(&parser.arena);
       match key.token_type {
         TokenType::Break => {
           return Ok(BreakNode::loc(argument, parser.gen_loc(start_loc)));

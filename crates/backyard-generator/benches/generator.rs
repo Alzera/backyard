@@ -1,5 +1,6 @@
 use backyard_generator::generate;
 use backyard_parser::parse;
+use bumpalo::Bump;
 use criterion::{ black_box, criterion_group, criterion_main, Criterion };
 
 const CONTENT: &str =
@@ -92,7 +93,8 @@ BAR;
 }";
 
 fn criterion_benchmark(c: &mut Criterion) {
-  let asts = parse(CONTENT).unwrap();
+  let arena = Bump::new();
+  let asts = parse(&arena, CONTENT).unwrap();
   c.bench_function("generator_basic", |b| {
     b.iter(|| {
       let _ = generate(black_box(&asts));

@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ BlockNode, Location, NamespaceNode, Node };
+use backyard_nodes::{ node::{ BlockNode, Location, NamespaceNode, Node }, utils::IntoBoxedNode };
 
 use crate::{
   error::ParserError,
@@ -11,8 +11,13 @@ use crate::{
 pub struct NamespaceParser;
 
 impl NamespaceParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Equal(&[TokenType::Namespace]),
@@ -21,12 +26,12 @@ impl NamespaceParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, name] = matched.as_slice() {
       let name = name.as_equal()?.value.to_owned();
       let is_bracket = if let Some(t) = parser.tokens.get(parser.position) {
@@ -39,10 +44,17 @@ impl NamespaceParser {
         parser.position += 1;
       }
       let body = BlockNode::loc(
-        parser.get_children(&mut LoopArgument::default("block_parser"))?,
+        parser.get_children(&mut LoopArgument::default(parser.arena, "block_parser"))?,
         parser.gen_loc(block_loc)
       );
-      return Ok(NamespaceNode::loc(name, body, is_bracket, parser.gen_loc(start_loc)));
+      return Ok(
+        NamespaceNode::loc(
+          name,
+          body.into_boxed(&parser.arena),
+          is_bracket,
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::Internal)
   }

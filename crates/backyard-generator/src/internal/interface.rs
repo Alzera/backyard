@@ -12,7 +12,11 @@ use super::{
 pub struct InterfaceGenerator;
 
 impl InterfaceGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Interface, &node.node);
     builder.push("interface ");
     IdentifierGenerator::generate(generator, builder, &node.name);

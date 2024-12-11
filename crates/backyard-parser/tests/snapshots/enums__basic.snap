@@ -18,8 +18,8 @@ children:
           line: 1
           column: 9
           offset: 9
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     enum_type: ~
     implements: ~
     body:
@@ -36,8 +36,8 @@ children:
               line: 2
               column: 13
               offset: 25
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 2
@@ -47,8 +47,8 @@ children:
             line: 2
             column: 7
             offset: 19
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
       - node_type: enum_item
         value:
           node_type: identifier
@@ -62,8 +62,8 @@ children:
               line: 3
               column: 13
               offset: 40
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
         loc:
           start:
             line: 3
@@ -73,8 +73,8 @@ children:
             line: 3
             column: 7
             offset: 34
-        leadings: []
-        trailings: []
+        leadings: ~
+        trailings: ~
     loc:
       start:
         line: 1
@@ -84,8 +84,8 @@ children:
         line: 4
         column: 0
         offset: 42
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -95,5 +95,5 @@ loc:
     line: 4
     column: 0
     offset: 42
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

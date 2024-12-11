@@ -2,24 +2,28 @@ use backyard_lexer::lex_eval;
 
 #[test]
 fn basic() {
-  let tokens = lex_eval("$a").unwrap();
+  let arena = bumpalo::Bump::new();
+  let tokens = lex_eval(&arena, "$a").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }
 
 #[test]
 fn this() {
-  let tokens = lex_eval("$this").unwrap();
+  let arena = bumpalo::Bump::new();
+  let tokens = lex_eval(&arena, "$this").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }
 
 #[test]
 fn bracket() {
-  let tokens = lex_eval("${$a}").unwrap();
+  let arena = bumpalo::Bump::new();
+  let tokens = lex_eval(&arena, "${$a}").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }
 
 #[test]
 fn multiple() {
-  let tokens = lex_eval("$$$a").unwrap();
+  let arena = bumpalo::Bump::new();
+  let tokens = lex_eval(&arena, "$$$a").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }

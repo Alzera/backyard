@@ -2,31 +2,36 @@ use backyard_parser::parse_eval;
 
 #[test]
 fn line_basic() {
-  let asts = parse_eval("// test").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "// test").unwrap();
   insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn line_long() {
-  let asts = parse_eval("///////////// TEST /////////////").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "///////////// TEST /////////////").unwrap();
   insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn block() {
-  let asts = parse_eval("/*\ntest\n*/").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "/*\ntest\n*/").unwrap();
   insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn doc() {
-  let asts = parse_eval("/**\n * test\n */").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "/**\n * test\n */").unwrap();
   insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn before_block() {
-  let asts = parse_eval("if (false) // test
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "if (false) // test
 {
 }").unwrap();
   insta::assert_yaml_snapshot!(asts);
@@ -34,7 +39,8 @@ fn before_block() {
 
 #[test]
 fn after_block() {
-  let asts = parse_eval("do {
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "do {
 }
 // test
 while(false);").unwrap();
@@ -43,7 +49,8 @@ while(false);").unwrap();
 
 #[test]
 fn at_block_end() {
-  let asts = parse_eval("if (false) {
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "if (false) {
 }
 // test").unwrap();
   insta::assert_yaml_snapshot!(asts);
@@ -51,6 +58,7 @@ fn at_block_end() {
 
 #[test]
 fn at_statement_end() {
-  let asts = parse_eval("$a = 5 /* test */;").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "$a = 5 /* test */;").unwrap();
   insta::assert_yaml_snapshot!(asts);
 }

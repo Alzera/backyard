@@ -22,8 +22,8 @@ children:
           line: 1
           column: 8
           offset: 8
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     loc:
       start:
         line: 1
@@ -33,8 +33,8 @@ children:
         line: 1
         column: 11
         offset: 11
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -44,5 +44,5 @@ loc:
     line: 1
     column: 12
     offset: 12
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

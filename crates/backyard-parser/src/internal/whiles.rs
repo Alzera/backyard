@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, WhileNode };
+use backyard_nodes::{ node::{ Location, Node, WhileNode }, utils::IntoBoxedNode };
 
 use crate::{
   error::ParserError,
@@ -14,23 +14,28 @@ use super::block::BlockParser;
 pub struct WhileParser;
 
 impl WhileParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[Lookup::Equal(&[TokenType::While]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, _] = matched.as_slice() {
       let condition = guard!(
         parser.get_statement(
-          &mut LoopArgument::with_tokens("while", &[], &[TokenType::RightParenthesis])
+          &mut LoopArgument::with_tokens(parser.arena, "while", &[], &[TokenType::RightParenthesis])
         )?
       );
       parser.position += 1;
@@ -39,7 +44,14 @@ impl WhileParser {
         &[TokenType::EndWhile],
         args
       )?;
-      return Ok(WhileNode::loc(condition, body, is_short, parser.gen_loc(start_loc)));
+      return Ok(
+        WhileNode::loc(
+          condition.into_boxed(&parser.arena),
+          body.into_boxed(&parser.arena),
+          is_short,
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::Internal)
   }

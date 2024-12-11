@@ -2,12 +2,14 @@ use backyard_parser::parse_eval;
 
 #[test]
 fn basic() {
-  let asts = parse_eval("label:").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "label:").unwrap();
   insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn get() {
-  let asts = parse_eval("get:").unwrap();
+  let arena = bumpalo::Bump::new();
+  let asts = parse_eval(&arena, "get:").unwrap();
   insta::assert_yaml_snapshot!(asts);
 }

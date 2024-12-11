@@ -5,7 +5,11 @@ use crate::generator::{ Builder, Generator, GeneratorArgument };
 pub struct ObjectAccessGenerator;
 
 impl ObjectAccessGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(ObjectAccess, &node.node);
     generator.generate_node(builder, &node.object, &mut GeneratorArgument::default());
     if node.is_nullsafe {

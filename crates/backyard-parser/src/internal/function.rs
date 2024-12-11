@@ -1,14 +1,18 @@
+use bumpalo::{ boxed::Box, collections::Vec, vec };
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{
-  AnonymousFunctionNode,
-  ArrowFunctionNode,
-  ConstructorParameterNode,
-  FunctionNode,
-  Location,
-  Modifier,
-  Node,
-  ParameterNode,
-  Visibility,
+use backyard_nodes::{
+  node::{
+    AnonymousFunctionNode,
+    ArrowFunctionNode,
+    ConstructorParameterNode,
+    FunctionNode,
+    Location,
+    Modifier,
+    Node,
+    ParameterNode,
+    Visibility,
+  },
+  utils::{ IntoBoxedNode, IntoBoxedOptionNode },
 };
 
 use crate::{
@@ -31,9 +35,14 @@ use super::{
 pub struct FunctionParser;
 
 impl FunctionParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     if
       let Some(m) = match_pattern(
+        parser,
         tokens,
         &[
           Lookup::Equal(&[TokenType::Function]),
@@ -47,6 +56,7 @@ impl FunctionParser {
     }
     if
       let Some(m) = match_pattern(
+        parser,
         tokens,
         &[
           Lookup::Equal(&[TokenType::Function]),
@@ -58,6 +68,7 @@ impl FunctionParser {
       return Some(m);
     }
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Equal(&[TokenType::Fn]),
@@ -67,12 +78,12 @@ impl FunctionParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     match matched.len() {
       4 => FunctionParser::parse_basic(parser, matched, start_loc),
       3 => {
@@ -92,12 +103,12 @@ impl FunctionParser {
 }
 
 impl FunctionParser {
-  pub fn parse_arrow(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse_arrow<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    args: &LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    args: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, is_ref, _] = matched.as_slice() {
       let arguments = FunctionParser::get_parameters(parser)?;
       let return_type = FunctionParser::get_return_type(parser).ok();
@@ -105,6 +116,7 @@ impl FunctionParser {
       let body = guard!(
         parser.get_statement(
           &mut LoopArgument::with_tokens(
+            parser.arena,
             "function_arrow",
             &[],
             &args.breakers.combine(args.separators)
@@ -116,7 +128,7 @@ impl FunctionParser {
           !is_ref.is_empty(),
           arguments,
           return_type,
-          body,
+          body.into_boxed(&parser.arena),
           parser.gen_loc(start_loc)
         )
       );
@@ -124,19 +136,20 @@ impl FunctionParser {
     Err(ParserError::Internal)
   }
 
-  pub fn parse_anonymous(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse_anonymous<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location
-  ) -> Result<Box<Node>, ParserError> {
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, is_ref, _] = matched.as_slice() {
       let arguments = FunctionParser::get_parameters(parser)?;
-      let mut uses = vec![];
+      let mut uses = vec![in parser.arena];
       if let Some(next_token) = parser.tokens.get(parser.position) {
         if next_token.token_type == TokenType::Use {
           parser.position += 2;
           uses = parser.get_children(
             &mut LoopArgument::with_tokens(
+              &parser.arena,
               "function_anonymous",
               &[TokenType::Comma],
               &[TokenType::RightParenthesis]
@@ -152,7 +165,7 @@ impl FunctionParser {
           arguments,
           uses,
           return_type,
-          body,
+          body.into_boxed(&parser.arena),
           parser.gen_loc(start_loc)
         )
       );
@@ -160,11 +173,11 @@ impl FunctionParser {
     Err(ParserError::Internal)
   }
 
-  pub fn parse_basic(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse_basic<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location
-  ) -> Result<Box<Node>, ParserError> {
+  ) -> Result<Node<'arena>, ParserError> {
     if let [_, is_ref, name, _] = matched.as_slice() {
       let mut is_contructor = false;
       let name = if let LookupResultWrapper::Any(name) = &name.wrapper {
@@ -182,6 +195,7 @@ impl FunctionParser {
       let arguments = if is_contructor {
         parser.get_children(
           &mut LoopArgument::new(
+            parser.arena,
             "function_construct_parameters",
             &[TokenType::Comma],
             &[TokenType::RightParenthesis],
@@ -205,10 +219,10 @@ impl FunctionParser {
       return Ok(
         FunctionNode::loc(
           !is_ref.is_empty(),
-          name,
+          name.into_boxed(&parser.arena),
           arguments,
           return_type,
-          body,
+          body.into_boxed(&parser.arena),
           parser.gen_loc(start_loc)
         )
       );
@@ -216,9 +230,12 @@ impl FunctionParser {
     Err(ParserError::Internal)
   }
 
-  pub fn get_parameters(parser: &mut Parser) -> Result<Vec<Box<Node>>, ParserError> {
+  pub fn get_parameters<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>
+  ) -> Result<Vec<'arena, Node<'arena>>, ParserError> {
     parser.get_children(
       &mut LoopArgument::new(
+        parser.arena,
         "function_parameters",
         &[TokenType::Comma],
         &[TokenType::RightParenthesis],
@@ -231,13 +248,16 @@ impl FunctionParser {
     )
   }
 
-  pub fn get_return_type(parser: &mut Parser) -> Result<Box<Node>, ParserError> {
+  pub fn get_return_type<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>
+  ) -> Result<Box<'arena, Node<'arena>>, ParserError> {
     if let Some(next_token) = parser.tokens.get(parser.position) {
       if next_token.token_type == TokenType::Colon {
         parser.position += 1;
         if
           let Some(return_type) = parser.get_statement(
             &mut LoopArgument::new(
+              parser.arena,
               "function_return_type",
               &[TokenType::LeftCurlyBracket, TokenType::Arrow, TokenType::Semicolon],
               &[],
@@ -248,7 +268,7 @@ impl FunctionParser {
             )
           )?
         {
-          return Ok(return_type);
+          return Ok(return_type.into_boxed(&parser.arena));
         }
       }
     }
@@ -260,8 +280,13 @@ impl FunctionParser {
 pub struct ConstructorParameterParser;
 
 impl ConstructorParameterParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::Modifiers(
@@ -280,18 +305,19 @@ impl ConstructorParameterParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if
       let [modifiers, has_var, prop_type, is_ref, is_variadic, name, has_value] = matched.as_slice()
     {
       let value = if !has_value.is_empty() {
         parser.get_statement(
           &mut LoopArgument::with_tokens(
+            parser.arena,
             "constructor_parameter",
             &[TokenType::Comma, TokenType::RightParenthesis],
             &[]
@@ -301,14 +327,14 @@ impl ConstructorParameterParser {
         None
       };
       let item = ParameterNode::loc(
-        prop_type.as_optional_type(),
+        prop_type.as_optional_type(parser.arena).into_boxed(&parser.arena),
         !is_ref.is_empty(),
         !is_variadic.is_empty(),
-        IdentifierParser::from_token(name.as_equal()?),
-        value,
+        IdentifierParser::from_token(name.as_equal()?).into_boxed(&parser.arena),
+        value.into_boxed(&parser.arena),
         parser.gen_loc(start_loc.clone())
       );
-      let mut visibilities = vec![];
+      let mut visibilities = std::vec![];
       let mut modifier = None;
       if let Some([m0, m1]) = modifiers.as_modifier() {
         visibilities = m0.as_visibilities();
@@ -318,7 +344,12 @@ impl ConstructorParameterParser {
         visibilities.push(Visibility::Public);
       }
       return Ok(
-        ConstructorParameterNode::loc(visibilities, modifier, item, parser.gen_loc(start_loc))
+        ConstructorParameterNode::loc(
+          visibilities,
+          modifier,
+          item.into_boxed(&parser.arena),
+          parser.gen_loc(start_loc)
+        )
       );
     }
     Err(ParserError::Internal)
@@ -329,8 +360,13 @@ impl ConstructorParameterParser {
 pub struct ParameterParser;
 
 impl ParameterParser {
-  pub fn test(tokens: &[Token], _: &mut LoopArgument) -> Option<Vec<LookupResult>> {
+  pub fn test<'arena, 'a>(
+    parser: &mut Parser<'arena, 'a>,
+    tokens: &[Token],
+    _: &mut LoopArgument
+  ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
+      parser,
       tokens,
       &[
         Lookup::OptionalType,
@@ -342,17 +378,18 @@ impl ParameterParser {
     )
   }
 
-  pub fn parse(
-    parser: &mut Parser,
-    matched: Vec<LookupResult>,
+  pub fn parse<'arena, 'a, 'b>(
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult>,
     start_loc: Location,
-    _: &mut LoopArgument
-  ) -> Result<Box<Node>, ParserError> {
+    _: &mut LoopArgument<'arena, 'b>
+  ) -> Result<Node<'arena>, ParserError> {
     if let [prop_type, is_ref, is_ellipsis, name, has_value] = matched.as_slice() {
       let name = IdentifierParser::from_token(name.as_equal()?);
       let value = if !has_value.is_empty() {
         parser.get_statement(
           &mut LoopArgument::with_tokens(
+            parser.arena,
             "parameter",
             &[TokenType::Comma, TokenType::RightParenthesis],
             &[]
@@ -363,11 +400,11 @@ impl ParameterParser {
       };
       return Ok(
         ParameterNode::loc(
-          prop_type.as_optional_type(),
+          prop_type.as_optional_type(&parser.arena).into_boxed(&parser.arena),
           !is_ref.is_empty(),
           !is_ellipsis.is_empty(),
-          name,
-          value,
+          name.into_boxed(&parser.arena),
+          value.into_boxed(&parser.arena),
           parser.gen_loc(start_loc)
         )
       );

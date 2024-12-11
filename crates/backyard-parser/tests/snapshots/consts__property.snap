@@ -1,6 +1,5 @@
 ---
 source: crates/backyard-parser/tests/consts.rs
-assertion_line: 18
 expression: asts
 snapshot_kind: text
 ---
@@ -20,8 +19,8 @@ children:
           line: 1
           column: 7
           offset: 7
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     extends: ~
     implements: []
     body:
@@ -46,8 +45,8 @@ children:
                     line: 1
                     column: 37
                     offset: 37
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               operator: "="
               right:
                 node_type: number
@@ -61,8 +60,8 @@ children:
                     line: 1
                     column: 40
                     offset: 40
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               loc:
                 start:
                   line: 1
@@ -72,8 +71,8 @@ children:
                   line: 1
                   column: 40
                   offset: 40
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
             - node_type: assignment
               left:
                 node_type: identifier
@@ -87,8 +86,8 @@ children:
                     line: 1
                     column: 44
                     offset: 44
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               operator: "="
               right:
                 node_type: number
@@ -102,8 +101,8 @@ children:
                     line: 1
                     column: 47
                     offset: 47
-                leadings: []
-                trailings: []
+                leadings: ~
+                trailings: ~
               loc:
                 start:
                   line: 1
@@ -113,8 +112,8 @@ children:
                   line: 1
                   column: 47
                   offset: 47
-              leadings: []
-              trailings: []
+              leadings: ~
+              trailings: ~
           loc:
             start:
               line: 1
@@ -124,8 +123,8 @@ children:
               line: 1
               column: 47
               offset: 47
-          leadings: []
-          trailings: []
+          leadings: ~
+          trailings: ~
       loc:
         start:
           line: 1
@@ -135,8 +134,8 @@ children:
           line: 1
           column: 50
           offset: 50
-      leadings: []
-      trailings: []
+      leadings: ~
+      trailings: ~
     is_readonly: false
     loc:
       start:
@@ -147,8 +146,8 @@ children:
         line: 1
         column: 50
         offset: 50
-    leadings: []
-    trailings: []
+    leadings: ~
+    trailings: ~
 loc:
   start:
     line: 1
@@ -158,5 +157,5 @@ loc:
     line: 1
     column: 50
     offset: 50
-leadings: []
-trailings: []
+leadings: ~
+trailings: ~

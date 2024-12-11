@@ -7,7 +7,11 @@ use super::identifier::IdentifierGenerator;
 pub struct LabelGenerator;
 
 impl LabelGenerator {
-  pub fn generate(generator: &mut Generator, builder: &mut Builder, node: &Node) {
+  pub fn generate<'arena, 'a>(
+    generator: &mut Generator<'arena, 'a>,
+    builder: &mut Builder,
+    node: &Node<'arena>
+  ) {
     let node = cast_node!(Label, &node.node);
 
     IdentifierGenerator::generate(generator, builder, &node.label);
