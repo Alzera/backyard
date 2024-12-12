@@ -1,15 +1,13 @@
 use bumpalo::{ collections::Vec, Bump };
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::{
-  node::{
-    IntersectionTypeNode,
-    Node,
-    NodeType,
-    RangeLocation,
-    TypeNode,
-    UnionTypeNode,
-    Visibility,
-  },
+  IntersectionTypeNode,
+  Node,
+  NodeType,
+  RangeLocation,
+  TypeNode,
+  UnionTypeNode,
+  Visibility,
   utils::CloneIn,
 };
 

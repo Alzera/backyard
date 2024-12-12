@@ -1,12 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{
-  CommentBlockNode,
-  CommentDocNode,
-  CommentLineNode,
-  Location,
-  Node,
-  NodeType,
-};
+use backyard_nodes::{ CommentBlockNode, CommentDocNode, CommentLineNode, Location, Node, NodeType };
 
 use crate::{
   error::ParserError,

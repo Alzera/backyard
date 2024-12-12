@@ -1,6 +1,9 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::{
-  node::{ EnumItemNode, EnumNode, Location, Node },
+  EnumItemNode,
+  EnumNode,
+  Location,
+  Node,
   utils::{ IntoBoxedNode, IntoBoxedOptionNode },
 };
 

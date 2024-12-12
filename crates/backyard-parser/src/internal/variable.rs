@@ -1,5 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ node::{ Location, Node, RangeLocation, VariableNode }, utils::IntoBoxedNode };
+use backyard_nodes::{ Location, Node, RangeLocation, VariableNode, utils::IntoBoxedNode };
 use bumpalo::Bump;
 
 use crate::{

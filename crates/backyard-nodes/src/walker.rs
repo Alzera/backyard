@@ -2,7 +2,7 @@ use std::collections::VecDeque;
 
 use compact_str::CompactString;
 
-use crate::node::{
+use crate::{
   BodyType,
   Inheritance,
   Modifier,
@@ -193,3 +193,25 @@ impl_map_into_walker_stack!(
   Quote,
   Modifier
 );
+
+#[cfg(test)]
+mod tests {
+  use crate::{ builder::{ BlueprintBuildable, Builder }, walker::Walker, NodeType };
+
+  #[test]
+  fn builder() {
+    let arena = bumpalo::Bump::new();
+    let b = Builder::new();
+    let node = b
+      .Program(&[b.Assignment(b.Variable(b.Identifier("a")), "=", b.Number("21"))])
+      .build(&arena);
+    let mut walker = Walker::new(&*node).into_iter();
+
+    assert_eq!(NodeType::Program, walker.next().unwrap().node_type);
+    assert_eq!(NodeType::Assignment, walker.next().unwrap().node_type);
+    assert_eq!(NodeType::Variable, walker.next().unwrap().node_type);
+    assert_eq!(NodeType::Identifier, walker.next().unwrap().node_type);
+    assert_eq!(NodeType::Number, walker.next().unwrap().node_type);
+    assert!(walker.next().is_none());
+  }
+}

@@ -1,6 +1,6 @@
 use bumpalo::vec;
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ AttributeItemNode, AttributeNode, Location, Node };
+use backyard_nodes::{ AttributeItemNode, AttributeNode, Location, Node };
 
 use crate::{
   error::ParserError,

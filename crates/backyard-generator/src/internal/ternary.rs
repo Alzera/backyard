@@ -1,4 +1,4 @@
-use backyard_nodes::{ cast_node, node::{ Node, NodeWrapper } };
+use backyard_nodes::{ cast_node, Node, NodeWrapper };
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
 pub struct TernaryGenerator;

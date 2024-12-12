@@ -2,7 +2,7 @@ use std::{ collections::HashSet, fmt::Debug };
 
 use bumpalo::{ vec, collections::Vec, Bump };
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::node::{ Location, Node, NodeType, RangeLocation };
+use backyard_nodes::{ Location, Node, NodeType, RangeLocation };
 use crate::{
   error::ParserError,
   internal::{

@@ -1,7 +1,13 @@
 use bumpalo::vec;
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::{
-  node::{ Location, Modifier, Node, PropertyHookNode, PropertyItemNode, PropertyNode, Visibility },
+  Location,
+  Modifier,
+  Node,
+  PropertyHookNode,
+  PropertyItemNode,
+  PropertyNode,
+  Visibility,
   utils::{ IntoBoxedNode, IntoBoxedOptionNode },
 };
 

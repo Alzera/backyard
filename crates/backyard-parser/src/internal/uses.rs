@@ -1,7 +1,11 @@
 use bumpalo::vec;
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::{
-  node::{ Location, Node, UseItemModifier, UseItemNode, UseNode },
+  Location,
+  Node,
+  UseItemModifier,
+  UseItemNode,
+  UseNode,
   utils::IntoBoxedOptionNode,
 };
 

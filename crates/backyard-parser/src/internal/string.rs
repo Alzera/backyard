@@ -1,16 +1,14 @@
 use bumpalo::{ collections::Vec, vec };
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::{
-  node::{
-    EncapsedNode,
-    EncapsedPartNode,
-    HereDocNode,
-    Location,
-    Node,
-    NowDocNode,
-    Quote,
-    StringNode,
-  },
+  EncapsedNode,
+  EncapsedPartNode,
+  HereDocNode,
+  Location,
+  Node,
+  NowDocNode,
+  Quote,
+  StringNode,
   utils::IntoBoxedNode,
 };
 use compact_str::ToCompactString;

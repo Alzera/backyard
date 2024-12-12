@@ -9,16 +9,17 @@ Generating tokens representation of PHP code.
 ## usage
 
     fn main() {
-        let code = r#"<?php
-        function hello_world($foo) {
-          var_dump($foo);
-        }"#;
+      let arena = bumpalo::Bump::new();
+      let code = r#"<?php
+      function hello_world($foo) {
+        var_dump($foo);
+      }"#;
 
-        let parsed = backyard_lexer::lex(code);
-        println!("{:?}", parsed);
+      let parsed = backyard_lexer::lex(&arena, code);
+      println!("{:?}", parsed);
     }
 
-Resulting this result:
+Resulting this:
 
     Ok([
       Token { token_type: Function, value: "function", line: 2, column: 4, offset: 10 },

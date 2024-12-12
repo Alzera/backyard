@@ -3,8 +3,8 @@
   "version": "0.1.8",
   "main": "dist/index.js",
   "scripts": {
-    "test": "cargo test",
-    "test:update-snap": "INSTA_UPDATE=always cargo test",
+    "test": "cargo test --all-features",
+    "test:update-snap": "INSTA_UPDATE=always cargo test --all-features",
     "test:coverage": "./scripts/gen_coverage.sh",
     "test:bench": "cargo bench && open target/criterion/report/index.html",
     "prebuild": "cargo test && cd ./crates/backyard && npm run build",

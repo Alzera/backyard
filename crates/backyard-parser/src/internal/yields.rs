@@ -1,6 +1,9 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::{
-  node::{ Location, Node, YieldFromNode, YieldNode },
+  Location,
+  Node,
+  YieldFromNode,
+  YieldNode,
   utils::{ IntoBoxedNode, IntoBoxedOptionNode },
 };
 

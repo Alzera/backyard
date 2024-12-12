@@ -1,4 +1,4 @@
-use backyard_nodes::node::{ Node, NodeType, NodeWrapper };
+use backyard_nodes::{ Node, NodeType, NodeWrapper };
 
 use crate::generator::{
   Builder,

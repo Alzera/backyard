@@ -1,7 +1,12 @@
 use bumpalo::vec;
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::{
-  node::{ AnonymousClassNode, BlockNode, ClassNode, Inheritance, Location, Node },
+  AnonymousClassNode,
+  BlockNode,
+  ClassNode,
+  Inheritance,
+  Location,
+  Node,
   utils::{ IntoBoxedNode, IntoBoxedOptionNode },
 };
 

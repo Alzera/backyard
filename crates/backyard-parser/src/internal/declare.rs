@@ -1,6 +1,10 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::{
-  node::{ BodyType, DeclareArgumentNode, DeclareNode, Location, Node },
+  BodyType,
+  DeclareArgumentNode,
+  DeclareNode,
+  Location,
+  Node,
   utils::{ IntoBoxedNode, IntoBoxedOptionNode },
 };
 

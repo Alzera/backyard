@@ -5,7 +5,7 @@ mod macros;
 pub mod error;
 
 use backyard_lexer::{ lex, lex_eval, error::LexError, token::Token };
-use backyard_nodes::node::{ Location, Node, ProgramNode, RangeLocation };
+use backyard_nodes::{ Location, Node, ProgramNode, RangeLocation };
 use bumpalo::Bump;
 use error::ParserError;
 use parser::{ LocationHelper, LoopArgument, Parser };

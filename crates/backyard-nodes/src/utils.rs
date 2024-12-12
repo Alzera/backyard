@@ -1,6 +1,6 @@
 use bumpalo::{ Bump, boxed::Box, collections::Vec };
 use compact_str::CompactString;
-use crate::node::{
+use crate::{
   BodyType,
   Inheritance,
   Modifier,

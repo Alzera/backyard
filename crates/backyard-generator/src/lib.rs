@@ -1,4 +1,4 @@
-use backyard_nodes::node::{ Node, NodeWrapper };
+use backyard_nodes::{ Node, NodeWrapper };
 use error::GeneratorError;
 use generator::Generator;
 

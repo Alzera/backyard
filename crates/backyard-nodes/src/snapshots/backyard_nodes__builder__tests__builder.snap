@@ -1,0 +1,33 @@
+---
+source: crates/backyard-nodes/src/builder.rs
+assertion_line: 315
+expression: node
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: assignment
+    left:
+      node_type: variable
+      name:
+        node_type: identifier
+        name: a
+        loc: ~
+        leadings: ~
+        trailings: ~
+      loc: ~
+      leadings: ~
+      trailings: ~
+    operator: "="
+    right:
+      node_type: number
+      value: "21"
+      loc: ~
+      leadings: ~
+      trailings: ~
+    loc: ~
+    leadings: ~
+    trailings: ~
+loc: ~
+leadings: ~
+trailings: ~

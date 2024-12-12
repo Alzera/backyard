@@ -1,7 +1,10 @@
 use bumpalo::collections::Vec;
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::{
-  node::{ CallArgumentNode, CallNode, Location, Node },
+  CallArgumentNode,
+  CallNode,
+  Location,
+  Node,
   utils::{ IntoBoxedNode, IntoBoxedOptionNode },
 };
 

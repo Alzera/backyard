@@ -1,6 +1,10 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::{
-  node::{ BlockNode, CaseNode, Location, Node, SwitchNode },
+  BlockNode,
+  CaseNode,
+  Location,
+  Node,
+  SwitchNode,
   utils::{ IntoBoxedNode, IntoBoxedOptionNode },
 };
 

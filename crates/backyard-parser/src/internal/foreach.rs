@@ -1,8 +1,5 @@
 use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{
-  node::{ ForeachNode, Location, Node },
-  utils::{ IntoBoxedNode, IntoBoxedOptionNode },
-};
+use backyard_nodes::{ ForeachNode, Location, Node, utils::{ IntoBoxedNode, IntoBoxedOptionNode } };
 
 use crate::{
   error::ParserError,

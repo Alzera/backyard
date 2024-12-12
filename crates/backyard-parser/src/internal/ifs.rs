@@ -1,6 +1,9 @@
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::{
-  node::{ ElseNode, IfNode, Location, Node },
+  ElseNode,
+  IfNode,
+  Location,
+  Node,
   utils::{ IntoBoxedNode, IntoBoxedOptionNode },
 };
 
@@ -116,9 +119,7 @@ impl ElseParser {
             loc,
             args
           )?;
-          return Ok(
-            ElseNode::loc(expr.into_boxed(parser.arena), false, parser.gen_loc(start_loc))
-          );
+          return Ok(ElseNode::loc(expr.into_boxed(parser.arena), false, parser.gen_loc(start_loc)));
         }
       }
       if let Some(next_token) = parser.tokens.get(parser.position) {
@@ -136,9 +137,7 @@ impl ElseParser {
             loc,
             args
           )?;
-          return Ok(
-            ElseNode::loc(expr.into_boxed(parser.arena), false, parser.gen_loc(start_loc))
-          );
+          return Ok(ElseNode::loc(expr.into_boxed(parser.arena), false, parser.gen_loc(start_loc)));
         }
       }
       let (is_short, valid) = BlockParser::new_or_short_or_single(
@@ -146,9 +145,7 @@ impl ElseParser {
         &[TokenType::ElseIf, TokenType::Else, TokenType::EndIf],
         args
       )?;
-      return Ok(
-        ElseNode::loc(valid.into_boxed(parser.arena), is_short, parser.gen_loc(start_loc))
-      );
+      return Ok(ElseNode::loc(valid.into_boxed(parser.arena), is_short, parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

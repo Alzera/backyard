@@ -1,4 +1,4 @@
-use backyard_nodes::{ cast_node, node::{ ArrayNode, Node, NodeType, NodeWrapper } };
+use backyard_nodes::{ cast_node, ArrayNode, Node, NodeType, NodeWrapper };
 use crate::generator::{ Builder, Generator, GeneratorArgument };
 
 pub struct ArrayGenerator;

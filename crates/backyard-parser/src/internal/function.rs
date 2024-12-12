@@ -1,17 +1,15 @@
 use bumpalo::{ boxed::Box, collections::Vec, vec };
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::{
-  node::{
-    AnonymousFunctionNode,
-    ArrowFunctionNode,
-    ConstructorParameterNode,
-    FunctionNode,
-    Location,
-    Modifier,
-    Node,
-    ParameterNode,
-    Visibility,
-  },
+  AnonymousFunctionNode,
+  ArrowFunctionNode,
+  ConstructorParameterNode,
+  FunctionNode,
+  Location,
+  Modifier,
+  Node,
+  ParameterNode,
+  Visibility,
   utils::{ IntoBoxedNode, IntoBoxedOptionNode },
 };
 

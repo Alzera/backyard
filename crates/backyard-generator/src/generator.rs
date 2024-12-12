@@ -1,4 +1,4 @@
-use backyard_nodes::node::{ Node, NodeType };
+use backyard_nodes::{ Node, NodeType };
 
 use crate::internal::{ attribute::AttributeGenerator, comment::CommentGenerator };
 

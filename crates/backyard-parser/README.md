@@ -9,16 +9,17 @@ Parse PHP code to AST node.
 ## usage
 
     fn main() {
-        let code = r#"<?php
-        function hello_world($foo) {
-          var_dump($foo);
-        }"#;
+      let arena = bumpalo::Bump::new();
+      let code = r#"<?php
+      function hello_world($foo) {
+        var_dump($foo);
+      }"#;
 
-        let parsed = backyard_parse::parse(code);
-        println!("{:?}", parsed);
+      let parsed = backyard_parse::parse(&arena, code);
+      println!("{:?}", parsed);
     }
 
-Resulting this result:
+Resulting this:
 
     Ok(Node {
       leadings: [],
