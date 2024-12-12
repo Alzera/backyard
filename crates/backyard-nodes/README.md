@@ -62,8 +62,8 @@ Resulting this:
 This builder is behind the `walker` feature.
 
     use backyard_nodes::{ builder::{ BlueprintBuildable, Builder }, walker::Walker, NodeType };
-    #[test]
-    fn builder() {
+
+    fn main() {
       let arena = bumpalo::Bump::new();
       let b = Builder::new();
       let node = b

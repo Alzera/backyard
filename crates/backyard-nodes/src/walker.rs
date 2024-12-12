@@ -199,7 +199,7 @@ mod tests {
   use crate::{ builder::{ BlueprintBuildable, Builder }, walker::Walker, NodeType };
 
   #[test]
-  fn builder() {
+  fn walker() {
     let arena = bumpalo::Bump::new();
     let b = Builder::new();
     let node = b
