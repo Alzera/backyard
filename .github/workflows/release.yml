@@ -1,0 +1,48 @@
+name: Publish Crates
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  publish:
+    name: Publish Crates to crates.io
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Publish backyard-lexer
+        run: |
+          cd crates/backyard-lexer
+          cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+
+      - name: Publish backyard-nodes
+        run: |
+          cd crates/backyard-nodes
+          cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+
+      - name: Publish backyard-parser
+        run: |
+          cd crates/backyard-parser
+          cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+
+      - name: Publish backyard-generator
+        run: |
+          cd crates/backyard-generator
+          cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
