@@ -12,6 +12,8 @@ Nodes representing PHP code AST, with simple builder and walker.
 
 ### builder
 
+This builder is behind the `builder` feature.
+
     use backyard_nodes::builder::{ Builder, BlueprintBuildable };
     fn main() {
       let arena = bumpalo::Bump::new();
@@ -57,6 +59,8 @@ Resulting this:
 
 ### walker
 
+This builder is behind the `walker` feature.
+
     use backyard_nodes::{ builder::{ BlueprintBuildable, Builder }, walker::Walker, NodeType };
     #[test]
     fn builder() {
@@ -77,9 +81,9 @@ Resulting this:
 
 ## ecosystem
 
-- [backyard-generator](https://crates.io/crates/backyard-generator)
-- [backyard-lexer](https://crates.io/crates/backyard-lexer)
+- [backyard-lexer (Tokenizer)](https://crates.io/crates/backyard-lexer)
 - [backyard-parser](https://crates.io/crates/backyard-parser)
+- [backyard-generator](https://crates.io/crates/backyard-generator)
 
 ## heavily inspired by
 

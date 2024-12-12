@@ -27,8 +27,8 @@ Resulting this code:
 
 ## ecosystem
 
-- [backyard-lexer](https://crates.io/crates/backyard-lexer)
-- [backyard-nodes](https://crates.io/crates/backyard-nodes)
+- [backyard-nodes (Node / AST, with builder and walker)](https://crates.io/crates/backyard-nodes)
+- [backyard-lexer (Tokenizer)](https://crates.io/crates/backyard-lexer)
 - [backyard-parser](https://crates.io/crates/backyard-parser)
 
 ## heavily inspired by

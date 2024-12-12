@@ -244,9 +244,9 @@ Resulting this:
 
 ## ecosystem
 
+- [backyard-nodes (Node / AST, with builder and walker)](https://crates.io/crates/backyard-nodes)
+- [backyard-lexer (Tokenizer)](https://crates.io/crates/backyard-lexer)
 - [backyard-generator](https://crates.io/crates/backyard-generator)
-- [backyard-lexer](https://crates.io/crates/backyard-lexer)
-- [backyard-nodes](https://crates.io/crates/backyard-nodes)
 
 ## heavily inspired by
 

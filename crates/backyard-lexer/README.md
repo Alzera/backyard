@@ -38,9 +38,9 @@ Resulting this:
 
 ## ecosystem
 
-- [backyard-generator](https://crates.io/crates/backyard-generator)
-- [backyard-nodes](https://crates.io/crates/backyard-nodes)
+- [backyard-nodes (Node / AST, with builder and walker)](https://crates.io/crates/backyard-nodes)
 - [backyard-parser](https://crates.io/crates/backyard-parser)
+- [backyard-generator](https://crates.io/crates/backyard-generator)
 
 ## heavily inspired by
 
