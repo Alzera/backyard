@@ -5,7 +5,7 @@ members = ["crates/*", "tests"]
 [workspace.package]
 edition = "2021"
 authors = ["Alzera Cita <alzeracita23@gmail.com>"]
-version = "0.1.8"
+version = "0.1.9"
 keywords = ["php", "parser"]
 repository = "https://github.com/Alzera/backyard"
 license = "MIT"
@@ -23,11 +23,11 @@ needless_lifetimes = "allow"
 
 [workspace.dependencies]
 # crates
-backyard-lexer = { version = "0.1.8", path = "crates/backyard-lexer" }
-backyard-nodes = { version = "0.1.8", path = "crates/backyard-nodes" }
-backyard-parser = { version = "0.1.8", path = "crates/backyard-parser" }
-backyard-generator = { version = "0.1.8", path = "crates/backyard-generator" }
-backyard = { version = "0.1.8", path = "crates/backyard" }
+backyard-lexer = { version = "0.1.9", path = "crates/backyard-lexer" }
+backyard-nodes = { version = "0.1.9", path = "crates/backyard-nodes" }
+backyard-parser = { version = "0.1.9", path = "crates/backyard-parser" }
+backyard-generator = { version = "0.1.9", path = "crates/backyard-generator" }
+backyard = { version = "0.1.9", path = "crates/backyard" }
 
 compact_str = { version = "0.8.0", features = ["serde"] }
 bumpalo = { version = "3.16.0" }
