@@ -16,7 +16,6 @@ bumpalo = { workspace = true, features = ["collections", "serde"] }
 compact_str = { workspace = true }
 
 serde = { workspace = true }
-wasm-bindgen = { workspace = true }
 
 [dev-dependencies]
 insta = { workspace = true }
