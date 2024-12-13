@@ -87,10 +87,10 @@ impl Control {
     }
   }
 
-  pub(crate) fn next_char_until<F>(&mut self, mut until: F) -> CompactString
+  pub(crate) fn next_char_until<F>(&mut self, take_prev_len: usize, mut until: F) -> CompactString
     where F: FnMut(&mut Control, &char, &mut usize) -> bool
   {
-    let start_position = self.position;
+    let start_position = self.position - take_prev_len;
     let mut end_position = self.position;
     while let Some(ch) = self.chars.get(end_position) {
       let ch = *ch;
@@ -109,6 +109,30 @@ impl Control {
 
   pub(crate) fn error_unrecognized(&self, t: &str) -> LexError {
     LexError::Unrecognized { token: t.to_string(), line: self.line, column: self.column }
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::Control;
+
+  #[test]
+  fn control() {
+    let mut control = Control::new("<?php\necho 'hello world';\n?>");
+    assert_eq!(Some('<'), control.next_char());
+    assert_eq!(Some('?'), control.next_char());
+
+    let until = control.next_char_until(0, |_, ch, _| *ch == '\'');
+    assert_eq!("php\necho ", until);
+
+    let snapshot = control.get_snapshot();
+    assert_eq!(2, snapshot.line);
+    assert_eq!(5, snapshot.column);
+    assert_eq!(11, snapshot.offset);
+
+    control.consume(5);
+    let until = control.next_char_until(0, |_, ch, _| *ch == '\'');
+    assert_eq!("o world", until);
   }
 }
 
@@ -214,10 +238,8 @@ impl<'a> Lexer<'a> {
     Ok(())
   }
 
-  fn until<F>(&mut self, ch: char, mut callback: F) -> CompactString where F: FnMut(&char) -> bool {
-    let mut next_chars = self.control.next_char_until(|_, ch, _| callback(ch));
-    next_chars.insert(0, ch);
-    next_chars
+  fn until<F>(&mut self, mut callback: F) -> CompactString where F: FnMut(&char) -> bool {
+    self.control.next_char_until(1, |_, ch, _| callback(ch))
   }
 
   pub fn start(&mut self) -> LexResult {
@@ -235,7 +257,7 @@ impl<'a> Lexer<'a> {
 
   pub fn next_tokens(&mut self, skip_whitespace: bool) -> LexResult {
     if skip_whitespace {
-      self.control.next_char_until(|_, ch, _| !ch.is_whitespace());
+      self.control.next_char_until(0, |_, ch, _| !ch.is_whitespace());
     }
 
     let snapshot = &self.control.get_snapshot();
@@ -249,7 +271,7 @@ impl<'a> Lexer<'a> {
       '$' => VariableToken::lex(self, snapshot),
       c if c.is_ascii_digit() => NumberToken::lex(self, current_char, snapshot),
       c if c.is_alphabetic() || c == '_' => {
-        let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_' || *ch == '\\'));
+        let t = self.until(|ch| !(ch.is_alphanumeric() || *ch == '_' || *ch == '\\'));
         if
           [
             "__CLASS__",
@@ -316,7 +338,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '=' => {
-        let t = self.until(current_char, |ch| !['=', '>', '&'].contains(ch));
+        let t = self.until(|ch| !['=', '>', '&'].contains(ch));
         match t.as_str() {
           "===" => {
             self.tokens.push(Token::new(TokenType::IsIdentical, "===".into(), snapshot));
@@ -342,7 +364,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '&' => {
-        let t = self.until(current_char, |ch| !['&', '='].contains(ch));
+        let t = self.until(|ch| !['&', '='].contains(ch));
         match t.as_str() {
           "&=" => {
             self.tokens.push(Token::new(TokenType::BitwiseAndAssignment, "&=".into(), snapshot));
@@ -360,7 +382,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '#' => {
-        let t = self.until(current_char, |ch| !['#', '['].contains(ch));
+        let t = self.until(|ch| !['#', '['].contains(ch));
         match t.as_str() {
           "#[" => {
             self.tokens.push(Token::new(TokenType::Attribute, "#[".into(), snapshot));
@@ -370,7 +392,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '?' => {
-        let t = self.until(current_char, |ch| !['?', '>', '=', '-', ':'].contains(ch));
+        let t = self.until(|ch| !['?', '>', '=', '-', ':'].contains(ch));
         match t.as_str() {
           "?:" => {
             self.tokens.push(Token::new(TokenType::Elvis, "?:".into(), snapshot));
@@ -402,7 +424,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '%' => {
-        let t = self.until(current_char, |ch| !['%', '='].contains(ch));
+        let t = self.until(|ch| !['%', '='].contains(ch));
         match t.as_str() {
           "%=" => {
             self.tokens.push(Token::new(TokenType::ModulusAssignment, "%=".into(), snapshot));
@@ -416,7 +438,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '^' => {
-        let t = self.until(current_char, |ch| !['^', '='].contains(ch));
+        let t = self.until(|ch| !['^', '='].contains(ch));
         match t.as_str() {
           "^=" => {
             self.tokens.push(Token::new(TokenType::BitwiseXorAssignment, "^=".into(), snapshot));
@@ -430,7 +452,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '*' => {
-        let t = self.until(current_char, |ch| !['*', '='].contains(ch));
+        let t = self.until(|ch| !['*', '='].contains(ch));
         match t.as_str() {
           "**=" => {
             self.tokens.push(
@@ -456,7 +478,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '/' => {
-        let t = self.until(current_char, |ch| !['/', '*', '='].contains(ch));
+        let t = self.until(|ch| !['/', '*', '='].contains(ch));
         match t.as_str() {
           "/=" => {
             self.tokens.push(Token::new(TokenType::DivisionAssignment, "/=".into(), snapshot));
@@ -473,7 +495,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '.' => {
-        let t = self.until(current_char, |ch| !['.', '='].contains(ch));
+        let t = self.until(|ch| !['.', '='].contains(ch));
         match t.as_str() {
           ".=" => {
             self.tokens.push(Token::new(TokenType::ConcatenationAssignment, ".=".into(), snapshot));
@@ -484,12 +506,11 @@ impl<'a> Lexer<'a> {
             Ok(())
           }
           "." => {
-            let mut t = self.control.next_char_until(|_, ch, _| !ch.is_ascii_digit());
-            if t.is_empty() {
+            let t = self.control.next_char_until(1, |_, ch, _| !ch.is_ascii_digit());
+            if t.len() == 1 {
               self.tokens.push(Token::new(TokenType::Concatenation, ".".into(), snapshot));
               Ok(())
             } else {
-              t.insert(0, '.');
               self.tokens.push(Token::new(TokenType::Number, t, snapshot));
               Ok(())
             }
@@ -498,7 +519,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '|' => {
-        let t = self.until(current_char, |ch| !['|', '='].contains(ch));
+        let t = self.until(|ch| !['|', '='].contains(ch));
         match t.as_str() {
           "|=" => {
             self.tokens.push(Token::new(TokenType::BitwiseOrAssignment, "|=".into(), snapshot));
@@ -516,7 +537,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '-' => {
-        let t = self.until(current_char, |ch| !['-', '=', '>'].contains(ch));
+        let t = self.until(|ch| !['-', '=', '>'].contains(ch));
         match t.as_str() {
           "-=" => {
             self.tokens.push(Token::new(TokenType::SubtractionAssignment, "-=".into(), snapshot));
@@ -547,7 +568,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '>' => {
-        let t = self.until(current_char, |ch| !['>', '='].contains(ch));
+        let t = self.until(|ch| !['>', '='].contains(ch));
         match t.as_str() {
           ">>=" => {
             self.tokens.push(
@@ -571,7 +592,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '<' => {
-        let t = self.until(current_char, |ch| !['<', '=', '>'].contains(ch));
+        let t = self.until(|ch| !['<', '=', '>'].contains(ch));
         match t.as_str() {
           "<=>" => {
             self.tokens.push(Token::new(TokenType::Spaceship, "<=>".into(), snapshot));
@@ -604,7 +625,7 @@ impl<'a> Lexer<'a> {
         }
       }
       ':' => {
-        let t = self.until(current_char, |ch| ![':'].contains(ch));
+        let t = self.until(|ch| ![':'].contains(ch));
         match t.as_str() {
           "::" => {
             self.tokens.push(Token::new(TokenType::DoubleColon, "::".into(), snapshot));
@@ -618,7 +639,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '!' => {
-        let t = self.until(current_char, |ch| !['!', '='].contains(ch));
+        let t = self.until(|ch| !['!', '='].contains(ch));
         match t.as_str() {
           "!==" => {
             self.tokens.push(Token::new(TokenType::IsNotIdentical, "!==".into(), snapshot));
@@ -639,7 +660,7 @@ impl<'a> Lexer<'a> {
         }
       }
       '+' => {
-        let t = self.until(current_char, |ch| !['+', '='].contains(ch));
+        let t = self.until(|ch| !['+', '='].contains(ch));
         match t.as_str() {
           "+=" => {
             self.tokens.push(Token::new(TokenType::AdditionAssignment, "+=".into(), snapshot));
@@ -693,7 +714,7 @@ impl<'a> Lexer<'a> {
       '"' => StringToken::lex(self, "\"", snapshot),
       '\'' => StringToken::lex_basic(self, "\'", snapshot),
       '\\' => {
-        let t = self.until(current_char, |ch| !(ch.is_alphanumeric() || *ch == '_' || *ch == '\\'));
+        let t = self.until(|ch| !(ch.is_alphanumeric() || *ch == '_' || *ch == '\\'));
         self.tokens.push(Token::new(TokenType::Name, t, snapshot));
         Ok(())
       }

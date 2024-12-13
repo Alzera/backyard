@@ -90,6 +90,8 @@ BAR;
 }";
 
 fn main() {
-  let arena = bumpalo::Bump::new();
-  let _ = lex(&arena, CONTENT);
+  for _ in 0..100 {
+    let arena = bumpalo::Bump::new();
+    let _ = lex(&arena, CONTENT);
+  }
 }

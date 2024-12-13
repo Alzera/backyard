@@ -1,3 +1,5 @@
+use compact_str::CompactString;
+
 use crate::error::LexResult;
 use crate::lexer::{ ControlSnapshot, Lexer, SeriesChecker, SeriesCheckerMode };
 use crate::token::{ Token, TokenType };
@@ -9,7 +11,7 @@ impl InlineToken {
     let mut checker = SeriesChecker::new(&["<?php", "<?=", "<%"], SeriesCheckerMode::Inline);
     let max_index = lexer.control.get_len().saturating_sub(1);
     let mut no_breaker = false;
-    let mut inline = lexer.control.next_char_until(|_, ch, i| {
+    let inline = lexer.control.next_char_until(0, |_, ch, i| {
       if *i >= max_index {
         *i += 1;
         no_breaker = true;
@@ -24,7 +26,8 @@ impl InlineToken {
         lexer.tokens.push(Token::new(TokenType::Inline, inline, snapshot));
       }
     } else if let Some(breaker) = checker.check() {
-      inline = inline[..inline.len() - breaker[..breaker.len() - 1].len()].into();
+      let inline: CompactString =
+        inline[..inline.len() - breaker[..breaker.len() - 1].len()].into();
       if !inline.is_empty() {
         lexer.tokens.push(Token::new(TokenType::Inline, inline, snapshot));
       }

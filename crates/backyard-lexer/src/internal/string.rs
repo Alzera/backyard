@@ -21,7 +21,7 @@ impl StringToken {
     need_check_condition.push('{');
     loop {
       let snapshot = lexer.control.get_snapshot();
-      let mut t = lexer.control.next_char_until(|control, ch, end_position| {
+      let mut t = lexer.control.next_char_until(0, |control, ch, end_position| {
         checker.push(*ch);
         if need_check_condition.contains(ch) {
           if checker.check().is_some() {
@@ -95,7 +95,7 @@ impl StringToken {
   pub fn lex_basic(lexer: &mut Lexer, breaker: &str, snapshot: &ControlSnapshot) -> LexResult {
     let checker_breaker: [&str; 1] = [breaker];
     let mut checker = SeriesChecker::new(&checker_breaker, SeriesCheckerMode::String);
-    let text = lexer.control.next_char_until(|_, i, _| {
+    let text = lexer.control.next_char_until(0, |_, i, _| {
       checker.push(*i);
       checker.check().is_some()
     });
@@ -136,7 +136,7 @@ impl StringToken {
 
   pub fn lex_doc(lexer: &mut Lexer, snapshot: &ControlSnapshot) -> LexResult {
     let label = lexer.control
-      .next_char_until(|_, i, _| *i == '\n')
+      .next_char_until(0, |_, i, _| *i == '\n')
       .trim()
       .to_compact_string();
     if
@@ -163,7 +163,7 @@ impl StringToken {
       let mut checker = SeriesChecker::new(&againsts, SeriesCheckerMode::Heredoc);
       let mut should_break = false;
       let content_snapshot = lexer.control.get_snapshot();
-      let text = lexer.control.next_char_until(|_, i, _| {
+      let text = lexer.control.next_char_until(0, |_, i, _| {
         checker.push(*i);
         let t = should_break;
         should_break = checker.check().is_some();

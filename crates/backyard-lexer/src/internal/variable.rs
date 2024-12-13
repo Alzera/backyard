@@ -16,7 +16,7 @@ impl VariableToken {
           Token::new(TokenType::VariableBracketClose, "}".into(), lexer.control.get_last_snapshot())
         );
       } else {
-        let t = lexer.control.next_char_until(|_, ch, _| !(ch.is_alphanumeric() || *ch == '_'));
+        let t = lexer.control.next_char_until(0, |_, ch, _| !(ch.is_alphanumeric() || *ch == '_'));
         if t == "this" {
           lexer.tokens.push(Token::new(TokenType::This, t, snapshot));
         } else {

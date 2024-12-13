@@ -9,7 +9,7 @@ pub struct CommentToken;
 impl CommentToken {
   pub fn parse(lexer: &mut Lexer) -> CompactString {
     let mut close: Vec<char> = Vec::new();
-    let comment = lexer.control.next_char_until(|_, ch, endpos| {
+    let comment = lexer.control.next_char_until(0, |_, ch, endpos| {
       close.push(*ch);
       if close.len() > 2 {
         close.remove(0);
@@ -29,9 +29,7 @@ impl CommentToken {
     lexer.tokens.push(
       Token::new(TokenType::CommentDoc, format_compact!("{}{}", t, comment), snapshot)
     );
-    Ok(
-      ()
-    )
+    Ok(())
   }
 
   pub fn lex_block(lexer: &mut Lexer, t: &str, snapshot: &ControlSnapshot) -> LexResult {
@@ -39,14 +37,12 @@ impl CommentToken {
     lexer.tokens.push(
       Token::new(TokenType::CommentBlock, format_compact!("{}{}", t, comment), snapshot)
     );
-    Ok(
-      ()
-    )
+    Ok(())
   }
 
   pub fn lex_line(lexer: &mut Lexer, t: &str, snapshot: &ControlSnapshot) -> LexResult {
     let comment = {
-      lexer.control.next_char_until(|control, ch, i| {
+      lexer.control.next_char_until(0, |control, ch, i| {
         if *ch == '\n' {
           return true;
         }
@@ -61,8 +57,6 @@ impl CommentToken {
     lexer.tokens.push(
       Token::new(TokenType::CommentLine, format_compact!("{}{}", t, comment), snapshot)
     );
-    Ok(
-      ()
-    )
+    Ok(())
   }
 }
