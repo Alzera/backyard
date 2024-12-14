@@ -256,10 +256,10 @@ pub struct Lexer<'a> {
 }
 
 impl<'a> Lexer<'a> {
-  pub fn new(arena: &'a Bump, input: &str) -> Self {
+  pub fn new(arena: &'a Bump, input: BString) -> Self {
     Lexer {
       tokens: bumpalo::collections::Vec::new_in(arena),
-      control: Control::new(BString::new(input.as_bytes().to_vec())),
+      control: Control::new(input),
     }
   }
 

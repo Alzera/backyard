@@ -9,7 +9,12 @@ children:
     items:
       - node_type: string
         quote: Double
-        value: Hello
+        value:
+          - 72
+          - 101
+          - 108
+          - 108
+          - 111
         loc:
           start:
             line: 1
@@ -23,7 +28,12 @@ children:
         trailings: ~
       - node_type: string
         quote: Double
-        value: World
+        value:
+          - 87
+          - 111
+          - 114
+          - 108
+          - 100
         loc:
           start:
             line: 1

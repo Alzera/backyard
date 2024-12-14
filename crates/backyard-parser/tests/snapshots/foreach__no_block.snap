@@ -10,7 +10,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: a
+        name:
+          - 97
         loc:
           start:
             line: 1
@@ -37,7 +38,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: b
+        name:
+          - 98
         loc:
           start:
             line: 1
@@ -64,7 +66,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: c
+        name:
+          - 99
         loc:
           start:
             line: 1
@@ -93,7 +96,8 @@ children:
         node_type: variable
         name:
           node_type: identifier
-          name: d
+          name:
+            - 100
           loc:
             start:
               line: 2
@@ -116,10 +120,12 @@ children:
             offset: 27
         leadings: ~
         trailings: ~
-      operator: "="
+      operator:
+        - 61
       right:
         node_type: number
-        value: "5"
+        value:
+          - 53
         loc:
           start:
             line: 2

@@ -10,7 +10,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: a
+        name:
+          - 97
         loc:
           start:
             line: 1
@@ -33,15 +34,20 @@ children:
           offset: 1
       leadings: ~
       trailings: ~
-    operator: "="
+    operator:
+      - 61
     right:
       node_type: cast
-      cast_type: int
+      cast_type:
+        - 105
+        - 110
+        - 116
       expression:
         node_type: variable
         name:
           node_type: identifier
-          name: a
+          name:
+            - 97
           loc:
             start:
               line: 1

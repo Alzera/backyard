@@ -8,14 +8,22 @@ children:
   - node_type: echo
     items:
       - node_type: here_doc
-        label: START
+        label:
+          - 83
+          - 84
+          - 65
+          - 82
+          - 84
         values:
           - node_type: encapsed_part
             is_advanced: false
             value:
               node_type: string
               quote: Single
-              value: "\na "
+              value:
+                - 10
+                - 97
+                - 32
               loc:
                 start:
                   line: 1
@@ -44,7 +52,8 @@ children:
               node_type: variable
               name:
                 node_type: identifier
-                name: a
+                name:
+                  - 97
                 loc:
                   start:
                     line: 2
@@ -83,7 +92,8 @@ children:
             value:
               node_type: string
               quote: Single
-              value: "\n"
+              value:
+                - 10
               loc:
                 start:
                   line: 2

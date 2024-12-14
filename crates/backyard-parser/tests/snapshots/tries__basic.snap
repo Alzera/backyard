@@ -24,7 +24,16 @@ children:
       - node_type: catch
         types:
           - node_type: identifier
-            name: Exception
+            name:
+              - 69
+              - 120
+              - 99
+              - 101
+              - 112
+              - 116
+              - 105
+              - 111
+              - 110
             loc:
               start:
                 line: 2
@@ -40,7 +49,8 @@ children:
           node_type: variable
           name:
             node_type: identifier
-            name: e
+            name:
+              - 101
             loc:
               start:
                 line: 2

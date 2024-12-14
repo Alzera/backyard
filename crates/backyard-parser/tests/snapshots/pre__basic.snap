@@ -10,7 +10,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: a
+        name:
+          - 97
         loc:
           start:
             line: 1
@@ -33,7 +34,9 @@ children:
           offset: 3
       leadings: ~
       trailings: ~
-    operator: ++
+    operator:
+      - 43
+      - 43
     loc:
       start:
         line: 1

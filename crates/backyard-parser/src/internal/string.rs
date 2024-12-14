@@ -1,3 +1,4 @@
+use bstr::BString;
 use bumpalo::{ collections::Vec, vec };
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::{
@@ -11,7 +12,6 @@ use backyard_nodes::{
   StringNode,
   utils::IntoBoxedNode,
 };
-use compact_str::ToCompactString;
 
 use crate::{
   error::ParserError,
@@ -73,21 +73,18 @@ impl StringParser {
         let quote = string_type.value.to_owned();
         return Ok(
           EncapsedNode::loc(
-            Quote::try_from(quote.as_str()).map_err(|_| ParserError::Internal)?,
+            Quote::try_from(&quote).map_err(|_| ParserError::Internal)?,
             values,
             parser.gen_loc(start_loc)
           )
         );
       } else if string_type.token_type == TokenType::String {
         let mut value = string_type.value.to_owned();
-        let quote = value.remove(0).to_string();
-        value = value
-          .get(..value.len() - 1)
-          .unwrap_or_default()
-          .to_compact_string();
+        let quote = BString::new(std::vec![value.remove(0)]);
+        value.pop();
         return Ok(
           StringNode::loc(
-            Quote::try_from(quote.as_str()).map_err(|_| ParserError::Internal)?,
+            Quote::try_from(&quote).map_err(|_| ParserError::Internal)?,
             value,
             parser.gen_loc(start_loc)
           )

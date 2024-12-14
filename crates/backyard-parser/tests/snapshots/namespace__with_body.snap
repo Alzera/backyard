@@ -6,7 +6,14 @@ snapshot_kind: text
 node_type: program
 children:
   - node_type: namespace
-    name: "MyApp\\B"
+    name:
+      - 77
+      - 121
+      - 65
+      - 112
+      - 112
+      - 92
+      - 66
     body:
       node_type: block
       statements: []

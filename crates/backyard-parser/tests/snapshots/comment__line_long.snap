@@ -6,7 +6,37 @@ snapshot_kind: text
 node_type: program
 children:
   - node_type: comment_line
-    comment: /////////// TEST /////////////
+    comment:
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 32
+      - 84
+      - 69
+      - 83
+      - 84
+      - 32
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
+      - 47
     loc:
       start:
         line: 1

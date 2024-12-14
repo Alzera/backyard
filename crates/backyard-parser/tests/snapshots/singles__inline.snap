@@ -6,7 +6,13 @@ snapshot_kind: text
 node_type: program
 children:
   - node_type: inline
-    text: "Hello "
+    text:
+      - 72
+      - 101
+      - 108
+      - 108
+      - 111
+      - 32
     loc:
       start:
         line: 1
@@ -23,7 +29,12 @@ children:
       - node_type: variable
         name:
           node_type: identifier
-          name: world
+          name:
+            - 119
+            - 111
+            - 114
+            - 108
+            - 100
           loc:
             start:
               line: 1

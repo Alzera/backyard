@@ -10,7 +10,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: a
+        name:
+          - 97
         loc:
           start:
             line: 1
@@ -33,7 +34,8 @@ children:
           offset: 1
       leadings: ~
       trailings: ~
-    operator: "="
+    operator:
+      - 61
     right:
       node_type: encapsed
       quote: Double
@@ -43,7 +45,30 @@ children:
           value:
             node_type: string
             quote: Single
-            value: " ini string $ \\\" \\$var "
+            value:
+              - 32
+              - 105
+              - 110
+              - 105
+              - 32
+              - 115
+              - 116
+              - 114
+              - 105
+              - 110
+              - 103
+              - 32
+              - 36
+              - 32
+              - 92
+              - 34
+              - 32
+              - 92
+              - 36
+              - 118
+              - 97
+              - 114
+              - 32
             loc:
               start:
                 line: 1
@@ -72,7 +97,8 @@ children:
             node_type: variable
             name:
               node_type: identifier
-              name: b
+              name:
+                - 98
               loc:
                 start:
                   line: 1
@@ -111,7 +137,8 @@ children:
           value:
             node_type: string
             quote: Single
-            value: " "
+            value:
+              - 32
             loc:
               start:
                 line: 1
@@ -143,7 +170,10 @@ children:
               left:
                 node_type: string
                 quote: Double
-                value: ale
+                value:
+                  - 97
+                  - 108
+                  - 101
                 loc:
                   start:
                     line: 1
@@ -155,10 +185,12 @@ children:
                     offset: 35
                 leadings: ~
                 trailings: ~
-              operator: "."
+              operator:
+                - 46
               right:
                 node_type: number
-                value: "5"
+                value:
+                  - 53
                 loc:
                   start:
                     line: 1
@@ -208,7 +240,8 @@ children:
           value:
             node_type: string
             quote: Single
-            value: " "
+            value:
+              - 32
             loc:
               start:
                 line: 1
@@ -237,7 +270,8 @@ children:
             node_type: variable
             name:
               node_type: identifier
-              name: a
+              name:
+                - 97
               loc:
                 start:
                   line: 1
@@ -276,7 +310,7 @@ children:
           value:
             node_type: string
             quote: Single
-            value: ""
+            value: []
             loc:
               start:
                 line: 1

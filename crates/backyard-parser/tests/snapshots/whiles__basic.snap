@@ -12,7 +12,8 @@ children:
         node_type: variable
         name:
           node_type: identifier
-          name: i
+          name:
+            - 105
           loc:
             start:
               line: 1
@@ -35,10 +36,14 @@ children:
             offset: 8
         leadings: ~
         trailings: ~
-      operator: "<="
+      operator:
+        - 60
+        - 61
       right:
         node_type: number
-        value: "10"
+        value:
+          - 49
+          - 48
         loc:
           start:
             line: 1

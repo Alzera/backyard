@@ -9,7 +9,7 @@ children:
     statement:
       node_type: string
       quote: Double
-      value: ""
+      value: []
       loc:
         start:
           line: 1

@@ -8,7 +8,11 @@ children:
   - node_type: enum
     name:
       node_type: identifier
-      name: Suit
+      name:
+        - 83
+        - 117
+        - 105
+        - 116
       loc:
         start:
           line: 1
@@ -23,7 +27,10 @@ children:
     enum_type:
       node_type: type
       is_nullable: false
-      name: int
+      name:
+        - 105
+        - 110
+        - 116
       loc:
         start:
           line: 1
@@ -42,7 +49,13 @@ children:
           node_type: assignment
           left:
             node_type: identifier
-            name: Hearts
+            name:
+              - 72
+              - 101
+              - 97
+              - 114
+              - 116
+              - 115
             loc:
               start:
                 line: 2
@@ -54,10 +67,12 @@ children:
                 offset: 30
             leadings: ~
             trailings: ~
-          operator: "="
+          operator:
+            - 61
           right:
             node_type: number
-            value: "5"
+            value:
+              - 53
             loc:
               start:
                 line: 2
@@ -96,7 +111,13 @@ children:
           node_type: assignment
           left:
             node_type: identifier
-            name: Spades
+            name:
+              - 83
+              - 112
+              - 97
+              - 100
+              - 101
+              - 115
             loc:
               start:
                 line: 3
@@ -108,10 +129,12 @@ children:
                 offset: 49
             leadings: ~
             trailings: ~
-          operator: "="
+          operator:
+            - 61
           right:
             node_type: number
-            value: "6"
+            value:
+              - 54
             loc:
               start:
                 line: 3

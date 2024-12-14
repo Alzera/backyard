@@ -9,7 +9,8 @@ children:
     inheritance: ~
     name:
       node_type: identifier
-      name: A
+      name:
+        - 65
       loc:
         start:
           line: 1
@@ -35,7 +36,22 @@ children:
             - node_type: property_item
               name:
                 node_type: identifier
-                name: suggestedValues
+                name:
+                  - 115
+                  - 117
+                  - 103
+                  - 103
+                  - 101
+                  - 115
+                  - 116
+                  - 101
+                  - 100
+                  - 86
+                  - 97
+                  - 108
+                  - 117
+                  - 101
+                  - 115
                 loc:
                   start:
                     line: 2
@@ -52,7 +68,12 @@ children:
                 types:
                   - node_type: type
                     is_nullable: false
-                    name: array
+                    name:
+                      - 97
+                      - 114
+                      - 114
+                      - 97
+                      - 121
                     loc:
                       start:
                         line: 2
@@ -66,7 +87,15 @@ children:
                     trailings: ~
                   - node_type: type
                     is_nullable: false
-                    name: "\\Closure"
+                    name:
+                      - 92
+                      - 67
+                      - 108
+                      - 111
+                      - 115
+                      - 117
+                      - 114
+                      - 101
                     loc:
                       start:
                         line: 2

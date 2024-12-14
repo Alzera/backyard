@@ -16,8 +16,8 @@ walker = []
 workspace = true
 
 [dependencies]
+bstr = { workspace = true }
 bumpalo = { workspace = true, features = ["boxed", "collections", "serde"] }
-compact_str = { workspace = true }
 serde = { workspace = true }
 
 [dev-dependencies]

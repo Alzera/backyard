@@ -21,7 +21,11 @@ children:
       trailings: ~
     property:
       node_type: identifier
-      name: from
+      name:
+        - 102
+        - 114
+        - 111
+        - 109
       loc:
         start:
           line: 1

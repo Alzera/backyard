@@ -10,7 +10,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: a
+        name:
+          - 97
         loc:
           start:
             line: 1
@@ -33,10 +34,22 @@ children:
           offset: 1
       leadings: ~
       trailings: ~
-    operator: "="
+    operator:
+      - 61
     right:
       node_type: number
-      value: 0b1101_1010
+      value:
+        - 48
+        - 98
+        - 49
+        - 49
+        - 48
+        - 49
+        - 95
+        - 49
+        - 48
+        - 49
+        - 48
       loc:
         start:
           line: 1

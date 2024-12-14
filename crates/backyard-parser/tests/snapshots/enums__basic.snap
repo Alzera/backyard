@@ -8,7 +8,11 @@ children:
   - node_type: enum
     name:
       node_type: identifier
-      name: Suit
+      name:
+        - 83
+        - 117
+        - 105
+        - 116
       loc:
         start:
           line: 1
@@ -26,7 +30,13 @@ children:
       - node_type: enum_item
         value:
           node_type: identifier
-          name: Hearts
+          name:
+            - 72
+            - 101
+            - 97
+            - 114
+            - 116
+            - 115
           loc:
             start:
               line: 2
@@ -52,7 +62,13 @@ children:
       - node_type: enum_item
         value:
           node_type: identifier
-          name: Spades
+          name:
+            - 83
+            - 112
+            - 97
+            - 100
+            - 101
+            - 115
           loc:
             start:
               line: 3

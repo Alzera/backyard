@@ -12,7 +12,8 @@ children:
     argument:
       node_type: string
       quote: Double
-      value: a
+      value:
+        - 97
       loc:
         start:
           line: 1

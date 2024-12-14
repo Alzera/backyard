@@ -9,7 +9,8 @@ children:
     inheritance: ~
     name:
       node_type: identifier
-      name: A
+      name:
+        - 65
       loc:
         start:
           line: 1
@@ -35,7 +36,18 @@ children:
             is_ref: false
             name:
               node_type: magic
-              name: __construct
+              name:
+                - 95
+                - 95
+                - 99
+                - 111
+                - 110
+                - 115
+                - 116
+                - 114
+                - 117
+                - 99
+                - 116
               loc:
                 start:
                   line: 2
@@ -57,7 +69,10 @@ children:
                   variable_type:
                     node_type: type
                     is_nullable: false
-                    name: int
+                    name:
+                      - 105
+                      - 110
+                      - 116
                     loc:
                       start:
                         line: 2
@@ -73,7 +88,8 @@ children:
                   is_ellipsis: false
                   name:
                     node_type: identifier
-                    name: x
+                    name:
+                      - 120
                     loc:
                       start:
                         line: 2
@@ -119,7 +135,13 @@ children:
                     types:
                       - node_type: type
                         is_nullable: false
-                        name: string
+                        name:
+                          - 115
+                          - 116
+                          - 114
+                          - 105
+                          - 110
+                          - 103
                         loc:
                           start:
                             line: 2
@@ -146,7 +168,8 @@ children:
                   is_ellipsis: true
                   name:
                     node_type: identifier
-                    name: y
+                    name:
+                      - 121
                     loc:
                       start:
                         line: 2
@@ -160,7 +183,8 @@ children:
                     trailings: ~
                   value:
                     node_type: number
-                    value: "0"
+                    value:
+                      - 48
                     loc:
                       start:
                         line: 2

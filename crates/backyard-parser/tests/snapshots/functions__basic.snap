@@ -9,7 +9,8 @@ children:
     is_ref: true
     name:
       node_type: identifier
-      name: a
+      name:
+        - 97
       loc:
         start:
           line: 1
@@ -26,7 +27,10 @@ children:
         variable_type:
           node_type: type
           is_nullable: true
-          name: int
+          name:
+            - 105
+            - 110
+            - 116
           loc:
             start:
               line: 1
@@ -42,7 +46,8 @@ children:
         is_ellipsis: true
         name:
           node_type: identifier
-          name: b
+          name:
+            - 98
           loc:
             start:
               line: 1
@@ -56,7 +61,8 @@ children:
           trailings: ~
         value:
           node_type: number
-          value: "0"
+          value:
+            - 48
           loc:
             start:
               line: 1
@@ -85,7 +91,13 @@ children:
           types:
             - node_type: type
               is_nullable: false
-              name: String
+              name:
+                - 83
+                - 116
+                - 114
+                - 105
+                - 110
+                - 103
               loc:
                 start:
                   line: 1
@@ -112,7 +124,8 @@ children:
         is_ellipsis: false
         name:
           node_type: identifier
-          name: c
+          name:
+            - 99
           loc:
             start:
               line: 1
@@ -132,7 +145,11 @@ children:
               key: ~
               value:
                 node_type: number
-                value: "0.01"
+                value:
+                  - 48
+                  - 46
+                  - 48
+                  - 49
                 loc: ~
                 leadings: ~
                 trailings: ~
@@ -151,7 +168,11 @@ children:
               key: ~
               value:
                 node_type: number
-                value: "0x12"
+                value:
+                  - 48
+                  - 120
+                  - 49
+                  - 50
                 loc: ~
                 leadings: ~
                 trailings: ~
@@ -192,7 +213,11 @@ children:
         variable_type:
           node_type: type
           is_nullable: false
-          name: bool
+          name:
+            - 98
+            - 111
+            - 111
+            - 108
           loc:
             start:
               line: 1
@@ -208,7 +233,8 @@ children:
         is_ellipsis: false
         name:
           node_type: identifier
-          name: d
+          name:
+            - 100
           loc:
             start:
               line: 1
@@ -235,7 +261,10 @@ children:
     return_type:
       node_type: type
       is_nullable: true
-      name: int
+      name:
+        - 105
+        - 110
+        - 116
       loc:
         start:
           line: 1

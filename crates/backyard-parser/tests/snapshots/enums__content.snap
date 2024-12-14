@@ -8,7 +8,11 @@ children:
   - node_type: enum
     name:
       node_type: identifier
-      name: Suit
+      name:
+        - 83
+        - 117
+        - 105
+        - 116
       loc:
         start:
           line: 1
@@ -23,7 +27,20 @@ children:
     enum_type: ~
     implements:
       node_type: identifier
-      name: SuitInterface
+      name:
+        - 83
+        - 117
+        - 105
+        - 116
+        - 73
+        - 110
+        - 116
+        - 101
+        - 114
+        - 102
+        - 97
+        - 99
+        - 101
       loc:
         start:
           line: 1
@@ -39,7 +56,13 @@ children:
       - node_type: enum_item
         value:
           node_type: identifier
-          name: Hearts
+          name:
+            - 72
+            - 101
+            - 97
+            - 114
+            - 116
+            - 115
           loc:
             start:
               line: 2
@@ -65,7 +88,13 @@ children:
       - node_type: enum_item
         value:
           node_type: identifier
-          name: Spades
+          name:
+            - 83
+            - 112
+            - 97
+            - 100
+            - 101
+            - 115
           loc:
             start:
               line: 3
@@ -96,7 +125,15 @@ children:
           - node_type: assignment
             left:
               node_type: identifier
-              name: MY_CONST
+              name:
+                - 77
+                - 89
+                - 95
+                - 67
+                - 79
+                - 78
+                - 83
+                - 84
               loc:
                 start:
                   line: 5
@@ -108,11 +145,20 @@ children:
                   offset: 91
               leadings: ~
               trailings: ~
-            operator: "="
+            operator:
+              - 61
             right:
               node_type: string
               quote: Double
-              value: constant
+              value:
+                - 99
+                - 111
+                - 110
+                - 115
+                - 116
+                - 97
+                - 110
+                - 116
               loc:
                 start:
                   line: 5
@@ -155,7 +201,12 @@ children:
           is_ref: false
           name:
             node_type: identifier
-            name: color
+            name:
+              - 99
+              - 111
+              - 108
+              - 111
+              - 114
             loc:
               start:
                 line: 7
@@ -171,7 +222,13 @@ children:
           return_type:
             node_type: type
             is_nullable: false
-            name: string
+            name:
+              - 115
+              - 116
+              - 114
+              - 105
+              - 110
+              - 103
             loc:
               start:
                 line: 7
@@ -208,7 +265,11 @@ children:
                         - node_type: static_lookup
                           left:
                             node_type: identifier
-                            name: Suit
+                            name:
+                              - 83
+                              - 117
+                              - 105
+                              - 116
                             loc:
                               start:
                                 line: 9
@@ -222,7 +283,13 @@ children:
                             trailings: ~
                           right:
                             node_type: identifier
-                            name: Hearts
+                            name:
+                              - 72
+                              - 101
+                              - 97
+                              - 114
+                              - 116
+                              - 115
                             loc:
                               start:
                                 line: 9
@@ -249,7 +316,11 @@ children:
                         - node_type: static_lookup
                           left:
                             node_type: identifier
-                            name: Suit
+                            name:
+                              - 83
+                              - 117
+                              - 105
+                              - 116
                             loc:
                               start:
                                 line: 9
@@ -263,7 +334,15 @@ children:
                             trailings: ~
                           right:
                             node_type: identifier
-                            name: Diamonds
+                            name:
+                              - 68
+                              - 105
+                              - 97
+                              - 109
+                              - 111
+                              - 110
+                              - 100
+                              - 115
                             loc:
                               start:
                                 line: 9
@@ -290,7 +369,10 @@ children:
                       expr:
                         node_type: string
                         quote: Single
-                        value: Red
+                        value:
+                          - 82
+                          - 101
+                          - 100
                         loc:
                           start:
                             line: 9
@@ -318,7 +400,11 @@ children:
                         - node_type: static_lookup
                           left:
                             node_type: identifier
-                            name: Suit
+                            name:
+                              - 83
+                              - 117
+                              - 105
+                              - 116
                             loc:
                               start:
                                 line: 10
@@ -332,7 +418,12 @@ children:
                             trailings: ~
                           right:
                             node_type: identifier
-                            name: Clubs
+                            name:
+                              - 67
+                              - 108
+                              - 117
+                              - 98
+                              - 115
                             loc:
                               start:
                                 line: 10
@@ -359,7 +450,11 @@ children:
                         - node_type: static_lookup
                           left:
                             node_type: identifier
-                            name: Suit
+                            name:
+                              - 83
+                              - 117
+                              - 105
+                              - 116
                             loc:
                               start:
                                 line: 10
@@ -373,7 +468,13 @@ children:
                             trailings: ~
                           right:
                             node_type: identifier
-                            name: Spades
+                            name:
+                              - 83
+                              - 112
+                              - 97
+                              - 100
+                              - 101
+                              - 115
                             loc:
                               start:
                                 line: 10
@@ -400,7 +501,12 @@ children:
                       expr:
                         node_type: string
                         quote: Single
-                        value: Black
+                        value:
+                          - 66
+                          - 108
+                          - 97
+                          - 99
+                          - 107
                         loc:
                           start:
                             line: 10

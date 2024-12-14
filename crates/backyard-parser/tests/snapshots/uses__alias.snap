@@ -10,10 +10,14 @@ children:
     items:
       - node_type: use_item
         modifier: Const
-        name: "A\\B"
+        name:
+          - 65
+          - 92
+          - 66
         alias:
           node_type: identifier
-          name: A
+          name:
+            - 65
           loc:
             start:
               line: 1

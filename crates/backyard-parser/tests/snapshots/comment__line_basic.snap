@@ -6,7 +6,12 @@ snapshot_kind: text
 node_type: program
 children:
   - node_type: comment_line
-    comment: " test"
+    comment:
+      - 32
+      - 116
+      - 101
+      - 115
+      - 116
     loc:
       start:
         line: 1

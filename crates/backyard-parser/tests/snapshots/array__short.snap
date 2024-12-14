@@ -12,7 +12,8 @@ children:
         key: ~
         value:
           node_type: number
-          value: "1"
+          value:
+            - 49
           loc: ~
           leadings: ~
           trailings: ~
@@ -31,7 +32,8 @@ children:
         key: ~
         value:
           node_type: number
-          value: "2"
+          value:
+            - 50
           loc: ~
           leadings: ~
           trailings: ~

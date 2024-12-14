@@ -1,5 +1,5 @@
+use bstr::BString;
 use bumpalo::{ Bump, boxed::Box, collections::Vec };
-use compact_str::CompactString;
 use crate::{
   BodyType,
   Inheritance,
@@ -211,7 +211,7 @@ impl_clone_in_clone!(
   Inheritance,
   Visibility,
   BodyType,
-  CompactString,
+  BString,
   std::vec::Vec<Visibility>
 );
 

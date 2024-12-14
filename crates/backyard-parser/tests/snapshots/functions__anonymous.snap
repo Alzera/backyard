@@ -10,7 +10,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: a
+        name:
+          - 97
         loc:
           start:
             line: 1
@@ -33,7 +34,8 @@ children:
           offset: 1
       leadings: ~
       trailings: ~
-    operator: "="
+    operator:
+      - 61
     right:
       node_type: anonymous_function
       is_ref: true
@@ -42,7 +44,10 @@ children:
           variable_type:
             node_type: type
             is_nullable: false
-            name: int
+            name:
+              - 105
+              - 110
+              - 116
             loc:
               start:
                 line: 1
@@ -58,7 +63,8 @@ children:
           is_ellipsis: false
           name:
             node_type: identifier
-            name: x
+            name:
+              - 120
             loc:
               start:
                 line: 1
@@ -86,7 +92,10 @@ children:
           variable_type:
             node_type: type
             is_nullable: true
-            name: int
+            name:
+              - 105
+              - 110
+              - 116
             loc:
               start:
                 line: 1
@@ -102,7 +111,8 @@ children:
           is_ellipsis: false
           name:
             node_type: identifier
-            name: y
+            name:
+              - 121
             loc:
               start:
                 line: 1
@@ -130,7 +140,11 @@ children:
         - node_type: variable
           name:
             node_type: identifier
-            name: arg2
+            name:
+              - 97
+              - 114
+              - 103
+              - 50
             loc:
               start:
                 line: 1
@@ -156,7 +170,13 @@ children:
       return_type:
         node_type: type
         is_nullable: false
-        name: static
+        name:
+          - 115
+          - 116
+          - 97
+          - 116
+          - 105
+          - 99
         loc:
           start:
             line: 1

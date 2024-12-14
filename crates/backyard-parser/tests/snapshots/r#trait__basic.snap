@@ -8,7 +8,8 @@ children:
   - node_type: trait
     name:
       node_type: identifier
-      name: B
+      name:
+        - 66
       loc:
         start:
           line: 1
@@ -26,7 +27,10 @@ children:
         - node_type: trait_use
           traits:
             - node_type: identifier
-              name: Ale
+              name:
+                - 65
+                - 108
+                - 101
               loc:
                 start:
                   line: 2
@@ -53,7 +57,15 @@ children:
         - node_type: trait_use
           traits:
             - node_type: identifier
-              name: Loggable
+              name:
+                - 76
+                - 111
+                - 103
+                - 103
+                - 97
+                - 98
+                - 108
+                - 101
               loc:
                 start:
                   line: 3
@@ -66,7 +78,13 @@ children:
               leadings: ~
               trailings: ~
             - node_type: identifier
-              name: Usable
+              name:
+                - 85
+                - 115
+                - 97
+                - 98
+                - 108
+                - 101
               loc:
                 start:
                   line: 3
@@ -83,7 +101,10 @@ children:
               trait_name: ~
               method:
                 node_type: identifier
-                name: log
+                name:
+                  - 108
+                  - 111
+                  - 103
                 loc:
                   start:
                     line: 4
@@ -97,7 +118,12 @@ children:
                 trailings: ~
               alias:
                 node_type: identifier
-                name: alias
+                name:
+                  - 97
+                  - 108
+                  - 105
+                  - 97
+                  - 115
                 loc:
                   start:
                     line: 4
@@ -124,7 +150,15 @@ children:
             - node_type: trait_use_alias
               trait_name:
                 node_type: identifier
-                name: Loggable
+                name:
+                  - 76
+                  - 111
+                  - 103
+                  - 103
+                  - 97
+                  - 98
+                  - 108
+                  - 101
                 loc:
                   start:
                     line: 5
@@ -138,7 +172,10 @@ children:
                 trailings: ~
               method:
                 node_type: identifier
-                name: log
+                name:
+                  - 108
+                  - 111
+                  - 103
                 loc:
                   start:
                     line: 5
@@ -152,7 +189,20 @@ children:
                 trailings: ~
               alias:
                 node_type: identifier
-                name: aliasLoggable
+                name:
+                  - 97
+                  - 108
+                  - 105
+                  - 97
+                  - 115
+                  - 76
+                  - 111
+                  - 103
+                  - 103
+                  - 97
+                  - 98
+                  - 108
+                  - 101
                 loc:
                   start:
                     line: 5
@@ -179,7 +229,13 @@ children:
             - node_type: trait_use_precedence
               trait_name:
                 node_type: identifier
-                name: Usable
+                name:
+                  - 85
+                  - 115
+                  - 97
+                  - 98
+                  - 108
+                  - 101
                 loc:
                   start:
                     line: 6
@@ -193,7 +249,18 @@ children:
                 trailings: ~
               method:
                 node_type: identifier
-                name: useResource
+                name:
+                  - 117
+                  - 115
+                  - 101
+                  - 82
+                  - 101
+                  - 115
+                  - 111
+                  - 117
+                  - 114
+                  - 99
+                  - 101
                 loc:
                   start:
                     line: 6
@@ -207,7 +274,15 @@ children:
                 trailings: ~
               instead:
                 node_type: identifier
-                name: Loggable
+                name:
+                  - 76
+                  - 111
+                  - 103
+                  - 103
+                  - 97
+                  - 98
+                  - 108
+                  - 101
                 loc:
                   start:
                     line: 6
@@ -249,7 +324,15 @@ children:
             - node_type: assignment
               left:
                 node_type: identifier
-                name: MY_CONST
+                name:
+                  - 77
+                  - 89
+                  - 95
+                  - 67
+                  - 79
+                  - 78
+                  - 83
+                  - 84
                 loc:
                   start:
                     line: 8
@@ -261,11 +344,20 @@ children:
                     offset: 179
                 leadings: ~
                 trailings: ~
-              operator: "="
+              operator:
+                - 61
               right:
                 node_type: string
                 quote: Double
-                value: constant
+                value:
+                  - 99
+                  - 111
+                  - 110
+                  - 115
+                  - 116
+                  - 97
+                  - 110
+                  - 116
                 loc:
                   start:
                     line: 8
@@ -308,7 +400,15 @@ children:
             - node_type: property_item
               name:
                 node_type: identifier
-                name: instance
+                name:
+                  - 105
+                  - 110
+                  - 115
+                  - 116
+                  - 97
+                  - 110
+                  - 99
+                  - 101
                 loc:
                   start:
                     line: 9
@@ -323,7 +423,8 @@ children:
               variable_type:
                 node_type: type
                 is_nullable: true
-                name: A
+                name:
+                  - 65
                 loc:
                   start:
                     line: 9
@@ -337,7 +438,8 @@ children:
                 trailings: ~
               value:
                 node_type: number
-                value: "4"
+                value:
+                  - 52
                 loc:
                   start:
                     line: 9

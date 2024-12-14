@@ -112,16 +112,13 @@ impl TraitUseAliasParser {
         (None, trait_name)
       };
       let alias = alias.as_optional().map(IdentifierParser::from_token);
-      let visibility = visibility
-        .as_optional()
-        .map(|x| x.value.to_owned())
-        .unwrap_or_default();
+      let visibility = visibility.as_optional().and_then(|x| Visibility::try_from(&x.value).ok());
       return Ok(
         TraitUseAliasNode::loc(
           trait_name_parsed.into_boxed(parser.arena),
           name_parsed.into_boxed(parser.arena),
           alias.into_boxed(parser.arena),
-          Visibility::try_from(visibility.as_str()).ok(),
+          visibility,
           parser.gen_loc(start_loc)
         )
       );

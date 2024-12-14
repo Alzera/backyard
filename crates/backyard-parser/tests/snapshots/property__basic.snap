@@ -9,7 +9,8 @@ children:
     inheritance: ~
     name:
       node_type: identifier
-      name: A
+      name:
+        - 65
       loc:
         start:
           line: 1
@@ -36,7 +37,8 @@ children:
             - node_type: property_item
               name:
                 node_type: identifier
-                name: a
+                name:
+                  - 97
                 loc:
                   start:
                     line: 2
@@ -51,7 +53,8 @@ children:
               variable_type:
                 node_type: type
                 is_nullable: true
-                name: A
+                name:
+                  - 65
                 loc:
                   start:
                     line: 2
@@ -65,7 +68,8 @@ children:
                 trailings: ~
               value:
                 node_type: number
-                value: "4"
+                value:
+                  - 52
                 loc:
                   start:
                     line: 2
@@ -108,7 +112,8 @@ children:
             - node_type: property_item
               name:
                 node_type: identifier
-                name: b
+                name:
+                  - 98
                 loc:
                   start:
                     line: 3
@@ -125,7 +130,8 @@ children:
                 types:
                   - node_type: type
                     is_nullable: false
-                    name: A
+                    name:
+                      - 65
                     loc:
                       start:
                         line: 3
@@ -139,7 +145,15 @@ children:
                     trailings: ~
                   - node_type: type
                     is_nullable: false
-                    name: callable
+                    name:
+                      - 99
+                      - 97
+                      - 108
+                      - 108
+                      - 97
+                      - 98
+                      - 108
+                      - 101
                     loc:
                       start:
                         line: 3
@@ -153,7 +167,11 @@ children:
                     trailings: ~
                   - node_type: type
                     is_nullable: false
-                    name: "null"
+                    name:
+                      - 110
+                      - 117
+                      - 108
+                      - 108
                     loc:
                       start:
                         line: 3
@@ -178,7 +196,8 @@ children:
                 trailings: ~
               value:
                 node_type: number
-                value: "4"
+                value:
+                  - 52
                 loc:
                   start:
                     line: 3
@@ -204,7 +223,8 @@ children:
             - node_type: property_item
               name:
                 node_type: identifier
-                name: c
+                name:
+                  - 99
                 loc:
                   start:
                     line: 3
@@ -219,7 +239,8 @@ children:
               variable_type: ~
               value:
                 node_type: number
-                value: "6"
+                value:
+                  - 54
                 loc:
                   start:
                     line: 3
@@ -270,7 +291,8 @@ children:
                       node_type: variable
                       name:
                         node_type: identifier
-                        name: e
+                        name:
+                          - 101
                         loc:
                           start:
                             line: 4
@@ -336,7 +358,10 @@ children:
                     types:
                       - node_type: type
                         is_nullable: false
-                        name: int
+                        name:
+                          - 105
+                          - 110
+                          - 116
                         loc:
                           start:
                             line: 4
@@ -363,7 +388,8 @@ children:
                   is_ellipsis: true
                   name:
                     node_type: identifier
-                    name: i
+                    name:
+                      - 105
                     loc:
                       start:
                         line: 4
@@ -391,7 +417,8 @@ children:
                 node_type: variable
                 name:
                   node_type: identifier
-                  name: f
+                  name:
+                    - 102
                   loc:
                     start:
                       line: 4
@@ -429,7 +456,8 @@ children:
             - node_type: property_item
               name:
                 node_type: identifier
-                name: d
+                name:
+                  - 100
                 loc:
                   start:
                     line: 4
@@ -444,7 +472,13 @@ children:
               variable_type:
                 node_type: type
                 is_nullable: false
-                name: string
+                name:
+                  - 115
+                  - 116
+                  - 114
+                  - 105
+                  - 110
+                  - 103
                 loc:
                   start:
                     line: 4

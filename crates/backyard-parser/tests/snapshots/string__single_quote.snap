@@ -10,7 +10,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: a
+        name:
+          - 97
         loc:
           start:
             line: 1
@@ -33,11 +34,57 @@ children:
           offset: 1
       leadings: ~
       trailings: ~
-    operator: "="
+    operator:
+      - 61
     right:
       node_type: string
       quote: Single
-      value: " ini string $ \\\" \\$var $b {${\"ale\" . 5}} {$a}"
+      value:
+        - 32
+        - 105
+        - 110
+        - 105
+        - 32
+        - 115
+        - 116
+        - 114
+        - 105
+        - 110
+        - 103
+        - 32
+        - 36
+        - 32
+        - 92
+        - 34
+        - 32
+        - 92
+        - 36
+        - 118
+        - 97
+        - 114
+        - 32
+        - 36
+        - 98
+        - 32
+        - 123
+        - 36
+        - 123
+        - 34
+        - 97
+        - 108
+        - 101
+        - 34
+        - 32
+        - 46
+        - 32
+        - 53
+        - 125
+        - 125
+        - 32
+        - 123
+        - 36
+        - 97
+        - 125
       loc:
         start:
           line: 1

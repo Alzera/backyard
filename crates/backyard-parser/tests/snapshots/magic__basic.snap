@@ -8,7 +8,14 @@ children:
   - node_type: bin
     left:
       node_type: magic
-      name: __DIR__
+      name:
+        - 95
+        - 95
+        - 68
+        - 73
+        - 82
+        - 95
+        - 95
       loc:
         start:
           line: 1
@@ -20,10 +27,19 @@ children:
           offset: 0
       leadings: ~
       trailings: ~
-    operator: "."
+    operator:
+      - 46
     right:
       node_type: magic
-      name: __FILE__
+      name:
+        - 95
+        - 95
+        - 70
+        - 73
+        - 76
+        - 69
+        - 95
+        - 95
       loc:
         start:
           line: 1

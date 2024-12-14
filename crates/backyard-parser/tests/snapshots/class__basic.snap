@@ -9,7 +9,8 @@ children:
     inheritance: ~
     name:
       node_type: identifier
-      name: A
+      name:
+        - 65
       loc:
         start:
           line: 1

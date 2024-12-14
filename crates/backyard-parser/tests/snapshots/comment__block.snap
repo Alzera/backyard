@@ -6,7 +6,13 @@ snapshot_kind: text
 node_type: program
 children:
   - node_type: comment_block
-    comment: "\ntest\n"
+    comment:
+      - 10
+      - 116
+      - 101
+      - 115
+      - 116
+      - 10
     loc:
       start:
         line: 1

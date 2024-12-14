@@ -25,7 +25,8 @@ children:
           trailings: ~
         property:
           node_type: identifier
-          name: a
+          name:
+            - 97
           loc:
             start:
               line: 1
@@ -57,7 +58,8 @@ children:
             node_type: variable
             name:
               node_type: identifier
-              name: a
+              name:
+                - 97
               loc:
                 start:
                   line: 1
@@ -102,7 +104,9 @@ children:
           offset: 11
       leadings: ~
       trailings: ~
-    operator: "??"
+    operator:
+      - 63
+      - 63
     right:
       node_type: bin
       left:
@@ -124,7 +128,8 @@ children:
             trailings: ~
           property:
             node_type: identifier
-            name: b
+            name:
+              - 98
             loc:
               start:
                 line: 2
@@ -156,7 +161,8 @@ children:
               node_type: variable
               name:
                 node_type: identifier
-                name: b
+                name:
+                  - 98
                 loc:
                   start:
                     line: 2
@@ -201,7 +207,9 @@ children:
             offset: 29
         leadings: ~
         trailings: ~
-      operator: "??"
+      operator:
+        - 63
+        - 63
       right:
         node_type: bin
         left:
@@ -223,7 +231,8 @@ children:
               trailings: ~
             property:
               node_type: identifier
-              name: c
+              name:
+                - 99
               loc:
                 start:
                   line: 2
@@ -255,7 +264,8 @@ children:
                 node_type: variable
                 name:
                   node_type: identifier
-                  name: c
+                  name:
+                    - 99
                   loc:
                     start:
                       line: 2
@@ -300,7 +310,9 @@ children:
               offset: 45
           leadings: ~
           trailings: ~
-        operator: "??"
+        operator:
+          - 63
+          - 63
         right:
           node_type: bin
           left:
@@ -322,7 +334,8 @@ children:
                 trailings: ~
               property:
                 node_type: identifier
-                name: d
+                name:
+                  - 100
                 loc:
                   start:
                     line: 3
@@ -354,7 +367,8 @@ children:
                   node_type: variable
                   name:
                     node_type: identifier
-                    name: d
+                    name:
+                      - 100
                     loc:
                       start:
                         line: 3
@@ -399,7 +413,9 @@ children:
                 offset: 65
             leadings: ~
             trailings: ~
-          operator: "??"
+          operator:
+            - 63
+            - 63
           right:
             node_type: call
             name:
@@ -419,7 +435,8 @@ children:
                 trailings: ~
               property:
                 node_type: identifier
-                name: e
+                name:
+                  - 101
                 loc:
                   start:
                     line: 3
@@ -451,7 +468,8 @@ children:
                   node_type: variable
                   name:
                     node_type: identifier
-                    name: e
+                    name:
+                      - 101
                     loc:
                       start:
                         line: 3

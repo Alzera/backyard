@@ -10,7 +10,16 @@ children:
       node_type: call
       name:
         node_type: identifier
-        name: Exception
+        name:
+          - 69
+          - 120
+          - 99
+          - 101
+          - 112
+          - 116
+          - 105
+          - 111
+          - 110
         loc:
           start:
             line: 1

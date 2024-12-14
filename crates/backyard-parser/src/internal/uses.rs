@@ -122,11 +122,7 @@ impl UseItemParser {
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [modifier, name] = matched.as_slice() {
-      let modifier = modifier
-        .as_optional()
-        .map(|i| i.value.to_owned())
-        .unwrap_or_default();
-      let modifier = UseItemModifier::try_from(modifier.as_str()).ok();
+      let modifier = modifier.as_optional().and_then(|x| UseItemModifier::try_from(&x.value).ok());
       let name = name.as_equal()?.value.to_owned();
       let mut alias = None;
       if let Some(last) = parser.tokens.get(parser.position) {

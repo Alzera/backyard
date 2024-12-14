@@ -10,7 +10,12 @@ children:
       - node_type: property_item
         name:
           node_type: identifier
-          name: title
+          name:
+            - 116
+            - 105
+            - 116
+            - 108
+            - 101
           loc:
             start:
               line: 1

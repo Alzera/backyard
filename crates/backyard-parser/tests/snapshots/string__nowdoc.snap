@@ -8,8 +8,20 @@ children:
   - node_type: echo
     items:
       - node_type: now_doc
-        label: START
-        value: "\na {$a}"
+        label:
+          - 83
+          - 84
+          - 65
+          - 82
+          - 84
+        value:
+          - 10
+          - 97
+          - 32
+          - 123
+          - 36
+          - 97
+          - 125
         loc:
           start:
             line: 1

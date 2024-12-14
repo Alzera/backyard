@@ -8,7 +8,12 @@ children:
   - node_type: label
     label:
       node_type: identifier
-      name: label
+      name:
+        - 108
+        - 97
+        - 98
+        - 101
+        - 108
       loc:
         start:
           line: 1

@@ -6,14 +6,53 @@ snapshot_kind: text
 node_type: program
 children:
   - node_type: use
-    name: "App\\Models\\"
+    name:
+      - 65
+      - 112
+      - 112
+      - 92
+      - 77
+      - 111
+      - 100
+      - 101
+      - 108
+      - 115
+      - 92
     items:
       - node_type: use_item
         modifier: Const
-        name: "User\\UserTesting"
+        name:
+          - 85
+          - 115
+          - 101
+          - 114
+          - 92
+          - 85
+          - 115
+          - 101
+          - 114
+          - 84
+          - 101
+          - 115
+          - 116
+          - 105
+          - 110
+          - 103
         alias:
           node_type: identifier
-          name: UserTestingA
+          name:
+            - 85
+            - 115
+            - 101
+            - 114
+            - 84
+            - 101
+            - 115
+            - 116
+            - 105
+            - 110
+            - 103
+            - 65
           loc:
             start:
               line: 2
@@ -38,10 +77,39 @@ children:
         trailings: ~
       - node_type: use_item
         modifier: ~
-        name: "User\\UserTestingB"
+        name:
+          - 85
+          - 115
+          - 101
+          - 114
+          - 92
+          - 85
+          - 115
+          - 101
+          - 114
+          - 84
+          - 101
+          - 115
+          - 116
+          - 105
+          - 110
+          - 103
+          - 66
         alias:
           node_type: identifier
-          name: UserTestingB
+          name:
+            - 85
+            - 115
+            - 101
+            - 114
+            - 84
+            - 101
+            - 115
+            - 116
+            - 105
+            - 110
+            - 103
+            - 66
           loc:
             start:
               line: 3
@@ -66,7 +134,19 @@ children:
         trailings: ~
       - node_type: use_item
         modifier: Function
-        name: UserTestingC
+        name:
+          - 85
+          - 115
+          - 101
+          - 114
+          - 84
+          - 101
+          - 115
+          - 116
+          - 105
+          - 110
+          - 103
+          - 67
         alias: ~
         loc:
           start:

@@ -8,7 +8,8 @@ children:
   - node_type: interface
     name:
       node_type: identifier
-      name: A
+      name:
+        - 65
       loc:
         start:
           line: 1

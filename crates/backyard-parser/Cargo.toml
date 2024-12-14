@@ -15,8 +15,8 @@ workspace = true
 backyard-lexer = { workspace = true }
 backyard-nodes = { workspace = true }
 
+bstr = { workspace = true }
 bumpalo = { workspace = true, features = ["boxed"] }
-compact_str = { workspace = true }
 
 [dev-dependencies]
 insta = { workspace = true }

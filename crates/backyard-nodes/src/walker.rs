@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use compact_str::CompactString;
+use bstr::BString;
 
 use crate::{
   BodyType,
@@ -184,7 +184,7 @@ macro_rules! impl_map_into_walker_stack {
 
 impl_map_into_walker_stack!(
   bool,
-  CompactString,
+  BString,
   BodyType,
   std::vec::Vec<Visibility>,
   UseItemModifier,

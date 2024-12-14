@@ -9,7 +9,8 @@ children:
     inheritance: ~
     name:
       node_type: identifier
-      name: A
+      name:
+        - 65
       loc:
         start:
           line: 1
@@ -32,7 +33,13 @@ children:
             types:
               - node_type: type
                 is_nullable: false
-                name: string
+                name:
+                  - 115
+                  - 116
+                  - 114
+                  - 105
+                  - 110
+                  - 103
                 loc:
                   start:
                     line: 1
@@ -46,7 +53,10 @@ children:
                 trailings: ~
               - node_type: type
                 is_nullable: false
-                name: int
+                name:
+                  - 105
+                  - 110
+                  - 116
                 loc:
                   start:
                     line: 1
@@ -74,7 +84,10 @@ children:
             - node_type: assignment
               left:
                 node_type: identifier
-                name: BAR
+                name:
+                  - 66
+                  - 65
+                  - 82
                 loc:
                   start:
                     line: 1
@@ -86,11 +99,15 @@ children:
                     offset: 30
                 leadings: ~
                 trailings: ~
-              operator: "="
+              operator:
+                - 61
               right:
                 node_type: string
                 quote: Single
-                value: bar
+                value:
+                  - 98
+                  - 97
+                  - 114
                 loc:
                   start:
                     line: 1

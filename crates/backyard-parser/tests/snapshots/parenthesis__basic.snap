@@ -10,7 +10,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: a
+        name:
+          - 97
         loc:
           start:
             line: 1
@@ -33,12 +34,14 @@ children:
           offset: 1
       leadings: ~
       trailings: ~
-    operator: "="
+    operator:
+      - 61
     right:
       node_type: bin
       left:
         node_type: number
-        value: "5"
+        value:
+          - 53
         loc:
           start:
             line: 1
@@ -50,14 +53,17 @@ children:
             offset: 5
         leadings: ~
         trailings: ~
-      operator: "*"
+      operator:
+        - 42
       right:
         node_type: parenthesis
         statement:
           node_type: bin
           left:
             node_type: number
-            value: ".5"
+            value:
+              - 46
+              - 53
             loc:
               start:
                 line: 1
@@ -69,10 +75,17 @@ children:
                 offset: 10
             leadings: ~
             trailings: ~
-          operator: +
+          operator:
+            - 43
           right:
             node_type: number
-            value: "0x2e45"
+            value:
+              - 48
+              - 120
+              - 50
+              - 101
+              - 52
+              - 53
             loc:
               start:
                 line: 1

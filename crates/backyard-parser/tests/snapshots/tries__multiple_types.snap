@@ -24,7 +24,29 @@ children:
       - node_type: catch
         types:
           - node_type: identifier
-            name: UnknownGetterException
+            name:
+              - 85
+              - 110
+              - 107
+              - 110
+              - 111
+              - 119
+              - 110
+              - 71
+              - 101
+              - 116
+              - 116
+              - 101
+              - 114
+              - 69
+              - 120
+              - 99
+              - 101
+              - 112
+              - 116
+              - 105
+              - 111
+              - 110
             loc:
               start:
                 line: 2
@@ -37,7 +59,26 @@ children:
             leadings: ~
             trailings: ~
           - node_type: identifier
-            name: ReflectionException
+            name:
+              - 82
+              - 101
+              - 102
+              - 108
+              - 101
+              - 99
+              - 116
+              - 105
+              - 111
+              - 110
+              - 69
+              - 120
+              - 99
+              - 101
+              - 112
+              - 116
+              - 105
+              - 111
+              - 110
             loc:
               start:
                 line: 2

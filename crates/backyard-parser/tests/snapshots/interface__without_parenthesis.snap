@@ -8,7 +8,8 @@ children:
   - node_type: interface
     name:
       node_type: identifier
-      name: A
+      name:
+        - 65
       loc:
         start:
           line: 1
@@ -22,7 +23,8 @@ children:
       trailings: ~
     extends:
       - node_type: identifier
-        name: B
+        name:
+          - 66
         loc:
           start:
             line: 1
@@ -35,7 +37,8 @@ children:
         leadings: ~
         trailings: ~
       - node_type: identifier
-        name: C
+        name:
+          - 67
         loc:
           start:
             line: 1
@@ -57,7 +60,18 @@ children:
             - node_type: assignment
               left:
                 node_type: identifier
-                name: MY_CONSTANT
+                name:
+                  - 77
+                  - 89
+                  - 95
+                  - 67
+                  - 79
+                  - 78
+                  - 83
+                  - 84
+                  - 65
+                  - 78
+                  - 84
                 loc:
                   start:
                     line: 2
@@ -69,11 +83,26 @@ children:
                     offset: 46
                 leadings: ~
                 trailings: ~
-              operator: "="
+              operator:
+                - 61
               right:
                 node_type: string
                 quote: Double
-                value: constant value
+                value:
+                  - 99
+                  - 111
+                  - 110
+                  - 115
+                  - 116
+                  - 97
+                  - 110
+                  - 116
+                  - 32
+                  - 118
+                  - 97
+                  - 108
+                  - 117
+                  - 101
                 loc:
                   start:
                     line: 2
@@ -116,7 +145,8 @@ children:
             is_ref: false
             name:
               node_type: identifier
-              name: a
+              name:
+                - 97
               loc:
                 start:
                   line: 3
@@ -133,7 +163,10 @@ children:
                 variable_type:
                   node_type: type
                   is_nullable: false
-                  name: int
+                  name:
+                    - 105
+                    - 110
+                    - 116
                   loc:
                     start:
                       line: 3
@@ -149,7 +182,8 @@ children:
                 is_ellipsis: false
                 name:
                   node_type: identifier
-                  name: x
+                  name:
+                    - 120
                   loc:
                     start:
                       line: 3
@@ -177,7 +211,10 @@ children:
                 variable_type:
                   node_type: type
                   is_nullable: false
-                  name: int
+                  name:
+                    - 105
+                    - 110
+                    - 116
                   loc:
                     start:
                       line: 3
@@ -193,7 +230,8 @@ children:
                 is_ellipsis: false
                 name:
                   node_type: identifier
-                  name: y
+                  name:
+                    - 121
                   loc:
                     start:
                       line: 3
@@ -207,7 +245,8 @@ children:
                   trailings: ~
                 value:
                   node_type: number
-                  value: "0"
+                  value:
+                    - 48
                   loc:
                     start:
                       line: 3
@@ -233,7 +272,10 @@ children:
             return_type:
               node_type: type
               is_nullable: false
-              name: int
+              name:
+                - 105
+                - 110
+                - 116
               loc:
                 start:
                   line: 3

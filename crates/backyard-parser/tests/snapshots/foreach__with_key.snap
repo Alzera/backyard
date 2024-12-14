@@ -10,7 +10,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: a
+        name:
+          - 97
         loc:
           start:
             line: 1
@@ -37,7 +38,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: b
+        name:
+          - 98
         loc:
           start:
             line: 1
@@ -64,7 +66,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: c
+        name:
+          - 99
         loc:
           start:
             line: 1

@@ -9,7 +9,8 @@ children:
     inheritance: ~
     name:
       node_type: identifier
-      name: A
+      name:
+        - 65
       loc:
         start:
           line: 1
@@ -35,7 +36,18 @@ children:
             is_ref: false
             name:
               node_type: magic
-              name: __construct
+              name:
+                - 95
+                - 95
+                - 99
+                - 111
+                - 110
+                - 115
+                - 116
+                - 114
+                - 117
+                - 99
+                - 116
               loc:
                 start:
                   line: 2
@@ -59,7 +71,8 @@ children:
                     types:
                       - node_type: type
                         is_nullable: false
-                        name: A
+                        name:
+                          - 65
                         loc:
                           start:
                             line: 2
@@ -73,7 +86,11 @@ children:
                         trailings: ~
                       - node_type: type
                         is_nullable: false
-                        name: "null"
+                        name:
+                          - 110
+                          - 117
+                          - 108
+                          - 108
                         loc:
                           start:
                             line: 2
@@ -100,7 +117,8 @@ children:
                   is_ellipsis: false
                   name:
                     node_type: identifier
-                    name: a
+                    name:
+                      - 97
                     loc:
                       start:
                         line: 2

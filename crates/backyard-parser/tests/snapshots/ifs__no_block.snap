@@ -26,7 +26,8 @@ children:
         node_type: variable
         name:
           node_type: identifier
-          name: e
+          name:
+            - 101
           loc:
             start:
               line: 1
@@ -49,10 +50,12 @@ children:
             offset: 12
         leadings: ~
         trailings: ~
-      operator: "="
+      operator:
+        - 61
       right:
         node_type: number
-        value: "5"
+        value:
+          - 53
         loc:
           start:
             line: 1
@@ -99,7 +102,8 @@ children:
             node_type: variable
             name:
               node_type: identifier
-              name: e
+              name:
+                - 101
               loc:
                 start:
                   line: 1
@@ -122,10 +126,12 @@ children:
                 offset: 35
             leadings: ~
             trailings: ~
-          operator: "="
+          operator:
+            - 61
           right:
             node_type: number
-            value: "6"
+            value:
+              - 54
             loc:
               start:
                 line: 1

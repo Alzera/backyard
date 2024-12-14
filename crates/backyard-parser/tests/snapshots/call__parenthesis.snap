@@ -15,7 +15,8 @@ children:
         return_type: ~
         body:
           node_type: number
-          value: "5"
+          value:
+            - 53
           loc:
             start:
               line: 1

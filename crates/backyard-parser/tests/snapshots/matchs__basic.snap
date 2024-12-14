@@ -10,7 +10,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: a
+        name:
+          - 97
         loc:
           start:
             line: 1
@@ -33,14 +34,16 @@ children:
           offset: 1
       leadings: ~
       trailings: ~
-    operator: "="
+    operator:
+      - 61
     right:
       node_type: match
       condition:
         node_type: variable
         name:
           node_type: identifier
-          name: a
+          name:
+            - 97
           loc:
             start:
               line: 1
@@ -68,7 +71,11 @@ children:
           conditions:
             - node_type: string
               quote: Single
-              value: ucs2
+              value:
+                - 117
+                - 99
+                - 115
+                - 50
               loc:
                 start:
                   line: 2
@@ -82,7 +89,13 @@ children:
               trailings: ~
             - node_type: string
               quote: Single
-              value: utf-16
+              value:
+                - 117
+                - 116
+                - 102
+                - 45
+                - 49
+                - 54
               loc:
                 start:
                   line: 2
@@ -96,7 +109,8 @@ children:
               trailings: ~
           expr:
             node_type: number
-            value: "2"
+            value:
+              - 50
             loc:
               start:
                 line: 2
@@ -123,7 +137,8 @@ children:
           conditions: []
           expr:
             node_type: number
-            value: "1"
+            value:
+              - 49
             loc:
               start:
                 line: 3

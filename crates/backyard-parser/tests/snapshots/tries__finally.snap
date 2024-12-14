@@ -16,7 +16,12 @@ children:
               node_type: call
               name:
                 node_type: identifier
-                name: Error
+                name:
+                  - 69
+                  - 114
+                  - 114
+                  - 111
+                  - 114
                 loc:
                   start:
                     line: 2
@@ -34,7 +39,28 @@ children:
                   value:
                     node_type: string
                     quote: Double
-                    value: Custom error occurred
+                    value:
+                      - 67
+                      - 117
+                      - 115
+                      - 116
+                      - 111
+                      - 109
+                      - 32
+                      - 101
+                      - 114
+                      - 114
+                      - 111
+                      - 114
+                      - 32
+                      - 111
+                      - 99
+                      - 99
+                      - 117
+                      - 114
+                      - 114
+                      - 101
+                      - 100
                     loc:
                       start:
                         line: 2
@@ -105,7 +131,15 @@ children:
       - node_type: catch
         types:
           - node_type: identifier
-            name: FooError
+            name:
+              - 70
+              - 111
+              - 111
+              - 69
+              - 114
+              - 114
+              - 111
+              - 114
             loc:
               start:
                 line: 3
@@ -121,7 +155,10 @@ children:
           node_type: variable
           name:
             node_type: identifier
-            name: err
+            name:
+              - 101
+              - 114
+              - 114
             loc:
               start:
                 line: 3
@@ -172,7 +209,16 @@ children:
       - node_type: catch
         types:
           - node_type: identifier
-            name: Foo2Error
+            name:
+              - 70
+              - 111
+              - 111
+              - 50
+              - 69
+              - 114
+              - 114
+              - 111
+              - 114
             loc:
               start:
                 line: 4
@@ -185,7 +231,15 @@ children:
             leadings: ~
             trailings: ~
           - node_type: identifier
-            name: BarError
+            name:
+              - 66
+              - 97
+              - 114
+              - 69
+              - 114
+              - 114
+              - 111
+              - 114
             loc:
               start:
                 line: 4
@@ -201,7 +255,10 @@ children:
           node_type: variable
           name:
             node_type: identifier
-            name: err
+            name:
+              - 101
+              - 114
+              - 114
             loc:
               start:
                 line: 4

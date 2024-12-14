@@ -10,7 +10,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: a
+        name:
+          - 97
         loc:
           start:
             line: 1
@@ -33,7 +34,8 @@ children:
           offset: 1
       leadings: ~
       trailings: ~
-    operator: "="
+    operator:
+      - 61
     right:
       node_type: new
       statement:
@@ -42,7 +44,8 @@ children:
           - node_type: variable
             name:
               node_type: identifier
-              name: b
+              name:
+                - 98
               loc:
                 start:
                   line: 1
@@ -67,7 +70,8 @@ children:
             trailings: ~
         extends:
           node_type: identifier
-          name: B
+          name:
+            - 66
           loc:
             start:
               line: 1
@@ -81,7 +85,8 @@ children:
           trailings: ~
         implements:
           - node_type: identifier
-            name: C
+            name:
+              - 67
             loc:
               start:
                 line: 1
@@ -94,7 +99,8 @@ children:
             leadings: ~
             trailings: ~
           - node_type: identifier
-            name: D
+            name:
+              - 68
             loc:
               start:
                 line: 1

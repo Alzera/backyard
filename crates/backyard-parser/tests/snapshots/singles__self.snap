@@ -21,7 +21,8 @@ children:
       trailings: ~
     right:
       node_type: identifier
-      name: a
+      name:
+        - 97
       loc:
         start:
           line: 1

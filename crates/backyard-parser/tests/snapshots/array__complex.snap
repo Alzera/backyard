@@ -10,7 +10,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: a
+        name:
+          - 97
         loc:
           start:
             line: 1
@@ -33,7 +34,8 @@ children:
           offset: 1
       leadings: ~
       trailings: ~
-    operator: "="
+    operator:
+      - 61
     right:
       node_type: array
       is_short: true
@@ -45,7 +47,10 @@ children:
               node_type: variable
               name:
                 node_type: identifier
-                name: key
+                name:
+                  - 107
+                  - 101
+                  - 121
                 loc:
                   start:
                     line: 1
@@ -68,7 +73,8 @@ children:
                   offset: 9
               leadings: ~
               trailings: ~
-            operator: "="
+            operator:
+              - 61
             right:
               node_type: parenthesis
               statement:
@@ -77,7 +83,13 @@ children:
                   node_type: call
                   name:
                     node_type: identifier
-                    name: is_int
+                    name:
+                      - 105
+                      - 115
+                      - 95
+                      - 105
+                      - 110
+                      - 116
                     loc:
                       start:
                         line: 1
@@ -96,7 +108,10 @@ children:
                         node_type: variable
                         name:
                           node_type: identifier
-                          name: key
+                          name:
+                            - 107
+                            - 101
+                            - 121
                           loc:
                             start:
                               line: 1
@@ -145,7 +160,12 @@ children:
                   node_type: variable
                   name:
                     node_type: identifier
-                    name: value
+                    name:
+                      - 118
+                      - 97
+                      - 108
+                      - 117
+                      - 101
                     loc:
                       start:
                         line: 1
@@ -172,7 +192,10 @@ children:
                   node_type: variable
                   name:
                     node_type: identifier
-                    name: key
+                    name:
+                      - 107
+                      - 101
+                      - 121
                     loc:
                       start:
                         line: 1
@@ -234,7 +257,12 @@ children:
               node_type: variable
               name:
                 node_type: identifier
-                name: value
+                name:
+                  - 118
+                  - 97
+                  - 108
+                  - 117
+                  - 101
                 loc:
                   start:
                     line: 1
@@ -257,7 +285,10 @@ children:
                   offset: 52
               leadings: ~
               trailings: ~
-            operator: "==="
+            operator:
+              - 61
+              - 61
+              - 61
             right:
               node_type: ternary
               condition:
@@ -278,7 +309,10 @@ children:
                 node_type: variable
                 name:
                   node_type: identifier
-                  name: key
+                  name:
+                    - 107
+                    - 101
+                    - 121
                   loc:
                     start:
                       line: 1
@@ -305,7 +339,12 @@ children:
                 node_type: variable
                 name:
                   node_type: identifier
-                  name: value
+                  name:
+                    - 118
+                    - 97
+                    - 108
+                    - 117
+                    - 101
                   loc:
                     start:
                       line: 1

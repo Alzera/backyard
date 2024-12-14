@@ -1,5 +1,5 @@
+use bstr::BString;
 use bumpalo::Bump;
-use compact_str::CompactString;
 
 use crate::{ Node, NodeType, Visibility, BodyType, UseItemModifier, Modifier, Quote, Inheritance };
 
@@ -269,10 +269,10 @@ impl<'arena, 'a> BlueprintBuildable<'arena> for &'a [Box<Blueprint<'a>>] {
 }
 
 impl<'arena, 'a> BlueprintBuildable<'arena> for &'a str {
-  type Result = CompactString;
+  type Result = BString;
 
   fn build(&self, _: &'arena Bump) -> Self::Result {
-    CompactString::new(self)
+    BString::new(self.as_bytes().to_vec())
   }
 }
 

@@ -11,6 +11,21 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct ParenthesisParser;
 
+const CAST_TYPES: &[&'static [u8]] = &[
+  b"int",
+  b"integer",
+  b"bool",
+  b"boolean",
+  b"float",
+  b"double",
+  b"real",
+  b"string",
+  b"binary",
+  b"array",
+  b"object",
+  b"unset",
+];
+
 impl ParenthesisParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
@@ -28,22 +43,7 @@ impl ParenthesisParser {
   ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
       if let Some(token) = parser.tokens.get(parser.position) {
-        if
-          [
-            "int",
-            "integer",
-            "bool",
-            "boolean",
-            "float",
-            "double",
-            "real",
-            "string",
-            "binary",
-            "array",
-            "object",
-            "unset",
-          ].contains(&token.value.as_str())
-        {
+        if CAST_TYPES.contains(&token.value.as_slice()) {
           if let Some(next_token) = parser.tokens.get(parser.position + 1) {
             if next_token.token_type == TokenType::RightParenthesis {
               parser.position += 2;

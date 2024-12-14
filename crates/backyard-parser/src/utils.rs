@@ -1,3 +1,4 @@
+use bstr::BString;
 use bumpalo::{ collections::Vec, Bump };
 use backyard_lexer::token::{ Token, TokenType };
 use backyard_nodes::{
@@ -83,24 +84,17 @@ impl ModifierResult {
   pub fn as_visibilities(&self) -> std::vec::Vec<Visibility> {
     if let ModifierResult::Visibility(v) = self {
       v.iter()
-        .filter_map(|x| Visibility::try_from(x.value.as_ref()).ok())
+        .filter_map(|x| Visibility::try_from(&x.value).ok())
         .collect()
     } else {
       vec![]
     }
   }
 
-  pub fn as_custom<T, C>(&self, callback: C) -> Option<T> where C: FnOnce(&str) -> Result<T, String> {
-    if let ModifierResult::Custom(v) = self {
-      callback(
-        v
-          .as_ref()
-          .map(|x| x.value.as_str())
-          .unwrap_or("")
-      ).ok()
-    } else {
-      None
-    }
+  pub fn as_custom<T, C>(&self, callback: C) -> Option<T>
+    where C: FnOnce(&BString) -> Result<T, String>
+  {
+    if let ModifierResult::Custom(Some(v)) = self { callback(&v.value).ok() } else { None }
   }
 }
 

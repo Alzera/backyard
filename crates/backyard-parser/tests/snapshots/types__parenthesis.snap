@@ -9,7 +9,8 @@ children:
     inheritance: ~
     name:
       node_type: identifier
-      name: A
+      name:
+        - 65
       loc:
         start:
           line: 1
@@ -35,7 +36,22 @@ children:
             - node_type: property_item
               name:
                 node_type: identifier
-                name: currentHandler2
+                name:
+                  - 99
+                  - 117
+                  - 114
+                  - 114
+                  - 101
+                  - 110
+                  - 116
+                  - 72
+                  - 97
+                  - 110
+                  - 100
+                  - 108
+                  - 101
+                  - 114
+                  - 50
                 loc:
                   start:
                     line: 2
@@ -56,7 +72,9 @@ children:
                         types:
                           - node_type: type
                             is_nullable: false
-                            name: "\\A"
+                            name:
+                              - 92
+                              - 65
                             loc:
                               start:
                                 line: 2
@@ -70,7 +88,9 @@ children:
                             trailings: ~
                           - node_type: type
                             is_nullable: false
-                            name: "\\C"
+                            name:
+                              - 92
+                              - 67
                             loc:
                               start:
                                 line: 2
@@ -95,7 +115,9 @@ children:
                         trailings: ~
                       - node_type: type
                         is_nullable: false
-                        name: "\\B"
+                        name:
+                          - 92
+                          - 66
                         loc:
                           start:
                             line: 2
@@ -120,7 +142,11 @@ children:
                     trailings: ~
                   - node_type: type
                     is_nullable: false
-                    name: "null"
+                    name:
+                      - 110
+                      - 117
+                      - 108
+                      - 108
                     loc:
                       start:
                         line: 2

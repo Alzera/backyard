@@ -8,7 +8,8 @@ children:
   - node_type: exit
     statement:
       node_type: number
-      value: "0"
+      value:
+        - 48
       loc:
         start:
           line: 1

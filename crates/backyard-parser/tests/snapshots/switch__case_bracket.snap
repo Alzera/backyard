@@ -10,7 +10,8 @@ children:
       node_type: variable
       name:
         node_type: identifier
-        name: a
+        name:
+          - 97
         loc:
           start:
             line: 1
@@ -39,7 +40,8 @@ children:
         - node_type: case
           condition:
             node_type: number
-            value: "1"
+            value:
+              - 49
             loc:
               start:
                 line: 2

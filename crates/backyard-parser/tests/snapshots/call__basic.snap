@@ -8,7 +8,11 @@ children:
   - node_type: call
     name:
       node_type: identifier
-      name: call
+      name:
+        - 99
+        - 97
+        - 108
+        - 108
       loc:
         start:
           line: 1
@@ -25,7 +29,8 @@ children:
         name: ~
         value:
           node_type: number
-          value: "1"
+          value:
+            - 49
           loc:
             start:
               line: 1
@@ -52,7 +57,8 @@ children:
         name: ~
         value:
           node_type: number
-          value: "2"
+          value:
+            - 50
           loc:
             start:
               line: 1
