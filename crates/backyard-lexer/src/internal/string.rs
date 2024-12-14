@@ -10,15 +10,14 @@ pub struct StringToken;
 impl StringToken {
   fn get_parts(
     lexer: &mut Lexer,
-    breaker: &str,
+    breaker: BString,
     mode: SeriesCheckerMode
   ) -> Result<bool, LexError> {
     let mut token_count = 0;
+    let need_check_condition = [breaker.last_byte().unwrap(), b'$', b'{'];
+    let breaker_len = breaker.len();
     let againsts = [breaker];
     let mut checker = SeriesChecker::new(&againsts, mode);
-    let mut need_check_condition: Vec<u8> = breaker.as_bytes().to_vec();
-    need_check_condition.push(b'$');
-    need_check_condition.push(b'{');
     loop {
       let snapshot = lexer.control.get_snapshot();
       let mut t = lexer.control.next_char_until(0, |control, ch, end_position| {
@@ -60,7 +59,7 @@ impl StringToken {
       };
       if checker.check().is_some() {
         t.push(current);
-        t = t[..t.len() - breaker.len()].into();
+        t = t[..t.len() - breaker_len].into();
         lexer.tokens.push(Token::new(TokenType::EncapsedString, t, &snapshot));
         lexer.control.next_char();
         break;
@@ -93,30 +92,29 @@ impl StringToken {
     Ok(token_count == 1)
   }
 
-  pub fn lex_basic(lexer: &mut Lexer, breaker: &str, snapshot: &ControlSnapshot) -> LexResult {
-    let checker_breaker: [&str; 1] = [breaker];
+  pub fn lex_basic(lexer: &mut Lexer, snapshot: &ControlSnapshot) -> LexResult {
+    let breaker: BString = [b'\''].into();
+    let checker_breaker = [breaker.clone()];
     let mut checker = SeriesChecker::new(&checker_breaker, SeriesCheckerMode::String);
-    let mut text = lexer.control.next_char_until(0, |_, i, _| {
+    let mut text = lexer.control.next_char_until(1, |_, i, _| {
       checker.push(i);
       checker.check().is_some()
     });
     lexer.control.next_char();
-    text.insert_str(0, breaker);
     text.push_str(breaker);
     lexer.tokens.push(Token::new(TokenType::String, text, snapshot));
     Ok(())
   }
 
-  pub fn lex(lexer: &mut Lexer, breaker: &str, snapshot: &ControlSnapshot) -> LexResult {
-    lexer.tokens.push(Token::new(TokenType::EncapsedStringOpen, breaker.into(), snapshot));
+  pub fn lex(lexer: &mut Lexer, breaker: BString, snapshot: &ControlSnapshot) -> LexResult {
+    lexer.tokens.push(Token::new(TokenType::EncapsedStringOpen, breaker.clone(), snapshot));
 
-    let is_without_encapsed = Self::get_parts(lexer, breaker, SeriesCheckerMode::String)?;
-
+    let is_without_encapsed = Self::get_parts(lexer, breaker.clone(), SeriesCheckerMode::String)?;
     if is_without_encapsed {
       if let Some(string_token) = lexer.tokens.pop() {
         lexer.tokens.pop();
         let mut value = string_token.value;
-        value.insert_str(0, breaker);
+        value.insert_str(0, breaker.clone());
         value.push_str(breaker);
         lexer.tokens.push(Token::new(TokenType::String, value, snapshot));
         return Ok(());
@@ -124,7 +122,7 @@ impl StringToken {
     }
 
     lexer.tokens.push(
-      Token::new(TokenType::EncapsedStringClose, breaker.into(), lexer.control.get_last_snapshot())
+      Token::new(TokenType::EncapsedStringClose, breaker, lexer.control.get_last_snapshot())
     );
 
     Ok(())
@@ -149,10 +147,9 @@ impl StringToken {
     if label.starts_with(b"\'") && label.ends_with(b"\'") {
       let clean_label: BString = label
         .get(1..label.len() - 1)
-        .unwrap_or_default()
+        .unwrap()
         .into();
-      let clean_label_str = clean_label.to_string();
-      let againsts: [&str; 1] = [&clean_label_str];
+      let againsts = [clean_label.clone()];
       let mut checker = SeriesChecker::new(&againsts, SeriesCheckerMode::Heredoc);
       let mut should_break = false;
       let content_snapshot = lexer.control.get_snapshot();
@@ -171,7 +168,7 @@ impl StringToken {
       Ok(())
     } else {
       lexer.tokens.push(Token::new(TokenType::HeredocOpen, label.clone(), snapshot));
-      Self::get_parts(lexer, &label.to_string(), SeriesCheckerMode::Heredoc)?;
+      Self::get_parts(lexer, label.clone(), SeriesCheckerMode::Heredoc)?;
       lexer.tokens.push(
         Token::new(TokenType::HeredocClose, label, lexer.control.get_last_snapshot())
       );

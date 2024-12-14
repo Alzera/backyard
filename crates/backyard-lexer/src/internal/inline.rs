@@ -8,7 +8,8 @@ pub struct InlineToken;
 
 impl InlineToken {
   pub fn lex(lexer: &mut Lexer, snapshot: &ControlSnapshot) -> LexResult {
-    let mut checker = SeriesChecker::new(&["<?php", "<?=", "<%"], SeriesCheckerMode::Inline);
+    let againsts = [b"<?php".into(), b"<?=".into(), b"<%".into()];
+    let mut checker = SeriesChecker::new(&againsts, SeriesCheckerMode::Inline);
     let max_index = lexer.control.get_len().saturating_sub(1);
     let mut no_breaker = false;
     let inline = lexer.control.next_char_until(0, |_, ch, i| {

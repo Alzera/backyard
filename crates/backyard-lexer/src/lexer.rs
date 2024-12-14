@@ -1,4 +1,4 @@
-use bstr::BString;
+use bstr::{ BString, ByteSlice };
 use bumpalo::Bump;
 
 use crate::error::{ LexError, LexResult };
@@ -12,7 +12,7 @@ use crate::internal::{
   variable::VariableToken,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct ControlSnapshot {
   pub(crate) line: usize,
   pub(crate) column: usize,
@@ -99,11 +99,14 @@ impl Control {
     let mut end_position = self.position;
     let mut line = self.line;
     let mut column = self.column;
+    let mut last_snapshot = self.last_snapshot.to_owned();
+
     while let Some(ch) = self.chars.get(end_position) {
       let ch = *ch;
       if until(self, ch, &mut end_position) {
         break;
       }
+      last_snapshot = ControlSnapshot { line, column, offset: end_position };
       end_position += 1;
       if ch == b'\n' {
         line += 1;
@@ -116,6 +119,7 @@ impl Control {
     self.line = line;
     self.column = column;
     self.position = end_position;
+    self.last_snapshot = last_snapshot;
     self.chars[start_position - take_prev_len..end_position].into()
   }
 
@@ -159,16 +163,18 @@ pub enum SeriesCheckerMode {
 #[derive(Debug)]
 pub struct SeriesChecker<'a> {
   list: BString,
-  againsts: &'a [&'a str],
+  againsts: &'a [BString],
   mode: SeriesCheckerMode,
+  last_result: Option<Option<&'a BString>>,
 }
 
 impl<'a> SeriesChecker<'a> {
-  pub fn new(againsts: &'a [&'a str], mode: SeriesCheckerMode) -> Self {
-    Self { list: BString::new(vec![]), againsts, mode }
+  pub fn new(againsts: &'a [BString], mode: SeriesCheckerMode) -> Self {
+    Self { list: BString::new(vec![]), againsts, mode, last_result: None }
   }
 
   pub fn push(&mut self, ch: u8) {
+    self.last_result = None;
     if self.mode == SeriesCheckerMode::Heredoc {
       if ch == b'\n' {
         self.list.clear();
@@ -184,17 +190,24 @@ impl<'a> SeriesChecker<'a> {
     }
   }
 
-  pub fn check(&mut self) -> Option<&'a str> {
-    let text = self.list.to_string();
+  pub fn check(&mut self) -> Option<&BString> {
+    if self.last_result.is_some() {
+      return self.last_result.unwrap();
+    }
     if self.mode == SeriesCheckerMode::Heredoc {
       if let Some(label) = self.againsts.first() {
-        return if text.trim() == *label { Some(label.to_owned()) } else { None };
+        let result = if self.list.trim() == *label { Some(label) } else { None };
+        self.last_result = Some(result);
+        return result;
       }
-    } else if let Some(valid) = self.againsts.iter().find(|i| text.ends_with(*i)) {
+    } else if let Some(valid) = self.againsts.iter().find(|i| self.list.ends_with(i)) {
       if !self.is_escaped(self.list.len() - valid.len()) {
-        return Some(valid.to_owned());
+        let result = Some(valid);
+        self.last_result = Some(result);
+        return result;
       }
     }
+    self.last_result = Some(None);
     None
   }
 
@@ -305,7 +318,10 @@ impl<'a> Lexer<'a> {
     self.control.next_char_until(1, |_, ch, _| callback(ch))
   }
 
-  pub fn start(&mut self) -> LexResult {
+  pub fn start(&mut self, is_eval: bool) -> LexResult {
+    if is_eval {
+      InlineToken::lex(self, &(ControlSnapshot { line: 1, column: 0, offset: 0 }))?;
+    }
     loop {
       let result = self.next_tokens(true);
       if let Err(err) = result {
@@ -724,9 +740,9 @@ impl<'a> Lexer<'a> {
         self.tokens.push(Token::new(TokenType::RightSquareBracket, "]".into(), snapshot));
         Ok(())
       }
-      b'`' => StringToken::lex(self, "`", snapshot),
-      b'"' => StringToken::lex(self, "\"", snapshot),
-      b'\'' => StringToken::lex_basic(self, "\'", snapshot),
+      b'`' => StringToken::lex(self, b"`".into(), snapshot),
+      b'"' => StringToken::lex(self, b"\"".into(), snapshot),
+      b'\'' => StringToken::lex_basic(self, snapshot),
       b'\\' => {
         let t = self.until(|ch| !(ch.is_ascii_alphanumeric() || ch == b'_' || ch == b'\\'));
         self.tokens.push(Token::new(TokenType::Name, t, snapshot));

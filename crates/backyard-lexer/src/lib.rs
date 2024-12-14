@@ -6,26 +6,24 @@ pub mod error;
 use bstr::BString;
 use bumpalo::Bump;
 use error::LexError;
-use internal::inline::InlineToken;
-use lexer::{ ControlSnapshot, Lexer };
+use lexer::Lexer;
 use token::Token;
 
-pub fn bytes_lex<'a>(
+pub fn lex_bytes<'a>(
   arena: &'a Bump,
   input: Vec<u8>
 ) -> Result<bumpalo::collections::Vec<'a, Token>, LexError> {
   let mut lexer = Lexer::new(arena, BString::new(input));
-  InlineToken::lex(&mut lexer, &(ControlSnapshot { line: 1, column: 0, offset: 0 }))?;
-  lexer.start()?;
+  lexer.start(true)?;
   Ok(lexer.tokens)
 }
 
-pub fn bytes_lex_eval<'a>(
+pub fn lex_eval_bytes<'a>(
   arena: &'a Bump,
   input: Vec<u8>
 ) -> Result<bumpalo::collections::Vec<'a, Token>, LexError> {
   let mut lexer = Lexer::new(arena, BString::new(input));
-  lexer.start()?;
+  lexer.start(false)?;
   Ok(lexer.tokens)
 }
 
@@ -33,12 +31,12 @@ pub fn lex<'a>(
   arena: &'a Bump,
   input: &str
 ) -> Result<bumpalo::collections::Vec<'a, Token>, LexError> {
-  bytes_lex(arena, input.as_bytes().to_vec())
+  lex_bytes(arena, input.as_bytes().to_vec())
 }
 
 pub fn lex_eval<'a>(
   arena: &'a Bump,
   input: &str
 ) -> Result<bumpalo::collections::Vec<'a, Token>, LexError> {
-  bytes_lex_eval(arena, input.as_bytes().to_vec())
+  lex_eval_bytes(arena, input.as_bytes().to_vec())
 }
