@@ -23,7 +23,7 @@ impl TypeGenerator {
     if node.is_nullable {
       builder.push("?");
     }
-    builder.push(&node.name);
+    builder.push(&node.name.to_string());
   }
 
   fn generate_union<'arena>(

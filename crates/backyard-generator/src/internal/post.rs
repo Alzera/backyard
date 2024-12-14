@@ -12,6 +12,6 @@ impl PostGenerator {
   ) {
     let node = cast_node!(Post, &node.wrapper);
     generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
-    builder.push(node.operator.as_str());
+    builder.push(&node.operator.to_string());
   }
 }

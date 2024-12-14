@@ -36,7 +36,7 @@ impl StringGenerator {
     let node = cast_node!(EncapsedPart, &node.wrapper);
     if node.value.node_type == NodeType::String {
       let value = cast_node!(String, &node.value.wrapper);
-      builder.push(&value.value);
+      builder.push(&value.value.to_string());
       return;
     }
     let expr = generator.generate_node_new(&node.value).print("");
@@ -50,13 +50,14 @@ impl StringGenerator {
   pub fn generate_nowdoc(_: &mut Generator, builder: &mut Builder, node: &Node) {
     let node = cast_node!(NowDoc, &node.wrapper);
     builder.push(&format!("<<<'{}'", node.label));
-    builder.push(&node.value);
-    if let Some(last) = node.value.split('\n').last() {
+    let content = node.value.to_string();
+    builder.push(&content);
+    if let Some(last) = content.split('\n').last() {
       if !last.chars().all(|x| x.is_whitespace()) {
         builder.push("\n");
       }
     }
-    builder.push(&node.label);
+    builder.push(&node.label.to_string());
   }
 
   pub fn generate_heredoc<'arena>(
@@ -78,6 +79,6 @@ impl StringGenerator {
         }
       }
     }
-    builder.push(&node.label);
+    builder.push(&node.label.to_string());
   }
 }

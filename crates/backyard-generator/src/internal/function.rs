@@ -42,7 +42,7 @@ impl FunctionGenerator {
     }
     let mut parameters = if node.name.node_type == NodeType::Magic {
       let name = cast_node!(Magic, &node.name.wrapper);
-      builder.push(&name.name);
+      builder.push(&name.name.to_string());
       if name.name == "__construct" {
         generator.generate_nodes_new(
           &node.parameters,
@@ -55,7 +55,7 @@ impl FunctionGenerator {
       }
     } else {
       let name = cast_node!(Identifier, &node.name.wrapper);
-      builder.push(&name.name);
+      builder.push(&name.name.to_string());
       Self::get_parameters(generator, &node.parameters)
     };
     let (return_type, return_type_len) = Self::get_return_type(

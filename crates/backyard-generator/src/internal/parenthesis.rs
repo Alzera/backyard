@@ -23,7 +23,7 @@ impl ParenthesisGenerator {
   ) {
     let node = cast_node!(Cast, &node.wrapper);
     builder.push("(");
-    builder.push(&node.cast_type);
+    builder.push(&node.cast_type.to_string());
     builder.push(") ");
     generator.generate_node(builder, &node.expression, &mut GeneratorArgument::default());
   }

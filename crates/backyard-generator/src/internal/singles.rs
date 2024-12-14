@@ -74,7 +74,7 @@ impl SinglesGenerator {
       }
       NodeType::Inline => {
         builder.push(" ?>");
-        builder.push(&cast_node!(Inline, &node.wrapper).text);
+        builder.push(&cast_node!(Inline, &node.wrapper).text.to_string());
         builder.push("<?php ");
       }
       NodeType::Boolean => {

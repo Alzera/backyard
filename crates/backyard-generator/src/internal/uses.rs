@@ -21,7 +21,7 @@ impl UseGenerator {
     );
 
     if let Some(name) = &node.name {
-      builder.push(name);
+      builder.push(&name.to_string());
 
       builder.push("{");
       if
@@ -55,7 +55,7 @@ impl UseGenerator {
     if let Some(n) = &node.modifier {
       builder.push(format!("{} ", n).as_str());
     }
-    builder.push(&node.name);
+    builder.push(&node.name.to_string());
 
     if let Some(alias) = &node.alias {
       builder.push(" as ");

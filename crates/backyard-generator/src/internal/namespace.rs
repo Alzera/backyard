@@ -14,7 +14,7 @@ impl NamespaceGenerator {
   ) {
     let node = cast_node!(Namespace, &node.wrapper);
     builder.push("namespace ");
-    builder.push(&node.name);
+    builder.push(&node.name.to_string());
     if node.is_bracket {
       BlockGenerator::generate(generator, builder, &node.body, None);
     } else {

@@ -27,7 +27,7 @@ impl AttributeGenerator {
     node: &Node<'arena>
   ) {
     let node = cast_node!(AttributeItem, &node.wrapper);
-    builder.push(&node.name);
+    builder.push(&node.name.to_string());
     if !node.arguments.is_empty() {
       builder.push("(");
       let arguments = generator.generate_nodes_new(

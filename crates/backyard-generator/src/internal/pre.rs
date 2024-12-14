@@ -35,7 +35,7 @@ impl PreGenerator {
       }
       NodeType::Pre => {
         let node = cast_node!(Pre, &node.wrapper);
-        builder.push(&node.operator);
+        builder.push(&node.operator.to_string());
         generator.generate_node(builder, &node.statement, &mut GeneratorArgument::default());
       }
       _ => {}
