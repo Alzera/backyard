@@ -320,22 +320,19 @@ impl<'a> Lexer<'a> {
       c if c.is_ascii_digit() => NumberToken::lex(self, &current_char, snapshot),
       c if c.is_ascii_alphabetic() || c == b'_' => {
         let t = self.until(|ch| !(ch.is_ascii_alphanumeric() || ch == b'_' || ch == b'\\'));
-        let t_slice = t.as_slice();
-        if MAGIC_KEYWORDS.contains(&t_slice) {
+        let t_sliced = t.as_slice();
+        if MAGIC_KEYWORDS.contains(&t_sliced) {
           self.tokens.push(Token::new(TokenType::Magic, t, snapshot));
-          Ok(())
-        } else if MAGIC_METHOD_KEYWORDS.contains(&t_slice) {
+        } else if MAGIC_METHOD_KEYWORDS.contains(&t_sliced) {
           self.tokens.push(Token::new(TokenType::MagicMethod, t, snapshot));
-          Ok(())
-        } else if TYPE_KEYWORDS.contains(&t_slice) {
+        } else if TYPE_KEYWORDS.contains(&t_sliced) {
           self.tokens.push(Token::new(TokenType::Type, t, snapshot));
-          Ok(())
-        } else if KeywordToken::is_keyword(t_slice) {
-          KeywordToken::lex(self, t, snapshot)
+        } else if let Some(token) = KeywordToken::try_lex(self, &t, t_sliced, snapshot) {
+          self.tokens.push(token);
         } else {
           self.tokens.push(Token::new(TokenType::Identifier, t, snapshot));
-          Ok(())
         }
+        Ok(())
       }
       b'=' => {
         let t = self.until(|ch| ![b'=', b'>', b'&'].contains(&ch));

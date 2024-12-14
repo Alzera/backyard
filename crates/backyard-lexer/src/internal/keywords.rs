@@ -1,227 +1,133 @@
 use bstr::{ BString, ByteVec };
 
-use crate::{ error::LexResult, lexer::{ ControlSnapshot, Lexer }, token::{ Token, TokenType } };
+use crate::{ lexer::{ ControlSnapshot, Lexer }, token::{ Token, TokenType } };
 
 pub struct KeywordToken;
 
 impl KeywordToken {
-  const KEYS: &[&'static [u8]; 75] = &[
-    b"abstract",
-    b"array",
-    b"as",
-    b"break",
-    b"callable",
-    b"case",
-    b"catch",
-    b"class",
-    b"clone",
-    b"const",
-    b"continue",
-    b"declare",
-    b"default",
-    b"do",
-    b"echo",
-    b"else",
-    b"elseif",
-    b"enddeclare",
-    b"endfor",
-    b"endforeach",
-    b"endif",
-    b"endswitch",
-    b"endwhile",
-    b"enum",
-    b"exit",
-    b"eval",
-    b"die",
-    b"extends",
-    b"false",
-    b"final",
-    b"finally",
-    b"fn",
-    b"for",
-    b"foreach",
-    b"from",
-    b"function",
-    b"get",
-    b"global",
-    b"goto",
-    b"if",
-    b"implements",
-    b"include",
-    b"include_once",
-    b"instanceof",
-    b"insteadof",
-    b"interface",
-    b"list",
-    b"and",
-    b"or",
-    b"match",
-    b"namespace",
-    b"new",
-    b"null",
-    b"print",
-    b"private",
-    b"protected",
-    b"public",
-    b"readonly",
-    b"require",
-    b"require_once",
-    b"return",
-    b"static",
-    b"true",
-    b"parent",
-    b"self",
-    b"set",
-    b"switch",
-    b"throw",
-    b"trait",
-    b"try",
-    b"use",
-    b"var",
-    b"while",
-    b"yield",
-    b"xor",
-  ];
-
-  pub fn is_keyword(input: &[u8]) -> bool {
-    Self::KEYS.contains(&input)
+  pub fn try_lex(
+    lexer: &mut Lexer,
+    input: &BString,
+    input_sliced: &[u8],
+    snapshot: &ControlSnapshot
+  ) -> Option<Token> {
+    match input_sliced {
+      b"abstract" => Some(Token::new(TokenType::Abstract, input.to_owned(), snapshot)),
+      b"array" => Some(Token::new(TokenType::Array, input.to_owned(), snapshot)),
+      b"as" => Some(Token::new(TokenType::As, input.to_owned(), snapshot)),
+      b"break" => Some(Token::new(TokenType::Break, input.to_owned(), snapshot)),
+      b"callable" => Some(Token::new(TokenType::Callable, input.to_owned(), snapshot)),
+      b"case" => Some(Token::new(TokenType::Case, input.to_owned(), snapshot)),
+      b"catch" => Some(Token::new(TokenType::Catch, input.to_owned(), snapshot)),
+      b"class" => Some(Token::new(TokenType::Class, input.to_owned(), snapshot)),
+      b"clone" => Some(Token::new(TokenType::Clone, input.to_owned(), snapshot)),
+      b"const" => Some(Token::new(TokenType::Const, input.to_owned(), snapshot)),
+      b"continue" => Some(Token::new(TokenType::Continue, input.to_owned(), snapshot)),
+      b"declare" => Some(Token::new(TokenType::Declare, input.to_owned(), snapshot)),
+      b"default" => Some(Token::new(TokenType::Default, input.to_owned(), snapshot)),
+      b"do" => Some(Token::new(TokenType::Do, input.to_owned(), snapshot)),
+      b"echo" => Some(Token::new(TokenType::Echo, input.to_owned(), snapshot)),
+      b"else" => Some(Token::new(TokenType::Else, input.to_owned(), snapshot)),
+      b"elseif" => Some(Token::new(TokenType::ElseIf, input.to_owned(), snapshot)),
+      b"enddeclare" => Some(Token::new(TokenType::EndDeclare, input.to_owned(), snapshot)),
+      b"endfor" => Some(Token::new(TokenType::EndFor, input.to_owned(), snapshot)),
+      b"endforeach" => Some(Token::new(TokenType::EndForeach, input.to_owned(), snapshot)),
+      b"endif" => Some(Token::new(TokenType::EndIf, input.to_owned(), snapshot)),
+      b"endswitch" => Some(Token::new(TokenType::EndSwitch, input.to_owned(), snapshot)),
+      b"endwhile" => Some(Token::new(TokenType::EndWhile, input.to_owned(), snapshot)),
+      b"enum" => Some(Token::new(TokenType::Enum, input.to_owned(), snapshot)),
+      b"exit" => Some(Token::new(TokenType::Exit, input.to_owned(), snapshot)),
+      b"eval" => Some(Token::new(TokenType::Eval, input.to_owned(), snapshot)),
+      b"die" => Some(Token::new(TokenType::Die, input.to_owned(), snapshot)),
+      b"extends" => Some(Token::new(TokenType::Extends, input.to_owned(), snapshot)),
+      b"false" => Some(Token::new(TokenType::False, input.to_owned(), snapshot)),
+      b"final" => Some(Token::new(TokenType::Final, input.to_owned(), snapshot)),
+      b"finally" => Some(Token::new(TokenType::Finally, input.to_owned(), snapshot)),
+      b"fn" => Some(Token::new(TokenType::Fn, input.to_owned(), snapshot)),
+      b"for" => Some(Token::new(TokenType::For, input.to_owned(), snapshot)),
+      b"foreach" => Some(Token::new(TokenType::Foreach, input.to_owned(), snapshot)),
+      b"from" => Some(Token::new(TokenType::From, input.to_owned(), snapshot)),
+      b"function" => Some(Token::new(TokenType::Function, input.to_owned(), snapshot)),
+      b"get" => Some(Token::new(TokenType::Get, input.to_owned(), snapshot)),
+      b"global" => Some(Token::new(TokenType::Global, input.to_owned(), snapshot)),
+      b"goto" => Some(Token::new(TokenType::Goto, input.to_owned(), snapshot)),
+      b"if" => Some(Token::new(TokenType::If, input.to_owned(), snapshot)),
+      b"implements" => Some(Token::new(TokenType::Implements, input.to_owned(), snapshot)),
+      b"include" => Some(Token::new(TokenType::Include, input.to_owned(), snapshot)),
+      b"include_once" => Some(Token::new(TokenType::IncludeOnce, input.to_owned(), snapshot)),
+      b"instanceof" => Some(Token::new(TokenType::InstanceOf, input.to_owned(), snapshot)),
+      b"insteadof" => Some(Token::new(TokenType::InsteadOf, input.to_owned(), snapshot)),
+      b"interface" => Some(Token::new(TokenType::Interface, input.to_owned(), snapshot)),
+      b"list" => Some(Token::new(TokenType::List, input.to_owned(), snapshot)),
+      b"and" => Some(Token::new(TokenType::And, input.to_owned(), snapshot)),
+      b"or" => Some(Token::new(TokenType::Or, input.to_owned(), snapshot)),
+      b"match" => Some(Token::new(TokenType::Match, input.to_owned(), snapshot)),
+      b"namespace" => Some(Token::new(TokenType::Namespace, input.to_owned(), snapshot)),
+      b"new" => Some(Token::new(TokenType::New, input.to_owned(), snapshot)),
+      b"null" => Some(Token::new(TokenType::Null, input.to_owned(), snapshot)),
+      b"print" => Some(Token::new(TokenType::Print, input.to_owned(), snapshot)),
+      b"readonly" => Some(Token::new(TokenType::Readonly, input.to_owned(), snapshot)),
+      b"require" => Some(Token::new(TokenType::Require, input.to_owned(), snapshot)),
+      b"require_once" => Some(Token::new(TokenType::RequireOnce, input.to_owned(), snapshot)),
+      b"return" => Some(Token::new(TokenType::Return, input.to_owned(), snapshot)),
+      b"static" => Some(Token::new(TokenType::Static, input.to_owned(), snapshot)),
+      b"parent" => Some(Token::new(TokenType::Parent, input.to_owned(), snapshot)),
+      b"self" => Some(Token::new(TokenType::SelfKeyword, input.to_owned(), snapshot)),
+      b"set" => Some(Token::new(TokenType::Set, input.to_owned(), snapshot)),
+      b"switch" => Some(Token::new(TokenType::Switch, input.to_owned(), snapshot)),
+      b"throw" => Some(Token::new(TokenType::Throw, input.to_owned(), snapshot)),
+      b"trait" => Some(Token::new(TokenType::Trait, input.to_owned(), snapshot)),
+      b"true" => Some(Token::new(TokenType::True, input.to_owned(), snapshot)),
+      b"try" => Some(Token::new(TokenType::Try, input.to_owned(), snapshot)),
+      b"use" => Some(Token::new(TokenType::Use, input.to_owned(), snapshot)),
+      b"var" => Some(Token::new(TokenType::Var, input.to_owned(), snapshot)),
+      b"while" => Some(Token::new(TokenType::While, input.to_owned(), snapshot)),
+      b"yield" => Some(Token::new(TokenType::Yield, input.to_owned(), snapshot)),
+      b"xor" => Some(Token::new(TokenType::Xor, input.to_owned(), snapshot)),
+      b"private" =>
+        Some(Self::lex_visibility(lexer, input.to_owned(), TokenType::Private, snapshot)),
+      b"protected" =>
+        Some(Self::lex_visibility(lexer, input.to_owned(), TokenType::Protected, snapshot)),
+      b"public" => Some(Self::lex_visibility(lexer, input.to_owned(), TokenType::Public, snapshot)),
+      _ => None,
+    }
   }
 
-  pub fn lex(lexer: &mut Lexer, input: BString, snapshot: &ControlSnapshot) -> LexResult {
-    let token = match input.as_slice() {
-      b"abstract" => Token::new(TokenType::Abstract, input, snapshot),
-      b"array" => Token::new(TokenType::Array, input, snapshot),
-      b"as" => Token::new(TokenType::As, input, snapshot),
-      b"break" => Token::new(TokenType::Break, input, snapshot),
-      b"callable" => Token::new(TokenType::Callable, input, snapshot),
-      b"case" => Token::new(TokenType::Case, input, snapshot),
-      b"catch" => Token::new(TokenType::Catch, input, snapshot),
-      b"class" => Token::new(TokenType::Class, input, snapshot),
-      b"clone" => Token::new(TokenType::Clone, input, snapshot),
-      b"const" => Token::new(TokenType::Const, input, snapshot),
-      b"continue" => Token::new(TokenType::Continue, input, snapshot),
-      b"declare" => Token::new(TokenType::Declare, input, snapshot),
-      b"default" => Token::new(TokenType::Default, input, snapshot),
-      b"do" => Token::new(TokenType::Do, input, snapshot),
-      b"echo" => Token::new(TokenType::Echo, input, snapshot),
-      b"else" => Token::new(TokenType::Else, input, snapshot),
-      b"elseif" => Token::new(TokenType::ElseIf, input, snapshot),
-      b"enddeclare" => Token::new(TokenType::EndDeclare, input, snapshot),
-      b"endfor" => Token::new(TokenType::EndFor, input, snapshot),
-      b"endforeach" => Token::new(TokenType::EndForeach, input, snapshot),
-      b"endif" => Token::new(TokenType::EndIf, input, snapshot),
-      b"endswitch" => Token::new(TokenType::EndSwitch, input, snapshot),
-      b"endwhile" => Token::new(TokenType::EndWhile, input, snapshot),
-      b"enum" => Token::new(TokenType::Enum, input, snapshot),
-      b"exit" => Token::new(TokenType::Exit, input, snapshot),
-      b"eval" => Token::new(TokenType::Eval, input, snapshot),
-      b"die" => Token::new(TokenType::Die, input, snapshot),
-      b"extends" => Token::new(TokenType::Extends, input, snapshot),
-      b"false" => Token::new(TokenType::False, input, snapshot),
-      b"final" => Token::new(TokenType::Final, input, snapshot),
-      b"finally" => Token::new(TokenType::Finally, input, snapshot),
-      b"fn" => Token::new(TokenType::Fn, input, snapshot),
-      b"for" => Token::new(TokenType::For, input, snapshot),
-      b"foreach" => Token::new(TokenType::Foreach, input, snapshot),
-      b"from" => Token::new(TokenType::From, input, snapshot),
-      b"function" => Token::new(TokenType::Function, input, snapshot),
-      b"get" => Token::new(TokenType::Get, input, snapshot),
-      b"global" => Token::new(TokenType::Global, input, snapshot),
-      b"goto" => Token::new(TokenType::Goto, input, snapshot),
-      b"if" => Token::new(TokenType::If, input, snapshot),
-      b"implements" => Token::new(TokenType::Implements, input, snapshot),
-      b"include" => Token::new(TokenType::Include, input, snapshot),
-      b"include_once" => Token::new(TokenType::IncludeOnce, input, snapshot),
-      b"instanceof" => Token::new(TokenType::InstanceOf, input, snapshot),
-      b"insteadof" => Token::new(TokenType::InsteadOf, input, snapshot),
-      b"interface" => Token::new(TokenType::Interface, input, snapshot),
-      b"list" => Token::new(TokenType::List, input, snapshot),
-      b"and" => Token::new(TokenType::And, input, snapshot),
-      b"or" => Token::new(TokenType::Or, input, snapshot),
-      b"match" => Token::new(TokenType::Match, input, snapshot),
-      b"namespace" => Token::new(TokenType::Namespace, input, snapshot),
-      b"new" => Token::new(TokenType::New, input, snapshot),
-      b"null" => Token::new(TokenType::Null, input, snapshot),
-      b"print" => Token::new(TokenType::Print, input, snapshot),
-      b"readonly" => Token::new(TokenType::Readonly, input, snapshot),
-      b"require" => Token::new(TokenType::Require, input, snapshot),
-      b"require_once" => Token::new(TokenType::RequireOnce, input, snapshot),
-      b"return" => Token::new(TokenType::Return, input, snapshot),
-      b"static" => Token::new(TokenType::Static, input, snapshot),
-      b"parent" => Token::new(TokenType::Parent, input, snapshot),
-      b"self" => Token::new(TokenType::SelfKeyword, input, snapshot),
-      b"set" => Token::new(TokenType::Set, input, snapshot),
-      b"switch" => Token::new(TokenType::Switch, input, snapshot),
-      b"throw" => Token::new(TokenType::Throw, input, snapshot),
-      b"trait" => Token::new(TokenType::Trait, input, snapshot),
-      b"true" => Token::new(TokenType::True, input, snapshot),
-      b"try" => Token::new(TokenType::Try, input, snapshot),
-      b"use" => Token::new(TokenType::Use, input, snapshot),
-      b"var" => Token::new(TokenType::Var, input, snapshot),
-      b"while" => Token::new(TokenType::While, input, snapshot),
-      b"yield" => Token::new(TokenType::Yield, input, snapshot),
-      b"xor" => Token::new(TokenType::Xor, input, snapshot),
-      _ => {
-        return Self::check_visibility(lexer, input, snapshot);
-      }
-    };
-    lexer.tokens.push(token);
-    Ok(())
-  }
-
-  fn check_visibility(
+  fn lex_visibility(
     lexer: &mut Lexer,
     mut input: BString,
+    token_type: TokenType,
     snapshot: &ControlSnapshot
-  ) -> LexResult {
-    let token_type = match input.as_slice() {
-      b"private" => TokenType::Private,
-      b"protected" => TokenType::Protected,
-      b"public" => TokenType::Public,
-      _ => {
-        return Err(lexer.control.error_unrecognized(input.to_string().split_off(1)));
-      }
-    };
+  ) -> Token {
     if let Some(pos) = lexer.control.peek_char_n(None, 5) {
       if pos == "(get)" {
         lexer.control.consume(5);
         input.push_str(pos);
-        lexer.tokens.push(
-          Token::new(
-            match token_type {
-              TokenType::Private => TokenType::PrivateGet,
-              TokenType::Protected => TokenType::ProtectedGet,
-              TokenType::Public => TokenType::PublicGet,
-              _ => {
-                return Err(lexer.control.error_unrecognized(input.to_string().split_off(1)));
-              }
-            },
-            input,
-            snapshot
-          )
+        return Token::new(
+          match token_type {
+            TokenType::Private => TokenType::PrivateGet,
+            TokenType::Protected => TokenType::ProtectedGet,
+            TokenType::Public => TokenType::PublicGet,
+            _ => unreachable!(),
+          },
+          input,
+          snapshot
         );
-        return Ok(());
       } else if pos == "(set)" {
         lexer.control.consume(5);
         input.push_str(pos);
-        lexer.tokens.push(
-          Token::new(
-            match token_type {
-              TokenType::Private => TokenType::PrivateSet,
-              TokenType::Protected => TokenType::ProtectedSet,
-              TokenType::Public => TokenType::PublicSet,
-              _ => {
-                return Err(lexer.control.error_unrecognized(input.to_string().split_off(1)));
-              }
-            },
-            input,
-            snapshot
-          )
+        return Token::new(
+          match token_type {
+            TokenType::Private => TokenType::PrivateSet,
+            TokenType::Protected => TokenType::ProtectedSet,
+            TokenType::Public => TokenType::PublicSet,
+            _ => unreachable!(),
+          },
+          input,
+          snapshot
         );
-        return Ok(());
       }
     }
-    lexer.tokens.push(Token::new(token_type, input, snapshot));
-    Ok(())
+    return Token::new(token_type, input.to_owned(), snapshot);
   }
 }

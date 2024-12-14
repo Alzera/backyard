@@ -107,7 +107,8 @@ fn criterion_benchmark(c: &mut Criterion) {
 criterion_group! {
   name = benches;
   config = Criterion::default()
-    .measurement_time(std::time::Duration::from_secs(30))
+  .warm_up_time(std::time::Duration::from_secs(5))
+  .measurement_time(std::time::Duration::from_secs(60))
     .sample_size(500);
   targets = criterion_benchmark,
 }
