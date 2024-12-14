@@ -2,7 +2,7 @@ use bstr::{ BString, ByteSlice, ByteVec };
 
 use crate::error::{ LexError, LexResult };
 use crate::internal::variable::VariableToken;
-use crate::lexer::{ ControlSnapshot, Lexer, SeriesChecker, SeriesCheckerMode, U8Ext };
+use crate::lexer::{ ControlSnapshot, Lexer, SeriesChecker, SeriesCheckerMode };
 use crate::token::{ Token, TokenType };
 
 pub struct StringToken;
@@ -31,7 +31,7 @@ impl StringToken {
               return false;
             }
             if let Some(next) = control.peek_char(Some(*end_position + 1)) {
-              if *next == b'_' || next.is_alphabetic() {
+              if *next == b'_' || next.is_ascii_alphabetic() {
                 return true;
               }
             }
@@ -42,7 +42,7 @@ impl StringToken {
             if let Some(next) = control.peek_char(Some(*end_position + 1)) {
               if *next == b'$' {
                 if let Some(next) = control.peek_char(Some(*end_position + 2)) {
-                  if *next == b'_' || *next == b'{' || next.is_alphabetic() {
+                  if *next == b'_' || *next == b'{' || next.is_ascii_alphabetic() {
                     return true;
                   }
                 }
@@ -110,7 +110,7 @@ impl StringToken {
   pub fn lex(lexer: &mut Lexer, breaker: &str, snapshot: &ControlSnapshot) -> LexResult {
     lexer.tokens.push(Token::new(TokenType::EncapsedStringOpen, breaker.into(), snapshot));
 
-    let is_without_encapsed = Self::get_parts(lexer, &breaker, SeriesCheckerMode::String)?;
+    let is_without_encapsed = Self::get_parts(lexer, breaker, SeriesCheckerMode::String)?;
 
     if is_without_encapsed {
       if let Some(string_token) = lexer.tokens.pop() {
@@ -139,14 +139,14 @@ impl StringToken {
         .enumerate()
         .fold(true, |acc, (i, ch)| {
           acc &&
-            (ch.is_alphanumeric() ||
+            (ch.is_ascii_alphanumeric() ||
               *ch == b'_' ||
               ((i == 0 || i == label.len() - 1) && [b'\'', b'"'].contains(ch)))
         })
     {
       return Err(lexer.control.error_unrecognized(label.to_string().split_off(1)));
     }
-    if label.starts_with(&[b'\'']) && label.ends_with(&[b'\'']) {
+    if label.starts_with(b"\'") && label.ends_with(b"\'") {
       let clean_label: BString = label
         .get(1..label.len() - 1)
         .unwrap_or_default()

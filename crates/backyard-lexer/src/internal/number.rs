@@ -1,5 +1,5 @@
 use crate::error::LexResult;
-use crate::lexer::{ ControlSnapshot, Lexer, U8Ext };
+use crate::lexer::{ ControlSnapshot, Lexer };
 use crate::token::{ Token, TokenType };
 
 pub struct NumberToken;
@@ -10,7 +10,7 @@ impl NumberToken {
       if let Some(next) = lexer.control.peek_char(None) {
         if *next == b'x' {
           lexer.control.next_char();
-          let t = lexer.control.next_char_until(2, |_, ch, _| !ch.is_alphanumeric());
+          let t = lexer.control.next_char_until(2, |_, ch, _| !ch.is_ascii_alphanumeric());
           return {
             lexer.tokens.push(Token::new(TokenType::NumberHex, t, snapshot));
             Ok(())

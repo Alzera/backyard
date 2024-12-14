@@ -163,7 +163,7 @@ impl<'a> SeriesChecker<'a> {
       }
       return;
     }
-    if ch.is_whitespace() {
+    if ch.is_ascii_whitespace() {
       self.list.clear();
     } else {
       self.list.push(ch);
@@ -174,11 +174,11 @@ impl<'a> SeriesChecker<'a> {
     let text = self.list.to_string();
     if self.mode == SeriesCheckerMode::Heredoc {
       if let Some(label) = self.againsts.first() {
-        return if text.trim() == *label { Some(label.to_owned().into()) } else { None };
+        return if text.trim() == *label { Some(label.to_owned()) } else { None };
       }
     } else if let Some(valid) = self.againsts.iter().find(|i| text.ends_with(*i)) {
       if !self.is_escaped(self.list.len() - valid.len()) {
-        return Some(valid.to_owned().into());
+        return Some(valid.to_owned());
       }
     }
     None
@@ -200,7 +200,7 @@ impl<'a> SeriesChecker<'a> {
   }
 }
 
-const MAGIC_KEYWORDS: &[&'static [u8]] = &[
+const MAGIC_KEYWORDS: &[&[u8]] = &[
   b"__CLASS__",
   b"__DIR__",
   b"__FILE__",
@@ -212,7 +212,7 @@ const MAGIC_KEYWORDS: &[&'static [u8]] = &[
   b"__PROPERTY__",
 ];
 
-const MAGIC_METHOD_KEYWORDS: &[&'static [u8]] = &[
+const MAGIC_METHOD_KEYWORDS: &[&[u8]] = &[
   b"__construct",
   b"__destruct",
   b"__call",
@@ -232,7 +232,7 @@ const MAGIC_METHOD_KEYWORDS: &[&'static [u8]] = &[
   b"__debugInfo",
 ];
 
-const TYPE_KEYWORDS: &[&'static [u8]] = &[
+const TYPE_KEYWORDS: &[&[u8]] = &[
   // "array",
   b"bool",
   b"boolean",
@@ -305,7 +305,7 @@ impl<'a> Lexer<'a> {
 
   pub fn next_tokens(&mut self, skip_whitespace: bool) -> LexResult {
     if skip_whitespace {
-      self.control.next_char_until(0, |_, ch, _| !ch.is_whitespace());
+      self.control.next_char_until(0, |_, ch, _| !ch.is_ascii_whitespace());
     }
 
     let snapshot = &self.control.get_snapshot();
@@ -318,8 +318,8 @@ impl<'a> Lexer<'a> {
     match current_char {
       b'$' => VariableToken::lex(self, snapshot),
       c if c.is_ascii_digit() => NumberToken::lex(self, &current_char, snapshot),
-      c if c.is_alphabetic() || c == b'_' => {
-        let t = self.until(|ch| !(ch.is_alphanumeric() || ch == b'_' || ch == b'\\'));
+      c if c.is_ascii_alphabetic() || c == b'_' => {
+        let t = self.until(|ch| !(ch.is_ascii_alphanumeric() || ch == b'_' || ch == b'\\'));
         let t_slice = t.as_slice();
         if MAGIC_KEYWORDS.contains(&t_slice) {
           self.tokens.push(Token::new(TokenType::Magic, t, snapshot));
@@ -549,7 +549,8 @@ impl<'a> Lexer<'a> {
           }
           b"--" => {
             let is_post = match self.control.peek_char(None) {
-              Some(t) => t.is_whitespace() || [b';', b',', b')', b']', b'}', b'?'].contains(&t),
+              Some(t) =>
+                t.is_ascii_whitespace() || [b';', b',', b')', b']', b'}', b'?'].contains(t),
               None => true,
             };
             if is_post {
@@ -668,7 +669,8 @@ impl<'a> Lexer<'a> {
           }
           b"++" => {
             let is_post = match self.control.peek_char(None) {
-              Some(t) => t.is_whitespace() || [b';', b',', b')', b']', b'}', b'?'].contains(&t),
+              Some(t) =>
+                t.is_ascii_whitespace() || [b';', b',', b')', b']', b'}', b'?'].contains(t),
               None => true,
             };
             if is_post {
@@ -714,7 +716,7 @@ impl<'a> Lexer<'a> {
       b'"' => StringToken::lex(self, "\"", snapshot),
       b'\'' => StringToken::lex_basic(self, "\'", snapshot),
       b'\\' => {
-        let t = self.until(|ch| !(ch.is_alphanumeric() || ch == b'_' || ch == b'\\'));
+        let t = self.until(|ch| !(ch.is_ascii_alphanumeric() || ch == b'_' || ch == b'\\'));
         self.tokens.push(Token::new(TokenType::Name, t, snapshot));
         Ok(())
       }
@@ -736,30 +738,5 @@ impl<'a> Lexer<'a> {
       }
       _ => Err(self.control.error_unrecognized(BString::new(vec![current_char]).to_string())),
     }
-  }
-}
-
-pub trait U8Ext {
-  fn is_whitespace(self) -> bool;
-  fn is_ascii_digit(self) -> bool;
-  fn is_alphabetic(self) -> bool;
-  fn is_alphanumeric(self) -> bool;
-}
-
-impl U8Ext for u8 {
-  fn is_whitespace(self) -> bool {
-    self == b' ' || self == b'\t' || self == b'\n' || self == b'\r' || self == b'\x0C'
-  }
-
-  fn is_ascii_digit(self) -> bool {
-    self >= b'0' && self <= b'9'
-  }
-
-  fn is_alphabetic(self) -> bool {
-    (self >= b'a' && self <= b'z') || (self >= b'A' && self <= b'Z')
-  }
-
-  fn is_alphanumeric(self) -> bool {
-    self.is_ascii_digit() || self.is_alphabetic()
   }
 }

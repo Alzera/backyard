@@ -11,7 +11,7 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct ParenthesisParser;
 
-const CAST_TYPES: &[&'static [u8]] = &[
+const CAST_TYPES: &[&[u8]] = &[
   b"int",
   b"integer",
   b"bool",

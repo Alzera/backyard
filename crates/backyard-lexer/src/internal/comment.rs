@@ -14,7 +14,7 @@ impl CommentToken {
       if close.len() > 2 {
         close.remove(0);
       }
-      let is_close = close.get(0) == Some(&b'*') && close.get(1) == Some(&b'/');
+      let is_close = close.first() == Some(&b'*') && close.get(1) == Some(&b'/');
       if is_close {
         *endpos -= 1;
       }

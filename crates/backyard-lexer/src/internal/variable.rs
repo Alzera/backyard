@@ -1,5 +1,5 @@
 use crate::error::LexResult;
-use crate::lexer::{ ControlSnapshot, Lexer, U8Ext };
+use crate::lexer::{ ControlSnapshot, Lexer };
 use crate::token::{ Token, TokenType };
 
 pub struct VariableToken;
@@ -16,7 +16,10 @@ impl VariableToken {
           Token::new(TokenType::VariableBracketClose, "}".into(), lexer.control.get_last_snapshot())
         );
       } else {
-        let t = lexer.control.next_char_until(0, |_, ch, _| !(ch.is_alphanumeric() || ch == b'_'));
+        let t = lexer.control.next_char_until(
+          0,
+          |_, ch, _| !(ch.is_ascii_alphanumeric() || ch == b'_')
+        );
         if t == "this" {
           lexer.tokens.push(Token::new(TokenType::This, t, snapshot));
         } else {
