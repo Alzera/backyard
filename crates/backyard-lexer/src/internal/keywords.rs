@@ -128,6 +128,6 @@ impl KeywordToken {
         );
       }
     }
-    return Token::new(token_type, input.to_owned(), snapshot);
+    Token::new(token_type, input.to_owned(), snapshot)
   }
 }

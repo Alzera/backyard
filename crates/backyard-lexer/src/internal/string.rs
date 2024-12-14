@@ -170,7 +170,6 @@ impl StringToken {
       );
       Ok(())
     } else {
-      let label = BString::new(label.to_vec());
       lexer.tokens.push(Token::new(TokenType::HeredocOpen, label.clone(), snapshot));
       Self::get_parts(lexer, &label.to_string(), SeriesCheckerMode::Heredoc)?;
       lexer.tokens.push(

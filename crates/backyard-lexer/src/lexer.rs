@@ -23,9 +23,9 @@ pub(crate) struct ControlSnapshot {
 pub(crate) struct Control {
   chars: BString,
   position: usize,
-  pub(crate) line: usize,
-  pub(crate) column: usize,
-  pub(crate) last_snapshot: ControlSnapshot,
+  line: usize,
+  column: usize,
+  last_snapshot: ControlSnapshot,
 }
 
 impl Control {
@@ -39,26 +39,31 @@ impl Control {
     }
   }
 
+  #[inline]
   pub(crate) fn get_len(&self) -> usize {
     self.chars.len()
   }
 
+  #[inline]
   pub(crate) fn get_position(&self) -> usize {
     self.position
   }
 
+  #[inline]
+  pub(crate) fn get_last_snapshot(&self) -> &ControlSnapshot {
+    &self.last_snapshot
+  }
+
+  #[inline]
   pub(crate) fn consume(&mut self, len: usize) {
     for _ in 0..len {
       self.next_char();
     }
   }
 
+  #[inline]
   pub(crate) fn get_snapshot(&self) -> ControlSnapshot {
     ControlSnapshot { line: self.line, column: self.column, offset: self.position }
-  }
-
-  pub(crate) fn get_last_snapshot(&self) -> &ControlSnapshot {
-    &self.last_snapshot
   }
 
   pub(crate) fn peek_char(&mut self, pos: Option<usize>) -> Option<&u8> {
@@ -68,7 +73,7 @@ impl Control {
 
   pub(crate) fn peek_char_n(&mut self, pos: Option<usize>, n: usize) -> Option<BString> {
     let p = if let Some(pos) = pos { pos } else { self.position };
-    self.chars.get(p..p + n).map(|x| BString::new(x.to_vec()))
+    self.chars.get(p..p + n).map(|x| x.into())
   }
 
   pub(crate) fn next_char(&mut self) -> Option<&u8> {
@@ -90,22 +95,31 @@ impl Control {
   pub(crate) fn next_char_until<F>(&mut self, take_prev_len: usize, mut until: F) -> BString
     where F: FnMut(&mut Control, u8, &mut usize) -> bool
   {
-    let start_position = self.position - take_prev_len;
+    let start_position = self.position;
     let mut end_position = self.position;
+    let mut line = self.line;
+    let mut column = self.column;
     while let Some(ch) = self.chars.get(end_position) {
-      if until(self, *ch, &mut end_position) {
+      let ch = *ch;
+      if until(self, ch, &mut end_position) {
         break;
       }
       end_position += 1;
+      if ch == b'\n' {
+        line += 1;
+        column = 0;
+      } else {
+        column += 1;
+      }
     }
 
-    let result = BString::new(self.chars[start_position..end_position].to_vec());
-    while self.position < end_position {
-      self.next_char();
-    }
-    result
+    self.line = line;
+    self.column = column;
+    self.position = end_position;
+    self.chars[start_position - take_prev_len..end_position].into()
   }
 
+  #[inline]
   pub(crate) fn error_unrecognized(&self, t: String) -> LexError {
     LexError::Unrecognized { token: t, line: self.line, column: self.column }
   }
@@ -286,6 +300,7 @@ impl<'a> Lexer<'a> {
     Ok(())
   }
 
+  #[inline]
   fn until<F>(&mut self, mut callback: F) -> BString where F: FnMut(u8) -> bool {
     self.control.next_char_until(1, |_, ch, _| callback(ch))
   }
