@@ -1,11 +1,17 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 171
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: Foreach
-  value: foreach
+  value:
+    - 102
+    - 111
+    - 114
+    - 101
+    - 97
+    - 99
+    - 104
   line: 1
   column: 0
   offset: 0

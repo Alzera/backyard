@@ -1,11 +1,19 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 251
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: Namespace
-  value: namespace
+  value:
+    - 110
+    - 97
+    - 109
+    - 101
+    - 115
+    - 112
+    - 97
+    - 99
+    - 101
   line: 1
   column: 0
   offset: 0

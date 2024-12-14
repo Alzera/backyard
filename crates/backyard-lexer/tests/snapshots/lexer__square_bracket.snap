@@ -4,47 +4,56 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: Variable
-  value: a
+  value:
+    - 97
   line: 1
   column: 0
   offset: 0
 - token_type: LeftSquareBracket
-  value: "["
+  value:
+    - 91
   line: 1
   column: 2
   offset: 2
 - token_type: Number
-  value: "1"
+  value:
+    - 49
   line: 1
   column: 3
   offset: 3
 - token_type: Comma
-  value: ","
+  value:
+    - 44
   line: 1
   column: 4
   offset: 4
 - token_type: Number
-  value: "2"
+  value:
+    - 50
   line: 1
   column: 6
   offset: 6
 - token_type: Comma
-  value: ","
+  value:
+    - 44
   line: 1
   column: 7
   offset: 7
 - token_type: Number
-  value: "3"
+  value:
+    - 51
   line: 1
   column: 9
   offset: 9
 - token_type: RightSquareBracket
-  value: "]"
+  value:
+    - 93
   line: 1
   column: 10
   offset: 10
 - token_type: Semicolon
-  value: ;
+  value:
+    - 59
   line: 1
   column: 11
   offset: 11

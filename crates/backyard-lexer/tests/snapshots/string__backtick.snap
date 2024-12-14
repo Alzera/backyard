@@ -4,37 +4,47 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: EncapsedStringOpen
-  value: "`"
+  value:
+    - 96
   line: 1
   column: 0
   offset: 0
 - token_type: EncapsedString
-  value: "test "
+  value:
+    - 116
+    - 101
+    - 115
+    - 116
+    - 32
   line: 1
   column: 1
   offset: 1
 - token_type: AdvanceInterpolationOpen
-  value: "{"
+  value:
+    - 123
   line: 1
   column: 6
   offset: 6
 - token_type: Variable
-  value: a
+  value:
+    - 97
   line: 1
   column: 7
   offset: 7
 - token_type: AdvanceInterpolationClose
-  value: "}"
+  value:
+    - 125
   line: 1
   column: 9
   offset: 9
 - token_type: EncapsedString
-  value: ""
+  value: []
   line: 1
   column: 10
   offset: 10
 - token_type: EncapsedStringClose
-  value: "`"
+  value:
+    - 96
   line: 1
   column: 10
   offset: 10

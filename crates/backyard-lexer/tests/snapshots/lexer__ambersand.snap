@@ -4,42 +4,52 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: Variable
-  value: a
+  value:
+    - 97
   line: 1
   column: 0
   offset: 0
 - token_type: BitwiseAndAssignment
-  value: "&="
+  value:
+    - 38
+    - 61
   line: 1
   column: 3
   offset: 3
 - token_type: Variable
-  value: b
+  value:
+    - 98
   line: 1
   column: 6
   offset: 6
 - token_type: BitwiseAnd
-  value: "&"
+  value:
+    - 38
   line: 1
   column: 9
   offset: 9
 - token_type: Variable
-  value: c
+  value:
+    - 99
   line: 1
   column: 11
   offset: 11
 - token_type: BooleanAnd
-  value: "&&"
+  value:
+    - 38
+    - 38
   line: 1
   column: 14
   offset: 14
 - token_type: Variable
-  value: d
+  value:
+    - 100
   line: 1
   column: 17
   offset: 17
 - token_type: Semicolon
-  value: ;
+  value:
+    - 59
   line: 1
   column: 19
   offset: 19

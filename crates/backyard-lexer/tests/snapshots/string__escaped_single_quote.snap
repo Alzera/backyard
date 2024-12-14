@@ -1,11 +1,25 @@
 ---
 source: crates/backyard-lexer/tests/string.rs
-assertion_line: 54
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: String
-  value: "'test \\' still'"
+  value:
+    - 39
+    - 116
+    - 101
+    - 115
+    - 116
+    - 32
+    - 92
+    - 39
+    - 32
+    - 115
+    - 116
+    - 105
+    - 108
+    - 108
+    - 39
   line: 1
   column: 0
   offset: 0

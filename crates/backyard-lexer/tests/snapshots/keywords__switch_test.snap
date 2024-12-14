@@ -1,11 +1,16 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 326
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: Switch
-  value: switch
+  value:
+    - 115
+    - 119
+    - 105
+    - 116
+    - 99
+    - 104
   line: 1
   column: 0
   offset: 0

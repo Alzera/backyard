@@ -4,7 +4,22 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: String
-  value: "\"test \\\" still\""
+  value:
+    - 34
+    - 116
+    - 101
+    - 115
+    - 116
+    - 32
+    - 92
+    - 34
+    - 32
+    - 115
+    - 116
+    - 105
+    - 108
+    - 108
+    - 34
   line: 1
   column: 0
   offset: 0

@@ -1,11 +1,21 @@
 ---
 source: crates/backyard-lexer/tests/lexer.rs
-assertion_line: 12
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: MagicMethod
-  value: __construct
+  value:
+    - 95
+    - 95
+    - 99
+    - 111
+    - 110
+    - 115
+    - 116
+    - 114
+    - 117
+    - 99
+    - 116
   line: 1
   column: 0
   offset: 0

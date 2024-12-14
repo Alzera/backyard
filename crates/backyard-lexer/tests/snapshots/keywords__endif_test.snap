@@ -1,11 +1,15 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 106
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: EndIf
-  value: endif
+  value:
+    - 101
+    - 110
+    - 100
+    - 105
+    - 102
   line: 1
   column: 0
   offset: 0

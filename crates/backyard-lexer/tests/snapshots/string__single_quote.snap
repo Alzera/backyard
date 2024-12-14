@@ -4,7 +4,18 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: String
-  value: "'test {$a}'"
+  value:
+    - 39
+    - 116
+    - 101
+    - 115
+    - 116
+    - 32
+    - 123
+    - 36
+    - 97
+    - 125
+    - 39
   line: 1
   column: 0
   offset: 0

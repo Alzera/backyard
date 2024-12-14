@@ -4,27 +4,36 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: Variable
-  value: a
+  value:
+    - 97
   line: 1
   column: 0
   offset: 0
 - token_type: Assignment
-  value: "="
+  value:
+    - 61
   line: 1
   column: 3
   offset: 3
 - token_type: BooleanNegate
-  value: "~"
+  value:
+    - 126
   line: 1
   column: 5
   offset: 5
 - token_type: "False"
-  value: "false"
+  value:
+    - 102
+    - 97
+    - 108
+    - 115
+    - 101
   line: 1
   column: 6
   offset: 6
 - token_type: Semicolon
-  value: ;
+  value:
+    - 59
   line: 1
   column: 11
   offset: 11

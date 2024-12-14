@@ -4,97 +4,124 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: Variable
-  value: a
+  value:
+    - 97
   line: 1
   column: 6
   offset: 6
 - token_type: CoalesceAssignment
-  value: "??="
+  value:
+    - 63
+    - 63
+    - 61
   line: 1
   column: 9
   offset: 9
 - token_type: LeftParenthesis
-  value: (
+  value:
+    - 40
   line: 1
   column: 13
   offset: 13
 - token_type: Variable
-  value: b
+  value:
+    - 98
   line: 1
   column: 14
   offset: 14
 - token_type: Coalesce
-  value: "??"
+  value:
+    - 63
+    - 63
   line: 1
   column: 17
   offset: 17
 - token_type: Variable
-  value: c
+  value:
+    - 99
   line: 1
   column: 20
   offset: 20
 - token_type: RightParenthesis
-  value: )
+  value:
+    - 41
   line: 1
   column: 22
   offset: 22
 - token_type: QuestionMark
-  value: "?"
+  value:
+    - 63
   line: 1
   column: 24
   offset: 24
 - token_type: LeftParenthesis
-  value: (
+  value:
+    - 40
   line: 1
   column: 26
   offset: 26
 - token_type: Variable
-  value: d
+  value:
+    - 100
   line: 1
   column: 27
   offset: 27
 - token_type: Elvis
-  value: "?:"
+  value:
+    - 63
+    - 58
   line: 1
   column: 30
   offset: 30
 - token_type: Variable
-  value: e
+  value:
+    - 101
   line: 1
   column: 33
   offset: 33
 - token_type: RightParenthesis
-  value: )
+  value:
+    - 41
   line: 1
   column: 35
   offset: 35
 - token_type: Colon
-  value: ":"
+  value:
+    - 58
   line: 1
   column: 37
   offset: 37
 - token_type: Variable
-  value: f
+  value:
+    - 102
   line: 1
   column: 39
   offset: 39
 - token_type: NullsafeObjectAccess
-  value: "?->"
+  value:
+    - 63
+    - 45
+    - 62
   line: 1
   column: 41
   offset: 41
 - token_type: Identifier
-  value: g
+  value:
+    - 103
   line: 1
   column: 44
   offset: 44
 - token_type: Semicolon
-  value: ;
+  value:
+    - 59
   line: 1
   column: 45
   offset: 45
 - token_type: Inline
-  value: ">>>"
+  value:
+    - 62
+    - 62
+    - 62
   line: 1
   column: 47
   offset: 47

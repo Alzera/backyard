@@ -1,11 +1,22 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 296
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: RequireOnce
-  value: require_once
+  value:
+    - 114
+    - 101
+    - 113
+    - 117
+    - 105
+    - 114
+    - 101
+    - 95
+    - 111
+    - 110
+    - 99
+    - 101
   line: 1
   column: 0
   offset: 0

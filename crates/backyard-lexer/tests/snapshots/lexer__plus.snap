@@ -4,42 +4,53 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: Variable
-  value: a
+  value:
+    - 97
   line: 1
   column: 0
   offset: 0
 - token_type: AdditionAssignment
-  value: +=
+  value:
+    - 43
+    - 61
   line: 1
   column: 3
   offset: 3
 - token_type: Variable
-  value: b
+  value:
+    - 98
   line: 1
   column: 6
   offset: 6
 - token_type: PostIncrement
-  value: ++
+  value:
+    - 43
+    - 43
   line: 1
   column: 8
   offset: 8
 - token_type: Addition
-  value: +
+  value:
+    - 43
   line: 1
   column: 11
   offset: 11
 - token_type: PreIncrement
-  value: ++
+  value:
+    - 43
+    - 43
   line: 1
   column: 13
   offset: 13
 - token_type: Variable
-  value: c
+  value:
+    - 99
   line: 1
   column: 15
   offset: 15
 - token_type: Semicolon
-  value: ;
+  value:
+    - 59
   line: 1
   column: 17
   offset: 17

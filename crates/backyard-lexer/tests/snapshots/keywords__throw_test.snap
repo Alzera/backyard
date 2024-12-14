@@ -1,11 +1,15 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 331
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: Throw
-  value: throw
+  value:
+    - 116
+    - 104
+    - 114
+    - 111
+    - 119
   line: 1
   column: 0
   offset: 0

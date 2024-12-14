@@ -4,12 +4,17 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: Name
-  value: "\\A\\B"
+  value:
+    - 92
+    - 65
+    - 92
+    - 66
   line: 1
   column: 0
   offset: 0
 - token_type: Semicolon
-  value: ;
+  value:
+    - 59
   line: 1
   column: 4
   offset: 4

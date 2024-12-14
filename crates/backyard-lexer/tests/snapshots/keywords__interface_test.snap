@@ -1,11 +1,19 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 226
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: Interface
-  value: interface
+  value:
+    - 105
+    - 110
+    - 116
+    - 101
+    - 114
+    - 102
+    - 97
+    - 99
+    - 101
   line: 1
   column: 0
   offset: 0

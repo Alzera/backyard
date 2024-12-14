@@ -4,7 +4,14 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: Magic
-  value: __DIR__
+  value:
+    - 95
+    - 95
+    - 68
+    - 73
+    - 82
+    - 95
+    - 95
   line: 1
   column: 0
   offset: 0

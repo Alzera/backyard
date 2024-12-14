@@ -1,11 +1,16 @@
 ---
 source: crates/backyard-lexer/tests/comment.rs
-assertion_line: 12
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: CommentBlock
-  value: " test "
+  value:
+    - 32
+    - 116
+    - 101
+    - 115
+    - 116
+    - 32
   line: 1
   column: 0
   offset: 0

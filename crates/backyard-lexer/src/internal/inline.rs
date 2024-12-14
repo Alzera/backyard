@@ -1,4 +1,4 @@
-use compact_str::CompactString;
+use bstr::BString;
 
 use crate::error::LexResult;
 use crate::lexer::{ ControlSnapshot, Lexer, SeriesChecker, SeriesCheckerMode };
@@ -17,7 +17,7 @@ impl InlineToken {
         no_breaker = true;
         return true;
       }
-      checker.push(*ch);
+      checker.push(ch);
       checker.check().is_some()
     });
     lexer.control.next_char();
@@ -26,8 +26,7 @@ impl InlineToken {
         lexer.tokens.push(Token::new(TokenType::Inline, inline, snapshot));
       }
     } else if let Some(breaker) = checker.check() {
-      let inline: CompactString =
-        inline[..inline.len() - breaker[..breaker.len() - 1].len()].into();
+      let inline: BString = inline[..inline.len() - breaker[..breaker.len() - 1].len()].into();
       if !inline.is_empty() {
         lexer.tokens.push(Token::new(TokenType::Inline, inline, snapshot));
       }

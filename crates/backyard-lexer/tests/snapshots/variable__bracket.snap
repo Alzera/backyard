@@ -1,21 +1,24 @@
 ---
 source: crates/backyard-lexer/tests/variable.rs
-assertion_line: 18
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: VariableBracketOpen
-  value: "${"
+  value:
+    - 36
+    - 123
   line: 1
   column: 0
   offset: 0
 - token_type: Variable
-  value: a
+  value:
+    - 97
   line: 1
   column: 2
   offset: 2
 - token_type: VariableBracketClose
-  value: "}"
+  value:
+    - 125
   line: 1
   column: 4
   offset: 4

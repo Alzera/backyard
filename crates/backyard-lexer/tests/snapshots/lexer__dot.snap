@@ -4,32 +4,38 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: Variable
-  value: a
+  value:
+    - 97
   line: 1
   column: 0
   offset: 0
 - token_type: Assignment
-  value: "="
+  value:
+    - 61
   line: 1
   column: 3
   offset: 3
 - token_type: Variable
-  value: b
+  value:
+    - 98
   line: 1
   column: 5
   offset: 5
 - token_type: Concatenation
-  value: "."
+  value:
+    - 46
   line: 1
   column: 8
   offset: 8
 - token_type: Variable
-  value: c
+  value:
+    - 99
   line: 1
   column: 10
   offset: 10
 - token_type: Semicolon
-  value: ;
+  value:
+    - 59
   line: 1
   column: 12
   offset: 12

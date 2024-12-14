@@ -29,6 +29,7 @@ backyard-parser = { version = "0.1.9", path = "crates/backyard-parser" }
 backyard-generator = { version = "0.1.9", path = "crates/backyard-generator" }
 backyard = { version = "0.1.9", path = "crates/backyard" }
 
+bstr = { version = "1.11.1", features = ["serde"] }
 compact_str = { version = "0.8.0", features = ["serde"] }
 bumpalo = { version = "3.16.0" }
 

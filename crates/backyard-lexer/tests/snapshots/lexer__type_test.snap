@@ -4,7 +4,10 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: Type
-  value: int
+  value:
+    - 105
+    - 110
+    - 116
   line: 1
   column: 0
   offset: 0

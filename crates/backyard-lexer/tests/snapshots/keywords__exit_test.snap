@@ -1,11 +1,14 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 126
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: Exit
-  value: exit
+  value:
+    - 101
+    - 120
+    - 105
+    - 116
   line: 1
   column: 0
   offset: 0

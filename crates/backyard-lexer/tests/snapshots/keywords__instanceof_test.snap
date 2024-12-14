@@ -1,11 +1,20 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 216
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: InstanceOf
-  value: instanceof
+  value:
+    - 105
+    - 110
+    - 115
+    - 116
+    - 97
+    - 110
+    - 99
+    - 101
+    - 111
+    - 102
   line: 1
   column: 0
   offset: 0

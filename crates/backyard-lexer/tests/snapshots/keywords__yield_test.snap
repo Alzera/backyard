@@ -1,11 +1,15 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 361
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: Yield
-  value: yield
+  value:
+    - 121
+    - 105
+    - 101
+    - 108
+    - 100
   line: 1
   column: 0
   offset: 0

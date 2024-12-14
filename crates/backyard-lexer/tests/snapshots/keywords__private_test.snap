@@ -1,21 +1,51 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 426
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: Private
-  value: private
+  value:
+    - 112
+    - 114
+    - 105
+    - 118
+    - 97
+    - 116
+    - 101
   line: 1
   column: 0
   offset: 0
 - token_type: PrivateGet
-  value: private(get)
+  value:
+    - 112
+    - 114
+    - 105
+    - 118
+    - 97
+    - 116
+    - 101
+    - 40
+    - 103
+    - 101
+    - 116
+    - 41
   line: 1
   column: 8
   offset: 8
 - token_type: PrivateSet
-  value: private(set)
+  value:
+    - 112
+    - 114
+    - 105
+    - 118
+    - 97
+    - 116
+    - 101
+    - 40
+    - 115
+    - 101
+    - 116
+    - 41
   line: 1
   column: 21
   offset: 21

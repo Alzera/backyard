@@ -4,22 +4,36 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: NowDocOpen
-  value: TEST
+  value:
+    - 84
+    - 69
+    - 83
+    - 84
   line: 1
   column: 0
   offset: 0
 - token_type: EncapsedString
-  value: "\ntest"
+  value:
+    - 10
+    - 116
+    - 101
+    - 115
+    - 116
   line: 1
   column: 9
   offset: 9
 - token_type: NowDocClose
-  value: TEST
+  value:
+    - 84
+    - 69
+    - 83
+    - 84
   line: 3
   column: 3
   offset: 18
 - token_type: Semicolon
-  value: ;
+  value:
+    - 59
   line: 3
   column: 4
   offset: 19

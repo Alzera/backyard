@@ -1,4 +1,4 @@
-use compact_str::{ format_compact, CompactString };
+use bstr::BString;
 
 use crate::error::LexResult;
 use crate::lexer::{ ControlSnapshot, Lexer };
@@ -7,14 +7,14 @@ use crate::token::{ Token, TokenType };
 pub struct CommentToken;
 
 impl CommentToken {
-  pub fn parse(lexer: &mut Lexer) -> CompactString {
-    let mut close: Vec<char> = Vec::new();
-    let comment = lexer.control.next_char_until(0, |_, ch, endpos| {
-      close.push(*ch);
+  pub fn parse(lexer: &mut Lexer, take_prev_len: usize) -> BString {
+    let mut close: Vec<u8> = Vec::new();
+    let comment = lexer.control.next_char_until(take_prev_len, |_, ch, endpos| {
+      close.push(ch);
       if close.len() > 2 {
         close.remove(0);
       }
-      let is_close = close.iter().collect::<String>() == "*/";
+      let is_close = close.get(0) == Some(&b'*') && close.get(1) == Some(&b'/');
       if is_close {
         *endpos -= 1;
       }
@@ -24,39 +24,41 @@ impl CommentToken {
     comment
   }
 
-  pub fn lex_doc(lexer: &mut Lexer, t: &str, snapshot: &ControlSnapshot) -> LexResult {
-    let comment = CommentToken::parse(lexer);
-    lexer.tokens.push(
-      Token::new(TokenType::CommentDoc, format_compact!("{}{}", t, comment), snapshot)
-    );
+  pub fn lex_doc(lexer: &mut Lexer, take_prev_len: usize, snapshot: &ControlSnapshot) -> LexResult {
+    let comment = CommentToken::parse(lexer, take_prev_len);
+    lexer.tokens.push(Token::new(TokenType::CommentDoc, comment, snapshot));
     Ok(())
   }
 
-  pub fn lex_block(lexer: &mut Lexer, t: &str, snapshot: &ControlSnapshot) -> LexResult {
-    let comment = CommentToken::parse(lexer);
-    lexer.tokens.push(
-      Token::new(TokenType::CommentBlock, format_compact!("{}{}", t, comment), snapshot)
-    );
+  pub fn lex_block(
+    lexer: &mut Lexer,
+    take_prev_len: usize,
+    snapshot: &ControlSnapshot
+  ) -> LexResult {
+    let comment = CommentToken::parse(lexer, take_prev_len);
+    lexer.tokens.push(Token::new(TokenType::CommentBlock, comment, snapshot));
     Ok(())
   }
 
-  pub fn lex_line(lexer: &mut Lexer, t: &str, snapshot: &ControlSnapshot) -> LexResult {
+  pub fn lex_line(
+    lexer: &mut Lexer,
+    take_prev_len: usize,
+    snapshot: &ControlSnapshot
+  ) -> LexResult {
     let comment = {
-      lexer.control.next_char_until(0, |control, ch, i| {
-        if *ch == '\n' {
+      lexer.control.next_char_until(take_prev_len, |control, ch, i| {
+        if ch == b'\n' {
           return true;
         }
         if let Some(next_char) = control.peek_char(Some(*i + 1)) {
-          if *ch == '?' && next_char == '>' {
+          if ch == b'?' && *next_char == b'>' {
             return true;
           }
         }
         false
       })
     };
-    lexer.tokens.push(
-      Token::new(TokenType::CommentLine, format_compact!("{}{}", t, comment), snapshot)
-    );
+    lexer.tokens.push(Token::new(TokenType::CommentLine, comment, snapshot));
     Ok(())
   }
 }

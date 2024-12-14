@@ -1,4 +1,6 @@
-use compact_str::CompactString;
+use std::fmt::{ Debug, Display };
+
+use bstr::BString;
 use serde::{ Deserialize, Serialize };
 
 use crate::lexer::ControlSnapshot;
@@ -200,21 +202,17 @@ pub enum TokenType {
   Xor,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Serialize, Deserialize)]
 pub struct Token {
   pub token_type: TokenType,
-  pub value: CompactString,
+  pub value: BString,
   pub line: usize,
   pub column: usize,
   pub offset: usize,
 }
 
 impl Token {
-  pub(crate) fn new(
-    token_type: TokenType,
-    value: CompactString,
-    snapshot: &ControlSnapshot
-  ) -> Self {
+  pub(crate) fn new(token_type: TokenType, value: BString, snapshot: &ControlSnapshot) -> Self {
     Token {
       token_type,
       value,
@@ -222,5 +220,33 @@ impl Token {
       column: snapshot.column,
       offset: snapshot.offset,
     }
+  }
+}
+
+impl Debug for Token {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(
+      f,
+      "Token {{ token_type: {:?}, value: {:?}, line: {:?}, column: {:?}, offset: {:?} }}",
+      self.token_type,
+      self.value.to_string(),
+      self.line,
+      self.column,
+      self.offset
+    )
+  }
+}
+
+impl Display for Token {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(
+      f,
+      "Token {{ token_type: {:?}, value: {:?}, line: {:?}, column: {:?}, offset: {:?} }}",
+      self.token_type,
+      self.value.to_string(),
+      self.line,
+      self.column,
+      self.offset
+    )
   }
 }

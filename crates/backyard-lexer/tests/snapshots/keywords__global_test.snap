@@ -1,11 +1,16 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 186
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: Global
-  value: global
+  value:
+    - 103
+    - 108
+    - 111
+    - 98
+    - 97
+    - 108
   line: 1
   column: 0
   offset: 0

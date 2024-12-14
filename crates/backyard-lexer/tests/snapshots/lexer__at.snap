@@ -4,37 +4,47 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: Variable
-  value: a
+  value:
+    - 97
   line: 1
   column: 0
   offset: 0
 - token_type: Assignment
-  value: "="
+  value:
+    - 61
   line: 1
   column: 3
   offset: 3
 - token_type: AtSign
-  value: "@"
+  value:
+    - 64
   line: 1
   column: 5
   offset: 5
 - token_type: This
-  value: this
+  value:
+    - 116
+    - 104
+    - 105
+    - 115
   line: 1
   column: 6
   offset: 6
 - token_type: LeftParenthesis
-  value: (
+  value:
+    - 40
   line: 1
   column: 11
   offset: 11
 - token_type: RightParenthesis
-  value: )
+  value:
+    - 41
   line: 1
   column: 12
   offset: 12
 - token_type: Semicolon
-  value: ;
+  value:
+    - 59
   line: 1
   column: 13
   offset: 13

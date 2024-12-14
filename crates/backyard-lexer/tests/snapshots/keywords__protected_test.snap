@@ -1,21 +1,57 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 432
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: Protected
-  value: protected
+  value:
+    - 112
+    - 114
+    - 111
+    - 116
+    - 101
+    - 99
+    - 116
+    - 101
+    - 100
   line: 1
   column: 0
   offset: 0
 - token_type: ProtectedGet
-  value: protected(get)
+  value:
+    - 112
+    - 114
+    - 111
+    - 116
+    - 101
+    - 99
+    - 116
+    - 101
+    - 100
+    - 40
+    - 103
+    - 101
+    - 116
+    - 41
   line: 1
   column: 10
   offset: 10
 - token_type: ProtectedSet
-  value: protected(set)
+  value:
+    - 112
+    - 114
+    - 111
+    - 116
+    - 101
+    - 99
+    - 116
+    - 101
+    - 100
+    - 40
+    - 115
+    - 101
+    - 116
+    - 41
   line: 1
   column: 25
   offset: 25

@@ -4,52 +4,66 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: Variable
-  value: a
+  value:
+    - 97
   line: 1
   column: 0
   offset: 0
 - token_type: ExponentiationAssignment
-  value: "**="
+  value:
+    - 42
+    - 42
+    - 61
   line: 1
   column: 3
   offset: 3
 - token_type: Variable
-  value: b
+  value:
+    - 98
   line: 1
   column: 7
   offset: 7
 - token_type: MultiplicationAssignment
-  value: "*="
+  value:
+    - 42
+    - 61
   line: 1
   column: 10
   offset: 10
 - token_type: Variable
-  value: c
+  value:
+    - 99
   line: 1
   column: 13
   offset: 13
 - token_type: Multiplication
-  value: "*"
+  value:
+    - 42
   line: 1
   column: 16
   offset: 16
 - token_type: Variable
-  value: d
+  value:
+    - 100
   line: 1
   column: 18
   offset: 18
 - token_type: Exponentiation
-  value: "**"
+  value:
+    - 42
+    - 42
   line: 1
   column: 21
   offset: 21
 - token_type: Variable
-  value: e
+  value:
+    - 101
   line: 1
   column: 24
   offset: 24
 - token_type: Semicolon
-  value: ;
+  value:
+    - 59
   line: 1
   column: 26
   offset: 26

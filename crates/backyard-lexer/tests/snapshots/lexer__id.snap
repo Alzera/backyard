@@ -4,7 +4,16 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: Identifier
-  value: sample_id
+  value:
+    - 115
+    - 97
+    - 109
+    - 112
+    - 108
+    - 101
+    - 95
+    - 105
+    - 100
   line: 1
   column: 0
   offset: 0

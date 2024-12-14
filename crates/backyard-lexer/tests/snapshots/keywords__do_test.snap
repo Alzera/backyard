@@ -1,11 +1,12 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 71
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: Do
-  value: do
+  value:
+    - 100
+    - 111
   line: 1
   column: 0
   offset: 0

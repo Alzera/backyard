@@ -1,11 +1,17 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 291
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: Require
-  value: require
+  value:
+    - 114
+    - 101
+    - 113
+    - 117
+    - 105
+    - 114
+    - 101
   line: 1
   column: 0
   offset: 0

@@ -4,32 +4,49 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: Attribute
-  value: "#["
+  value:
+    - 35
+    - 91
   line: 1
   column: 0
   offset: 0
 - token_type: Identifier
-  value: attr
+  value:
+    - 97
+    - 116
+    - 116
+    - 114
   line: 1
   column: 2
   offset: 2
 - token_type: RightSquareBracket
-  value: "]"
+  value:
+    - 93
   line: 1
   column: 6
   offset: 6
 - token_type: Variable
-  value: a
+  value:
+    - 97
   line: 2
   column: 0
   offset: 8
 - token_type: Semicolon
-  value: ;
+  value:
+    - 59
   line: 2
   column: 2
   offset: 10
 - token_type: CommentLine
-  value: " comment"
+  value:
+    - 32
+    - 99
+    - 111
+    - 109
+    - 109
+    - 101
+    - 110
+    - 116
   line: 2
   column: 4
   offset: 12

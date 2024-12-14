@@ -4,7 +4,13 @@ expression: tokens
 snapshot_kind: text
 ---
 - token_type: String
-  value: "\"test\""
+  value:
+    - 34
+    - 116
+    - 101
+    - 115
+    - 116
+    - 34
   line: 1
   column: 0
   offset: 0

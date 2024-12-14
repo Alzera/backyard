@@ -1,16 +1,35 @@
 ---
 source: crates/backyard-lexer/tests/inline.rs
-assertion_line: 12
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: Inline
-  value: "<div>test</div>"
+  value:
+    - 60
+    - 100
+    - 105
+    - 118
+    - 62
+    - 116
+    - 101
+    - 115
+    - 116
+    - 60
+    - 47
+    - 100
+    - 105
+    - 118
+    - 62
   line: 1
   column: 0
   offset: 0
 - token_type: CommentLine
-  value: " test"
+  value:
+    - 32
+    - 116
+    - 101
+    - 115
+    - 116
   line: 1
   column: 21
   offset: 21

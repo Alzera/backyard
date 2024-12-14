@@ -1,11 +1,14 @@
 ---
 source: crates/backyard-lexer/tests/keywords.rs
-assertion_line: 321
 expression: tokens
 snapshot_kind: text
 ---
 - token_type: SelfKeyword
-  value: self
+  value:
+    - 115
+    - 101
+    - 108
+    - 102
   line: 1
   column: 0
   offset: 0
