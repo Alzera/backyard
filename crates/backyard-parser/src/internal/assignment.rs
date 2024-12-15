@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{ AssignmentNode, Location, Node, utils::IntoBoxedNode };
 
 use crate::{
@@ -13,13 +13,11 @@ pub struct AssignmentParser;
 impl AssignmentParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     args: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     args.last_expr.as_ref()?;
     match_pattern(
       parser,
-      tokens,
       &[
         Lookup::Equal(
           &[
@@ -46,12 +44,12 @@ impl AssignmentParser {
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [operator] = matched.as_slice() {
-      let operator = operator.as_equal()?;
+      let operator = operator.as_equal(parser)?.value.to_owned();
       let left = args.last_expr.take().unwrap();
       args.last_expr = None;
       if
@@ -70,7 +68,7 @@ impl AssignmentParser {
         return Ok(
           AssignmentNode::loc(
             left.into_boxed(parser.arena),
-            operator.value.to_owned(),
+            operator,
             right.into_boxed(parser.arena),
             parser.gen_loc(start_loc)
           )

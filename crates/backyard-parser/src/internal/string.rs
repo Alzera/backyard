@@ -1,6 +1,6 @@
 use bstr::BString;
 use bumpalo::{ collections::Vec, vec };
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{
   EncapsedNode,
   EncapsedPartNode,
@@ -28,12 +28,10 @@ pub struct StringParser;
 impl StringParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[
         Lookup::Equal(
           &[
@@ -49,12 +47,12 @@ impl StringParser {
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [string_type] = matched.as_slice() {
-      let string_type = string_type.as_equal()?;
+      let string_type = string_type.as_equal(parser)?;
       if string_type.token_type == TokenType::NowDocOpen {
         let label = string_type.value.to_owned();
         let text = guard!(parser.tokens.get(parser.position)).value.to_owned();
@@ -65,12 +63,12 @@ impl StringParser {
           }
         }
       } else if string_type.token_type == TokenType::HeredocOpen {
-        let values = StringParser::parse_encapsed(parser, args, TokenType::HeredocClose)?;
         let label = string_type.value.to_owned();
+        let values = StringParser::parse_encapsed(parser, args, TokenType::HeredocClose)?;
         return Ok(HereDocNode::loc(label, values, parser.gen_loc(start_loc)));
       } else if string_type.token_type == TokenType::EncapsedStringOpen {
-        let values = StringParser::parse_encapsed(parser, args, TokenType::EncapsedStringClose)?;
         let quote = string_type.value.to_owned();
+        let values = StringParser::parse_encapsed(parser, args, TokenType::EncapsedStringClose)?;
         return Ok(
           EncapsedNode::loc(
             Quote::try_from(&quote).map_err(|_| ParserError::Internal)?,

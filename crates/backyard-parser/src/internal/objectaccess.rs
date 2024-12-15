@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{ Location, Node, ObjectAccessNode, utils::IntoBoxedNode };
 
 use crate::{
@@ -15,25 +15,23 @@ pub struct ObjectAccessParser;
 impl ObjectAccessParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     args: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     args.last_expr.as_ref()?;
     match_pattern(
       parser,
-      tokens,
       &[Lookup::Equal(&[TokenType::ObjectAccess, TokenType::NullsafeObjectAccess])]
     )
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [access_type] = matched.as_slice() {
-      let is_nullsafe = access_type.as_equal()?.token_type == TokenType::NullsafeObjectAccess;
+      let is_nullsafe = access_type.as_equal(parser)?.token_type == TokenType::NullsafeObjectAccess;
       let is_bracket = if let Some(next_token) = parser.tokens.get(parser.position) {
         next_token.token_type == TokenType::LeftCurlyBracket
       } else {
@@ -53,7 +51,7 @@ impl ObjectAccessParser {
         );
         parser.position += 1;
         t
-      } else if let Some(m) = VariableParser::test(parser, &parser.tokens[parser.position..], args) {
+      } else if let Some(m) = VariableParser::test(parser, args) {
         let loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
         parser.position += m
           .iter()

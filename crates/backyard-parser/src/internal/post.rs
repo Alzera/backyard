@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{ Location, Node, PostNode, utils::IntoBoxedNode };
 
 use crate::{
@@ -13,20 +13,15 @@ pub struct PostParser;
 impl PostParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     args: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     args.last_expr.as_ref()?;
-    match_pattern(
-      parser,
-      tokens,
-      &[Lookup::Equal(&[TokenType::PostIncrement, TokenType::PostDecrement])]
-    )
+    match_pattern(parser, &[Lookup::Equal(&[TokenType::PostIncrement, TokenType::PostDecrement])])
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
@@ -34,7 +29,7 @@ impl PostParser {
       return Ok(
         PostNode::loc(
           args.last_expr.take().unwrap().into_boxed(parser.arena),
-          operator.as_equal()?.value.to_owned(),
+          operator.as_equal(parser)?.value.to_owned(),
           parser.gen_loc(start_loc)
         )
       );

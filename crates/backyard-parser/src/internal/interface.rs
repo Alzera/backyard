@@ -1,5 +1,5 @@
 use bumpalo::vec;
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{ BlockNode, InterfaceNode, Location, Node, utils::IntoBoxedNode };
 
 use crate::{
@@ -22,24 +22,22 @@ pub struct InterfaceParser;
 impl InterfaceParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[Lookup::Equal(&[TokenType::Interface]), Lookup::Equal(&[TokenType::Identifier])]
     )
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [_, name] = matched.as_slice() {
-      let name = IdentifierParser::from_token(name.as_equal()?);
+      let name = IdentifierParser::from_token(name.as_equal(parser)?);
       let extends = {
         let mut parsed = None;
         if let Some(t) = parser.tokens.get(parser.position) {

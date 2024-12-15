@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{ ExitNode, Location, Node, utils::IntoBoxedOptionNode };
 
 use crate::{
@@ -13,12 +13,10 @@ pub struct ExitParser;
 impl ExitParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[
         Lookup::Equal(&[TokenType::Exit, TokenType::Die]),
         Lookup::Optional(&[TokenType::LeftParenthesis]),
@@ -28,7 +26,7 @@ impl ExitParser {
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {

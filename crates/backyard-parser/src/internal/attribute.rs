@@ -1,5 +1,5 @@
 use bumpalo::vec;
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{ AttributeItemNode, AttributeNode, Location, Node };
 
 use crate::{
@@ -16,15 +16,14 @@ pub struct AttributeParser;
 impl AttributeParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
-    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Attribute])])
+    match_pattern(parser, &[Lookup::Equal(&[TokenType::Attribute])])
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
@@ -62,12 +61,10 @@ pub struct AttributeItemParser;
 impl AttributeItemParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[
         Lookup::Equal(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set]),
         Lookup::Optional(&[TokenType::LeftParenthesis]),
@@ -77,12 +74,12 @@ impl AttributeItemParser {
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [name, has_argument] = matched.as_slice() {
-      let name = name.as_equal()?.value.to_owned();
+      let name = name.as_equal(parser)?.value.to_owned();
       let arguments = if !has_argument.is_empty() {
         CallParser::get_arguments(parser)?
       } else {

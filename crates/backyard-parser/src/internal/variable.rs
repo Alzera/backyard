@@ -32,24 +32,19 @@ impl VariableParser {
 impl VariableParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
-    match_pattern(
-      parser,
-      tokens,
-      &[Lookup::Equal(&[TokenType::Variable, TokenType::VariableBracketOpen])]
-    )
+    match_pattern(parser, &[Lookup::Equal(&[TokenType::Variable, TokenType::VariableBracketOpen])])
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [name] = matched.as_slice() {
-      let name = name.as_equal()?;
+      let name = name.as_equal(parser)?;
       if name.token_type == TokenType::VariableBracketOpen {
         let expr = parser.get_statement(
           &mut LoopArgument::with_tokens(

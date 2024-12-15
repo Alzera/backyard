@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{
   BooleanNode,
   BreakNode,
@@ -32,12 +32,10 @@ pub struct SinglesParser;
 impl SinglesParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[
         Lookup::Equal(
           &[
@@ -65,12 +63,12 @@ impl SinglesParser {
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [key] = matched.as_slice() {
-      let key = key.as_equal()?;
+      let key = key.as_equal(parser)?;
       if
         [
           TokenType::Parent,
@@ -95,6 +93,7 @@ impl SinglesParser {
           _ => Err(ParserError::Internal),
         };
       }
+      let key_type = key.token_type;
       let argument = parser
         .get_statement(
           &mut LoopArgument::with_tokens(
@@ -105,7 +104,7 @@ impl SinglesParser {
           )
         )?
         .into_boxed(parser.arena);
-      match key.token_type {
+      match key_type {
         TokenType::Break => {
           return Ok(BreakNode::loc(argument, parser.gen_loc(start_loc)));
         }
@@ -121,7 +120,7 @@ impl SinglesParser {
         return Err(ParserError::Internal);
       }
       let argument = argument.unwrap();
-      return match key.token_type {
+      return match key_type {
         TokenType::New => Ok(NewNode::loc(argument, parser.gen_loc(start_loc))),
         TokenType::Print => Ok(PrintNode::loc(argument, parser.gen_loc(start_loc))),
         TokenType::Throw => Ok(ThrowNode::loc(argument, parser.gen_loc(start_loc))),

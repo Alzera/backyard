@@ -1,5 +1,5 @@
 use bumpalo::vec;
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{
   Location,
   Node,
@@ -14,7 +14,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 use super::{ comment::CommentParser, identifier::IdentifierParser };
@@ -25,15 +25,14 @@ pub struct TraitUseParser;
 impl TraitUseParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
-    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Use])])
+    match_pattern(parser, &[Lookup::Equal(&[TokenType::Use])])
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
@@ -80,12 +79,10 @@ pub struct TraitUseAliasParser;
 impl TraitUseAliasParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[
         Lookup::Equal(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set]),
         Lookup::Optional(&[TokenType::DoubleColon]),
@@ -99,20 +96,22 @@ impl TraitUseAliasParser {
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [trait_name, double_colon, name, _, visibility, alias] = matched.as_slice() {
-      let trait_name = IdentifierParser::from_token(trait_name.as_equal()?);
-      let name = name.as_optional().map(IdentifierParser::from_token);
+      let trait_name = IdentifierParser::from_token(trait_name.as_equal(parser)?);
+      let name = name.as_optional(parser).map(IdentifierParser::from_token);
       let (trait_name_parsed, name_parsed) = if !double_colon.is_empty() {
         (Some(trait_name), name.unwrap())
       } else {
         (None, trait_name)
       };
-      let alias = alias.as_optional().map(IdentifierParser::from_token);
-      let visibility = visibility.as_optional().and_then(|x| Visibility::try_from(&x.value).ok());
+      let alias = alias.as_optional(parser).map(IdentifierParser::from_token);
+      let visibility = visibility
+        .as_optional(parser)
+        .and_then(|x| Visibility::try_from(&x.value).ok());
       return Ok(
         TraitUseAliasNode::loc(
           trait_name_parsed.into_boxed(parser.arena),
@@ -133,12 +132,10 @@ pub struct TraitUsePrecedenceParser;
 impl TraitUsePrecedenceParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[
         Lookup::Equal(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set]),
         Lookup::Optional(&[TokenType::DoubleColon]),
@@ -151,14 +148,15 @@ impl TraitUsePrecedenceParser {
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [trait_name, _, method, _, instead] = matched.as_slice() {
-      let instead = IdentifierParser::from_token(instead.as_equal()?);
-      let mut trait_name_parsed = Some(IdentifierParser::from_token(trait_name.as_equal()?));
-      let method = if let LookupResultWrapper::Optional(Some(method)) = &method.wrapper {
+      let instead = IdentifierParser::from_token(instead.as_equal(parser)?);
+      let mut trait_name_parsed = Some(IdentifierParser::from_token(trait_name.as_equal(parser)?));
+
+      let method = if let Some(method) = &method.as_optional(parser) {
         IdentifierParser::from_token(method)
       } else {
         let t = trait_name_parsed.unwrap();

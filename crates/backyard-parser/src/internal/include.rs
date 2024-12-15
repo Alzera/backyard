@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{ IncludeNode, Location, Node, utils::IntoBoxedNode };
 
 use crate::{
@@ -14,12 +14,10 @@ pub struct IncludeParser;
 impl IncludeParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[
         Lookup::Equal(
           &[TokenType::Require, TokenType::RequireOnce, TokenType::Include, TokenType::IncludeOnce]
@@ -31,12 +29,12 @@ impl IncludeParser {
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [keyword, use_parenthesis] = matched.as_slice() {
-      let keyword = keyword.as_equal()?;
+      let keyword = keyword.as_equal(parser)?;
       let is_require =
         keyword.token_type == TokenType::Require || keyword.token_type == TokenType::RequireOnce;
       let is_once =

@@ -1,5 +1,5 @@
 use bumpalo::vec;
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{
   Location,
   Node,
@@ -24,15 +24,14 @@ pub struct UseParser;
 impl UseParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
-    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Use])])
+    match_pattern(parser, &[Lookup::Equal(&[TokenType::Use])])
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
@@ -100,12 +99,10 @@ pub struct UseItemParser;
 impl UseItemParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[
         Lookup::Optional(&[TokenType::Function, TokenType::Const]),
         Lookup::Equal(
@@ -117,13 +114,15 @@ impl UseItemParser {
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [modifier, name] = matched.as_slice() {
-      let modifier = modifier.as_optional().and_then(|x| UseItemModifier::try_from(&x.value).ok());
-      let name = name.as_equal()?.value.to_owned();
+      let modifier = modifier
+        .as_optional(parser)
+        .and_then(|x| UseItemModifier::try_from(&x.value).ok());
+      let name = name.as_equal(parser)?.value.to_owned();
       let mut alias = None;
       if let Some(last) = parser.tokens.get(parser.position) {
         if last.token_type == TokenType::As {

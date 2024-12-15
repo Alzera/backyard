@@ -18,20 +18,19 @@ impl MagicParser {
 
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
-    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Magic, TokenType::MagicMethod])])
+    match_pattern(parser, &[Lookup::Equal(&[TokenType::Magic, TokenType::MagicMethod])])
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [text] = matched.as_slice() {
-      return Ok(MagicNode::loc(text.as_equal()?.value.to_owned(), parser.gen_loc(start_loc)));
+      return Ok(MagicNode::loc(text.as_equal(parser)?.value.to_owned(), parser.gen_loc(start_loc)));
     }
     Err(ParserError::Internal)
   }

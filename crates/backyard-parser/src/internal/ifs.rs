@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{
   ElseNode,
   IfNode,
@@ -22,19 +22,17 @@ pub struct IfParser;
 impl IfParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[Lookup::Equal(&[TokenType::If]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
@@ -92,29 +90,32 @@ pub struct ElseParser;
 impl ElseParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
-    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Else, TokenType::ElseIf])])
+    match_pattern(parser, &[Lookup::Equal(&[TokenType::Else, TokenType::ElseIf])])
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [keyword] = matched.as_slice() {
-      if let Ok(keyword) = keyword.as_equal() {
-        if keyword.token_type == TokenType::ElseIf {
-          let token = parser.tokens.get(parser.position).unwrap();
+      if let LookupResultWrapper::Equal(keyword) = &keyword.wrapper {
+        if
+          parser.tokens.get(*keyword).ok_or_else(|| ParserError::Internal)?.token_type ==
+          TokenType::ElseIf
+        {
+          let token_pos = parser.position;
+          let token = parser.tokens.get(token_pos).unwrap();
           let loc = token.get_location().unwrap();
           parser.position += 1;
           let expr = IfParser::parse(
             parser,
             vec![
-              LookupResult { size: 1, wrapper: LookupResultWrapper::Equal(keyword.to_owned()) },
-              LookupResult { size: 1, wrapper: LookupResultWrapper::Equal(token.to_owned()) }
+              LookupResult { size: 1, wrapper: LookupResultWrapper::Equal(*keyword) },
+              LookupResult { size: 1, wrapper: LookupResultWrapper::Equal(token_pos) }
             ],
             loc,
             args
@@ -124,6 +125,7 @@ impl ElseParser {
       }
       if let Some(next_token) = parser.tokens.get(parser.position) {
         if next_token.token_type == TokenType::If {
+          let next_token_pos = parser.position;
           parser.position += 1;
           let token = parser.tokens.get(parser.position).unwrap();
           let loc = token.get_location().unwrap();
@@ -131,8 +133,8 @@ impl ElseParser {
           let expr = IfParser::parse(
             parser,
             vec![
-              LookupResult { size: 1, wrapper: LookupResultWrapper::Equal(next_token.to_owned()) },
-              LookupResult { size: 1, wrapper: LookupResultWrapper::Equal(token.to_owned()) }
+              LookupResult { size: 1, wrapper: LookupResultWrapper::Equal(next_token_pos) },
+              LookupResult { size: 1, wrapper: LookupResultWrapper::Equal(next_token_pos + 1) }
             ],
             loc,
             args

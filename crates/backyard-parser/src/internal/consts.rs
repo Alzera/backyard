@@ -1,5 +1,5 @@
 use bumpalo::collections::Vec;
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{ ConstNode, ConstPropertyNode, Location, Node, utils::IntoBoxedOptionNode };
 
 use crate::{
@@ -38,15 +38,14 @@ impl ConstParser {
 impl ConstParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
-    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Const])])
+    match_pattern(parser, &[Lookup::Equal(&[TokenType::Const])])
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
@@ -63,12 +62,10 @@ pub struct ConstPropertyParser;
 impl ConstPropertyParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[
         Lookup::Modifiers(&[ModifierLookup::Visibility]),
         Lookup::Equal(&[TokenType::Const]),
@@ -79,19 +76,19 @@ impl ConstPropertyParser {
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    mut matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
-    if let [modifiers, _, const_type] = matched.as_slice() {
+    if let [modifiers, _, const_type] = matched.as_mut_slice() {
       let visibilities = if let Some([m0]) = modifiers.as_modifier() {
-        m0.as_visibilities()
+        m0.as_visibilities(parser)
       } else {
         vec![]
       };
       return Ok(
         ConstPropertyNode::loc(
-          const_type.as_optional_type(parser.arena).into_boxed(parser.arena),
+          const_type.as_optional_type().into_boxed(parser.arena),
           visibilities,
           ConstParser::get_consts(parser)?,
           parser.gen_loc(start_loc)

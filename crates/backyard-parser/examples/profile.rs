@@ -1,4 +1,6 @@
-use backyard_parser::parse;
+use backyard_lexer::lex;
+use backyard_parser::parse_base;
+use bumpalo::Bump;
 
 const CONTENT: &str =
   "<?php
@@ -90,8 +92,10 @@ BAR;
 }";
 
 fn main() {
+  let lexer_arena = Bump::new();
+  let tokens = lex(&lexer_arena, CONTENT);
   for _ in 0..100 {
-    let arena = bumpalo::Bump::new();
-    let _ = parse(&arena, CONTENT);
+    let arena = Bump::new();
+    let _ = parse_base(&arena, &tokens);
   }
 }

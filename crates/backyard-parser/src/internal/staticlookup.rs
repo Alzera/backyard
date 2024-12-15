@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{ ClassKeywordNode, Location, Node, StaticLookupNode, utils::IntoBoxedNode };
 
 use crate::{
@@ -15,16 +15,15 @@ pub struct StaticLookupParser;
 impl StaticLookupParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     args: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     args.last_expr.as_ref()?;
-    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::DoubleColon])])
+    match_pattern(parser, &[Lookup::Equal(&[TokenType::DoubleColon])])
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
@@ -36,7 +35,7 @@ impl StaticLookupParser {
           parser.position += 1;
           ClassKeywordNode::loc(parser.gen_loc_helper(t))
         } else if [TokenType::Variable, TokenType::VariableBracketOpen].contains(&t.token_type) {
-          if let Some(m) = VariableParser::test(parser, &parser.tokens[parser.position..], args) {
+          if let Some(m) = VariableParser::test(parser, args) {
             parser.position += 1;
             VariableParser::parse(parser, m, t.get_location().unwrap(), args)?
           } else {

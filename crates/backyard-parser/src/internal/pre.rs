@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{
   Location,
   NegateNode,
@@ -23,12 +23,10 @@ pub struct PreParser;
 impl PreParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[
         Lookup::Equal(
           &[
@@ -48,12 +46,11 @@ impl PreParser {
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [operator] = matched.as_slice() {
-      let operator = operator.as_equal()?;
       let argument = parser
         .get_statement(
           &mut LoopArgument::safe(
@@ -65,6 +62,7 @@ impl PreParser {
           )
         )?
         .into_boxed(parser.arena);
+      let operator = operator.as_equal(parser)?;
       if operator.token_type == TokenType::Ellipsis {
         return Ok(VariadicNode::loc(argument, parser.gen_loc(start_loc)));
       }

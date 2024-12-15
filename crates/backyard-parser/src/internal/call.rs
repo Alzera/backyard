@@ -1,5 +1,5 @@
 use bumpalo::collections::Vec;
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{
   CallArgumentNode,
   CallNode,
@@ -42,16 +42,15 @@ impl CallParser {
 impl CallParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     args: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     args.last_expr.as_ref()?;
-    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::LeftParenthesis])])
+    match_pattern(parser, &[Lookup::Equal(&[TokenType::LeftParenthesis])])
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
@@ -73,22 +72,21 @@ pub struct ArgumentParser;
 
 impl ArgumentParser {
   pub fn test<'arena, 'a>(
-    _: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
+    parser: &mut Parser<'arena, 'a>,
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
-    if let Some(is_colon) = tokens.get(1) {
+    if let Some(is_colon) = parser.tokens.get(parser.position + 1) {
       if is_colon.token_type == TokenType::Colon {
-        if let Some(name) = tokens.first() {
+        if let Some(_) = parser.tokens.get(parser.position) {
           return Some(
             vec![
               LookupResult {
                 size: 1,
-                wrapper: LookupResultWrapper::Optional(Some(name.to_owned())),
+                wrapper: LookupResultWrapper::Optional(Some(parser.position)),
               },
               LookupResult {
                 size: 1,
-                wrapper: LookupResultWrapper::Optional(Some(is_colon.to_owned())),
+                wrapper: LookupResultWrapper::Optional(Some(parser.position + 1)),
               }
             ]
           );
@@ -111,14 +109,14 @@ impl ArgumentParser {
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [name, has_name] = matched.as_slice() {
       let name = has_name
-        .as_optional()
-        .map(|_| name.as_optional().map(IdentifierParser::from_token))
+        .as_optional(parser)
+        .map(|_| name.as_optional(parser).map(IdentifierParser::from_token))
         .unwrap_or_default();
       let value = guard!(
         parser.get_statement(

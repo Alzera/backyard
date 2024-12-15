@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{ LabelNode, Location, Node, NodeType, utils::IntoBoxedNode };
 
 use crate::{
@@ -13,7 +13,6 @@ pub struct LabelParser;
 impl LabelParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     args: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     if let Some(last) = &args.last_expr {
@@ -21,12 +20,12 @@ impl LabelParser {
         return None;
       }
     }
-    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Colon])])
+    match_pattern(parser, &[Lookup::Equal(&[TokenType::Colon])])
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {

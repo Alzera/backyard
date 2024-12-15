@@ -18,24 +18,22 @@ impl IdentifierParser {
 
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[Lookup::Equal(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set])]
     )
   }
 
   pub fn parse<'arena, 'a, 'b>(
-    _: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    parser: &mut Parser<'arena, 'a>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     _: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [identifier] = matched.as_slice() {
-      return Ok(Self::from_token(identifier.as_equal()?));
+      return Ok(Self::from_token(identifier.as_equal(parser)?));
     }
     Err(ParserError::Internal)
   }

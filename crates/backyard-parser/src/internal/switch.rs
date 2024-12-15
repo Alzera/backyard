@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{
   BlockNode,
   CaseNode,
@@ -12,7 +12,7 @@ use crate::{
   error::ParserError,
   guard,
   parser::{ LocationHelper, LoopArgument, Parser },
-  utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
+  utils::{ match_pattern, Lookup, LookupResult },
 };
 
 use super::{ block::BlockParser, comment::CommentParser };
@@ -23,19 +23,17 @@ pub struct SwitchParser;
 impl SwitchParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[Lookup::Equal(&[TokenType::Switch]), Lookup::Equal(&[TokenType::LeftParenthesis])]
     )
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
@@ -85,34 +83,29 @@ pub struct CaseParser;
 impl CaseParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
-    match_pattern(parser, tokens, &[Lookup::Equal(&[TokenType::Case, TokenType::Default])])
+    match_pattern(parser, &[Lookup::Equal(&[TokenType::Case, TokenType::Default])])
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [is_default] = matched.as_slice() {
-      let condition = if let LookupResultWrapper::Equal(is_default) = &is_default.wrapper {
-        if is_default.token_type == TokenType::Default {
-          None
-        } else {
-          parser.get_statement(
-            &mut LoopArgument::with_tokens(
-              parser.arena,
-              "switch_case_condition",
-              &[],
-              &[TokenType::Colon]
-            )
-          )?
-        }
+      let condition = if is_default.as_equal(parser)?.token_type == TokenType::Default {
+        None
       } else {
-        return Err(ParserError::Internal);
+        parser.get_statement(
+          &mut LoopArgument::with_tokens(
+            parser.arena,
+            "switch_case_condition",
+            &[],
+            &[TokenType::Colon]
+          )
+        )?
       };
       parser.position += 1;
       let statements = {

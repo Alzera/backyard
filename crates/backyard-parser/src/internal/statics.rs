@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{ Location, Node, NodeType, StaticNode };
 
 use crate::{
@@ -15,14 +15,12 @@ pub struct StaticsParser;
 impl StaticsParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     args: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     if let Some(last_expr) = &args.last_expr {
       if last_expr.node_type == NodeType::StaticKeyword {
         return match_pattern(
           parser,
-          tokens,
           &[Lookup::Equal(&[TokenType::Variable, TokenType::VariableBracketOpen])]
         );
       }
@@ -32,7 +30,7 @@ impl StaticsParser {
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {

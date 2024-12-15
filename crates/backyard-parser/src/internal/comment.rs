@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{ CommentBlockNode, CommentDocNode, CommentLineNode, Location, Node, NodeType };
 
 use crate::{
@@ -13,24 +13,22 @@ pub struct CommentParser;
 impl CommentParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      tokens,
       &[Lookup::Equal(&[TokenType::CommentLine, TokenType::CommentBlock, TokenType::CommentDoc])]
     )
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [comment] = matched.as_slice() {
-      let comment = comment.as_equal()?;
+      let comment = comment.as_equal(parser)?;
       let comment = match comment.token_type {
         TokenType::CommentLine =>
           CommentLineNode::loc(comment.value.to_owned(), parser.gen_loc(start_loc)),

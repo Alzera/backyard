@@ -61,12 +61,11 @@ use super::internal::{
 
 type InternalParserTest = for<'arena, 'a> fn(
   parser: &mut Parser<'arena, 'a>,
-  tokens: &[Token],
   args: &mut LoopArgument
 ) -> Option<std::vec::Vec<LookupResult<'arena>>>;
 type InternalParserParse = for<'arena, 'a, 'b> fn(
   parser: &mut Parser<'arena, 'a>,
-  matched: std::vec::Vec<LookupResult>,
+  matched: std::vec::Vec<LookupResult<'arena>>,
   start_loc: Location,
   _: &mut LoopArgument<'arena, 'b>
 ) -> Result<Node<'arena>, ParserError>;
@@ -314,11 +313,9 @@ impl<'arena, 'a> Parser<'arena, 'a> {
     &mut self,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Option<Node<'arena>>, ParserError> {
-    let tokens = &self.tokens[self.position..];
-
     for (test, parse) in args.parsers {
-      if let Some(matched) = test(self, tokens, args) {
-        if let Some(start_loc) = tokens.first().map(|x| x.get_location().unwrap()) {
+      if let Some(matched) = test(self, args) {
+        if let Some(start_loc) = self.tokens.get(self.position).map(|x| x.get_location().unwrap()) {
           self.position += matched
             .iter()
             .map(|x| x.size)

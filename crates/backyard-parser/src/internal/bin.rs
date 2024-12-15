@@ -1,4 +1,4 @@
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{ BinNode, Location, Node, utils::IntoBoxedNode };
 
 use crate::{
@@ -13,13 +13,11 @@ pub struct BinParser;
 impl BinParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     args: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     args.last_expr.as_ref()?;
     match_pattern(
       parser,
-      tokens,
       &[
         Lookup::Equal(
           &[
@@ -60,12 +58,12 @@ impl BinParser {
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [operator] = matched.as_slice() {
-      let operator = operator.as_equal()?.value.to_owned();
+      let operator = operator.as_equal(parser)?.value.to_owned();
       let left = args.last_expr.take().unwrap();
       args.last_expr = None;
       if

@@ -1,5 +1,5 @@
 use bumpalo::vec;
-use backyard_lexer::token::{ Token, TokenType };
+use backyard_lexer::token::TokenType;
 use backyard_nodes::{
   AnonymousClassNode,
   BlockNode,
@@ -33,13 +33,11 @@ pub struct ClassParser;
 impl ClassParser {
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
-    tokens: &[Token],
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     if
       let Some(m) = match_pattern(
         parser,
-        tokens,
         &[
           Lookup::Modifiers(
             &[
@@ -59,14 +57,13 @@ impl ClassParser {
     }
     match_pattern(
       parser,
-      tokens,
       &[Lookup::Equal(&[TokenType::Class]), Lookup::Optional(&[TokenType::LeftParenthesis])]
     )
   }
 
   pub fn parse<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: std::vec::Vec<LookupResult>,
+    matched: std::vec::Vec<LookupResult<'arena>>,
     start_loc: Location,
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
@@ -165,13 +162,13 @@ impl ClassParser {
 
   fn parse_basic<'arena, 'a, 'b>(
     parser: &mut Parser<'arena, 'a>,
-    matched: Vec<LookupResult>,
+    matched: Vec<LookupResult<'arena>>,
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [modifiers, _, name, _, extends, has_implements] = matched.as_slice() {
-      let name = IdentifierParser::from_token(name.as_equal()?);
-      let extends = extends.as_optional().map(IdentifierParser::from_token);
+      let name = IdentifierParser::from_token(name.as_equal(parser)?);
+      let extends = extends.as_optional(parser).map(IdentifierParser::from_token);
       let implements = if !has_implements.is_empty() {
         let t = parser.get_children(
           &mut LoopArgument::new(
@@ -211,8 +208,8 @@ impl ClassParser {
       let mut inheritance = None;
       let mut is_readonly = false;
       if let Some([m0, m1]) = modifiers.as_modifier() {
-        is_readonly = m0.as_custom(|x| Ok(x == "readonly")).unwrap_or(false);
-        inheritance = m1.as_custom(|x| Inheritance::try_from(x));
+        is_readonly = m0.as_custom(parser, |x| Ok(x == "readonly")).unwrap_or(false);
+        inheritance = m1.as_custom(parser, |x| Inheritance::try_from(x));
       }
       return Ok(
         ClassNode::loc(
