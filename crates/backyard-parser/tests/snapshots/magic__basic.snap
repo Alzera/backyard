@@ -8,14 +8,7 @@ children:
   - node_type: bin
     left:
       node_type: magic
-      name:
-        - 95
-        - 95
-        - 68
-        - 73
-        - 82
-        - 95
-        - 95
+      name: Dir
       loc:
         start:
           line: 1
@@ -30,15 +23,7 @@ children:
     operator: Concatenation
     right:
       node_type: magic
-      name:
-        - 95
-        - 95
-        - 70
-        - 73
-        - 76
-        - 69
-        - 95
-        - 95
+      name: File
       loc:
         start:
           line: 1

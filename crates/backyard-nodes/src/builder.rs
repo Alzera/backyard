@@ -7,6 +7,8 @@ use crate::{
   BodyType,
   CastType,
   Inheritance,
+  MagicMethodName,
+  MagicName,
   Modifier,
   Node,
   NodeType,
@@ -99,6 +101,7 @@ impl<'arena, 'a> BlueprintBuildable<'arena> for Blueprint<'a> {
       BlueprintWrapper::Label(bp) => bp.build(arena),
       BlueprintWrapper::List(bp) => bp.build(arena),
       BlueprintWrapper::Magic(bp) => bp.build(arena),
+      BlueprintWrapper::MagicMethod(bp) => bp.build(arena),
       BlueprintWrapper::Match(bp) => bp.build(arena),
       BlueprintWrapper::MatchArm(bp) => bp.build(arena),
       BlueprintWrapper::Method(bp) => bp.build(arena),
@@ -206,7 +209,8 @@ pub enum BlueprintWrapper<'a> {
   IntersectionType(crate::IntersectionTypeBlueprint<'a>),
   Label(crate::LabelBlueprint<'a>),
   List(crate::ListBlueprint<'a>),
-  Magic(crate::MagicBlueprint<'a>),
+  Magic(crate::MagicBlueprint),
+  MagicMethod(crate::MagicMethodBlueprint),
   Match(crate::MatchBlueprint<'a>),
   MatchArm(crate::MatchArmBlueprint<'a>),
   Method(crate::MethodBlueprint<'a>),
@@ -313,6 +317,8 @@ impl_build!(
   CastType,
   PostType,
   PreType,
+  MagicName,
+  MagicMethodName,
   UseItemModifier,
   Visibility,
   Inheritance,
@@ -333,7 +339,6 @@ mod tests {
         &[b.Assignment(b.Variable(b.Identifier("a")), AssignmentType::Default, b.Number("21"))]
       )
       .build(&arena);
-    println!("{node:?}");
     insta::assert_yaml_snapshot!(node);
   }
 }

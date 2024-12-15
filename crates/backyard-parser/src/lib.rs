@@ -16,7 +16,6 @@ pub fn parse<'arena>(arena: &'arena Bump, input: &str) -> Result<Node<'arena>, P
 
 pub fn parse_eval<'arena>(arena: &'arena Bump, input: &str) -> Result<Node<'arena>, ParserError> {
   let tokens = lex_eval(arena, input);
-  println!("{tokens:?}");
   parse_base(arena, &tokens)
 }
 

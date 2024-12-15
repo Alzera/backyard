@@ -35,19 +35,8 @@ children:
             node_type: function
             is_ref: false
             name:
-              node_type: magic
-              name:
-                - 95
-                - 95
-                - 99
-                - 111
-                - 110
-                - 115
-                - 116
-                - 114
-                - 117
-                - 99
-                - 116
+              node_type: magic_method
+              name: Construct
               loc:
                 start:
                   line: 2

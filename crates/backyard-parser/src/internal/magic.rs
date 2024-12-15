@@ -1,9 +1,9 @@
-use backyard_lexer::token::{ Token, TokenType };
-use backyard_nodes::{ Location, MagicNode, Node };
+use backyard_lexer::token::TokenType;
+use backyard_nodes::{ Location, MagicMethodName, MagicMethodNode, MagicName, MagicNode, Node };
 
 use crate::{
   error::ParserError,
-  parser::{ LocationHelper, LoopArgument, Parser },
+  parser::{ LoopArgument, Parser },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 
@@ -11,11 +11,6 @@ use crate::{
 pub struct MagicParser;
 
 impl MagicParser {
-  pub fn from_token<'arena>(id: &Token) -> Node<'arena> {
-    let loc = id.get_range_location();
-    MagicNode::loc(id.value.to_owned(), loc)
-  }
-
   pub fn test<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>,
     _: &mut LoopArgument
@@ -29,8 +24,22 @@ impl MagicParser {
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
-    if let [text] = matched.as_slice() {
-      return Ok(MagicNode::loc(text.as_equal(parser)?.value.to_owned(), parser.gen_loc(start_loc)));
+    if let [name] = matched.as_slice() {
+      let name = name.as_equal(parser)?;
+      if name.token_type == TokenType::MagicMethod {
+        return Ok(
+          MagicMethodNode::loc(
+            MagicMethodName::try_from(&name.value).map_err(|_| ParserError::Internal)?,
+            parser.gen_loc(start_loc)
+          )
+        );
+      }
+      return Ok(
+        MagicNode::loc(
+          MagicName::try_from(&name.value).map_err(|_| ParserError::Internal)?,
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::Internal)
   }

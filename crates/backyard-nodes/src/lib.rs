@@ -138,6 +138,7 @@ pub enum NodeWrapper<'a> {
   Label(LabelNode<'a>),
   List(ListNode<'a>),
   Magic(MagicNode),
+  MagicMethod(MagicMethodNode),
   Match(MatchNode<'a>),
   MatchArm(MatchArmNode<'a>),
   Method(MethodNode<'a>),
@@ -245,6 +246,7 @@ pub enum NodeType {
   Label,
   List,
   Magic,
+  MagicMethod,
   Match,
   MatchArm,
   Method,
@@ -526,9 +528,10 @@ macro_rules! new_node {
     impl<'arena> BlueprintBuildable<'arena> for $blueprint_name {
       type Result = Node<'arena>;
 
-      fn build(&self, _: &'arena Bump) -> Self::Result {
+      #[allow(unused_variables)]
+      fn build(&self, arena: &'arena Bump) -> Self::Result {
         $struct_name::loc(
-          $(self.$field_name,)*
+          $(self.$field_name.build(arena),)*
           None
         )
       }
@@ -591,7 +594,12 @@ new_node!(Interface, InterfaceNode<'a> { name: bumpalo::boxed::Box<'a, Node<'a>>
 new_node!(IntersectionType, IntersectionTypeNode<'a> { types: bumpalo::collections::Vec<'a, Node<'a>>, }, IntersectionTypeBlueprint<'b> { types: &'b [Box<Blueprint<'b>>], });
 new_node!(Label, LabelNode<'a> { label: bumpalo::boxed::Box<'a, Node<'a>>, }, LabelBlueprint<'b> { label: Box<Blueprint<'b>>, });
 new_node!(List, ListNode<'a> { items: bumpalo::collections::Vec<'a, Node<'a>>, }, ListBlueprint<'b> { items: &'b [Box<Blueprint<'b>>], });
-new_node!(Magic, MagicNode { name: BString, }, MagicBlueprint<'b> { name: &'b str, });
+new_node!(Magic, MagicNode { name: MagicName }, MagicBlueprint { name: MagicName });
+new_node!(
+  MagicMethod,
+  MagicMethodNode { name: MagicMethodName },
+  MagicMethodBlueprint { name: MagicMethodName }
+);
 new_node!(Match, MatchNode<'a> { condition: bumpalo::boxed::Box<'a, Node<'a>>, arms: bumpalo::collections::Vec<'a, Node<'a>>, }, MatchBlueprint<'b> { condition: Box<Blueprint<'b>>, arms: &'b [Box<Blueprint<'b>>], });
 new_node!(MatchArm, MatchArmNode<'a> { conditions: bumpalo::collections::Vec<'a, Node<'a>>, expr: bumpalo::boxed::Box<'a, Node<'a>>, }, MatchArmBlueprint<'b> { conditions: &'b [Box<Blueprint<'b>>], expr: Box<Blueprint<'b>>, });
 new_node!(Method, MethodNode<'a> { visibility: Option<Visibility>, inheritance: Option<Inheritance>, is_static: bool, function: bumpalo::boxed::Box<'a, Node<'a>>, }, MethodBlueprint<'b> { visibility: Option<Visibility>, inheritance: Option<Inheritance>, is_static: bool, function: Box<Blueprint<'b>>, });
@@ -639,6 +647,125 @@ new_node!(While, WhileNode<'a> { condition: bumpalo::boxed::Box<'a, Node<'a>>, b
 new_node!(Yield, YieldNode<'a> { key: Option<bumpalo::boxed::Box<'a, Node<'a>>>, value: Option<bumpalo::boxed::Box<'a, Node<'a>>>, }, YieldBlueprint<'b> { key: Option<Box<Blueprint<'b>>>, value: Option<Box<Blueprint<'b>>>, });
 new_node!(YieldFrom, YieldFromNode<'a> { statement: bumpalo::boxed::Box<'a, Node<'a>>, }, YieldFromBlueprint<'b> { statement: Box<Blueprint<'b>>, });
 
+#[derive(Debug, PartialEq, Clone, Serialize)]
+pub enum MagicMethodName {
+  Construct,
+  Destruct,
+  Call,
+  CallStatic,
+  Get,
+  Set,
+  Isset,
+  Unset,
+  Sleep,
+  Wakeup,
+  Serialize,
+  Unserialize,
+  ToString,
+  Invoke,
+  SetState,
+  Clone,
+  DebugInfo,
+}
+
+impl TryFrom<&BString> for MagicMethodName {
+  type Error = String;
+
+  fn try_from(value: &BString) -> Result<Self, Self::Error> {
+    match value.as_slice() {
+      b"__construct" => Ok(MagicMethodName::Construct),
+      b"__destruct" => Ok(MagicMethodName::Destruct),
+      b"__call" => Ok(MagicMethodName::Call),
+      b"__callStatic" => Ok(MagicMethodName::CallStatic),
+      b"__get" => Ok(MagicMethodName::Get),
+      b"__set" => Ok(MagicMethodName::Set),
+      b"__isset" => Ok(MagicMethodName::Isset),
+      b"__unset" => Ok(MagicMethodName::Unset),
+      b"__sleep" => Ok(MagicMethodName::Sleep),
+      b"__wakeup" => Ok(MagicMethodName::Wakeup),
+      b"__serialize" => Ok(MagicMethodName::Serialize),
+      b"__unserialize" => Ok(MagicMethodName::Unserialize),
+      b"__toString" => Ok(MagicMethodName::ToString),
+      b"__invoke" => Ok(MagicMethodName::Invoke),
+      b"__set_state" => Ok(MagicMethodName::SetState),
+      b"__clone" => Ok(MagicMethodName::Clone),
+      b"__debugInfo" => Ok(MagicMethodName::DebugInfo),
+      _ => Err(format!("Invalid magic method name: {}", value)),
+    }
+  }
+}
+
+impl Display for MagicMethodName {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      MagicMethodName::Construct => "__construct",
+      MagicMethodName::Destruct => "__destruct",
+      MagicMethodName::Call => "__call",
+      MagicMethodName::CallStatic => "__callStatic",
+      MagicMethodName::Get => "__get",
+      MagicMethodName::Set => "__set",
+      MagicMethodName::Isset => "__isset",
+      MagicMethodName::Unset => "__unset",
+      MagicMethodName::Sleep => "__sleep",
+      MagicMethodName::Wakeup => "__wakeup",
+      MagicMethodName::Serialize => "__serialize",
+      MagicMethodName::Unserialize => "__unserialize",
+      MagicMethodName::ToString => "__toString",
+      MagicMethodName::Invoke => "__invoke",
+      MagicMethodName::SetState => "__set_state",
+      MagicMethodName::Clone => "__clone",
+      MagicMethodName::DebugInfo => "__debugInfo",
+    })
+  }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize)]
+pub enum MagicName {
+  Class,
+  Dir,
+  File,
+  Function,
+  Line,
+  Method,
+  Namespace,
+  Trait,
+  Property,
+}
+
+impl TryFrom<&BString> for MagicName {
+  type Error = String;
+
+  fn try_from(value: &BString) -> Result<Self, Self::Error> {
+    match value.as_slice() {
+      b"__CLASS__" => Ok(MagicName::Class),
+      b"__DIR__" => Ok(MagicName::Dir),
+      b"__FILE__" => Ok(MagicName::File),
+      b"__FUNCTION__" => Ok(MagicName::Function),
+      b"__LINE__" => Ok(MagicName::Line),
+      b"__METHOD__" => Ok(MagicName::Method),
+      b"__NAMESPACE__" => Ok(MagicName::Namespace),
+      b"__TRAIT__" => Ok(MagicName::Trait),
+      b"__PROPERTY__" => Ok(MagicName::Property),
+      _ => Err(format!("Invalid magic name: {}", value)),
+    }
+  }
+}
+
+impl Display for MagicName {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      MagicName::Class => "__CLASS__",
+      MagicName::Dir => "__DIR__",
+      MagicName::File => "__FILE__",
+      MagicName::Function => "__FUNCTION__",
+      MagicName::Line => "__LINE__",
+      MagicName::Method => "__METHOD__",
+      MagicName::Namespace => "__NAMESPACE__",
+      MagicName::Trait => "__TRAIT__",
+      MagicName::Property => "__PROPERTY__",
+    })
+  }
+}
 #[derive(Debug, PartialEq, Clone, Serialize)]
 pub enum PreType {
   Increment,

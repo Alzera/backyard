@@ -1,4 +1,4 @@
-use backyard_nodes::{ cast_node, Node, NodeType, NodeWrapper };
+use backyard_nodes::{ cast_node, MagicMethodName, Node, NodeType, NodeWrapper };
 
 use crate::generator::{ Builder, Generator, GeneratorArgument, DEFAULT_GENERATORS };
 
@@ -40,10 +40,10 @@ impl FunctionGenerator {
     if node.is_ref {
       builder.push("&");
     }
-    let mut parameters = if node.name.node_type == NodeType::Magic {
-      let name = cast_node!(Magic, &node.name.wrapper);
+    let mut parameters = if node.name.node_type == NodeType::MagicMethod {
+      let name = cast_node!(MagicMethod, &node.name.wrapper);
       builder.push(&name.name.to_string());
-      if name.name == "__construct" {
+      if name.name == MagicMethodName::Construct {
         generator.generate_nodes_new(
           &node.parameters,
           &mut GeneratorArgument::for_parameter(

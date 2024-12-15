@@ -25,7 +25,6 @@ fn type_test() {
 fn unqualified_name() {
   let arena = bumpalo::Bump::new();
   let tokens = lex_eval(&arena, "sample_id").unwrap();
-  println!("{tokens:?}");
   insta::assert_yaml_snapshot!(tokens);
 }
 
@@ -33,7 +32,6 @@ fn unqualified_name() {
 fn qualified_name() {
   let arena = bumpalo::Bump::new();
   let tokens = lex_eval(&arena, "sample_id\\a").unwrap();
-  println!("{tokens:?}");
   insta::assert_yaml_snapshot!(tokens);
 }
 
@@ -41,7 +39,6 @@ fn qualified_name() {
 fn fully_qualified_name() {
   let arena = bumpalo::Bump::new();
   let tokens = lex_eval(&arena, "\\sample_id\\a").unwrap();
-  println!("{tokens:?}");
   insta::assert_yaml_snapshot!(tokens);
 }
 
@@ -49,7 +46,6 @@ fn fully_qualified_name() {
 fn relative_name() {
   let arena = bumpalo::Bump::new();
   let tokens = lex_eval(&arena, "namespace\\sample_id\\a").unwrap();
-  println!("{tokens:?}");
   insta::assert_yaml_snapshot!(tokens);
 }
 

@@ -1,21 +1,23 @@
 use bumpalo::{ boxed::Box, collections::Vec, vec };
 use backyard_lexer::token::TokenType;
 use backyard_nodes::{
+  utils::{ IntoBoxedNode, IntoBoxedOptionNode },
   AnonymousFunctionNode,
   ArrowFunctionNode,
   ConstructorParameterNode,
   FunctionNode,
   Location,
+  MagicMethodName,
+  MagicMethodNode,
   Modifier,
   Node,
   ParameterNode,
   Visibility,
-  utils::{ IntoBoxedNode, IntoBoxedOptionNode },
 };
 
 use crate::{
   error::ParserError,
-  parser::{ LoopArgument, OptionNodeOrInternal, Parser, TokenTypeArrayCombine },
+  parser::{ LocationHelper, LoopArgument, OptionNodeOrInternal, Parser, TokenTypeArrayCombine },
   utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper, ModifierLookup },
 };
 
@@ -24,7 +26,6 @@ use super::{
   block::BlockParser,
   comment::CommentParser,
   identifier::IdentifierParser,
-  magic::MagicParser,
   types::TypesParser,
 };
 
@@ -179,7 +180,7 @@ impl FunctionParser {
           if name.value == "__construct" {
             is_contructor = true;
           }
-          MagicParser::from_token(name)
+          MagicMethodNode::loc(MagicMethodName::Construct, name.get_range_location())
         } else {
           IdentifierParser::from_token(name)
         }
