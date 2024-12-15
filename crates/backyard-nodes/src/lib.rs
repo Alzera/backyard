@@ -1215,17 +1215,150 @@ mod tests {
   use bstr::BString;
 
   use crate::{
-    AssignmentType,
-    BinaryType,
-    CastType,
-    Inheritance,
-    Modifier,
-    PostType,
-    PreType,
-    Quote,
-    UseItemModifier,
-    Visibility,
+    AssignmentType, BinaryType, CastType, Inheritance, MagicMethodName, MagicName, Modifier, PostType, PreType, Quote, UseItemModifier, Visibility
   };
+
+  #[test]
+  fn magic_name() {
+    assert_eq!(
+      MagicName::try_from(&BString::new("__CLASS__".as_bytes().to_vec())),
+      Ok(MagicName::Class)
+    );
+    assert_eq!(
+      MagicName::try_from(&BString::new("__DIR__".as_bytes().to_vec())),
+      Ok(MagicName::Dir)
+    );
+    assert_eq!(
+      MagicName::try_from(&BString::new("__FILE__".as_bytes().to_vec())),
+      Ok(MagicName::File)
+    );
+    assert_eq!(
+      MagicName::try_from(&BString::new("__FUNCTION__".as_bytes().to_vec())),
+      Ok(MagicName::Function)
+    );
+    assert_eq!(
+      MagicName::try_from(&BString::new("__LINE__".as_bytes().to_vec())),
+      Ok(MagicName::Line)
+    );
+    assert_eq!(
+      MagicName::try_from(&BString::new("__METHOD__".as_bytes().to_vec())),
+      Ok(MagicName::Method)
+    );
+    assert_eq!(
+      MagicName::try_from(&BString::new("__NAMESPACE__".as_bytes().to_vec())),
+      Ok(MagicName::Namespace)
+    );
+    assert_eq!(
+      MagicName::try_from(&BString::new("__TRAIT__".as_bytes().to_vec())),
+      Ok(MagicName::Trait)
+    );
+    assert_eq!(
+      MagicName::try_from(&BString::new("__PROPERTY__".as_bytes().to_vec())),
+      Ok(MagicName::Property)
+    );
+    assert!(MagicName::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
+
+    assert_eq!("__CLASS__", format!("{}", MagicName::Class));
+    assert_eq!("__DIR__", format!("{}", MagicName::Dir));
+    assert_eq!("__FILE__", format!("{}", MagicName::File));
+    assert_eq!("__FUNCTION__", format!("{}", MagicName::Function));
+    assert_eq!("__LINE__", format!("{}", MagicName::Line));
+    assert_eq!("__METHOD__", format!("{}", MagicName::Method));
+    assert_eq!("__NAMESPACE__", format!("{}", MagicName::Namespace));
+    assert_eq!("__TRAIT__", format!("{}", MagicName::Trait));
+    assert_eq!("__PROPERTY__", format!("{}", MagicName::Property));
+  }
+
+  #[test]
+  fn magic_method_name() {
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__construct".as_bytes().to_vec())),
+      Ok(MagicMethodName::Construct)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__destruct".as_bytes().to_vec())),
+      Ok(MagicMethodName::Destruct)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__call".as_bytes().to_vec())),
+      Ok(MagicMethodName::Call)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__callStatic".as_bytes().to_vec())),
+      Ok(MagicMethodName::CallStatic)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__get".as_bytes().to_vec())),
+      Ok(MagicMethodName::Get)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__set".as_bytes().to_vec())),
+      Ok(MagicMethodName::Set)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__isset".as_bytes().to_vec())),
+      Ok(MagicMethodName::Isset)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__unset".as_bytes().to_vec())),
+      Ok(MagicMethodName::Unset)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__sleep".as_bytes().to_vec())),
+      Ok(MagicMethodName::Sleep)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__wakeup".as_bytes().to_vec())),
+      Ok(MagicMethodName::Wakeup)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__serialize".as_bytes().to_vec())),
+      Ok(MagicMethodName::Serialize)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__unserialize".as_bytes().to_vec())),
+      Ok(MagicMethodName::Unserialize)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__toString".as_bytes().to_vec())),
+      Ok(MagicMethodName::ToString)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__invoke".as_bytes().to_vec())),
+      Ok(MagicMethodName::Invoke)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__set_state".as_bytes().to_vec())),
+      Ok(MagicMethodName::SetState)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__clone".as_bytes().to_vec())),
+      Ok(MagicMethodName::Clone)
+    );
+    assert_eq!(
+      MagicMethodName::try_from(&BString::new("__debugInfo".as_bytes().to_vec())),
+      Ok(MagicMethodName::DebugInfo)
+    );
+    assert!(MagicMethodName::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
+
+    assert_eq!("__construct", format!("{}", MagicMethodName::Construct));
+    assert_eq!("__destruct", format!("{}", MagicMethodName::Destruct));
+    assert_eq!("__call", format!("{}", MagicMethodName::Call));
+    assert_eq!("__callStatic", format!("{}", MagicMethodName::CallStatic));
+    assert_eq!("__get", format!("{}", MagicMethodName::Get));
+    assert_eq!("__set", format!("{}", MagicMethodName::Set));
+    assert_eq!("__isset", format!("{}", MagicMethodName::Isset));
+    assert_eq!("__unset", format!("{}", MagicMethodName::Unset));
+    assert_eq!("__sleep", format!("{}", MagicMethodName::Sleep));
+    assert_eq!("__wakeup", format!("{}", MagicMethodName::Wakeup));
+    assert_eq!("__serialize", format!("{}", MagicMethodName::Serialize));
+    assert_eq!("__unserialize", format!("{}", MagicMethodName::Unserialize));
+    assert_eq!("__toString", format!("{}", MagicMethodName::ToString));
+    assert_eq!("__invoke", format!("{}", MagicMethodName::Invoke));
+    assert_eq!("__set_state", format!("{}", MagicMethodName::SetState));
+    assert_eq!("__clone", format!("{}", MagicMethodName::Clone));
+    assert_eq!("__debugInfo", format!("{}", MagicMethodName::DebugInfo));
+  }
 
   #[test]
   fn pre_type() {

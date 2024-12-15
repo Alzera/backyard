@@ -5,13 +5,9 @@ use crate::{ lexer::{ ControlSnapshot, Lexer }, token::{ Token, TokenType } };
 pub struct KeywordToken;
 
 impl KeywordToken {
-  pub fn try_lex(
-    lexer: &mut Lexer,
-    input: &BString,
-    input_sliced: &[u8],
-    snapshot: &ControlSnapshot
-  ) -> Option<Token> {
-    match input_sliced {
+  pub fn try_lex(lexer: &mut Lexer, input: &BString, snapshot: &ControlSnapshot) -> Option<Token> {
+    let input: BString = input.to_ascii_lowercase().into();
+    match input.as_slice() {
       b"abstract" => Some(Token::new(TokenType::Abstract, input.to_owned(), snapshot)),
       b"array" => Some(Token::new(TokenType::Array, input.to_owned(), snapshot)),
       b"as" => Some(Token::new(TokenType::As, input.to_owned(), snapshot)),

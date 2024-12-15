@@ -361,7 +361,7 @@ impl<'a> Lexer<'a> {
           self.tokens.push(Token::new(TokenType::MagicMethod, t, snapshot));
         } else if TYPE_KEYWORDS.contains(&t_sliced) {
           self.tokens.push(Token::new(TokenType::Type, t, snapshot));
-        } else if let Some(token) = KeywordToken::try_lex(self, &t, t_sliced, snapshot) {
+        } else if let Some(token) = KeywordToken::try_lex(self, &t, snapshot) {
           self.tokens.push(token);
         } else {
           self.tokens.push(Token::new(TokenType::UnqualifiedName, t, snapshot));
