@@ -104,7 +104,7 @@ impl ElseParser {
     if let [keyword] = matched.as_slice() {
       if let LookupResultWrapper::Equal(keyword) = &keyword.wrapper {
         if
-          parser.tokens.get(*keyword).ok_or_else(|| ParserError::Internal)?.token_type ==
+          parser.tokens.get(*keyword).ok_or(ParserError::Internal)?.token_type ==
           TokenType::ElseIf
         {
           let token_pos = parser.position;

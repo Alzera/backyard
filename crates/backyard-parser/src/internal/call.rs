@@ -76,21 +76,19 @@ impl ArgumentParser {
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     if let Some(is_colon) = parser.tokens.get(parser.position + 1) {
-      if is_colon.token_type == TokenType::Colon {
-        if let Some(_) = parser.tokens.get(parser.position) {
-          return Some(
-            vec![
-              LookupResult {
-                size: 1,
-                wrapper: LookupResultWrapper::Optional(Some(parser.position)),
-              },
-              LookupResult {
-                size: 1,
-                wrapper: LookupResultWrapper::Optional(Some(parser.position + 1)),
-              }
-            ]
-          );
-        }
+      if is_colon.token_type == TokenType::Colon && parser.tokens.get(parser.position).is_some() {
+        return Some(
+          vec![
+            LookupResult {
+              size: 1,
+              wrapper: LookupResultWrapper::Optional(Some(parser.position)),
+            },
+            LookupResult {
+              size: 1,
+              wrapper: LookupResultWrapper::Optional(Some(parser.position + 1)),
+            }
+          ]
+        );
       }
     }
     Some(

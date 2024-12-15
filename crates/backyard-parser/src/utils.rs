@@ -41,7 +41,7 @@ impl<'arena> LookupResult<'arena> {
 
   pub fn as_equal<'a>(&self, parser: &'a Parser<'arena, '_>) -> Result<&'a Token, ParserError> {
     if let LookupResultWrapper::Equal(v) = &self.wrapper {
-      parser.tokens.get(*v).ok_or_else(|| ParserError::Internal)
+      parser.tokens.get(*v).ok_or(ParserError::Internal)
     } else {
       Err(ParserError::Internal)
     }

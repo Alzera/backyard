@@ -175,7 +175,7 @@ impl FunctionParser {
     if let [_, is_ref, name, _] = matched.as_slice() {
       let mut is_contructor = false;
       let name = if let LookupResultWrapper::Any(name) = &name.wrapper {
-        let name = parser.tokens.get(*name).ok_or_else(|| ParserError::Internal)?;
+        let name = parser.tokens.get(*name).ok_or(ParserError::Internal)?;
         if name.token_type == TokenType::MagicMethod {
           if name.value == "__construct" {
             is_contructor = true;
