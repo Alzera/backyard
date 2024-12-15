@@ -34,8 +34,7 @@ children:
           offset: 1
       leadings: ~
       trailings: ~
-    operator:
-      - 61
+    operator: Default
     right:
       node_type: bin
       left:
@@ -53,8 +52,7 @@ children:
             offset: 5
         leadings: ~
         trailings: ~
-      operator:
-        - 43
+      operator: Addition
       right:
         node_type: number
         value:

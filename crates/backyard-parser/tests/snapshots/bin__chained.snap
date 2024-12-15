@@ -104,9 +104,7 @@ children:
           offset: 11
       leadings: ~
       trailings: ~
-    operator:
-      - 63
-      - 63
+    operator: Coalesce
     right:
       node_type: bin
       left:
@@ -207,9 +205,7 @@ children:
             offset: 29
         leadings: ~
         trailings: ~
-      operator:
-        - 63
-        - 63
+      operator: Coalesce
       right:
         node_type: bin
         left:
@@ -310,9 +306,7 @@ children:
               offset: 45
           leadings: ~
           trailings: ~
-        operator:
-          - 63
-          - 63
+        operator: Coalesce
         right:
           node_type: bin
           left:
@@ -413,9 +407,7 @@ children:
                 offset: 65
             leadings: ~
             trailings: ~
-          operator:
-            - 63
-            - 63
+          operator: Coalesce
           right:
             node_type: call
             name:

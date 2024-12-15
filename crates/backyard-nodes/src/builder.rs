@@ -1,7 +1,21 @@
 use bstr::BString;
 use bumpalo::Bump;
 
-use crate::{ Node, NodeType, Visibility, BodyType, UseItemModifier, Modifier, Quote, Inheritance };
+use crate::{
+  AssignmentType,
+  BinaryType,
+  BodyType,
+  CastType,
+  Inheritance,
+  Modifier,
+  Node,
+  NodeType,
+  PostType,
+  PreType,
+  Quote,
+  UseItemModifier,
+  Visibility,
+};
 
 pub struct Builder {}
 
@@ -294,6 +308,11 @@ impl_build!(
   bool,
   std::vec::Vec<Visibility>,
   BodyType,
+  AssignmentType,
+  BinaryType,
+  CastType,
+  PostType,
+  PreType,
   UseItemModifier,
   Visibility,
   Inheritance,
@@ -303,14 +322,16 @@ impl_build!(
 
 #[cfg(test)]
 mod tests {
-  use crate::builder::{ Builder, BlueprintBuildable };
+  use crate::{ builder::{ BlueprintBuildable, Builder }, AssignmentType };
 
   #[test]
   fn builder() {
     let arena = bumpalo::Bump::new();
     let b = Builder::new();
     let node = b
-      .Program(&[b.Assignment(b.Variable(b.Identifier("a")), "=", b.Number("21"))])
+      .Program(
+        &[b.Assignment(b.Variable(b.Identifier("a")), AssignmentType::Default, b.Number("21"))]
+      )
       .build(&arena);
     println!("{node:?}");
     insta::assert_yaml_snapshot!(node);

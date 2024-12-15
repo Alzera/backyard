@@ -1,5 +1,5 @@
 use backyard_lexer::token::TokenType;
-use backyard_nodes::{ AssignmentNode, Location, Node, utils::IntoBoxedNode };
+use backyard_nodes::{ utils::IntoBoxedNode, AssignmentNode, AssignmentType, Location, Node };
 
 use crate::{
   error::ParserError,
@@ -49,9 +49,10 @@ impl AssignmentParser {
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [operator] = matched.as_slice() {
-      let operator = operator.as_equal(parser)?.value.to_owned();
+      let operator = AssignmentType::try_from(&operator.as_equal(parser)?.value).map_err(
+        |_| ParserError::Internal
+      )?;
       let left = args.last_expr.take().unwrap();
-      args.last_expr = None;
       if
         let Some(right) = parser.get_statement(
           &mut LoopArgument::safe(

@@ -34,9 +34,7 @@ children:
           offset: 3
       leadings: ~
       trailings: ~
-    operator:
-      - 43
-      - 43
+    operator: Increment
     loc:
       start:
         line: 1

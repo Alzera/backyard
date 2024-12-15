@@ -34,8 +34,7 @@ children:
           offset: 2
       leadings: ~
       trailings: ~
-    operator:
-      - 61
+    operator: Default
     right:
       node_type: number
       value:

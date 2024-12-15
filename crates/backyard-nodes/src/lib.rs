@@ -20,165 +20,6 @@ use crate::builder::{ Blueprint, BlueprintBuildable, BlueprintWrapper, Builder }
 use crate::walker::{ MapIntoWalkerStack, Walkable };
 
 #[derive(Debug, PartialEq, Clone, Serialize)]
-pub enum UseItemModifier {
-  Function,
-  Const,
-}
-
-impl TryFrom<&BString> for UseItemModifier {
-  type Error = String;
-
-  fn try_from(value: &BString) -> Result<Self, Self::Error> {
-    match value.as_slice() {
-      b"function" => Ok(UseItemModifier::Function),
-      b"const" => Ok(UseItemModifier::Const),
-      _ => Err(format!("Invalid use item modifier: {}", value)),
-    }
-  }
-}
-
-impl Display for UseItemModifier {
-  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-    write!(f, "{}", match self {
-      UseItemModifier::Function => "function",
-      UseItemModifier::Const => "const",
-    })
-  }
-}
-
-#[derive(Debug, PartialEq, Clone, Serialize)]
-pub enum Modifier {
-  Static,
-  Readonly,
-}
-
-impl TryFrom<&BString> for Modifier {
-  type Error = String;
-
-  fn try_from(value: &BString) -> Result<Self, Self::Error> {
-    match value.as_slice() {
-      b"static" => Ok(Modifier::Static),
-      b"readonly" => Ok(Modifier::Readonly),
-      _ => Err(format!("Invalid modifier: {}", value)),
-    }
-  }
-}
-
-impl Display for Modifier {
-  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-    write!(f, "{}", match self {
-      Modifier::Static => "static",
-      Modifier::Readonly => "readonly",
-    })
-  }
-}
-
-#[derive(Debug, PartialEq, Clone, Serialize)]
-pub enum Quote {
-  Single,
-  Double,
-  Backtick,
-}
-
-impl TryFrom<&BString> for Quote {
-  type Error = String;
-
-  fn try_from(value: &BString) -> Result<Self, Self::Error> {
-    match value.as_slice() {
-      b"'" => Ok(Quote::Single),
-      b"\"" => Ok(Quote::Double),
-      b"`" => Ok(Quote::Backtick),
-      _ => Err(format!("Invalid quote: {}", value)),
-    }
-  }
-}
-
-impl Display for Quote {
-  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-    write!(f, "{}", match self {
-      Quote::Single => "'",
-      Quote::Double => "\"",
-      Quote::Backtick => "`",
-    })
-  }
-}
-
-#[derive(Debug, PartialEq, Clone, Serialize)]
-pub enum Inheritance {
-  Abstract,
-  Final,
-}
-
-impl TryFrom<&BString> for Inheritance {
-  type Error = String;
-
-  fn try_from(value: &BString) -> Result<Self, Self::Error> {
-    match value.as_slice() {
-      b"abstract" => Ok(Inheritance::Abstract),
-      b"final" => Ok(Inheritance::Final),
-      _ => Err(format!("Invalid inheritance: {}", value)),
-    }
-  }
-}
-
-impl Display for Inheritance {
-  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-    write!(f, "{}", match self {
-      Inheritance::Abstract => "abstract",
-      Inheritance::Final => "final",
-    })
-  }
-}
-
-#[derive(Debug, PartialEq, Clone, Serialize)]
-pub enum Visibility {
-  Public,
-  PublicGet,
-  PublicSet,
-  Private,
-  PrivateGet,
-  PrivateSet,
-  Protected,
-  ProtectedGet,
-  ProtectedSet,
-}
-
-impl TryFrom<&BString> for Visibility {
-  type Error = String;
-
-  fn try_from(value: &BString) -> Result<Self, Self::Error> {
-    match value.as_slice() {
-      b"public" => Ok(Visibility::Public),
-      b"public(get)" => Ok(Visibility::PublicGet),
-      b"public(set)" => Ok(Visibility::PublicSet),
-      b"private" => Ok(Visibility::Private),
-      b"private(get)" => Ok(Visibility::PrivateGet),
-      b"private(set)" => Ok(Visibility::PrivateSet),
-      b"protected" => Ok(Visibility::Protected),
-      b"protected(get)" => Ok(Visibility::ProtectedGet),
-      b"protected(set)" => Ok(Visibility::ProtectedSet),
-      _ => Err(format!("Invalid visibility: {}", value)),
-    }
-  }
-}
-
-impl Display for Visibility {
-  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-    write!(f, "{}", match self {
-      Visibility::Public => "public",
-      Visibility::PublicGet => "public(get)",
-      Visibility::PublicSet => "public(set)",
-      Visibility::Private => "private",
-      Visibility::PrivateGet => "private(get)",
-      Visibility::PrivateSet => "private(set)",
-      Visibility::Protected => "protected",
-      Visibility::ProtectedGet => "protected(get)",
-      Visibility::ProtectedSet => "protected(set)",
-    })
-  }
-}
-
-#[derive(Debug, PartialEq, Clone, Serialize)]
 pub enum BodyType {
   Basic,
   Short,
@@ -452,124 +293,6 @@ pub enum NodeType {
   YieldFrom,
 }
 
-#[cfg(test)]
-mod tests {
-  use bstr::BString;
-
-  use crate::{ Inheritance, Modifier, Quote, UseItemModifier, Visibility };
-
-  #[test]
-  fn use_item_modifier() {
-    assert_eq!(
-      UseItemModifier::try_from(&BString::new("const".as_bytes().to_vec())),
-      Ok(UseItemModifier::Const)
-    );
-    assert_eq!(
-      UseItemModifier::try_from(&BString::new("function".as_bytes().to_vec())),
-      Ok(UseItemModifier::Function)
-    );
-    assert!(UseItemModifier::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
-
-    assert_eq!("const", format!("{}", UseItemModifier::Const));
-    assert_eq!("function", format!("{}", UseItemModifier::Function));
-  }
-
-  #[test]
-  fn modifier() {
-    assert_eq!(
-      Modifier::try_from(&BString::new("static".as_bytes().to_vec())),
-      Ok(Modifier::Static)
-    );
-    assert_eq!(
-      Modifier::try_from(&BString::new("readonly".as_bytes().to_vec())),
-      Ok(Modifier::Readonly)
-    );
-    assert!(Modifier::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
-
-    assert_eq!("static", format!("{}", Modifier::Static));
-    assert_eq!("readonly", format!("{}", Modifier::Readonly));
-  }
-
-  #[test]
-  fn quote() {
-    assert_eq!(Quote::try_from(&BString::new("'".as_bytes().to_vec())), Ok(Quote::Single));
-    assert_eq!(Quote::try_from(&BString::new("\"".as_bytes().to_vec())), Ok(Quote::Double));
-    assert_eq!(Quote::try_from(&BString::new("`".as_bytes().to_vec())), Ok(Quote::Backtick));
-    assert!(Quote::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
-
-    assert_eq!("'", format!("{}", Quote::Single));
-    assert_eq!("\"", format!("{}", Quote::Double));
-    assert_eq!("`", format!("{}", Quote::Backtick));
-  }
-
-  #[test]
-  fn inheritance() {
-    assert_eq!(
-      Inheritance::try_from(&BString::new("abstract".as_bytes().to_vec())),
-      Ok(Inheritance::Abstract)
-    );
-    assert_eq!(
-      Inheritance::try_from(&BString::new("final".as_bytes().to_vec())),
-      Ok(Inheritance::Final)
-    );
-    assert!(Inheritance::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
-
-    assert_eq!("abstract", format!("{}", Inheritance::Abstract));
-    assert_eq!("final", format!("{}", Inheritance::Final));
-  }
-
-  #[test]
-  fn visibility() {
-    assert_eq!(
-      Visibility::try_from(&BString::new("private".as_bytes().to_vec())),
-      Ok(Visibility::Private)
-    );
-    assert_eq!(
-      Visibility::try_from(&BString::new("private(get)".as_bytes().to_vec())),
-      Ok(Visibility::PrivateGet)
-    );
-    assert_eq!(
-      Visibility::try_from(&BString::new("private(set)".as_bytes().to_vec())),
-      Ok(Visibility::PrivateSet)
-    );
-    assert_eq!(
-      Visibility::try_from(&BString::new("protected".as_bytes().to_vec())),
-      Ok(Visibility::Protected)
-    );
-    assert_eq!(
-      Visibility::try_from(&BString::new("protected(get)".as_bytes().to_vec())),
-      Ok(Visibility::ProtectedGet)
-    );
-    assert_eq!(
-      Visibility::try_from(&BString::new("protected(set)".as_bytes().to_vec())),
-      Ok(Visibility::ProtectedSet)
-    );
-    assert_eq!(
-      Visibility::try_from(&BString::new("public".as_bytes().to_vec())),
-      Ok(Visibility::Public)
-    );
-    assert_eq!(
-      Visibility::try_from(&BString::new("public(get)".as_bytes().to_vec())),
-      Ok(Visibility::PublicGet)
-    );
-    assert_eq!(
-      Visibility::try_from(&BString::new("public(set)".as_bytes().to_vec())),
-      Ok(Visibility::PublicSet)
-    );
-    assert!(Visibility::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
-
-    assert_eq!("private", format!("{}", Visibility::Private));
-    assert_eq!("private(get)", format!("{}", Visibility::PrivateGet));
-    assert_eq!("private(set)", format!("{}", Visibility::PrivateSet));
-    assert_eq!("protected", format!("{}", Visibility::Protected));
-    assert_eq!("protected(get)", format!("{}", Visibility::ProtectedGet));
-    assert_eq!("protected(set)", format!("{}", Visibility::ProtectedSet));
-    assert_eq!("public", format!("{}", Visibility::Public));
-    assert_eq!("public(get)", format!("{}", Visibility::PublicGet));
-    assert_eq!("public(set)", format!("{}", Visibility::PublicSet));
-  }
-}
-
 macro_rules! new_node {
   (
     $node_type:ident,
@@ -820,16 +543,16 @@ new_node!(Array, ArrayNode<'a> { is_short: bool, items: bumpalo::collections::Ve
 new_node!(ArrayItem, ArrayItemNode<'a> { key: Option<bumpalo::boxed::Box<'a, Node<'a>>>, value: bumpalo::boxed::Box<'a, Node<'a>>, }, ArrayItemBlueprint<'b> { key: Option<Box<Blueprint<'b>>>, value: Box<Blueprint<'b>>, });
 new_node!(ArrayLookup, ArrayLookupNode<'a> { left: bumpalo::boxed::Box<'a, Node<'a>>, right: Option<bumpalo::boxed::Box<'a, Node<'a>>>, }, ArrayLookupBlueprint<'b> { left: Box<Blueprint<'b>>, right: Option<Box<Blueprint<'b>>>, });
 new_node!(ArrowFunction, ArrowFunctionNode<'a> { is_ref: bool, parameters: bumpalo::collections::Vec<'a, Node<'a>>, return_type: Option<bumpalo::boxed::Box<'a, Node<'a>>>, body: bumpalo::boxed::Box<'a, Node<'a>>, }, ArrowFunctionBlueprint<'b> { is_ref: bool, parameters: &'b [Box<Blueprint<'b>>], return_type: Option<Box<Blueprint<'b>>>, body: Box<Blueprint<'b>>, });
-new_node!(Assignment, AssignmentNode<'a> { left: bumpalo::boxed::Box<'a, Node<'a>>, operator: BString, right: bumpalo::boxed::Box<'a, Node<'a>>, }, AssignmentBlueprint<'b> { left: Box<Blueprint<'b>>, operator: &'b str, right: Box<Blueprint<'b>>, });
+new_node!(Assignment, AssignmentNode<'a> { left: bumpalo::boxed::Box<'a, Node<'a>>, operator: AssignmentType, right: bumpalo::boxed::Box<'a, Node<'a>>, }, AssignmentBlueprint<'b> { left: Box<Blueprint<'b>>, operator: AssignmentType, right: Box<Blueprint<'b>>, });
 new_node!(Attribute, AttributeNode<'a> { items: bumpalo::collections::Vec<'a, Node<'a>>, }, AttributeBlueprint<'b> { items: &'b [Box<Blueprint<'b>>], });
 new_node!(AttributeItem, AttributeItemNode<'a> { name: BString, arguments: bumpalo::collections::Vec<'a, Node<'a>>, }, AttributeItemBlueprint<'b> { name: &'b str, arguments: &'b [Box<Blueprint<'b>>], });
-new_node!(Bin, BinNode<'a> { left: bumpalo::boxed::Box<'a, Node<'a>>, operator: BString, right: bumpalo::boxed::Box<'a, Node<'a>>, }, BinBlueprint<'b> { left: Box<Blueprint<'b>>, operator: &'b str, right: Box<Blueprint<'b>>, });
+new_node!(Bin, BinNode<'a> { left: bumpalo::boxed::Box<'a, Node<'a>>, operator: BinaryType, right: bumpalo::boxed::Box<'a, Node<'a>>, }, BinBlueprint<'b> { left: Box<Blueprint<'b>>, operator: BinaryType, right: Box<Blueprint<'b>>, });
 new_node!(Block, BlockNode<'a> { statements: bumpalo::collections::Vec<'a, Node<'a>>, }, BlockBlueprint<'b> { statements: &'b [Box<Blueprint<'b>>], });
 new_node!(Boolean, BooleanNode { is_true: bool }, BooleanBlueprint { is_true: bool });
 new_node!(Break, BreakNode<'a> { statement: Option<bumpalo::boxed::Box<'a, Node<'a>>>, }, BreakBlueprint<'b> { statement: Option<Box<Blueprint<'b>>>, });
 new_node!(Call, CallNode<'a> { name: bumpalo::boxed::Box<'a, Node<'a>>, arguments: bumpalo::collections::Vec<'a, Node<'a>>, }, CallBlueprint<'b> { name: Box<Blueprint<'b>>, arguments: &'b [Box<Blueprint<'b>>], });
 new_node!(Case, CaseNode<'a> { condition: Option<bumpalo::boxed::Box<'a, Node<'a>>>, body: bumpalo::boxed::Box<'a, Node<'a>>, }, CaseBlueprint<'b> { condition: Option<Box<Blueprint<'b>>>, body: Box<Blueprint<'b>>, });
-new_node!(Cast, CastNode<'a> { cast_type: BString, expression: bumpalo::boxed::Box<'a, Node<'a>>, }, CastBlueprint<'b> { cast_type: &'b str, expression: Box<Blueprint<'b>>, });
+new_node!(Cast, CastNode<'a> { cast_type: CastType, expression: bumpalo::boxed::Box<'a, Node<'a>>, }, CastBlueprint<'b> { cast_type: CastType, expression: Box<Blueprint<'b>>, });
 new_node!(Catch, CatchNode<'a> { types: bumpalo::collections::Vec<'a, Node<'a>>, variable: Option<bumpalo::boxed::Box<'a, Node<'a>>>, body: bumpalo::boxed::Box<'a, Node<'a>>, }, CatchBlueprint<'b> { types: &'b [Box<Blueprint<'b>>], variable: Option<Box<Blueprint<'b>>>, body: Box<Blueprint<'b>>, });
 new_node!(Class, ClassNode<'a> { inheritance: Option<Inheritance>, name: Option<bumpalo::boxed::Box<'a, Node<'a>>>, extends: Option<bumpalo::boxed::Box<'a, Node<'a>>>, implements: bumpalo::collections::Vec<'a, Node<'a>>, body: bumpalo::boxed::Box<'a, Node<'a>>, is_readonly: bool, }, ClassBlueprint<'b> { inheritance: Option<Inheritance>, name: Option<Box<Blueprint<'b>>>, extends: Option<Box<Blueprint<'b>>>, implements: &'b [Box<Blueprint<'b>>], body: Box<Blueprint<'b>>, is_readonly: bool, });
 new_node!(ClassKeyword, ClassKeywordNode {}, ClassKeywordBlueprint {});
@@ -882,8 +605,8 @@ new_node!(ObjectAccess, ObjectAccessNode<'a> { object: bumpalo::boxed::Box<'a, N
 new_node!(Parameter, ParameterNode<'a> { variable_type: Option<bumpalo::boxed::Box<'a, Node<'a>>>, is_ref: bool, is_ellipsis: bool, name: bumpalo::boxed::Box<'a, Node<'a>>, value: Option<bumpalo::boxed::Box<'a, Node<'a>>>, }, ParameterBlueprint<'b> { variable_type: Option<Box<Blueprint<'b>>>, is_ref: bool, is_ellipsis: bool, name: Box<Blueprint<'b>>, value: Option<Box<Blueprint<'b>>>, });
 new_node!(Parent, ParentNode {}, ParentBlueprint {});
 new_node!(Parenthesis, ParenthesisNode<'a> { statement: bumpalo::boxed::Box<'a, Node<'a>>, }, ParenthesisBlueprint<'b> { statement: Box<Blueprint<'b>>, });
-new_node!(Post, PostNode<'a> { statement: bumpalo::boxed::Box<'a, Node<'a>>, operator: BString, }, PostBlueprint<'b> { statement: Box<Blueprint<'b>>, operator: &'b str, });
-new_node!(Pre, PreNode<'a> { statement: bumpalo::boxed::Box<'a, Node<'a>>, operator: BString, }, PreBlueprint<'b> { statement: Box<Blueprint<'b>>, operator: &'b str, });
+new_node!(Post, PostNode<'a> { statement: bumpalo::boxed::Box<'a, Node<'a>>, operator: PostType, }, PostBlueprint<'b> { statement: Box<Blueprint<'b>>, operator: PostType, });
+new_node!(Pre, PreNode<'a> { statement: bumpalo::boxed::Box<'a, Node<'a>>, operator: PreType, }, PreBlueprint<'b> { statement: Box<Blueprint<'b>>, operator: PreType, });
 new_node!(Print, PrintNode<'a> { statement: bumpalo::boxed::Box<'a, Node<'a>>, }, PrintBlueprint<'b> { statement: Box<Blueprint<'b>>, });
 new_node!(Program, ProgramNode<'a> { children: bumpalo::collections::Vec<'a, Node<'a>>, }, ProgramBlueprint<'b> { children: &'b [Box<Blueprint<'b>>], });
 new_node!(Property, PropertyNode<'a> { visibilities: Vec<Visibility>, modifier: Option<Modifier>, hooks: bumpalo::collections::Vec<'a, Node<'a>>, items: bumpalo::collections::Vec<'a, Node<'a>>, }, PropertyBlueprint<'b> { visibilities: Vec<Visibility>, modifier: Option<Modifier>, hooks: &'b [Box<Blueprint<'b>>], items: &'b [Box<Blueprint<'b>>], });
@@ -915,3 +638,879 @@ new_node!(Variadic, VariadicNode<'a> { statement: Option<bumpalo::boxed::Box<'a,
 new_node!(While, WhileNode<'a> { condition: bumpalo::boxed::Box<'a, Node<'a>>, body: bumpalo::boxed::Box<'a, Node<'a>>, is_short: bool, }, WhileBlueprint<'b> { condition: Box<Blueprint<'b>>, body: Box<Blueprint<'b>>, is_short: bool, });
 new_node!(Yield, YieldNode<'a> { key: Option<bumpalo::boxed::Box<'a, Node<'a>>>, value: Option<bumpalo::boxed::Box<'a, Node<'a>>>, }, YieldBlueprint<'b> { key: Option<Box<Blueprint<'b>>>, value: Option<Box<Blueprint<'b>>>, });
 new_node!(YieldFrom, YieldFromNode<'a> { statement: bumpalo::boxed::Box<'a, Node<'a>>, }, YieldFromBlueprint<'b> { statement: Box<Blueprint<'b>>, });
+
+#[derive(Debug, PartialEq, Clone, Serialize)]
+pub enum PreType {
+  Increment,
+  Decrement,
+  Addition,
+  Subtraction,
+}
+
+impl TryFrom<&BString> for PreType {
+  type Error = String;
+
+  fn try_from(value: &BString) -> Result<Self, Self::Error> {
+    match value.as_slice() {
+      b"++" => Ok(PreType::Increment),
+      b"--" => Ok(PreType::Decrement),
+      b"+" => Ok(PreType::Addition),
+      b"-" => Ok(PreType::Subtraction),
+      _ => Err(format!("Invalid pre type: {}", value)),
+    }
+  }
+}
+
+impl Display for PreType {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      PreType::Increment => "++",
+      PreType::Decrement => "--",
+      PreType::Addition => "+",
+      PreType::Subtraction => "-",
+    })
+  }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize)]
+pub enum PostType {
+  Increment,
+  Decrement,
+}
+
+impl TryFrom<&BString> for PostType {
+  type Error = String;
+
+  fn try_from(value: &BString) -> Result<Self, Self::Error> {
+    match value.as_slice() {
+      b"++" => Ok(PostType::Increment),
+      b"--" => Ok(PostType::Decrement),
+      _ => Err(format!("Invalid post type: {}", value)),
+    }
+  }
+}
+
+impl Display for PostType {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      PostType::Increment => "++",
+      PostType::Decrement => "--",
+    })
+  }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize)]
+pub enum CastType {
+  Int,
+  Integer,
+  Bool,
+  Boolean,
+  Float,
+  Double,
+  Real,
+  String,
+  Binary,
+  Array,
+  Object,
+  Unset,
+}
+
+impl TryFrom<&BString> for CastType {
+  type Error = String;
+
+  fn try_from(value: &BString) -> Result<Self, Self::Error> {
+    match value.as_slice() {
+      b"int" => Ok(CastType::Int),
+      b"integer" => Ok(CastType::Integer),
+      b"bool" => Ok(CastType::Bool),
+      b"boolean" => Ok(CastType::Boolean),
+      b"float" => Ok(CastType::Float),
+      b"double" => Ok(CastType::Double),
+      b"real" => Ok(CastType::Real),
+      b"string" => Ok(CastType::String),
+      b"binary" => Ok(CastType::Binary),
+      b"array" => Ok(CastType::Array),
+      b"object" => Ok(CastType::Object),
+      b"unset" => Ok(CastType::Unset),
+      _ => Err(format!("Invalid cast type: {}", value)),
+    }
+  }
+}
+
+impl Display for CastType {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      CastType::Int => "int",
+      CastType::Integer => "integer",
+      CastType::Bool => "bool",
+      CastType::Boolean => "boolean",
+      CastType::Float => "float",
+      CastType::Double => "double",
+      CastType::Real => "real",
+      CastType::String => "string",
+      CastType::Binary => "binary",
+      CastType::Array => "array",
+      CastType::Object => "object",
+      CastType::Unset => "unset",
+    })
+  }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize)]
+pub enum BinaryType {
+  Addition,
+  Subtraction,
+  Multiplication,
+  Division,
+  Modulus,
+  Exponentiation,
+  BitwiseAnd,
+  BitwiseOr,
+  BitwiseXor,
+  BitwiseShiftLeft,
+  BitwiseShiftRight,
+  IsEqual,
+  IsIdentical,
+  IsNotEqual,
+  IsNotIdentical,
+  IsLesser,
+  IsGreater,
+  IsLesserOrEqual,
+  IsGreaterOrEqual,
+  Spaceship,
+  Concatenation,
+  BooleanAnd,
+  BooleanOr,
+  BooleanXor,
+  Elvis,
+  Coalesce,
+  InstanceOf,
+}
+
+impl TryFrom<&BString> for BinaryType {
+  type Error = String;
+
+  fn try_from(value: &BString) -> Result<Self, Self::Error> {
+    match value.as_slice() {
+      b"+" => Ok(BinaryType::Addition),
+      b"-" => Ok(BinaryType::Subtraction),
+      b"*" => Ok(BinaryType::Multiplication),
+      b"/" => Ok(BinaryType::Division),
+      b"%" => Ok(BinaryType::Modulus),
+      b"**" => Ok(BinaryType::Exponentiation),
+      b"&" => Ok(BinaryType::BitwiseAnd),
+      b"|" => Ok(BinaryType::BitwiseOr),
+      b"^" => Ok(BinaryType::BitwiseXor),
+      b"<<" => Ok(BinaryType::BitwiseShiftLeft),
+      b">>" => Ok(BinaryType::BitwiseShiftRight),
+      b"==" => Ok(BinaryType::IsEqual),
+      b"===" => Ok(BinaryType::IsIdentical),
+      b"!=" => Ok(BinaryType::IsNotEqual),
+      b"!==" => Ok(BinaryType::IsNotIdentical),
+      b"<" => Ok(BinaryType::IsLesser),
+      b">" => Ok(BinaryType::IsGreater),
+      b"<=" => Ok(BinaryType::IsLesserOrEqual),
+      b">=" => Ok(BinaryType::IsGreaterOrEqual),
+      b"<=>" => Ok(BinaryType::Spaceship),
+      b"." => Ok(BinaryType::Concatenation),
+      b"&&" | b"and" => Ok(BinaryType::BooleanAnd),
+      b"||" | b"or" => Ok(BinaryType::BooleanOr),
+      b"xor" => Ok(BinaryType::BooleanXor),
+      b"?:" => Ok(BinaryType::Elvis),
+      b"??" => Ok(BinaryType::Coalesce),
+      b"instanceof" => Ok(BinaryType::InstanceOf),
+      _ => Err(format!("Invalid binary type: {}", value)),
+    }
+  }
+}
+
+impl Display for BinaryType {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      BinaryType::Addition => "+",
+      BinaryType::Subtraction => "-",
+      BinaryType::Multiplication => "*",
+      BinaryType::Division => "/",
+      BinaryType::Modulus => "%",
+      BinaryType::Exponentiation => "**",
+      BinaryType::BitwiseAnd => "&",
+      BinaryType::BitwiseOr => "|",
+      BinaryType::BitwiseXor => "^",
+      BinaryType::BitwiseShiftLeft => "<<",
+      BinaryType::BitwiseShiftRight => ">>",
+      BinaryType::IsEqual => "==",
+      BinaryType::IsIdentical => "===",
+      BinaryType::IsNotEqual => "!=",
+      BinaryType::IsNotIdentical => "!==",
+      BinaryType::IsLesser => "<",
+      BinaryType::IsGreater => ">",
+      BinaryType::IsLesserOrEqual => "<=",
+      BinaryType::IsGreaterOrEqual => ">=",
+      BinaryType::Spaceship => "<=>",
+      BinaryType::Concatenation => ".",
+      BinaryType::BooleanAnd => "&&",
+      BinaryType::BooleanOr => "||",
+      BinaryType::BooleanXor => "xor",
+      BinaryType::Elvis => "?:",
+      BinaryType::Coalesce => "??",
+      BinaryType::InstanceOf => "instanceof",
+    })
+  }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize)]
+pub enum AssignmentType {
+  Default,
+  Reference,
+  Coalesce,
+  Concatenation,
+  Addition,
+  Subtraction,
+  Multiplication,
+  Division,
+  Exponentiation,
+  Modulus,
+  BitwiseAnd,
+  BitwiseOr,
+  BitwiseXor,
+  BitwiseShiftRight,
+  BitwiseShiftLeft,
+}
+
+impl TryFrom<&BString> for AssignmentType {
+  type Error = String;
+
+  fn try_from(value: &BString) -> Result<Self, Self::Error> {
+    match value.as_slice() {
+      b"=" => Ok(AssignmentType::Default),
+      b"=&" => Ok(AssignmentType::Reference),
+      b"??=" => Ok(AssignmentType::Coalesce),
+      b".=" => Ok(AssignmentType::Concatenation),
+      b"+=" => Ok(AssignmentType::Addition),
+      b"-=" => Ok(AssignmentType::Subtraction),
+      b"*=" => Ok(AssignmentType::Multiplication),
+      b"/=" => Ok(AssignmentType::Division),
+      b"**=" => Ok(AssignmentType::Exponentiation),
+      b"%=" => Ok(AssignmentType::Modulus),
+      b"&=" => Ok(AssignmentType::BitwiseAnd),
+      b"|=" => Ok(AssignmentType::BitwiseOr),
+      b"^=" => Ok(AssignmentType::BitwiseXor),
+      b">>=" => Ok(AssignmentType::BitwiseShiftRight),
+      b"<<=" => Ok(AssignmentType::BitwiseShiftLeft),
+      _ => Err(format!("Invalid assignment type: {}", value)),
+    }
+  }
+}
+
+impl Display for AssignmentType {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      AssignmentType::Default => "=",
+      AssignmentType::Reference => "=&",
+      AssignmentType::Coalesce => "??=",
+      AssignmentType::Concatenation => ".=",
+      AssignmentType::Addition => "+=",
+      AssignmentType::Subtraction => "-=",
+      AssignmentType::Multiplication => "*=",
+      AssignmentType::Division => "/=",
+      AssignmentType::Exponentiation => "**=",
+      AssignmentType::Modulus => "%=",
+      AssignmentType::BitwiseAnd => "&=",
+      AssignmentType::BitwiseOr => "|=",
+      AssignmentType::BitwiseXor => "^=",
+      AssignmentType::BitwiseShiftRight => ">>=",
+      AssignmentType::BitwiseShiftLeft => "<<=",
+    })
+  }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize)]
+pub enum UseItemModifier {
+  Function,
+  Const,
+}
+
+impl TryFrom<&BString> for UseItemModifier {
+  type Error = String;
+
+  fn try_from(value: &BString) -> Result<Self, Self::Error> {
+    match value.as_slice() {
+      b"function" => Ok(UseItemModifier::Function),
+      b"const" => Ok(UseItemModifier::Const),
+      _ => Err(format!("Invalid use item modifier: {}", value)),
+    }
+  }
+}
+
+impl Display for UseItemModifier {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      UseItemModifier::Function => "function",
+      UseItemModifier::Const => "const",
+    })
+  }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize)]
+pub enum Modifier {
+  Static,
+  Readonly,
+}
+
+impl TryFrom<&BString> for Modifier {
+  type Error = String;
+
+  fn try_from(value: &BString) -> Result<Self, Self::Error> {
+    match value.as_slice() {
+      b"static" => Ok(Modifier::Static),
+      b"readonly" => Ok(Modifier::Readonly),
+      _ => Err(format!("Invalid modifier: {}", value)),
+    }
+  }
+}
+
+impl Display for Modifier {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      Modifier::Static => "static",
+      Modifier::Readonly => "readonly",
+    })
+  }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize)]
+pub enum Quote {
+  Single,
+  Double,
+  Backtick,
+}
+
+impl TryFrom<&BString> for Quote {
+  type Error = String;
+
+  fn try_from(value: &BString) -> Result<Self, Self::Error> {
+    match value.as_slice() {
+      b"'" => Ok(Quote::Single),
+      b"\"" => Ok(Quote::Double),
+      b"`" => Ok(Quote::Backtick),
+      _ => Err(format!("Invalid quote: {}", value)),
+    }
+  }
+}
+
+impl Display for Quote {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      Quote::Single => "'",
+      Quote::Double => "\"",
+      Quote::Backtick => "`",
+    })
+  }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize)]
+pub enum Inheritance {
+  Abstract,
+  Final,
+}
+
+impl TryFrom<&BString> for Inheritance {
+  type Error = String;
+
+  fn try_from(value: &BString) -> Result<Self, Self::Error> {
+    match value.as_slice() {
+      b"abstract" => Ok(Inheritance::Abstract),
+      b"final" => Ok(Inheritance::Final),
+      _ => Err(format!("Invalid inheritance: {}", value)),
+    }
+  }
+}
+
+impl Display for Inheritance {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      Inheritance::Abstract => "abstract",
+      Inheritance::Final => "final",
+    })
+  }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize)]
+pub enum Visibility {
+  Public,
+  PublicGet,
+  PublicSet,
+  Private,
+  PrivateGet,
+  PrivateSet,
+  Protected,
+  ProtectedGet,
+  ProtectedSet,
+}
+
+impl TryFrom<&BString> for Visibility {
+  type Error = String;
+
+  fn try_from(value: &BString) -> Result<Self, Self::Error> {
+    match value.as_slice() {
+      b"public" => Ok(Visibility::Public),
+      b"public(get)" => Ok(Visibility::PublicGet),
+      b"public(set)" => Ok(Visibility::PublicSet),
+      b"private" => Ok(Visibility::Private),
+      b"private(get)" => Ok(Visibility::PrivateGet),
+      b"private(set)" => Ok(Visibility::PrivateSet),
+      b"protected" => Ok(Visibility::Protected),
+      b"protected(get)" => Ok(Visibility::ProtectedGet),
+      b"protected(set)" => Ok(Visibility::ProtectedSet),
+      _ => Err(format!("Invalid visibility: {}", value)),
+    }
+  }
+}
+
+impl Display for Visibility {
+  fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    write!(f, "{}", match self {
+      Visibility::Public => "public",
+      Visibility::PublicGet => "public(get)",
+      Visibility::PublicSet => "public(set)",
+      Visibility::Private => "private",
+      Visibility::PrivateGet => "private(get)",
+      Visibility::PrivateSet => "private(set)",
+      Visibility::Protected => "protected",
+      Visibility::ProtectedGet => "protected(get)",
+      Visibility::ProtectedSet => "protected(set)",
+    })
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use bstr::BString;
+
+  use crate::{
+    AssignmentType,
+    BinaryType,
+    CastType,
+    Inheritance,
+    Modifier,
+    PostType,
+    PreType,
+    Quote,
+    UseItemModifier,
+    Visibility,
+  };
+
+  #[test]
+  fn pre_type() {
+    assert_eq!(PreType::try_from(&BString::new("++".as_bytes().to_vec())), Ok(PreType::Increment));
+    assert_eq!(PreType::try_from(&BString::new("--".as_bytes().to_vec())), Ok(PreType::Decrement));
+    assert_eq!(PreType::try_from(&BString::new("+".as_bytes().to_vec())), Ok(PreType::Addition));
+    assert_eq!(PreType::try_from(&BString::new("-".as_bytes().to_vec())), Ok(PreType::Subtraction));
+    assert!(PreType::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
+
+    assert_eq!("++", format!("{}", PreType::Increment));
+    assert_eq!("--", format!("{}", PreType::Decrement));
+    assert_eq!("+", format!("{}", PreType::Addition));
+    assert_eq!("-", format!("{}", PreType::Subtraction));
+  }
+
+  #[test]
+  fn post_type() {
+    assert_eq!(
+      PostType::try_from(&BString::new("++".as_bytes().to_vec())),
+      Ok(PostType::Increment)
+    );
+    assert_eq!(
+      PostType::try_from(&BString::new("--".as_bytes().to_vec())),
+      Ok(PostType::Decrement)
+    );
+    assert!(PostType::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
+
+    assert_eq!("++", format!("{}", PostType::Increment));
+    assert_eq!("--", format!("{}", PostType::Decrement));
+  }
+
+  #[test]
+  fn cast_type() {
+    assert_eq!(CastType::try_from(&BString::new("int".as_bytes().to_vec())), Ok(CastType::Int));
+    assert_eq!(
+      CastType::try_from(&BString::new("integer".as_bytes().to_vec())),
+      Ok(CastType::Integer)
+    );
+    assert_eq!(CastType::try_from(&BString::new("bool".as_bytes().to_vec())), Ok(CastType::Bool));
+    assert_eq!(
+      CastType::try_from(&BString::new("boolean".as_bytes().to_vec())),
+      Ok(CastType::Boolean)
+    );
+    assert_eq!(CastType::try_from(&BString::new("float".as_bytes().to_vec())), Ok(CastType::Float));
+    assert_eq!(
+      CastType::try_from(&BString::new("double".as_bytes().to_vec())),
+      Ok(CastType::Double)
+    );
+    assert_eq!(CastType::try_from(&BString::new("real".as_bytes().to_vec())), Ok(CastType::Real));
+    assert_eq!(
+      CastType::try_from(&BString::new("string".as_bytes().to_vec())),
+      Ok(CastType::String)
+    );
+    assert_eq!(
+      CastType::try_from(&BString::new("binary".as_bytes().to_vec())),
+      Ok(CastType::Binary)
+    );
+    assert_eq!(CastType::try_from(&BString::new("array".as_bytes().to_vec())), Ok(CastType::Array));
+    assert_eq!(
+      CastType::try_from(&BString::new("object".as_bytes().to_vec())),
+      Ok(CastType::Object)
+    );
+    assert_eq!(CastType::try_from(&BString::new("unset".as_bytes().to_vec())), Ok(CastType::Unset));
+    assert!(CastType::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
+
+    assert_eq!("int", format!("{}", CastType::Int));
+    assert_eq!("integer", format!("{}", CastType::Integer));
+    assert_eq!("bool", format!("{}", CastType::Bool));
+    assert_eq!("boolean", format!("{}", CastType::Boolean));
+    assert_eq!("float", format!("{}", CastType::Float));
+    assert_eq!("double", format!("{}", CastType::Double));
+    assert_eq!("real", format!("{}", CastType::Real));
+    assert_eq!("string", format!("{}", CastType::String));
+    assert_eq!("binary", format!("{}", CastType::Binary));
+    assert_eq!("array", format!("{}", CastType::Array));
+    assert_eq!("object", format!("{}", CastType::Object));
+    assert_eq!("unset", format!("{}", CastType::Unset));
+  }
+
+  #[test]
+  fn binary_type() {
+    assert_eq!(
+      BinaryType::try_from(&BString::new("+".as_bytes().to_vec())),
+      Ok(BinaryType::Addition)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("-".as_bytes().to_vec())),
+      Ok(BinaryType::Subtraction)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("*".as_bytes().to_vec())),
+      Ok(BinaryType::Multiplication)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("/".as_bytes().to_vec())),
+      Ok(BinaryType::Division)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("%".as_bytes().to_vec())),
+      Ok(BinaryType::Modulus)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("**".as_bytes().to_vec())),
+      Ok(BinaryType::Exponentiation)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("&".as_bytes().to_vec())),
+      Ok(BinaryType::BitwiseAnd)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("|".as_bytes().to_vec())),
+      Ok(BinaryType::BitwiseOr)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("^".as_bytes().to_vec())),
+      Ok(BinaryType::BitwiseXor)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("<<".as_bytes().to_vec())),
+      Ok(BinaryType::BitwiseShiftLeft)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new(">>".as_bytes().to_vec())),
+      Ok(BinaryType::BitwiseShiftRight)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("==".as_bytes().to_vec())),
+      Ok(BinaryType::IsEqual)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("===".as_bytes().to_vec())),
+      Ok(BinaryType::IsIdentical)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("!=".as_bytes().to_vec())),
+      Ok(BinaryType::IsNotEqual)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("!==".as_bytes().to_vec())),
+      Ok(BinaryType::IsNotIdentical)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("<".as_bytes().to_vec())),
+      Ok(BinaryType::IsLesser)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new(">".as_bytes().to_vec())),
+      Ok(BinaryType::IsGreater)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("<=".as_bytes().to_vec())),
+      Ok(BinaryType::IsLesserOrEqual)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new(">=".as_bytes().to_vec())),
+      Ok(BinaryType::IsGreaterOrEqual)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("<=>".as_bytes().to_vec())),
+      Ok(BinaryType::Spaceship)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new(".".as_bytes().to_vec())),
+      Ok(BinaryType::Concatenation)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("&&".as_bytes().to_vec())),
+      Ok(BinaryType::BooleanAnd)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("and".as_bytes().to_vec())),
+      Ok(BinaryType::BooleanAnd)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("||".as_bytes().to_vec())),
+      Ok(BinaryType::BooleanOr)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("or".as_bytes().to_vec())),
+      Ok(BinaryType::BooleanOr)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("xor".as_bytes().to_vec())),
+      Ok(BinaryType::BooleanXor)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("?:".as_bytes().to_vec())),
+      Ok(BinaryType::Elvis)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("??".as_bytes().to_vec())),
+      Ok(BinaryType::Coalesce)
+    );
+    assert_eq!(
+      BinaryType::try_from(&BString::new("instanceof".as_bytes().to_vec())),
+      Ok(BinaryType::InstanceOf)
+    );
+    assert!(BinaryType::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
+
+    assert_eq!("+", format!("{}", BinaryType::Addition));
+    assert_eq!("-", format!("{}", BinaryType::Subtraction));
+    assert_eq!("*", format!("{}", BinaryType::Multiplication));
+    assert_eq!("/", format!("{}", BinaryType::Division));
+    assert_eq!("%", format!("{}", BinaryType::Modulus));
+    assert_eq!("**", format!("{}", BinaryType::Exponentiation));
+    assert_eq!("&", format!("{}", BinaryType::BitwiseAnd));
+    assert_eq!("|", format!("{}", BinaryType::BitwiseOr));
+    assert_eq!("^", format!("{}", BinaryType::BitwiseXor));
+    assert_eq!("<<", format!("{}", BinaryType::BitwiseShiftLeft));
+    assert_eq!(">>", format!("{}", BinaryType::BitwiseShiftRight));
+    assert_eq!("==", format!("{}", BinaryType::IsEqual));
+    assert_eq!("===", format!("{}", BinaryType::IsIdentical));
+    assert_eq!("!=", format!("{}", BinaryType::IsNotEqual));
+    assert_eq!("!==", format!("{}", BinaryType::IsNotIdentical));
+    assert_eq!("<", format!("{}", BinaryType::IsLesser));
+    assert_eq!(">", format!("{}", BinaryType::IsGreater));
+    assert_eq!("<=", format!("{}", BinaryType::IsLesserOrEqual));
+    assert_eq!(">=", format!("{}", BinaryType::IsGreaterOrEqual));
+    assert_eq!("<=>", format!("{}", BinaryType::Spaceship));
+    assert_eq!(".", format!("{}", BinaryType::Concatenation));
+    assert_eq!("&&", format!("{}", BinaryType::BooleanAnd));
+    assert_eq!("||", format!("{}", BinaryType::BooleanOr));
+    assert_eq!("xor", format!("{}", BinaryType::BooleanXor));
+    assert_eq!("?:", format!("{}", BinaryType::Elvis));
+    assert_eq!("??", format!("{}", BinaryType::Coalesce));
+    assert_eq!("instanceof", format!("{}", BinaryType::InstanceOf));
+  }
+
+  #[test]
+  fn assignment_type() {
+    assert_eq!(
+      AssignmentType::try_from(&BString::new("=".as_bytes().to_vec())),
+      Ok(AssignmentType::Default)
+    );
+    assert_eq!(
+      AssignmentType::try_from(&BString::new("=&".as_bytes().to_vec())),
+      Ok(AssignmentType::Reference)
+    );
+    assert_eq!(
+      AssignmentType::try_from(&BString::new("??=".as_bytes().to_vec())),
+      Ok(AssignmentType::Coalesce)
+    );
+    assert_eq!(
+      AssignmentType::try_from(&BString::new("**=".as_bytes().to_vec())),
+      Ok(AssignmentType::Exponentiation)
+    );
+    assert_eq!(
+      AssignmentType::try_from(&BString::new("*=".as_bytes().to_vec())),
+      Ok(AssignmentType::Multiplication)
+    );
+    assert_eq!(
+      AssignmentType::try_from(&BString::new("/=".as_bytes().to_vec())),
+      Ok(AssignmentType::Division)
+    );
+    assert_eq!(
+      AssignmentType::try_from(&BString::new("+=".as_bytes().to_vec())),
+      Ok(AssignmentType::Addition)
+    );
+    assert_eq!(
+      AssignmentType::try_from(&BString::new("-=".as_bytes().to_vec())),
+      Ok(AssignmentType::Subtraction)
+    );
+    assert_eq!(
+      AssignmentType::try_from(&BString::new("%=".as_bytes().to_vec())),
+      Ok(AssignmentType::Modulus)
+    );
+    assert_eq!(
+      AssignmentType::try_from(&BString::new("&=".as_bytes().to_vec())),
+      Ok(AssignmentType::BitwiseAnd)
+    );
+    assert_eq!(
+      AssignmentType::try_from(&BString::new("|=".as_bytes().to_vec())),
+      Ok(AssignmentType::BitwiseOr)
+    );
+    assert_eq!(
+      AssignmentType::try_from(&BString::new("^=".as_bytes().to_vec())),
+      Ok(AssignmentType::BitwiseXor)
+    );
+    assert_eq!(
+      AssignmentType::try_from(&BString::new(">>=".as_bytes().to_vec())),
+      Ok(AssignmentType::BitwiseShiftRight)
+    );
+    assert_eq!(
+      AssignmentType::try_from(&BString::new("<<=".as_bytes().to_vec())),
+      Ok(AssignmentType::BitwiseShiftLeft)
+    );
+    assert!(AssignmentType::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
+
+    assert_eq!("=", format!("{}", AssignmentType::Default));
+    assert_eq!("=&", format!("{}", AssignmentType::Reference));
+    assert_eq!("??=", format!("{}", AssignmentType::Coalesce));
+    assert_eq!("**=", format!("{}", AssignmentType::Exponentiation));
+    assert_eq!("*=", format!("{}", AssignmentType::Multiplication));
+    assert_eq!("/=", format!("{}", AssignmentType::Division));
+    assert_eq!("+=", format!("{}", AssignmentType::Addition));
+    assert_eq!("-=", format!("{}", AssignmentType::Subtraction));
+    assert_eq!("%=", format!("{}", AssignmentType::Modulus));
+    assert_eq!("&=", format!("{}", AssignmentType::BitwiseAnd));
+    assert_eq!("|=", format!("{}", AssignmentType::BitwiseOr));
+    assert_eq!("^=", format!("{}", AssignmentType::BitwiseXor));
+    assert_eq!(">>=", format!("{}", AssignmentType::BitwiseShiftRight));
+    assert_eq!("<<=", format!("{}", AssignmentType::BitwiseShiftLeft));
+  }
+
+  #[test]
+  fn use_item_modifier() {
+    assert_eq!(
+      UseItemModifier::try_from(&BString::new("const".as_bytes().to_vec())),
+      Ok(UseItemModifier::Const)
+    );
+    assert_eq!(
+      UseItemModifier::try_from(&BString::new("function".as_bytes().to_vec())),
+      Ok(UseItemModifier::Function)
+    );
+    assert!(UseItemModifier::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
+
+    assert_eq!("const", format!("{}", UseItemModifier::Const));
+    assert_eq!("function", format!("{}", UseItemModifier::Function));
+  }
+
+  #[test]
+  fn modifier() {
+    assert_eq!(
+      Modifier::try_from(&BString::new("static".as_bytes().to_vec())),
+      Ok(Modifier::Static)
+    );
+    assert_eq!(
+      Modifier::try_from(&BString::new("readonly".as_bytes().to_vec())),
+      Ok(Modifier::Readonly)
+    );
+    assert!(Modifier::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
+
+    assert_eq!("static", format!("{}", Modifier::Static));
+    assert_eq!("readonly", format!("{}", Modifier::Readonly));
+  }
+
+  #[test]
+  fn quote() {
+    assert_eq!(Quote::try_from(&BString::new("'".as_bytes().to_vec())), Ok(Quote::Single));
+    assert_eq!(Quote::try_from(&BString::new("\"".as_bytes().to_vec())), Ok(Quote::Double));
+    assert_eq!(Quote::try_from(&BString::new("`".as_bytes().to_vec())), Ok(Quote::Backtick));
+    assert!(Quote::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
+
+    assert_eq!("'", format!("{}", Quote::Single));
+    assert_eq!("\"", format!("{}", Quote::Double));
+    assert_eq!("`", format!("{}", Quote::Backtick));
+  }
+
+  #[test]
+  fn inheritance() {
+    assert_eq!(
+      Inheritance::try_from(&BString::new("abstract".as_bytes().to_vec())),
+      Ok(Inheritance::Abstract)
+    );
+    assert_eq!(
+      Inheritance::try_from(&BString::new("final".as_bytes().to_vec())),
+      Ok(Inheritance::Final)
+    );
+    assert!(Inheritance::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
+
+    assert_eq!("abstract", format!("{}", Inheritance::Abstract));
+    assert_eq!("final", format!("{}", Inheritance::Final));
+  }
+
+  #[test]
+  fn visibility() {
+    assert_eq!(
+      Visibility::try_from(&BString::new("private".as_bytes().to_vec())),
+      Ok(Visibility::Private)
+    );
+    assert_eq!(
+      Visibility::try_from(&BString::new("private(get)".as_bytes().to_vec())),
+      Ok(Visibility::PrivateGet)
+    );
+    assert_eq!(
+      Visibility::try_from(&BString::new("private(set)".as_bytes().to_vec())),
+      Ok(Visibility::PrivateSet)
+    );
+    assert_eq!(
+      Visibility::try_from(&BString::new("protected".as_bytes().to_vec())),
+      Ok(Visibility::Protected)
+    );
+    assert_eq!(
+      Visibility::try_from(&BString::new("protected(get)".as_bytes().to_vec())),
+      Ok(Visibility::ProtectedGet)
+    );
+    assert_eq!(
+      Visibility::try_from(&BString::new("protected(set)".as_bytes().to_vec())),
+      Ok(Visibility::ProtectedSet)
+    );
+    assert_eq!(
+      Visibility::try_from(&BString::new("public".as_bytes().to_vec())),
+      Ok(Visibility::Public)
+    );
+    assert_eq!(
+      Visibility::try_from(&BString::new("public(get)".as_bytes().to_vec())),
+      Ok(Visibility::PublicGet)
+    );
+    assert_eq!(
+      Visibility::try_from(&BString::new("public(set)".as_bytes().to_vec())),
+      Ok(Visibility::PublicSet)
+    );
+    assert!(Visibility::try_from(&BString::new("none".as_bytes().to_vec())).is_err());
+
+    assert_eq!("private", format!("{}", Visibility::Private));
+    assert_eq!("private(get)", format!("{}", Visibility::PrivateGet));
+    assert_eq!("private(set)", format!("{}", Visibility::PrivateSet));
+    assert_eq!("protected", format!("{}", Visibility::Protected));
+    assert_eq!("protected(get)", format!("{}", Visibility::ProtectedGet));
+    assert_eq!("protected(set)", format!("{}", Visibility::ProtectedSet));
+    assert_eq!("public", format!("{}", Visibility::Public));
+    assert_eq!("public(get)", format!("{}", Visibility::PublicGet));
+    assert_eq!("public(set)", format!("{}", Visibility::PublicSet));
+  }
+}

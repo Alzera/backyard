@@ -1,5 +1,5 @@
 use backyard_lexer::token::TokenType;
-use backyard_nodes::{ CastNode, Location, Node, ParenthesisNode, utils::IntoBoxedNode };
+use backyard_nodes::{ utils::IntoBoxedNode, CastNode, CastType, Location, Node, ParenthesisNode };
 
 use crate::{
   error::ParserError,
@@ -44,7 +44,7 @@ impl ParenthesisParser {
         if CAST_TYPES.contains(&token.value.as_slice()) {
           if let Ok(next_token) = parser.get_token(parser.position + 1) {
             if next_token.token_type == TokenType::RightParenthesis {
-              let cast_type = token.value.to_owned();
+              let cast_type = CastType::try_from(&token.value).map_err(|_| ParserError::Internal)?;
               parser.position += 2;
               let expression = parser
                 .get_statement(

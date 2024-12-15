@@ -1,13 +1,14 @@
 use backyard_lexer::token::TokenType;
 use backyard_nodes::{
+  utils::IntoBoxedOptionNode,
   Location,
   NegateNode,
   Node,
   PreNode,
+  PreType,
   ReferenceNode,
   SilentNode,
   VariadicNode,
-  utils::IntoBoxedOptionNode,
 };
 
 use crate::{
@@ -70,8 +71,10 @@ impl PreParser {
         | TokenType::PreIncrement
         | TokenType::PreDecrement
         | TokenType::Addition
-        | TokenType::Subtraction =>
-          Ok(PreNode::loc(argument, operator.value.to_owned(), parser.gen_loc(start_loc))),
+        | TokenType::Subtraction => {
+          let operator = PreType::try_from(&operator.value).map_err(|_| ParserError::Internal)?;
+          Ok(PreNode::loc(argument, operator, parser.gen_loc(start_loc)))
+        }
         TokenType::BooleanNegate => Ok(NegateNode::loc(argument, parser.gen_loc(start_loc))),
         TokenType::AtSign => Ok(SilentNode::loc(argument, parser.gen_loc(start_loc))),
         TokenType::BitwiseAnd => Ok(ReferenceNode::loc(argument, parser.gen_loc(start_loc))),

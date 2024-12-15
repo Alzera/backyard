@@ -1,5 +1,5 @@
 use backyard_lexer::token::TokenType;
-use backyard_nodes::{ BinNode, Location, Node, utils::IntoBoxedNode };
+use backyard_nodes::{ utils::IntoBoxedNode, BinNode, BinaryType, Location, Node };
 
 use crate::{
   error::ParserError,
@@ -63,9 +63,10 @@ impl BinParser {
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [operator] = matched.as_slice() {
-      let operator = operator.as_equal(parser)?.value.to_owned();
+      let operator = BinaryType::try_from(&operator.as_equal(parser)?.value).map_err(
+        |_| ParserError::Internal
+      )?;
       let left = args.last_expr.take().unwrap();
-      args.last_expr = None;
       if
         let Some(right) = parser.get_statement(
           &mut LoopArgument::safe(

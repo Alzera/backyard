@@ -36,9 +36,7 @@ children:
             offset: 8
         leadings: ~
         trailings: ~
-      operator:
-        - 60
-        - 61
+      operator: IsLesserOrEqual
       right:
         node_type: number
         value:

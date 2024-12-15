@@ -36,8 +36,7 @@ children:
               offset: 6
           leadings: ~
           trailings: ~
-        operator:
-          - 61
+        operator: Default
         right:
           node_type: number
           value:
@@ -93,8 +92,7 @@ children:
               offset: 14
           leadings: ~
           trailings: ~
-        operator:
-          - 61
+        operator: Default
         right:
           node_type: number
           value:
@@ -151,9 +149,7 @@ children:
               offset: 22
           leadings: ~
           trailings: ~
-        operator:
-          - 60
-          - 61
+        operator: IsLesserOrEqual
         right:
           node_type: number
           value:
@@ -211,9 +207,7 @@ children:
               offset: 32
           leadings: ~
           trailings: ~
-        operator:
-          - 43
-          - 61
+        operator: Addition
         right:
           node_type: variable
           name:
@@ -322,9 +316,7 @@ children:
               offset: 52
           leadings: ~
           trailings: ~
-        operator:
-          - 43
-          - 43
+        operator: Increment
         loc:
           start:
             line: 1

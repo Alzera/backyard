@@ -34,14 +34,10 @@ children:
           offset: 1
       leadings: ~
       trailings: ~
-    operator:
-      - 61
+    operator: Default
     right:
       node_type: cast
-      cast_type:
-        - 105
-        - 110
-        - 116
+      cast_type: Int
       expression:
         node_type: variable
         name:

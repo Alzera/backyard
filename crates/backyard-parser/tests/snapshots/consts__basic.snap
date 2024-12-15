@@ -23,8 +23,7 @@ children:
               offset: 7
           leadings: ~
           trailings: ~
-        operator:
-          - 61
+        operator: Default
         right:
           node_type: number
           value:
@@ -67,8 +66,7 @@ children:
               offset: 14
           leadings: ~
           trailings: ~
-        operator:
-          - 61
+        operator: Default
         right:
           node_type: number
           value:

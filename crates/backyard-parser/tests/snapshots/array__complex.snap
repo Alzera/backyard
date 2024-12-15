@@ -34,8 +34,7 @@ children:
           offset: 1
       leadings: ~
       trailings: ~
-    operator:
-      - 61
+    operator: Default
     right:
       node_type: array
       is_short: true
@@ -73,8 +72,7 @@ children:
                   offset: 9
               leadings: ~
               trailings: ~
-            operator:
-              - 61
+            operator: Default
             right:
               node_type: parenthesis
               statement:
@@ -285,10 +283,7 @@ children:
                   offset: 52
               leadings: ~
               trailings: ~
-            operator:
-              - 61
-              - 61
-              - 61
+            operator: IsIdentical
             right:
               node_type: ternary
               condition:

@@ -1,5 +1,5 @@
 use backyard_lexer::token::TokenType;
-use backyard_nodes::{ Location, Node, PostNode, utils::IntoBoxedNode };
+use backyard_nodes::{ utils::IntoBoxedNode, Location, Node, PostNode, PostType };
 
 use crate::{
   error::ParserError,
@@ -26,10 +26,13 @@ impl PostParser {
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [operator] = matched.as_slice() {
+      let operator = PostType::try_from(&operator.as_equal(parser)?.value).map_err(
+        |_| ParserError::Internal
+      )?;
       return Ok(
         PostNode::loc(
           args.last_expr.take().unwrap().into_boxed(parser.arena),
-          operator.as_equal(parser)?.value.to_owned(),
+          operator,
           parser.gen_loc(start_loc)
         )
       );

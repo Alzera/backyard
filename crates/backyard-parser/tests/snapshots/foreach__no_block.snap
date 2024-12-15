@@ -120,8 +120,7 @@ children:
             offset: 27
         leadings: ~
         trailings: ~
-      operator:
-        - 61
+      operator: Default
       right:
         node_type: number
         value:

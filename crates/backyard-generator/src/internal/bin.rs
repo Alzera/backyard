@@ -11,12 +11,13 @@ impl BinGenerator {
     node: &Node<'arena>
   ) {
     let node = cast_node!(Bin, &node.wrapper);
+    let operator = format!("{} ", node.operator);
     generator.generate_node(builder, &node.left, &mut GeneratorArgument::default());
     let mut expr = generator.generate_node_new(&node.right);
-    if builder.last_len() + expr.first_len() + node.operator.len() > generator.max_length {
+    if builder.last_len() + expr.first_len() + operator.len() > generator.max_length {
       let mut t = Builder::new();
       t.new_line();
-      t.push(format!("{} ", node.operator).as_str());
+      t.push(&operator);
       t.indent();
       builder.extend(t);
       expr.indent();

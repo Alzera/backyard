@@ -1,11 +1,16 @@
 use bstr::BString;
 use bumpalo::{ Bump, boxed::Box, collections::Vec };
 use crate::{
+  AssignmentType,
+  BinaryType,
   BodyType,
+  CastType,
   Inheritance,
   Modifier,
   Node,
   NodeWrapper,
+  PostType,
+  PreType,
   Quote,
   UseItemModifier,
   Visibility,
@@ -205,6 +210,11 @@ macro_rules! impl_clone_in_clone {
 }
 
 impl_clone_in_clone!(
+  AssignmentType,
+  BinaryType,
+  CastType,
+  PostType,
+  PreType,
   UseItemModifier,
   Modifier,
   Quote,

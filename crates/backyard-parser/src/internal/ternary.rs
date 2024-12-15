@@ -27,7 +27,6 @@ impl TernaryParser {
   ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
       let left = args.last_expr.take().unwrap();
-      args.last_expr = None;
       let valid = parser
         .get_statement(
           &mut LoopArgument::with_tokens(parser.arena, "ternary_valid", &[], &[TokenType::Colon])

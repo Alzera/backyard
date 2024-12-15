@@ -74,8 +74,7 @@ children:
           offset: 11
       leadings: ~
       trailings: ~
-    operator:
-      - 61
+    operator: Default
     right:
       node_type: array
       is_short: true

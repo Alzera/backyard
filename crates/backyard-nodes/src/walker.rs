@@ -3,11 +3,16 @@ use std::collections::VecDeque;
 use bstr::BString;
 
 use crate::{
+  AssignmentType,
+  BinaryType,
   BodyType,
+  CastType,
   Inheritance,
   Modifier,
   Node,
   NodeWrapper,
+  PostType,
+  PreType,
   Quote,
   UseItemModifier,
   Visibility,
@@ -187,6 +192,11 @@ impl_map_into_walker_stack!(
   BString,
   BodyType,
   std::vec::Vec<Visibility>,
+  AssignmentType,
+  BinaryType,
+  CastType,
+  PostType,
+  PreType,
   UseItemModifier,
   Visibility,
   Inheritance,
@@ -196,14 +206,16 @@ impl_map_into_walker_stack!(
 
 #[cfg(test)]
 mod tests {
-  use crate::{ builder::{ BlueprintBuildable, Builder }, walker::Walker, NodeType };
+  use crate::{ builder::{ BlueprintBuildable, Builder }, walker::Walker, AssignmentType, NodeType };
 
   #[test]
   fn walker() {
     let arena = bumpalo::Bump::new();
     let b = Builder::new();
     let node = b
-      .Program(&[b.Assignment(b.Variable(b.Identifier("a")), "=", b.Number("21"))])
+      .Program(
+        &[b.Assignment(b.Variable(b.Identifier("a")), AssignmentType::Default, b.Number("21"))]
+      )
       .build(&arena);
     let mut walker = Walker::new(&*node).into_iter();
 

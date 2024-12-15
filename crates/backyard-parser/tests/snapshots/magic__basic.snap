@@ -27,8 +27,7 @@ children:
           offset: 0
       leadings: ~
       trailings: ~
-    operator:
-      - 46
+    operator: Concatenation
     right:
       node_type: magic
       name:

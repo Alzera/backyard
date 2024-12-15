@@ -29,7 +29,6 @@ impl StaticLookupParser {
   ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
       let left = args.last_expr.take().unwrap();
-      args.last_expr = None;
       if let Ok(t) = parser.get_token(parser.position) {
         let expr = if t.token_type == TokenType::Class {
           let start_loc = t.get_location().unwrap();

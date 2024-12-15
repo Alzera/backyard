@@ -1,6 +1,5 @@
 ---
 source: crates/backyard-nodes/src/builder.rs
-assertion_line: 316
 expression: node
 snapshot_kind: text
 ---
@@ -19,8 +18,7 @@ children:
       loc: ~
       leadings: ~
       trailings: ~
-    operator:
-      - 61
+    operator: Default
     right:
       node_type: number
       value:
