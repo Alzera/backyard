@@ -40,11 +40,6 @@ impl Control {
   }
 
   #[inline]
-  pub(crate) fn get_len(&self) -> usize {
-    self.chars.len()
-  }
-
-  #[inline]
   pub(crate) fn get_position(&self) -> usize {
     self.position
   }
@@ -93,7 +88,7 @@ impl Control {
   }
 
   pub(crate) fn next_char_until<F>(&mut self, take_prev_len: usize, mut until: F) -> BString
-    where F: FnMut(&mut Control, u8, &mut usize) -> bool
+    where F: FnMut(&mut Control, u8, &usize) -> bool
   {
     let start_position = self.position;
     let mut end_position = self.position;
@@ -103,7 +98,7 @@ impl Control {
 
     while let Some(ch) = self.chars.get(end_position) {
       let ch = *ch;
-      if until(self, ch, &mut end_position) {
+      if until(self, ch, &end_position) {
         break;
       }
       last_snapshot = ControlSnapshot { line, column, offset: end_position };
@@ -129,29 +124,31 @@ impl Control {
   }
 }
 
-// #[cfg(test)]
-// mod tests {
-//   use super::Control;
+#[cfg(test)]
+mod tests {
+  use bstr::BString;
 
-//   #[test]
-//   fn control() {
-//     let mut control = Control::new("<?php\necho 'hello world';\n?>");
-//     assert_eq!(Some(b'<'), control.next_char());
-//     assert_eq!(Some(b'?'), control.next_char());
+  use super::Control;
 
-//     let until = control.next_char_until(0, | ch, _| *ch == bb'\'');
-//     assert_eq!("php\necho ", until);
+  #[test]
+  fn control() {
+    let mut control = Control::new(BString::new(b"<?php\necho 'hello world';\n?>".to_vec()));
+    assert_eq!(Some(&b'<'), control.next_char());
+    assert_eq!(Some(&b'?'), control.next_char());
 
-//     let snapshot = control.get_snapshot();
-//     assert_eq!(2, snapshot.line);
-//     assert_eq!(5, snapshot.column);
-//     assert_eq!(11, snapshot.offset);
+    let until = control.next_char_until(0, |_, ch, _| ch == b'\'');
+    assert_eq!("php\necho ", until);
 
-//     control.consume(5);
-//     let until = control.next_char_until(0, | ch, _| *ch == bb'\'');
-//     assert_eq!("o world", until);
-//   }
-// }
+    let snapshot = control.get_snapshot();
+    assert_eq!(2, snapshot.line);
+    assert_eq!(5, snapshot.column);
+    assert_eq!(11, snapshot.offset);
+
+    control.consume(5);
+    let until = control.next_char_until(0, |_, ch, _| ch == b'\'');
+    assert_eq!("o world", until);
+  }
+}
 
 #[derive(Debug, PartialEq)]
 pub enum SeriesCheckerMode {

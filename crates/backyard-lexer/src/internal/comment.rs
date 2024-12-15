@@ -9,18 +9,15 @@ pub struct CommentToken;
 impl CommentToken {
   pub fn parse(lexer: &mut Lexer, take_prev_len: usize) -> BString {
     let mut close: Vec<u8> = Vec::new();
-    let comment = lexer.control.next_char_until(take_prev_len, |_, ch, endpos| {
+    let mut comment = lexer.control.next_char_until(take_prev_len, |_, ch, _| {
       close.push(ch);
       if close.len() > 2 {
         close.remove(0);
       }
-      let is_close = close.first() == Some(&b'*') && close.get(1) == Some(&b'/');
-      if is_close {
-        *endpos -= 1;
-      }
-      is_close
+      close.first() == Some(&b'*') && close.get(1) == Some(&b'/')
     });
-    lexer.control.consume(2);
+    lexer.control.next_char();
+    comment.pop();
     comment
   }
 

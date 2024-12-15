@@ -10,23 +10,12 @@ impl InlineToken {
   pub fn lex(lexer: &mut Lexer, snapshot: &ControlSnapshot) -> LexResult {
     let againsts = [b"<?php".into(), b"<?=".into(), b"<%".into()];
     let mut checker = SeriesChecker::new(&againsts, SeriesCheckerMode::Inline);
-    let max_index = lexer.control.get_len().saturating_sub(1);
-    let mut no_breaker = false;
-    let inline = lexer.control.next_char_until(0, |_, ch, i| {
-      if *i >= max_index {
-        *i += 1;
-        no_breaker = true;
-        return true;
-      }
+    let inline = lexer.control.next_char_until(0, |_, ch, _| {
       checker.push(ch);
       checker.check().is_some()
     });
-    lexer.control.next_char();
-    if no_breaker {
-      if !inline.is_empty() {
-        lexer.tokens.push(Token::new(TokenType::Inline, inline, snapshot));
-      }
-    } else if let Some(breaker) = checker.check() {
+    if let Some(breaker) = checker.check() {
+      lexer.control.next_char();
       let inline: BString = inline[..inline.len() - breaker[..breaker.len() - 1].len()].into();
       if !inline.is_empty() {
         lexer.tokens.push(Token::new(TokenType::Inline, inline, snapshot));
@@ -34,6 +23,8 @@ impl InlineToken {
       if breaker == "<?=" {
         lexer.tokens.push(Token::new(TokenType::Echo, "echo".into(), snapshot));
       }
+    } else if !inline.is_empty() {
+      lexer.tokens.push(Token::new(TokenType::Inline, inline, snapshot));
     }
     Ok(())
   }
