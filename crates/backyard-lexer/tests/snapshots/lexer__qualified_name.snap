@@ -3,18 +3,19 @@ source: crates/backyard-lexer/tests/lexer.rs
 expression: tokens
 snapshot_kind: text
 ---
-- token_type: FullyQualifiedName
+- token_type: QualifiedName
   value:
+    - 115
+    - 97
+    - 109
+    - 112
+    - 108
+    - 101
+    - 95
+    - 105
+    - 100
     - 92
-    - 65
-    - 92
-    - 66
+    - 97
   line: 1
   column: 0
   offset: 0
-- token_type: Semicolon
-  value:
-    - 59
-  line: 1
-  column: 4
-  offset: 4

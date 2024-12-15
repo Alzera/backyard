@@ -6,15 +6,17 @@ snapshot_kind: text
 - token_type: FullyQualifiedName
   value:
     - 92
-    - 65
+    - 115
+    - 97
+    - 109
+    - 112
+    - 108
+    - 101
+    - 95
+    - 105
+    - 100
     - 92
-    - 66
+    - 97
   line: 1
   column: 0
   offset: 0
-- token_type: Semicolon
-  value:
-    - 59
-  line: 1
-  column: 4
-  offset: 4

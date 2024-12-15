@@ -86,7 +86,7 @@ impl DeclareArgumentParser {
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      &[Lookup::Equal(&[TokenType::Identifier]), Lookup::Equal(&[TokenType::Assignment])]
+      &[Lookup::Equal(&[TokenType::UnqualifiedName]), Lookup::Equal(&[TokenType::Assignment])]
     )
   }
 

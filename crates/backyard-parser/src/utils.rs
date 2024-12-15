@@ -111,9 +111,11 @@ impl ModifierResult {
   }
 }
 
-const TYPES: [TokenType; 11] = [
-  TokenType::Identifier,
-  TokenType::Name,
+const TYPES: [TokenType; 13] = [
+  TokenType::UnqualifiedName,
+  TokenType::QualifiedName,
+  TokenType::RelativeName,
+  TokenType::FullyQualifiedName,
   TokenType::Type,
   TokenType::Callable,
   TokenType::Static,
@@ -219,7 +221,7 @@ pub fn match_pattern<'arena, 'a>(
         let old_check_position = check_position;
         let mut parsed = parse_type(parser, &mut check_position);
         if let Some(to_check) = &parsed {
-          if to_check.node_type == NodeType::Type && cur.token_type == TokenType::Identifier {
+          if to_check.node_type == NodeType::Type && cur.token_type == TokenType::UnqualifiedName {
             if let Some(next) = next {
               if next.token_type == TokenType::Assignment {
                 parsed = None;

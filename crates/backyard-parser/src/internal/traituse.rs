@@ -83,12 +83,39 @@ impl TraitUseAliasParser {
     match_pattern(
       parser,
       &[
-        Lookup::Equal(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set]),
+        Lookup::Equal(
+          &[
+            TokenType::UnqualifiedName,
+            TokenType::QualifiedName,
+            TokenType::RelativeName,
+            TokenType::FullyQualifiedName,
+            TokenType::Get,
+            TokenType::Set,
+          ]
+        ),
         Lookup::Optional(&[TokenType::DoubleColon]),
-        Lookup::Optional(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set]),
+        Lookup::Optional(
+          &[
+            TokenType::UnqualifiedName,
+            TokenType::QualifiedName,
+            TokenType::RelativeName,
+            TokenType::FullyQualifiedName,
+            TokenType::Get,
+            TokenType::Set,
+          ]
+        ),
         Lookup::Equal(&[TokenType::As]),
         Lookup::Optional(&[TokenType::Public, TokenType::Private, TokenType::Protected]),
-        Lookup::Optional(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set]),
+        Lookup::Optional(
+          &[
+            TokenType::UnqualifiedName,
+            TokenType::QualifiedName,
+            TokenType::RelativeName,
+            TokenType::FullyQualifiedName,
+            TokenType::Get,
+            TokenType::Set,
+          ]
+        ),
       ]
     )
   }
@@ -136,11 +163,38 @@ impl TraitUsePrecedenceParser {
     match_pattern(
       parser,
       &[
-        Lookup::Equal(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set]),
+        Lookup::Equal(
+          &[
+            TokenType::UnqualifiedName,
+            TokenType::QualifiedName,
+            TokenType::RelativeName,
+            TokenType::FullyQualifiedName,
+            TokenType::Get,
+            TokenType::Set,
+          ]
+        ),
         Lookup::Optional(&[TokenType::DoubleColon]),
-        Lookup::Optional(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set]),
+        Lookup::Optional(
+          &[
+            TokenType::UnqualifiedName,
+            TokenType::QualifiedName,
+            TokenType::RelativeName,
+            TokenType::FullyQualifiedName,
+            TokenType::Get,
+            TokenType::Set,
+          ]
+        ),
         Lookup::Equal(&[TokenType::InsteadOf]),
-        Lookup::Equal(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set]),
+        Lookup::Equal(
+          &[
+            TokenType::UnqualifiedName,
+            TokenType::QualifiedName,
+            TokenType::RelativeName,
+            TokenType::FullyQualifiedName,
+            TokenType::Get,
+            TokenType::Set,
+          ]
+        ),
       ]
     )
   }

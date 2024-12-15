@@ -66,7 +66,16 @@ impl AttributeItemParser {
     match_pattern(
       parser,
       &[
-        Lookup::Equal(&[TokenType::Identifier, TokenType::Name, TokenType::Get, TokenType::Set]),
+        Lookup::Equal(
+          &[
+            TokenType::UnqualifiedName,
+            TokenType::QualifiedName,
+            TokenType::RelativeName,
+            TokenType::FullyQualifiedName,
+            TokenType::Get,
+            TokenType::Set,
+          ]
+        ),
         Lookup::Optional(&[TokenType::LeftParenthesis]),
       ]
     )

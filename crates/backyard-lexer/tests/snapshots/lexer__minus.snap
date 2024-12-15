@@ -29,7 +29,7 @@ snapshot_kind: text
   line: 1
   column: 8
   offset: 8
-- token_type: Identifier
+- token_type: UnqualifiedName
   value:
     - 99
   line: 1

@@ -10,7 +10,7 @@ snapshot_kind: text
   line: 1
   column: 0
   offset: 0
-- token_type: Identifier
+- token_type: UnqualifiedName
   value:
     - 97
     - 116

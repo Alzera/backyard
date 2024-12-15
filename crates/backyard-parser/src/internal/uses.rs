@@ -105,7 +105,14 @@ impl UseItemParser {
       &[
         Lookup::Optional(&[TokenType::Function, TokenType::Const]),
         Lookup::Equal(
-          &[TokenType::Identifier, TokenType::Name, TokenType::Name, TokenType::Get, TokenType::Set]
+          &[
+            TokenType::UnqualifiedName,
+            TokenType::QualifiedName,
+            TokenType::RelativeName,
+            TokenType::FullyQualifiedName,
+            TokenType::Get,
+            TokenType::Set,
+          ]
         ),
       ]
     )

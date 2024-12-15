@@ -19,7 +19,14 @@ impl NamespaceParser {
       parser,
       &[
         Lookup::Equal(&[TokenType::Namespace]),
-        Lookup::Equal(&[TokenType::Identifier, TokenType::Name]),
+        Lookup::Equal(
+          &[
+            TokenType::UnqualifiedName,
+            TokenType::QualifiedName,
+            TokenType::RelativeName,
+            TokenType::FullyQualifiedName,
+          ]
+        ),
       ]
     )
   }

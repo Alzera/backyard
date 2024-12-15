@@ -9,9 +9,13 @@ use crate::lexer::ControlSnapshot;
 pub enum TokenType {
   Inline,
   Type,
-  Identifier,
   Magic,
   MagicMethod,
+
+  UnqualifiedName,
+  QualifiedName,
+  FullyQualifiedName,
+  RelativeName,
 
   NumberBinary,
   NumberHex,
@@ -108,7 +112,6 @@ pub enum TokenType {
   RightCurlyBracket,
   LeftSquareBracket,
   RightSquareBracket,
-  Name,
   Comma,
   Semicolon,
   AtSign,

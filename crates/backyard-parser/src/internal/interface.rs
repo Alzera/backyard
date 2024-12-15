@@ -26,7 +26,7 @@ impl InterfaceParser {
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      &[Lookup::Equal(&[TokenType::Interface]), Lookup::Equal(&[TokenType::Identifier])]
+      &[Lookup::Equal(&[TokenType::Interface]), Lookup::Equal(&[TokenType::UnqualifiedName])]
     )
   }
 

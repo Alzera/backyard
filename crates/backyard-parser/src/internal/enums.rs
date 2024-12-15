@@ -33,11 +33,18 @@ impl EnumParser {
       parser,
       &[
         Lookup::Equal(&[TokenType::Enum]),
-        Lookup::Equal(&[TokenType::Identifier]),
+        Lookup::Equal(&[TokenType::UnqualifiedName]),
         Lookup::Optional(&[TokenType::Colon]),
         Lookup::OptionalType,
         Lookup::Optional(&[TokenType::Implements]),
-        Lookup::Optional(&[TokenType::Identifier, TokenType::Name]),
+        Lookup::Optional(
+          &[
+            TokenType::UnqualifiedName,
+            TokenType::QualifiedName,
+            TokenType::RelativeName,
+            TokenType::FullyQualifiedName,
+          ]
+        ),
         Lookup::Equal(&[TokenType::LeftCurlyBracket]),
       ]
     )

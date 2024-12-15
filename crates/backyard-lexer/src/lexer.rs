@@ -349,7 +349,13 @@ impl<'a> Lexer<'a> {
       c if c.is_ascii_alphabetic() || c == b'_' => {
         let t = self.until(|ch| !(ch.is_ascii_alphanumeric() || ch == b'_' || ch == b'\\'));
         let t_sliced = t.as_slice();
-        if MAGIC_KEYWORDS.contains(&t_sliced) {
+        if t.contains(&b'\\') {
+          if t.starts_with(b"namespace") {
+            self.tokens.push(Token::new(TokenType::RelativeName, t, snapshot));
+          } else {
+            self.tokens.push(Token::new(TokenType::QualifiedName, t, snapshot));
+          }
+        } else if MAGIC_KEYWORDS.contains(&t_sliced) {
           self.tokens.push(Token::new(TokenType::Magic, t, snapshot));
         } else if MAGIC_METHOD_KEYWORDS.contains(&t_sliced) {
           self.tokens.push(Token::new(TokenType::MagicMethod, t, snapshot));
@@ -358,7 +364,7 @@ impl<'a> Lexer<'a> {
         } else if let Some(token) = KeywordToken::try_lex(self, &t, t_sliced, snapshot) {
           self.tokens.push(token);
         } else {
-          self.tokens.push(Token::new(TokenType::Identifier, t, snapshot));
+          self.tokens.push(Token::new(TokenType::UnqualifiedName, t, snapshot));
         }
         Ok(())
       }
@@ -742,7 +748,7 @@ impl<'a> Lexer<'a> {
       b'\'' => StringToken::lex_basic(self, snapshot),
       b'\\' => {
         let t = self.until(|ch| !(ch.is_ascii_alphanumeric() || ch == b'_' || ch == b'\\'));
-        self.tokens.push(Token::new(TokenType::Name, t, snapshot));
+        self.tokens.push(Token::new(TokenType::FullyQualifiedName, t, snapshot));
         Ok(())
       }
       b',' => {

@@ -3,7 +3,7 @@ source: crates/backyard-lexer/tests/lexer.rs
 expression: tokens
 snapshot_kind: text
 ---
-- token_type: Identifier
+- token_type: UnqualifiedName
   value:
     - 115
     - 97

@@ -27,7 +27,7 @@ impl TraitParser {
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
     match_pattern(
       parser,
-      &[Lookup::Equal(&[TokenType::Trait]), Lookup::Equal(&[TokenType::Identifier])]
+      &[Lookup::Equal(&[TokenType::Trait]), Lookup::Equal(&[TokenType::UnqualifiedName])]
     )
   }
 

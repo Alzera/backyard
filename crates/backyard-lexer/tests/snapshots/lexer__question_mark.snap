@@ -105,7 +105,7 @@ snapshot_kind: text
   line: 1
   column: 41
   offset: 41
-- token_type: Identifier
+- token_type: UnqualifiedName
   value:
     - 103
   line: 1

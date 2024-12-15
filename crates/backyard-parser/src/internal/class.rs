@@ -45,9 +45,16 @@ impl ClassParser {
             ]
           ),
           Lookup::Equal(&[TokenType::Class]),
-          Lookup::Equal(&[TokenType::Identifier]),
+          Lookup::Equal(&[TokenType::UnqualifiedName]),
           Lookup::Optional(&[TokenType::Extends]),
-          Lookup::Optional(&[TokenType::Identifier, TokenType::Name]),
+          Lookup::Optional(
+            &[
+              TokenType::UnqualifiedName,
+              TokenType::QualifiedName,
+              TokenType::RelativeName,
+              TokenType::FullyQualifiedName,
+            ]
+          ),
           Lookup::Optional(&[TokenType::Implements]),
         ]
       )
