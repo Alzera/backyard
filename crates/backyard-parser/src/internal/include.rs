@@ -3,8 +3,7 @@ use backyard_nodes::{ IncludeNode, Location, Node, utils::IntoBoxedNode };
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LoopArgument, Parser, TokenTypeArrayCombine },
+  parser::{ LoopArgument, OptionNodeOrInternal, Parser, TokenTypeArrayCombine },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 
@@ -41,7 +40,7 @@ impl IncludeParser {
         keyword.token_type == TokenType::RequireOnce ||
         keyword.token_type == TokenType::IncludeOnce;
       let use_parenthesis = !use_parenthesis.is_empty();
-      let argument = guard!(
+      let argument = (
         if use_parenthesis {
           let a = parser.get_statement(
             &mut LoopArgument::with_tokens(
@@ -63,7 +62,7 @@ impl IncludeParser {
             )
           )?
         }
-      );
+      ).ok_internal()?;
       return Ok(
         IncludeNode::loc(
           use_parenthesis,

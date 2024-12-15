@@ -213,6 +213,11 @@ impl<'arena, 'a> Parser<'arena, 'a> {
     }
   }
 
+  #[inline]
+  pub fn get_token(&self, index: usize) -> Result<&Token, ParserError> {
+    self.tokens.get(index).ok_or(ParserError::Eof)
+  }
+
   pub fn get_children<'b>(
     &mut self,
     args: &mut LoopArgument<'arena, 'b>
@@ -309,6 +314,7 @@ impl<'arena, 'a> Parser<'arena, 'a> {
     Ok(args.last_expr.take())
   }
 
+  #[inline]
   pub fn find_match<'b>(
     &mut self,
     args: &mut LoopArgument<'arena, 'b>
@@ -345,15 +351,6 @@ impl<'arena, 'a> Parser<'arena, 'a> {
     let end = self.tokens.get(self.position - 1);
     end.and_then(|x| x.get_location()).map(|end| RangeLocation { start, end })
   }
-
-  pub fn gen_loc_helper<T>(&self, start: T) -> Option<RangeLocation> where T: LocationHelper {
-    let start = start.get_location();
-    if let Some(start) = start {
-      self.gen_loc(start)
-    } else {
-      None
-    }
-  }
 }
 
 pub trait LocationHelper {
@@ -362,16 +359,19 @@ pub trait LocationHelper {
 }
 
 impl<'a> LocationHelper for &Node<'a> {
+  #[inline]
   fn get_location(&self) -> Option<Location> {
     self.loc.as_ref().map(|loc| loc.start.clone())
   }
 
+  #[inline]
   fn get_range_location(&self) -> Option<RangeLocation> {
     self.loc.clone()
   }
 }
 
 impl LocationHelper for &Token {
+  #[inline]
   fn get_location(&self) -> Option<Location> {
     Some(Location { line: self.line, column: self.column, offset: self.offset })
   }
@@ -403,5 +403,16 @@ impl TokenTypeArrayCombine for &[TokenType] {
     let combined: std::vec::Vec<TokenType> = [self, tokens].concat();
     let unique: HashSet<_> = combined.into_iter().collect();
     unique.into_iter().collect()
+  }
+}
+
+pub trait OptionNodeOrInternal<'arena> {
+  fn ok_internal(self) -> Result<Node<'arena>, ParserError>;
+}
+
+impl<'arena> OptionNodeOrInternal<'arena> for Option<Node<'arena>> {
+  #[inline]
+  fn ok_internal(self) -> Result<Node<'arena>, ParserError> {
+    self.ok_or(ParserError::Internal)
   }
 }

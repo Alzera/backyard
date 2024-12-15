@@ -3,8 +3,7 @@ use backyard_nodes::{ ForeachNode, Location, Node, utils::{ IntoBoxedNode, IntoB
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LoopArgument, Parser },
+  parser::{ LoopArgument, OptionNodeOrInternal, Parser },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 
@@ -17,8 +16,8 @@ impl ForeachParser {
   fn get_key_value<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>
   ) -> Result<(Option<Node<'arena>>, Node<'arena>), ParserError> {
-    let key_or_value = guard!(
-      parser.get_statement(
+    let key_or_value = parser
+      .get_statement(
         &mut LoopArgument::with_tokens(
           parser.arena,
           "foreach_key_or_value",
@@ -26,14 +25,14 @@ impl ForeachParser {
           &[TokenType::Arrow, TokenType::RightParenthesis]
         )
       )?
-    );
-    let has_key = guard!(parser.tokens.get(parser.position));
+      .ok_internal()?;
+    let has_key_type = parser.get_token(parser.position)?.token_type;
     parser.position += 1;
-    if has_key.token_type == TokenType::RightParenthesis {
+    if has_key_type == TokenType::RightParenthesis {
       return Ok((None, key_or_value));
-    } else if has_key.token_type == TokenType::Arrow {
-      let value = guard!(
-        parser.get_statement(
+    } else if has_key_type == TokenType::Arrow {
+      let value = parser
+        .get_statement(
           &mut LoopArgument::with_tokens(
             parser.arena,
             "foreach_value",
@@ -41,7 +40,7 @@ impl ForeachParser {
             &[TokenType::RightParenthesis]
           )
         )?
-      );
+        .ok_internal()?;
       parser.position += 1;
       return Ok((Some(key_or_value), value));
     }
@@ -67,11 +66,11 @@ impl ForeachParser {
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [_, _] = matched.as_slice() {
-      let source = guard!(
-        parser.get_statement(
+      let source = parser
+        .get_statement(
           &mut LoopArgument::with_tokens(parser.arena, "foreach_source", &[], &[TokenType::As])
         )?
-      );
+        .ok_internal()?;
       parser.position += 1;
       let (key, value) = ForeachParser::get_key_value(parser)?;
       let (is_short, body) = BlockParser::new_or_short_or_single(

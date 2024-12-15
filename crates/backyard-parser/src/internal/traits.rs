@@ -39,7 +39,7 @@ impl TraitParser {
   ) -> Result<Node<'arena>, ParserError> {
     if let [_, name] = matched.as_slice() {
       let name = IdentifierParser::from_token(name.as_equal(parser)?);
-      let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
+      let block_loc = parser.get_token(parser.position)?.get_location().unwrap();
       parser.position += 1;
       let body = parser.get_children(
         &mut LoopArgument::new(

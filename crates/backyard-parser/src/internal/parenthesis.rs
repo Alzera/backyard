@@ -3,8 +3,7 @@ use backyard_nodes::{ CastNode, Location, Node, ParenthesisNode, utils::IntoBoxe
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
+  parser::{ LoopArgument, OptionNodeOrInternal, Parser, DEFAULT_PARSERS },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 
@@ -41,13 +40,14 @@ impl ParenthesisParser {
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
-      if let Some(token) = parser.tokens.get(parser.position) {
+      if let Ok(token) = parser.get_token(parser.position) {
         if CAST_TYPES.contains(&token.value.as_slice()) {
-          if let Some(next_token) = parser.tokens.get(parser.position + 1) {
+          if let Ok(next_token) = parser.get_token(parser.position + 1) {
             if next_token.token_type == TokenType::RightParenthesis {
+              let cast_type = token.value.to_owned();
               parser.position += 2;
-              let expression = guard!(
-                parser.get_statement(
+              let expression = parser
+                .get_statement(
                   &mut LoopArgument::safe(
                     parser.arena,
                     "cast",
@@ -56,10 +56,10 @@ impl ParenthesisParser {
                     &DEFAULT_PARSERS
                   )
                 )?
-              );
+                .ok_internal()?;
               return Ok(
                 CastNode::loc(
-                  token.value.to_owned(),
+                  cast_type,
                   expression.into_boxed(parser.arena),
                   parser.gen_loc(start_loc)
                 )
@@ -68,8 +68,8 @@ impl ParenthesisParser {
           }
         }
       }
-      let statement = guard!(
-        parser.get_statement(
+      let statement = parser
+        .get_statement(
           &mut LoopArgument::with_tokens(
             parser.arena,
             "parenthesis",
@@ -77,7 +77,7 @@ impl ParenthesisParser {
             &[TokenType::RightParenthesis]
           )
         )?
-      );
+        .ok_internal()?;
       parser.position += 1;
       return Ok(
         ParenthesisNode::loc(statement.into_boxed(parser.arena), parser.gen_loc(start_loc))

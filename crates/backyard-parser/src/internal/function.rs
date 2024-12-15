@@ -15,8 +15,7 @@ use backyard_nodes::{
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LoopArgument, Parser, TokenTypeArrayCombine },
+  parser::{ LoopArgument, OptionNodeOrInternal, Parser, TokenTypeArrayCombine },
   utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper, ModifierLookup },
 };
 
@@ -107,8 +106,8 @@ impl FunctionParser {
       let arguments = FunctionParser::get_parameters(parser)?;
       let return_type = FunctionParser::get_return_type(parser).ok();
       parser.position += 1;
-      let body = guard!(
-        parser.get_statement(
+      let body = parser
+        .get_statement(
           &mut LoopArgument::with_tokens(
             parser.arena,
             "function_arrow",
@@ -116,7 +115,7 @@ impl FunctionParser {
             &args.breakers.combine(args.separators)
           )
         )?
-      );
+        .ok_internal()?;
       return Ok(
         ArrowFunctionNode::loc(
           !is_ref.is_empty(),
@@ -138,7 +137,7 @@ impl FunctionParser {
     if let [_, is_ref, _] = matched.as_slice() {
       let arguments = FunctionParser::get_parameters(parser)?;
       let mut uses = vec![in parser.arena];
-      if let Some(next_token) = parser.tokens.get(parser.position) {
+      if let Ok(next_token) = parser.get_token(parser.position) {
         if next_token.token_type == TokenType::Use {
           parser.position += 2;
           uses = parser.get_children(
@@ -175,7 +174,7 @@ impl FunctionParser {
     if let [_, is_ref, name, _] = matched.as_slice() {
       let mut is_contructor = false;
       let name = if let LookupResultWrapper::Any(name) = &name.wrapper {
-        let name = parser.tokens.get(*name).ok_or(ParserError::Internal)?;
+        let name = parser.get_token(*name)?;
         if name.token_type == TokenType::MagicMethod {
           if name.value == "__construct" {
             is_contructor = true;
@@ -206,7 +205,7 @@ impl FunctionParser {
         FunctionParser::get_parameters(parser)?
       };
       let return_type = FunctionParser::get_return_type(parser).ok();
-      let body = if guard!(parser.tokens.get(parser.position)).token_type == TokenType::Semicolon {
+      let body = if parser.get_token(parser.position)?.token_type == TokenType::Semicolon {
         None
       } else {
         Some(BlockParser::new_block(parser)?)
@@ -246,7 +245,7 @@ impl FunctionParser {
   pub fn get_return_type<'arena, 'a>(
     parser: &mut Parser<'arena, 'a>
   ) -> Result<Box<'arena, Node<'arena>>, ParserError> {
-    if let Some(next_token) = parser.tokens.get(parser.position) {
+    if let Ok(next_token) = parser.get_token(parser.position) {
       if next_token.token_type == TokenType::Colon {
         parser.position += 1;
         if

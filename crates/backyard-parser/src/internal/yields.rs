@@ -9,8 +9,7 @@ use backyard_nodes::{
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LoopArgument, Parser, TokenTypeArrayCombine },
+  parser::{ LoopArgument, OptionNodeOrInternal, Parser, TokenTypeArrayCombine },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 
@@ -36,8 +35,8 @@ impl YieldParser {
   ) -> Result<Node<'arena>, ParserError> {
     if let [_, has_from] = matched.as_slice() {
       if !has_from.is_empty() {
-        let expr = guard!(
-          parser.get_statement(
+        let expr = parser
+          .get_statement(
             &mut LoopArgument::with_tokens(
               parser.arena,
               "yield_from",
@@ -45,7 +44,7 @@ impl YieldParser {
               &args.breakers.combine(args.separators)
             )
           )?
-        );
+          .ok_internal()?;
         return Ok(YieldFromNode::loc(expr.into_boxed(parser.arena), parser.gen_loc(start_loc)));
       }
       let mut value = parser.get_statement(
@@ -60,12 +59,12 @@ impl YieldParser {
         return Ok(YieldNode::loc(None, None, parser.gen_loc(start_loc)));
       }
       let mut key = None;
-      if guard!(parser.tokens.get(parser.position)).token_type == TokenType::Arrow {
+      if parser.get_token(parser.position)?.token_type == TokenType::Arrow {
         key = Some(value.unwrap());
         parser.position += 1;
         value = Some(
-          guard!(
-            parser.get_statement(
+          parser
+            .get_statement(
               &mut LoopArgument::with_tokens(
                 parser.arena,
                 "singles",
@@ -73,7 +72,7 @@ impl YieldParser {
                 &args.breakers.combine(&[TokenType::Semicolon])
               )
             )?
-          )
+            .ok_internal()?
         );
       }
       return Ok(

@@ -3,8 +3,7 @@ use backyard_nodes::{ Location, Node, WhileNode, utils::IntoBoxedNode };
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LoopArgument, Parser },
+  parser::{ LoopArgument, OptionNodeOrInternal, Parser },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 
@@ -31,11 +30,11 @@ impl WhileParser {
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [_, _] = matched.as_slice() {
-      let condition = guard!(
-        parser.get_statement(
+      let condition = parser
+        .get_statement(
           &mut LoopArgument::with_tokens(parser.arena, "while", &[], &[TokenType::RightParenthesis])
         )?
-      );
+        .ok_internal()?;
       parser.position += 1;
       let (is_short, body) = BlockParser::new_or_short_or_single(
         parser,

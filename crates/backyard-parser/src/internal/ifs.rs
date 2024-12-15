@@ -9,8 +9,7 @@ use backyard_nodes::{
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LocationHelper, LoopArgument, Parser },
+  parser::{ LocationHelper, LoopArgument, OptionNodeOrInternal, Parser },
   utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
@@ -37,11 +36,11 @@ impl IfParser {
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [_, _] = matched.as_slice() {
-      let condition = guard!(
-        parser.get_statement(
+      let condition = parser
+        .get_statement(
           &mut LoopArgument::with_tokens(parser.arena, "if", &[], &[TokenType::RightParenthesis])
         )?
-      );
+        .ok_internal()?;
       parser.position += 1;
       let (is_short, valid) = BlockParser::new_or_short_or_single(
         parser,
@@ -64,7 +63,7 @@ impl IfParser {
         )
       )?;
       if is_short {
-        if let Some(token) = parser.tokens.get(parser.position) {
+        if let Ok(token) = parser.get_token(parser.position) {
           if [TokenType::EndIf].contains(&token.token_type) {
             parser.position += 1;
           }
@@ -103,12 +102,9 @@ impl ElseParser {
   ) -> Result<Node<'arena>, ParserError> {
     if let [keyword] = matched.as_slice() {
       if let LookupResultWrapper::Equal(keyword) = &keyword.wrapper {
-        if
-          parser.tokens.get(*keyword).ok_or(ParserError::Internal)?.token_type ==
-          TokenType::ElseIf
-        {
+        if parser.get_token(*keyword)?.token_type == TokenType::ElseIf {
           let token_pos = parser.position;
-          let token = parser.tokens.get(token_pos).unwrap();
+          let token = parser.get_token(token_pos)?;
           let loc = token.get_location().unwrap();
           parser.position += 1;
           let expr = IfParser::parse(
@@ -123,11 +119,11 @@ impl ElseParser {
           return Ok(ElseNode::loc(expr.into_boxed(parser.arena), false, parser.gen_loc(start_loc)));
         }
       }
-      if let Some(next_token) = parser.tokens.get(parser.position) {
+      if let Ok(next_token) = parser.get_token(parser.position) {
         if next_token.token_type == TokenType::If {
           let next_token_pos = parser.position;
           parser.position += 1;
-          let token = parser.tokens.get(parser.position).unwrap();
+          let token = parser.get_token(parser.position)?;
           let loc = token.get_location().unwrap();
           parser.position += 1;
           let expr = IfParser::parse(

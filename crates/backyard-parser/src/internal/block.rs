@@ -3,8 +3,7 @@ use backyard_nodes::{ BlockNode, Location, Node };
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LocationHelper, LoopArgument, Parser, DEFAULT_PARSERS },
+  parser::{ LocationHelper, LoopArgument, OptionNodeOrInternal, Parser, DEFAULT_PARSERS },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 
@@ -41,7 +40,7 @@ impl BlockParser {
     parser: &mut Parser<'arena, 'a>,
     breakers: &[TokenType]
   ) -> Result<Node<'arena>, ParserError> {
-    let start_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
+    let start_loc = parser.get_token(parser.position)?.get_location().unwrap();
     parser.position += 1;
     Ok(
       BlockNode::loc(
@@ -63,7 +62,7 @@ impl BlockParser {
     breakers: &[TokenType],
     _: &mut LoopArgument
   ) -> Result<(bool, Node<'arena>), ParserError> {
-    if let Some(start) = parser.tokens.get(parser.position) {
+    if let Ok(start) = parser.get_token(parser.position) {
       return match start.token_type {
         TokenType::Colon => Ok((true, BlockParser::new_short(parser, breakers)?)),
         TokenType::LeftCurlyBracket => Ok((false, BlockParser::new_block(parser)?)),
@@ -78,13 +77,13 @@ impl BlockParser {
     breakers: &[TokenType],
     _: &mut LoopArgument
   ) -> Result<(bool, Node<'arena>), ParserError> {
-    if let Some(start) = parser.tokens.get(parser.position) {
+    if let Ok(start) = parser.get_token(parser.position) {
       return match start.token_type {
         TokenType::Colon => Ok((true, BlockParser::new_short(parser, breakers)?)),
         TokenType::LeftCurlyBracket => Ok((false, BlockParser::new_block(parser)?)),
         _ => {
-          let expr = guard!(
-            parser.get_statement(
+          let expr = parser
+            .get_statement(
               &mut LoopArgument::safe(
                 parser.arena,
                 "block_expr",
@@ -93,8 +92,8 @@ impl BlockParser {
                 &DEFAULT_PARSERS
               )
             )?
-          );
-          if let Some(token) = parser.tokens.get(parser.position) {
+            .ok_internal()?;
+          if let Ok(token) = parser.get_token(parser.position) {
             if token.token_type == TokenType::Semicolon {
               parser.position += 1;
             }

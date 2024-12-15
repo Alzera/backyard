@@ -11,7 +11,6 @@ use backyard_nodes::{
 
 use crate::{
   error::ParserError,
-  guard,
   parser::{ LoopArgument, Parser },
   utils::{ match_pattern, Lookup, LookupResult },
 };
@@ -38,7 +37,7 @@ impl UseParser {
     if let [_] = matched.as_slice() {
       let mut p = parser.position;
       let mut has_bracket = false;
-      while let Some(i) = parser.tokens.get(p) {
+      while let Ok(i) = parser.get_token(p) {
         if i.token_type == TokenType::Semicolon {
           break;
         } else if i.token_type == TokenType::LeftCurlyBracket {
@@ -48,12 +47,12 @@ impl UseParser {
         p += 1;
       }
       if has_bracket {
-        let name = guard!(parser.tokens.get(parser.position)).value.to_owned();
+        let name = parser.get_token(parser.position)?.value.to_owned();
         parser.position += 1;
 
         let items = {
           let mut items = vec![in parser.arena];
-          if let Some(t) = parser.tokens.get(parser.position) {
+          if let Ok(t) = parser.get_token(parser.position) {
             if t.token_type == TokenType::LeftCurlyBracket {
               parser.position += 1;
               items = parser.get_children(
@@ -124,14 +123,11 @@ impl UseItemParser {
         .and_then(|x| UseItemModifier::try_from(&x.value).ok());
       let name = name.as_equal(parser)?.value.to_owned();
       let mut alias = None;
-      if let Some(last) = parser.tokens.get(parser.position) {
+      if let Ok(last) = parser.get_token(parser.position) {
         if last.token_type == TokenType::As {
-          if let Some(id) = parser.tokens.get(parser.position + 1) {
-            alias = Some(IdentifierParser::from_token(id));
-            parser.position += 2;
-          } else {
-            return Err(ParserError::Internal);
-          }
+          let id = parser.get_token(parser.position + 1)?;
+          alias = Some(IdentifierParser::from_token(id));
+          parser.position += 2;
         }
       }
       return Ok(

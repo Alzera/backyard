@@ -4,8 +4,7 @@ use backyard_nodes::{ Location, MatchArmNode, MatchNode, Node, utils::IntoBoxedN
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LoopArgument, Parser },
+  parser::{ LoopArgument, OptionNodeOrInternal, Parser },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 
@@ -32,11 +31,11 @@ impl MatchParser {
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [_, _] = matched.as_slice() {
-      let condition = guard!(
-        parser.get_statement(
+      let condition = parser
+        .get_statement(
           &mut LoopArgument::with_tokens(parser.arena, "match", &[], &[TokenType::RightParenthesis])
         )?
-      );
+        .ok_internal()?;
       parser.position += 2;
       let arms = parser.get_children(
         &mut LoopArgument::new(
@@ -75,7 +74,7 @@ impl MatchArmParser {
     start_loc: Location,
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
-    let conditions = match guard!(parser.tokens.get(parser.position)).token_type {
+    let conditions = match parser.get_token(parser.position)?.token_type {
       TokenType::Default => {
         parser.position += 2;
         vec![in parser.arena]
@@ -90,8 +89,8 @@ impl MatchArmParser {
           )
         )?,
     };
-    let body = guard!(
-      parser.get_statement(
+    let body = parser
+      .get_statement(
         &mut LoopArgument::with_tokens(
           parser.arena,
           "match_arm_body",
@@ -99,8 +98,8 @@ impl MatchArmParser {
           &[TokenType::Comma, TokenType::RightCurlyBracket]
         )
       )?
-    );
-    if let Some(next_token) = parser.tokens.get(parser.position) {
+      .ok_internal()?;
+    if let Ok(next_token) = parser.get_token(parser.position) {
       if next_token.token_type == TokenType::Comma {
         parser.position += 1;
       }

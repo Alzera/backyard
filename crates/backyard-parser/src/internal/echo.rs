@@ -35,7 +35,7 @@ impl EchoParser {
             .combine(&[TokenType::Semicolon, TokenType::Inline])
         )
       )?;
-      if let Some(last_token) = parser.tokens.get(parser.position - 1) {
+      if let Ok(last_token) = parser.get_token(parser.position - 1) {
         if [TokenType::Semicolon, TokenType::Inline].contains(&last_token.token_type) {
           parser.position -= 1;
         }

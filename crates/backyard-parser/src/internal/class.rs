@@ -12,7 +12,6 @@ use backyard_nodes::{
 
 use crate::{
   error::ParserError,
-  guard,
   parser::{ LocationHelper, LoopArgument, Parser },
   utils::{ match_pattern, Lookup, LookupResult, ModifierLookup },
 };
@@ -94,16 +93,16 @@ impl ClassParser {
         vec![in parser.arena]
       };
       let mut extends = None;
-      if let Some(t) = parser.tokens.get(parser.position) {
+      if let Ok(t) = parser.get_token(parser.position) {
         if t.token_type == TokenType::Extends {
           parser.position += 1;
-          extends = Some(IdentifierParser::from_token(guard!(parser.tokens.get(parser.position))));
+          extends = Some(IdentifierParser::from_token(parser.get_token(parser.position)?));
           parser.position += 1;
         }
       }
       let implements = {
         let mut parsed = None;
-        if let Some(t) = parser.tokens.get(parser.position) {
+        if let Ok(t) = parser.get_token(parser.position) {
           if t.token_type == TokenType::Implements {
             parser.position += 1;
             parsed = Some(
@@ -129,7 +128,7 @@ impl ClassParser {
           vec![in parser.arena]
         }
       };
-      let body_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
+      let body_loc = parser.get_token(parser.position)?.get_location().unwrap();
       parser.position += 1;
       let body = parser.get_children(
         &mut LoopArgument::new(
@@ -187,7 +186,7 @@ impl ClassParser {
       } else {
         vec![in parser.arena]
       };
-      let body_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
+      let body_loc = parser.get_token(parser.position)?.get_location().unwrap();
       parser.position += 1;
       let body = parser.get_children(
         &mut LoopArgument::new(

@@ -11,8 +11,7 @@ use backyard_nodes::{
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LoopArgument, Parser, TokenTypeArrayCombine, DEFAULT_PARSERS },
+  parser::{ LoopArgument, OptionNodeOrInternal, Parser, TokenTypeArrayCombine, DEFAULT_PARSERS },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 
@@ -124,8 +123,8 @@ impl ArrayItemParser {
     args: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
-      let value = guard!(
-        parser.get_statement(
+      let value = parser
+        .get_statement(
           &mut LoopArgument::with_tokens(
             parser.arena,
             "array_item",
@@ -133,7 +132,7 @@ impl ArrayItemParser {
             &args.breakers.combine(args.separators)
           )
         )?
-      );
+        .ok_internal()?;
       let key = args.last_expr.take();
       return Ok(
         ArrayItemNode::loc(

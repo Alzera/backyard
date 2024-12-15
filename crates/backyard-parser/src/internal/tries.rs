@@ -94,7 +94,7 @@ impl CatchParser {
       )?;
       parser.position -= 1;
       let mut variable = None;
-      if let Some(last_token) = parser.tokens.get(parser.position) {
+      if let Ok(last_token) = parser.get_token(parser.position) {
         if last_token.token_type != TokenType::RightParenthesis {
           variable = parser.get_statement(
             &mut LoopArgument::new(

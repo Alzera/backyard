@@ -10,8 +10,7 @@ use backyard_nodes::{
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LocationHelper, LoopArgument, Parser },
+  parser::{ LocationHelper, LoopArgument, OptionNodeOrInternal, Parser },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 
@@ -38,8 +37,8 @@ impl SwitchParser {
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [_, _] = matched.as_slice() {
-      let condition = guard!(
-        parser.get_statement(
+      let condition = parser
+        .get_statement(
           &mut LoopArgument::with_tokens(
             parser.arena,
             "switch",
@@ -47,10 +46,10 @@ impl SwitchParser {
             &[TokenType::RightParenthesis]
           )
         )?
-      );
+        .ok_internal()?;
       parser.position += 1;
-      let is_short = guard!(parser.tokens.get(parser.position)).token_type == TokenType::Colon;
-      let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
+      let is_short = parser.get_token(parser.position)?.token_type == TokenType::Colon;
+      let block_loc = parser.get_token(parser.position)?.get_location().unwrap();
       parser.position += 1;
       let statements = parser.get_children(
         &mut LoopArgument::new(
@@ -109,11 +108,10 @@ impl CaseParser {
       };
       parser.position += 1;
       let statements = {
-        let token = guard!(parser.tokens.get(parser.position)).token_type;
-        if token == TokenType::LeftCurlyBracket {
+        if parser.get_token(parser.position)?.token_type == TokenType::LeftCurlyBracket {
           BlockParser::new_block(parser)?
         } else {
-          let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
+          let block_loc = parser.get_token(parser.position)?.get_location().unwrap();
           let s = parser.get_children(
             &mut LoopArgument::with_tokens(
               parser.arena,

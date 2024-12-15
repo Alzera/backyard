@@ -15,8 +15,7 @@ use backyard_nodes::{
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LocationHelper, LoopArgument, Parser },
+  parser::{ LocationHelper, LoopArgument, OptionNodeOrInternal, Parser },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 
@@ -55,9 +54,9 @@ impl StringParser {
       let string_type = string_type.as_equal(parser)?;
       if string_type.token_type == TokenType::NowDocOpen {
         let label = string_type.value.to_owned();
-        let text = guard!(parser.tokens.get(parser.position)).value.to_owned();
-        if let Some(next) = parser.tokens.get(parser.position + 1) {
+        if let Ok(next) = parser.get_token(parser.position + 1) {
           if next.token_type == TokenType::NowDocClose {
+            let text = parser.get_token(parser.position)?.value.to_owned();
             parser.position += 2;
             return Ok(NowDocNode::loc(label, text, parser.gen_loc(start_loc)));
           }
@@ -99,21 +98,21 @@ impl StringParser {
     breaker: TokenType
   ) -> Result<Vec<'arena, Node<'arena>>, ParserError> {
     let mut values = vec![in parser.arena];
-    while let Some(i) = parser.tokens.get(parser.position) {
+    while let Ok(i) = parser.get_token(parser.position) {
       let start_loc = i.get_location().unwrap();
-      parser.position += 1;
       match i.token_type {
         c if c == breaker => {
+          parser.position += 1;
           break;
         }
         TokenType::EncapsedString => {
           let loc = i.get_range_location();
+          let value = i.value.to_owned();
+          parser.position += 1;
           values.push(
             EncapsedPartNode::loc(
               false,
-              StringNode::loc(Quote::Single, i.value.to_owned(), loc.clone()).into_boxed(
-                parser.arena
-              ),
+              StringNode::loc(Quote::Single, value, loc.clone()).into_boxed(parser.arena),
               loc
             )
           );
@@ -121,11 +120,13 @@ impl StringParser {
         TokenType::Variable => {
           let parsed = VariableParser::from_token(parser.arena, i);
           let loc = parsed.loc.clone();
+          parser.position += 1;
           values.push(EncapsedPartNode::loc(false, parsed.into_boxed(parser.arena), loc));
         }
         TokenType::AdvanceInterpolationOpen => {
-          let value = guard!(
-            parser.get_statement(
+          parser.position += 1;
+          let value = parser
+            .get_statement(
               &mut LoopArgument::with_tokens(
                 parser.arena,
                 "string",
@@ -133,13 +134,14 @@ impl StringParser {
                 &[]
               )
             )?
-          );
+            .ok_internal()?;
           parser.position += 1;
           values.push(
             EncapsedPartNode::loc(true, value.into_boxed(parser.arena), parser.gen_loc(start_loc))
           );
         }
         _ => {
+          parser.position += 1;
           continue;
         }
       }

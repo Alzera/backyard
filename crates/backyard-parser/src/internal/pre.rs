@@ -12,7 +12,6 @@ use backyard_nodes::{
 
 use crate::{
   error::ParserError,
-  guard,
   parser::{ LoopArgument, Parser, DEFAULT_PARSERS },
   utils::{ match_pattern, Lookup, LookupResult },
 };
@@ -66,7 +65,7 @@ impl PreParser {
       if operator.token_type == TokenType::Ellipsis {
         return Ok(VariadicNode::loc(argument, parser.gen_loc(start_loc)));
       }
-      let argument = guard!(argument);
+      let argument = argument.ok_or(ParserError::Internal)?;
       return match operator.token_type {
         | TokenType::PreIncrement
         | TokenType::PreDecrement

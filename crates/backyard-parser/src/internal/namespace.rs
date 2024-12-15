@@ -32,12 +32,8 @@ impl NamespaceParser {
   ) -> Result<Node<'arena>, ParserError> {
     if let [_, name] = matched.as_slice() {
       let name = name.as_equal(parser)?.value.to_owned();
-      let is_bracket = if let Some(t) = parser.tokens.get(parser.position) {
-        t.token_type == TokenType::LeftCurlyBracket
-      } else {
-        return Err(ParserError::Internal);
-      };
-      let block_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
+      let is_bracket = parser.get_token(parser.position)?.token_type == TokenType::LeftCurlyBracket;
+      let block_loc = parser.get_token(parser.position)?.get_location().unwrap();
       if is_bracket {
         parser.position += 1;
       }

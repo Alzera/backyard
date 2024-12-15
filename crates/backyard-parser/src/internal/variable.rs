@@ -56,7 +56,7 @@ impl VariableParser {
         )?;
         parser.position += 1;
         if let Some(expr) = expr {
-          let end_loc = parser.tokens.get(parser.position).unwrap().get_location().unwrap();
+          let end_loc = parser.get_token(parser.position)?.get_location().unwrap();
           return Ok(
             VariableParser::new_bracked(
               parser.arena,

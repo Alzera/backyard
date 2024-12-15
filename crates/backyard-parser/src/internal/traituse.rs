@@ -12,7 +12,6 @@ use backyard_nodes::{
 
 use crate::{
   error::ParserError,
-  guard,
   parser::{ LoopArgument, Parser },
   utils::{ match_pattern, Lookup, LookupResult },
 };
@@ -50,7 +49,7 @@ impl TraitUseParser {
         )
       )?;
       let mut adaptations = vec![in parser.arena];
-      if guard!(parser.tokens.get(parser.position - 1)).token_type == TokenType::Semicolon {
+      if parser.get_token(parser.position - 1)?.token_type == TokenType::Semicolon {
         parser.position -= 1;
       } else {
         adaptations = parser.get_children(

@@ -10,8 +10,7 @@ use backyard_nodes::{
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LoopArgument, Parser },
+  parser::{ LoopArgument, OptionNodeOrInternal, Parser },
   utils::{ match_pattern, Lookup, LookupResult, LookupResultWrapper },
 };
 
@@ -75,8 +74,8 @@ impl ArgumentParser {
     parser: &mut Parser<'arena, 'a>,
     _: &mut LoopArgument
   ) -> Option<std::vec::Vec<LookupResult<'arena>>> {
-    if let Some(is_colon) = parser.tokens.get(parser.position + 1) {
-      if is_colon.token_type == TokenType::Colon && parser.tokens.get(parser.position).is_some() {
+    if let Ok(is_colon) = parser.get_token(parser.position + 1) {
+      if is_colon.token_type == TokenType::Colon && parser.get_token(parser.position).is_ok() {
         return Some(
           vec![
             LookupResult {
@@ -116,8 +115,8 @@ impl ArgumentParser {
         .as_optional(parser)
         .map(|_| name.as_optional(parser).map(IdentifierParser::from_token))
         .unwrap_or_default();
-      let value = guard!(
-        parser.get_statement(
+      let value = parser
+        .get_statement(
           &mut LoopArgument::with_tokens(
             parser.arena,
             "argument",
@@ -125,7 +124,7 @@ impl ArgumentParser {
             &[]
           )
         )?
-      );
+        .ok_internal()?;
       return Ok(
         CallArgumentNode::loc(
           name.into_boxed(parser.arena),

@@ -3,8 +3,7 @@ use backyard_nodes::{ Location, Node, TernaryNode, utils::IntoBoxedNode };
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LoopArgument, Parser, TokenTypeArrayCombine, DEFAULT_PARSERS },
+  parser::{ LoopArgument, OptionNodeOrInternal, Parser, TokenTypeArrayCombine, DEFAULT_PARSERS },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 
@@ -29,14 +28,14 @@ impl TernaryParser {
     if let [_] = matched.as_slice() {
       let left = args.last_expr.take().unwrap();
       args.last_expr = None;
-      let valid = guard!(
-        parser.get_statement(
+      let valid = parser
+        .get_statement(
           &mut LoopArgument::with_tokens(parser.arena, "ternary_valid", &[], &[TokenType::Colon])
         )?
-      );
+        .ok_internal()?;
       parser.position += 1;
-      let invalid = guard!(
-        parser.get_statement(
+      let invalid = parser
+        .get_statement(
           &mut LoopArgument::safe(
             parser.arena,
             "ternary_invalid",
@@ -45,7 +44,7 @@ impl TernaryParser {
             &DEFAULT_PARSERS
           )
         )?
-      );
+        .ok_internal()?;
       return Ok(
         TernaryNode::loc(
           left.into_boxed(parser.arena),

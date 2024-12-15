@@ -3,8 +3,7 @@ use backyard_nodes::{ DoWhileConditionNode, DoWhileNode, Location, Node, utils::
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LoopArgument, Parser },
+  parser::{ LoopArgument, OptionNodeOrInternal, Parser },
   utils::{ match_pattern, Lookup, LookupResult },
 };
 
@@ -29,8 +28,8 @@ impl DoWhileParser {
   ) -> Result<Node<'arena>, ParserError> {
     if let [_] = matched.as_slice() {
       let body = BlockParser::new_block(parser)?;
-      let condition = guard!(
-        parser.get_statement(
+      let condition = parser
+        .get_statement(
           &mut LoopArgument::new(
             parser.arena,
             "do_while",
@@ -42,7 +41,7 @@ impl DoWhileParser {
             ]
           )
         )?
-      );
+        .ok_internal()?;
       parser.position += 1;
       return Ok(
         DoWhileNode::loc(
@@ -77,8 +76,8 @@ impl DoWhileConditionParser {
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [_, _] = matched.as_slice() {
-      let condition = guard!(
-        parser.get_statement(
+      let condition = parser
+        .get_statement(
           &mut LoopArgument::with_tokens(
             parser.arena,
             "do_while_condition",
@@ -86,7 +85,7 @@ impl DoWhileConditionParser {
             &[TokenType::RightParenthesis]
           )
         )?
-      );
+        .ok_internal()?;
       return Ok(
         DoWhileConditionNode::loc(condition.into_boxed(parser.arena), parser.gen_loc(start_loc))
       );

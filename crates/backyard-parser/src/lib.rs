@@ -1,7 +1,6 @@
 mod internal;
 mod parser;
 mod utils;
-mod macros;
 pub mod error;
 
 use backyard_lexer::{ lex, lex_eval, error::LexError, token::Token };

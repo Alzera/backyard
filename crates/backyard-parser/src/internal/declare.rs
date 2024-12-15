@@ -49,16 +49,14 @@ impl DeclareParser {
           ]
         )
       )?;
-      let body_type: BodyType = {
-        let mut body_type = BodyType::Empty;
-        if let Some(close) = parser.tokens.get(parser.position) {
-          body_type = match close.token_type {
-            TokenType::Colon => BodyType::Short,
-            TokenType::LeftCurlyBracket => BodyType::Basic,
-            _ => BodyType::Empty,
-          };
+      let body_type: BodyType = if let Ok(close) = parser.get_token(parser.position) {
+        match close.token_type {
+          TokenType::Colon => BodyType::Short,
+          TokenType::LeftCurlyBracket => BodyType::Basic,
+          _ => BodyType::Empty,
         }
-        body_type
+      } else {
+        BodyType::Empty
       };
       let body = match body_type {
         BodyType::Empty => None,

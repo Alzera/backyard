@@ -3,8 +3,7 @@ use backyard_nodes::{ Inheritance, Location, MethodNode, Node, Visibility, utils
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LoopArgument, Parser },
+  parser::{ LoopArgument, OptionNodeOrInternal, Parser },
   utils::{ match_pattern, Lookup, LookupResult, ModifierLookup },
 };
 
@@ -42,8 +41,8 @@ impl MethodParser {
   ) -> Result<Node<'arena>, ParserError> {
     if let [modifiers, _] = matched.as_slice() {
       parser.position -= 1;
-      let function = guard!(
-        parser.get_statement(
+      let function = parser
+        .get_statement(
           &mut LoopArgument::new(
             parser.arena,
             "method",
@@ -55,7 +54,7 @@ impl MethodParser {
             ]
           )
         )?
-      );
+        .ok_internal()?;
       let mut visibility = None;
       let mut inheritance = None;
       let mut is_static = false;

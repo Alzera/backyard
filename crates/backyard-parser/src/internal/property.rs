@@ -13,8 +13,7 @@ use backyard_nodes::{
 
 use crate::{
   error::ParserError,
-  guard,
-  parser::{ LocationHelper, LoopArgument, Parser, TokenTypeArrayCombine },
+  parser::{ LocationHelper, LoopArgument, OptionNodeOrInternal, Parser, TokenTypeArrayCombine },
   utils::{ match_pattern, Lookup, LookupResult, ModifierLookup },
 };
 
@@ -57,7 +56,7 @@ impl PropertyParser {
     _: &mut LoopArgument<'arena, 'b>
   ) -> Result<Node<'arena>, ParserError> {
     if let [modifiers, has_var, prop_type, name] = matched.as_mut_slice() {
-      let next_token = guard!(parser.tokens.get(parser.position));
+      let next_token = parser.get_token(parser.position)?;
       let prop_type = prop_type.as_optional_type().into_boxed(parser.arena);
       let first_prop = if next_token.token_type == TokenType::Assignment {
         parser.position += 1;
@@ -94,7 +93,7 @@ impl PropertyParser {
       };
       let mut items = vec![in parser.arena; first_prop];
       let mut hooks = vec![in parser.arena];
-      let next_token = guard!(parser.tokens.get(parser.position));
+      let next_token = parser.get_token(parser.position)?;
       if next_token.token_type == TokenType::Comma {
         let next_items = parser.get_children(
           &mut LoopArgument::new(
@@ -218,34 +217,30 @@ impl HookParser {
       } else {
         vec![in parser.arena]
       };
-      if let Some(next_token) = parser.tokens.get(parser.position) {
-        let body = if next_token.token_type == TokenType::LeftCurlyBracket {
-          BlockParser::new_block(parser)?
-        } else if next_token.token_type == TokenType::Arrow {
-          parser.position += 1;
-          if
-            let Some(expr) = parser.get_statement(
-              &mut LoopArgument::with_tokens(parser.arena, "set_hook", &[], &[TokenType::Semicolon])
-            )?
-          {
-            parser.position += 1;
-            expr
-          } else {
-            return Err(ParserError::Internal);
-          }
-        } else {
-          return Err(ParserError::Internal);
-        };
-        return Ok(
-          PropertyHookNode::loc(
-            is_get,
-            !is_ref.is_empty(),
-            params,
-            body.into_boxed(parser.arena),
-            parser.gen_loc(start_loc)
-          )
-        );
-      }
+      let next_token = parser.get_token(parser.position)?;
+      let body = if next_token.token_type == TokenType::LeftCurlyBracket {
+        BlockParser::new_block(parser)?
+      } else if next_token.token_type == TokenType::Arrow {
+        parser.position += 1;
+        let expr = parser
+          .get_statement(
+            &mut LoopArgument::with_tokens(parser.arena, "set_hook", &[], &[TokenType::Semicolon])
+          )?
+          .ok_internal()?;
+        parser.position += 1;
+        expr
+      } else {
+        return Err(ParserError::Internal);
+      };
+      return Ok(
+        PropertyHookNode::loc(
+          is_get,
+          !is_ref.is_empty(),
+          params,
+          body.into_boxed(parser.arena),
+          parser.gen_loc(start_loc)
+        )
+      );
     }
     Err(ParserError::Internal)
   }

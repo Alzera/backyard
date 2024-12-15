@@ -30,14 +30,17 @@ impl StaticLookupParser {
     if let [_] = matched.as_slice() {
       let left = args.last_expr.take().unwrap();
       args.last_expr = None;
-      if let Some(t) = parser.tokens.get(parser.position) {
+      if let Ok(t) = parser.get_token(parser.position) {
         let expr = if t.token_type == TokenType::Class {
+          let start_loc = t.get_location().unwrap();
           parser.position += 1;
-          ClassKeywordNode::loc(parser.gen_loc_helper(t))
+          let node = ClassKeywordNode::loc(parser.gen_loc(start_loc));
+          node
         } else if [TokenType::Variable, TokenType::VariableBracketOpen].contains(&t.token_type) {
+          let start_loc = t.get_location().unwrap();
           if let Some(m) = VariableParser::test(parser, args) {
             parser.position += 1;
-            VariableParser::parse(parser, m, t.get_location().unwrap(), args)?
+            VariableParser::parse(parser, m, start_loc, args)?
           } else {
             return Err(ParserError::Internal);
           }
@@ -65,8 +68,9 @@ impl StaticLookupParser {
             return Err(ParserError::Internal);
           }
         } else {
+          let node = IdentifierParser::from_token(t);
           parser.position += 1;
-          IdentifierParser::from_token(t)
+          node
         };
         return Ok(
           StaticLookupNode::loc(
