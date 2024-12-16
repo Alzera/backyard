@@ -10,7 +10,7 @@ pub mod builder;
 #[cfg(feature = "printer")]
 pub mod printer;
 
-use std::fmt::{ self, Display, Formatter };
+use std::{ collections::VecDeque, fmt::{ self, Display, Formatter } };
 
 use bstr::BString;
 use bumpalo::Bump;
@@ -22,7 +22,7 @@ use crate::utils::CloneIn;
 use crate::builder::{ Blueprint, BlueprintBuildable, BlueprintWrapper, Builder };
 
 #[cfg(feature = "walker")]
-use crate::walker::{ MapIntoWalkerStack, Walkable };
+use crate::walker::{ Walkable, WalkerItem };
 
 #[cfg(feature = "printer")]
 use crate::printer::{ PrintBuilder, Printable, PrintType, PrintConfig };
@@ -343,10 +343,11 @@ macro_rules! new_node {
 
     #[cfg(feature = "walker")]
     impl<'arena> Walkable<'arena> for $struct_name<'arena> {
-      fn populate_walks<'a>(&'a self) -> std::collections::VecDeque<&'a Node<'arena>> {
-        let mut stack = std::collections::VecDeque::new();
-        $(self.$field_name.map_into_walker_stack(&mut stack);)*
-        stack.into_iter().rev().collect::<std::collections::VecDeque<_>>()
+      fn populate_walks<'a>(&'a self, stack: &mut VecDeque<WalkerItem<'arena, 'a>>, level: u16) {
+        let next_level = level + 1;
+        let mut scoped_stack = VecDeque::new();
+        $(self.$field_name.populate_walks(&mut scoped_stack, next_level);)*
+        scoped_stack.into_iter().rev().for_each(|x| stack.push_back(x))
       }
     }
 
@@ -437,8 +438,11 @@ macro_rules! new_node {
 
     #[cfg(feature = "walker")]
     impl<'arena> Walkable<'arena> for $struct_name {
-      fn populate_walks<'a>(&'a self) -> std::collections::VecDeque<&'a Node<'arena>> {
-        std::collections::VecDeque::new()
+      fn populate_walks<'a>(&'a self, stack: &mut VecDeque<WalkerItem<'arena, 'a>>, level: u16) {
+        let next_level = level + 1;
+        let mut scoped_stack = VecDeque::new();
+        $(self.$field_name.populate_walks(&mut scoped_stack, next_level);)*
+        scoped_stack.into_iter().rev().for_each(|x| stack.push_back(x))
       }
     }
 
@@ -527,8 +531,13 @@ macro_rules! new_node {
 
     #[cfg(feature = "walker")]
     impl<'arena> Walkable<'arena> for $struct_name {
-      fn populate_walks<'a>(&'a self) -> std::collections::VecDeque<&'a Node<'arena>> {
-        std::collections::VecDeque::new()
+
+      #[allow(unused_variables, unused_mut)]
+      fn populate_walks<'a>(&'a self, stack: &mut VecDeque<WalkerItem<'arena, 'a>>, level: u16) {
+        let next_level = level + 1;
+        let mut scoped_stack = VecDeque::new();
+        $(self.$field_name.populate_walks(&mut scoped_stack, next_level);)*
+        scoped_stack.into_iter().rev().for_each(|x| stack.push_back(x))
       }
     }
 

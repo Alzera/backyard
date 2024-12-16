@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::{ collections::VecDeque, iter::{ Chain, Rev }, slice::Iter };
 
 use bstr::BString;
 
@@ -20,15 +20,78 @@ use crate::{
   Visibility,
 };
 
+pub struct Explorer<'arena, 'a> {
+  ancestors: Vec<&'a Node<'arena>>,
+  prev_siblings: Vec<&'a Node<'arena>>,
+  next_siblings: Vec<&'a Node<'arena>>,
+}
+
+impl<'arena, 'a> Explorer<'arena, 'a> {
+  pub fn ancestors(&self) -> Iter<'_, &'a Node<'arena>> {
+    self.ancestors.iter()
+  }
+
+  pub fn prev_siblings(&self) -> Iter<'_, &'a Node<'arena>> {
+    self.prev_siblings.iter()
+  }
+
+  pub fn next_siblings(&self) -> Iter<'_, &'a Node<'arena>> {
+    self.next_siblings.iter()
+  }
+
+  pub fn siblings(&self) -> Chain<Rev<Iter<'_, &'a Node<'arena>>>, Iter<'_, &'a Node<'arena>>> {
+    self.prev_siblings.iter().rev().chain(self.next_siblings.iter())
+  }
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct WalkerItem<'arena, 'a> {
+  pub node: &'a Node<'arena>,
+  pub is_vec: bool,
+  pub level: u16,
+}
+
 pub struct Walker<'arena, 'a> {
-  stack: VecDeque<&'a Node<'arena>>,
+  ancestors: Vec<WalkerItem<'arena, 'a>>,
+  stack: VecDeque<WalkerItem<'arena, 'a>>,
 }
 
 impl<'arena, 'a> Walker<'arena, 'a> {
   pub(crate) fn new(root: &'a Node<'arena>) -> Self {
     let mut stack = VecDeque::new();
-    stack.push_back(root);
-    Self { stack }
+    stack.push_back(WalkerItem { node: root, is_vec: false, level: 0 });
+    Self { ancestors: vec![], stack }
+  }
+
+  fn get_ancestors(&self, level: u16) -> Vec<&'a Node<'arena>> {
+    let mut level = level.saturating_sub(1);
+    let mut ancestors = vec![];
+    for i in self.ancestors.iter() {
+      if i.level == level {
+        ancestors.push(i.node);
+        level = level.saturating_sub(1);
+      }
+    }
+    ancestors
+  }
+
+  fn get_siblings(&self, level: u16) -> (Vec<&'a Node<'arena>>, Vec<&'a Node<'arena>>) {
+    let mut prevs = vec![];
+    let end_level = level.saturating_sub(1);
+    for i in self.ancestors.iter().rev() {
+      if i.level == end_level {
+        break;
+      } else if i.level == level {
+        prevs.push(i.node);
+      }
+    }
+    let mut nexts = vec![];
+    for i in self.stack.iter() {
+      if i.level == level {
+        nexts.push(i.node);
+      }
+    }
+    (prevs, nexts)
   }
 }
 
@@ -39,158 +102,159 @@ impl<'arena> Node<'arena> {
 }
 
 pub(crate) trait Walkable<'arena> {
-  fn populate_walks<'a>(&'a self) -> VecDeque<&'a Node<'arena>>;
+  fn populate_walks<'a>(&'a self, stack: &mut VecDeque<WalkerItem<'arena, 'a>>, level: u16);
 }
 
 impl<'arena, 'a> Iterator for Walker<'arena, 'a> {
-  type Item = &'a Node<'arena>;
+  type Item = (Explorer<'arena, 'a>, &'a Node<'arena>);
 
   fn next(&mut self) -> Option<Self::Item> {
-    if let Some(node) = self.stack.pop_back() {
-      let _ = match &node.wrapper {
-        NodeWrapper::AnonymousClass(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::AnonymousFunction(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::CallArgument(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Array(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::ArrayItem(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::ArrayLookup(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::ArrowFunction(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Assignment(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Attribute(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::AttributeItem(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Bin(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Block(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Boolean(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Break(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Call(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Case(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Cast(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Catch(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Class(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::ClassKeyword(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Clone(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::CommentBlock(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::CommentDoc(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::CommentLine(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Const(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::ConstProperty(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::ConstructorParameter(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Continue(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Declare(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::DeclareArgument(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::DoWhile(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::DoWhileCondition(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Echo(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Else(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Encapsed(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::EncapsedPart(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Enum(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::EnumItem(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Eval(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Exit(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Finally(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::For(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Foreach(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Function(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Global(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Goto(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::HereDoc(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Identifier(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::If(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Include(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Inline(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Interface(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::IntersectionType(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Label(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::List(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Magic(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::MagicMethod(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Match(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::MatchArm(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Method(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Namespace(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Negate(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::New(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::NowDoc(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Null(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Number(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::ObjectAccess(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Parameter(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Parent(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Parenthesis(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Post(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Pre(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Print(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Program(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Property(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::PropertyHook(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::PropertyItem(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Reference(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Return(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::SelfKeyword(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Silent(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Static(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::StaticKeyword(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::StaticLookup(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::String(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Switch(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Ternary(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::This(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Trait(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::TraitUse(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::TraitUseAlias(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::TraitUsePrecedence(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Throw(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Try(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Type(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::UnionType(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Use(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::UseItem(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Variable(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Variadic(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::While(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::Yield(v) => self.stack.append(&mut v.populate_walks()),
-        NodeWrapper::YieldFrom(v) => self.stack.append(&mut v.populate_walks()),
+    if let Some(item) = self.stack.pop_back() {
+      match &item.node.wrapper {
+        NodeWrapper::AnonymousClass(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::AnonymousFunction(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::CallArgument(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Array(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::ArrayItem(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::ArrayLookup(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::ArrowFunction(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Assignment(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Attribute(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::AttributeItem(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Bin(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Block(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Boolean(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Break(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Call(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Case(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Cast(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Catch(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Class(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::ClassKeyword(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Clone(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::CommentBlock(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::CommentDoc(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::CommentLine(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Const(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::ConstProperty(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::ConstructorParameter(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Continue(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Declare(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::DeclareArgument(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::DoWhile(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::DoWhileCondition(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Echo(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Else(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Encapsed(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::EncapsedPart(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Enum(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::EnumItem(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Eval(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Exit(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Finally(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::For(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Foreach(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Function(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Global(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Goto(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::HereDoc(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Identifier(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::If(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Include(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Inline(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Interface(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::IntersectionType(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Label(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::List(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Magic(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::MagicMethod(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Match(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::MatchArm(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Method(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Namespace(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Negate(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::New(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::NowDoc(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Null(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Number(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::ObjectAccess(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Parameter(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Parent(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Parenthesis(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Post(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Pre(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Print(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Program(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Property(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::PropertyHook(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::PropertyItem(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Reference(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Return(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::SelfKeyword(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Silent(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Static(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::StaticKeyword(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::StaticLookup(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::String(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Switch(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Ternary(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::This(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Trait(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::TraitUse(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::TraitUseAlias(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::TraitUsePrecedence(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Throw(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Try(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Type(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::UnionType(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Use(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::UseItem(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Variable(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Variadic(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::While(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Yield(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::YieldFrom(v) => v.populate_walks(&mut self.stack, item.level),
+      }
+      let node = item.node;
+      let level = item.level;
+      let (prev_siblings, next_siblings) = if item.is_vec {
+        self.get_siblings(level)
+      } else {
+        (vec![], vec![])
       };
-      Some(node)
+      self.ancestors.push(item);
+      Some((Explorer { ancestors: self.get_ancestors(level), prev_siblings, next_siblings }, node))
     } else {
       None
     }
   }
 }
 
-pub(crate) trait MapIntoWalkerStack<'arena> {
-  fn map_into_walker_stack<'a>(&'a self, stack: &mut std::collections::VecDeque<&'a Node<'arena>>);
-}
-
-impl<'arena> MapIntoWalkerStack<'arena> for bumpalo::collections::Vec<'arena, Node<'arena>> {
-  fn map_into_walker_stack<'a>(&'a self, stack: &mut std::collections::VecDeque<&'a Node<'arena>>) {
-    self.iter().for_each(|x| stack.push_back(x));
+impl<'arena> Walkable<'arena> for bumpalo::collections::Vec<'arena, Node<'arena>> {
+  fn populate_walks<'a>(&'a self, stack: &mut VecDeque<WalkerItem<'arena, 'a>>, level: u16) {
+    self.iter().for_each(|x| stack.push_back(WalkerItem { node: x, is_vec: true, level }));
   }
 }
 
-impl<'arena, T> MapIntoWalkerStack<'arena> for Option<T> where T: MapIntoWalkerStack<'arena> {
-  fn map_into_walker_stack<'a>(&'a self, stack: &mut std::collections::VecDeque<&'a Node<'arena>>) {
+impl<'arena, T> Walkable<'arena> for Option<T> where T: Walkable<'arena> {
+  fn populate_walks<'a>(&'a self, stack: &mut VecDeque<WalkerItem<'arena, 'a>>, level: u16) {
     if let Some(x) = self {
-      x.map_into_walker_stack(stack);
+      x.populate_walks(stack, level);
     }
   }
 }
 
-impl<'arena> MapIntoWalkerStack<'arena> for bumpalo::boxed::Box<'arena, Node<'arena>> {
-  fn map_into_walker_stack<'a>(&'a self, stack: &mut std::collections::VecDeque<&'a Node<'arena>>) {
-    stack.push_back(self);
+impl<'arena> Walkable<'arena> for bumpalo::boxed::Box<'arena, Node<'arena>> {
+  fn populate_walks<'a>(&'a self, stack: &mut VecDeque<WalkerItem<'arena, 'a>>, level: u16) {
+    stack.push_back(WalkerItem { node: self, is_vec: false, level });
   }
 }
 
 macro_rules! impl_map_into_walker_stack {
   ($($t:ty),*) => {
       $(
-          impl<'arena> MapIntoWalkerStack<'arena> for $t {
-            fn map_into_walker_stack<'a>(
-              &'a self,
-              _: &mut std::collections::VecDeque<&'a Node<'arena>>
-            ) {}
+          impl<'arena> Walkable<'arena> for $t {
+            fn populate_walks<'a>(&'a self, _: &mut VecDeque<WalkerItem<'arena, 'a>>, _: u16) {}
           }
       )*
   };
@@ -230,11 +294,11 @@ mod tests {
       .build(&arena);
     let mut walker = node.walk();
 
-    assert_eq!(NodeType::Program, walker.next().unwrap().node_type);
-    assert_eq!(NodeType::Assignment, walker.next().unwrap().node_type);
-    assert_eq!(NodeType::Variable, walker.next().unwrap().node_type);
-    assert_eq!(NodeType::Identifier, walker.next().unwrap().node_type);
-    assert_eq!(NodeType::Number, walker.next().unwrap().node_type);
+    assert_eq!(NodeType::Program, walker.next().unwrap().1.node_type);
+    assert_eq!(NodeType::Assignment, walker.next().unwrap().1.node_type);
+    assert_eq!(NodeType::Variable, walker.next().unwrap().1.node_type);
+    assert_eq!(NodeType::Identifier, walker.next().unwrap().1.node_type);
+    assert_eq!(NodeType::Number, walker.next().unwrap().1.node_type);
     assert!(walker.next().is_none());
   }
 }
