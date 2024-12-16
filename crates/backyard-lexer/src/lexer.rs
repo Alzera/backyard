@@ -14,9 +14,9 @@ use crate::internal::{
 
 #[derive(Debug, Clone)]
 pub(crate) struct ControlSnapshot {
-  pub(crate) line: u32,
-  pub(crate) column: u32,
-  pub(crate) offset: u32,
+  pub(crate) line: usize,
+  pub(crate) column: usize,
+  pub(crate) offset: usize,
 }
 
 #[derive(Debug)]
@@ -59,9 +59,9 @@ impl Control {
   #[inline]
   pub(crate) fn get_snapshot(&self) -> ControlSnapshot {
     ControlSnapshot {
-      line: self.line as u32,
-      column: self.column as u32,
-      offset: self.position as u32,
+      line: self.line,
+      column: self.column,
+      offset: self.position,
     }
   }
 
@@ -106,9 +106,9 @@ impl Control {
         break;
       }
       last_snapshot = ControlSnapshot {
-        line: line as u32,
-        column: column as u32,
-        offset: end_position as u32,
+        line: line,
+        column: column,
+        offset: end_position,
       };
       end_position += 1;
       if ch == b'\n' {

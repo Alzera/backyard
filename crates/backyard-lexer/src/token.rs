@@ -219,9 +219,9 @@ impl Token {
     Token {
       token_type,
       value,
-      line: snapshot.line,
-      column: snapshot.column,
-      offset: snapshot.offset,
+      line: snapshot.line as u32,
+      column: snapshot.column as u32,
+      offset: snapshot.offset as u32,
     }
   }
 }
