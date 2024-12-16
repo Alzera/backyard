@@ -1,9 +1,14 @@
 pub mod macros;
 pub mod utils;
+
 #[cfg(feature = "walker")]
 pub mod walker;
+
 #[cfg(feature = "builder")]
 pub mod builder;
+
+#[cfg(feature = "printer")]
+pub mod printer;
 
 use std::fmt::{ self, Display, Formatter };
 
@@ -18,6 +23,9 @@ use crate::builder::{ Blueprint, BlueprintBuildable, BlueprintWrapper, Builder }
 
 #[cfg(feature = "walker")]
 use crate::walker::{ MapIntoWalkerStack, Walkable };
+
+#[cfg(feature = "printer")]
+use crate::printer::{ PrintBuilder, Printable, PrintType };
 
 #[derive(Debug, PartialEq, Clone, Serialize)]
 pub enum BodyType {
@@ -366,6 +374,7 @@ macro_rules! new_node {
         )
       }
     }
+
     #[cfg(feature = "builder")]
     impl<'arena, $blt> BlueprintBuildable<'arena> for $blueprint_name<$blt> {
       type Result = Node<'arena>;
@@ -375,6 +384,18 @@ macro_rules! new_node {
           $(self.$field_name.build(arena),)*
           None
         )
+      }
+    }
+
+    #[cfg(feature = "printer")]
+    impl<$lt> Printable for $struct_name<$lt> {
+      fn print(&self) -> PrintBuilder {
+        let mut builder = PrintBuilder::new(PrintType::Object);
+        builder.push_props(false, &mut [
+          $((stringify!($field_name), self.$field_name.print()),)*
+        ]);
+        builder.shift_new_line(stringify!($struct_name));
+        builder
       }
     }
   };
@@ -457,6 +478,18 @@ macro_rules! new_node {
         )
       }
     }
+
+    #[cfg(feature = "printer")]
+    impl Printable for $struct_name {
+      fn print(&self) -> PrintBuilder {
+        let mut builder = PrintBuilder::new(PrintType::Object);
+        builder.push_props(false, &mut [
+          $((stringify!($field_name), self.$field_name.print()),)*
+        ]);
+        builder.shift_new_line(stringify!($struct_name));
+        builder
+      }
+    }
   };
 
   (
@@ -534,6 +567,18 @@ macro_rules! new_node {
           $(self.$field_name.build(arena),)*
           None
         )
+      }
+    }
+
+    #[cfg(feature = "printer")]
+    impl Printable for $struct_name {
+      fn print(&self) -> PrintBuilder {
+        let mut builder = PrintBuilder::new(PrintType::Object);
+        builder.push_props(false, &mut [
+          $((stringify!($field_name), self.$field_name.print()),)*
+        ]);
+        builder.shift_new_line(stringify!($struct_name));
+        builder
       }
     }
   };
@@ -1215,7 +1260,18 @@ mod tests {
   use bstr::BString;
 
   use crate::{
-    AssignmentType, BinaryType, CastType, Inheritance, MagicMethodName, MagicName, Modifier, PostType, PreType, Quote, UseItemModifier, Visibility
+    AssignmentType,
+    BinaryType,
+    CastType,
+    Inheritance,
+    MagicMethodName,
+    MagicName,
+    Modifier,
+    PostType,
+    PreType,
+    Quote,
+    UseItemModifier,
+    Visibility,
   };
 
   #[test]
