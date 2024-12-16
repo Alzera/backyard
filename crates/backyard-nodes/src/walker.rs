@@ -25,7 +25,7 @@ pub struct Walker<'arena, 'a> {
 }
 
 impl<'arena, 'a> Walker<'arena, 'a> {
-  pub fn new(root: &'a Node<'arena>) -> Self {
+  pub(crate) fn new(root: &'a Node<'arena>) -> Self {
     let mut stack = VecDeque::new();
     stack.push_back(root);
     Self { stack }

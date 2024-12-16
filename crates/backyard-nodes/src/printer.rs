@@ -64,7 +64,11 @@ impl PrintBuilder {
     for (i, (key, value)) in props.iter_mut().enumerate() {
       match &value.print_type {
         PrintType::Vec => {
-          value.shift_new_line(format!("{}[]", key).as_str());
+          if value.lines.is_empty() {
+            value.shift_new_line(format!("{}[]: ~", key).as_str());
+          } else {
+            value.shift_new_line(format!("{}[]", key).as_str());
+          }
         }
         PrintType::Object => {
           value.indent(false, false);
@@ -89,7 +93,11 @@ impl PrintBuilder {
     } else {
       if is_middle { "├-" } else { "└-" }
     };
-    let middle_char = if is_middle { "│ " } else { "  " };
+    let middle_char = if is_middle {
+      if is_vec { "║ " } else { "│ " }
+    } else {
+      "  "
+    };
     for (i, line) in self.lines.iter_mut().enumerate() {
       if i == 0 {
         line.insert_str(0, first_char);
@@ -279,9 +287,7 @@ impl<'arena> Printable for bumpalo::collections::Vec<'arena, Node<'arena>> {
   fn print(&self, config: &PrintConfig) -> PrintBuilder {
     let len = self.len();
     if len == 0 {
-      let mut builder = PrintBuilder::new(PrintType::Inline);
-      builder.shift_new_line("~");
-      return builder;
+      return PrintBuilder::new(PrintType::Vec);
     }
     let mut builder = PrintBuilder::new(PrintType::Vec);
     let last_index = len.saturating_sub(1);
