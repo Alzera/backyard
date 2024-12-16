@@ -28,7 +28,24 @@ children:
       leadings: ~
       trailings: ~
     loc: ~
-    leadings: ~
+    leadings:
+      - node_type: comment_line
+        comment:
+          - 84
+          - 101
+          - 115
+          - 116
+          - 32
+          - 108
+          - 101
+          - 97
+          - 100
+          - 105
+          - 110
+          - 103
+        loc: ~
+        leadings: ~
+        trailings: ~
     trailings: ~
 loc: ~
 leadings: ~

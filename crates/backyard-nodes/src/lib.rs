@@ -13,7 +13,7 @@ pub mod printer;
 use std::fmt::{ self, Display, Formatter };
 
 use bstr::BString;
-use bumpalo::{ vec, Bump };
+use bumpalo::Bump;
 use serde::Serialize;
 
 use crate::utils::CloneIn;
@@ -66,7 +66,7 @@ impl<'a> Node<'a> {
     if let Some(leadings) = &mut self.leadings {
       leadings.insert(0, node);
     } else {
-      self.leadings = Some(vec![in arena; node]);
+      self.leadings = Some(bumpalo::vec![in arena; node]);
     }
   }
 
@@ -74,7 +74,7 @@ impl<'a> Node<'a> {
     if let Some(leadings) = &mut self.leadings {
       leadings.push(node);
     } else {
-      self.leadings = Some(vec![in arena; node]);
+      self.leadings = Some(bumpalo::vec![in arena; node]);
     }
   }
 
@@ -82,7 +82,7 @@ impl<'a> Node<'a> {
     if let Some(trailings) = &mut self.trailings {
       trailings.push(node);
     } else {
-      self.trailings = Some(vec![in arena; node]);
+      self.trailings = Some(bumpalo::vec![in arena; node]);
     }
   }
 }
@@ -362,8 +362,8 @@ macro_rules! new_node {
       pub fn $node_type<$blt>(&self, $($blueprint_field_name: $blueprint_field_type,)*) -> std::boxed::Box<Blueprint<$blt>> {
         std::boxed::Box::new(
           Blueprint {
-            leadings: &[],
-            trailings: &[],
+            leadings: vec![],
+            trailings: vec![],
             node_type: NodeType::$node_type,
             wrapper: BlueprintWrapper::$node_type(
               $blueprint_name {
@@ -454,8 +454,8 @@ macro_rules! new_node {
       pub fn $node_type<$blt>(&self, $($blueprint_field_name: $blueprint_field_type,)*) -> std::boxed::Box<Blueprint<$blt>> {
         std::boxed::Box::new(
           Blueprint {
-            leadings: &[],
-            trailings: &[],
+            leadings: vec![],
+            trailings: vec![],
             node_type: NodeType::$node_type,
             wrapper: BlueprintWrapper::$node_type(
               $blueprint_name {
@@ -544,8 +544,8 @@ macro_rules! new_node {
       pub fn $node_type<'a>(&self, $($blueprint_field_name: $blueprint_field_type,)*) -> std::boxed::Box<Blueprint<'a>> {
         std::boxed::Box::new(
           Blueprint {
-            leadings: &[],
-            trailings: &[],
+            leadings: vec![],
+            trailings: vec![],
             node_type: NodeType::$node_type,
             wrapper: BlueprintWrapper::$node_type(
               $blueprint_name {

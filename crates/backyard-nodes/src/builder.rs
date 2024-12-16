@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use bstr::BString;
 use bumpalo::Bump;
 
@@ -34,17 +36,50 @@ pub trait BlueprintBuildable<'arena> {
 
 #[derive(Debug)]
 pub struct Blueprint<'a> {
-  pub leadings: &'a [Box<Blueprint<'a>>],
-  pub trailings: &'a [Box<Blueprint<'a>>],
-  pub node_type: NodeType,
-  pub wrapper: BlueprintWrapper<'a>,
+  pub(crate) leadings: Vec<Box<Blueprint<'a>>>,
+  pub(crate) trailings: Vec<Box<Blueprint<'a>>>,
+  pub(crate) node_type: NodeType,
+  pub(crate) wrapper: BlueprintWrapper<'a>,
+}
+
+impl<'a> Blueprint<'a> {
+  pub fn get_type(&self) -> NodeType {
+    self.node_type.clone()
+  }
+
+  // pub fn add_leading(&mut self, leading: Box<Blueprint<'a>>) -> &mut Self {
+  //   self.leadings.push(leading);
+  //   self
+  // }
+
+  // pub fn add_trailing(&mut self, leading: Box<Blueprint<'a>>) -> &mut Self {
+  //   self.trailings.push(leading);
+  //   self
+  // }
+}
+
+pub trait BoxBlueprint<'a> {
+  fn add_leading(self, leading: Box<Blueprint<'a>>) -> Self;
+  fn add_trailing(self, leading: Box<Blueprint<'a>>) -> Self;
+}
+
+impl<'a> BoxBlueprint<'a> for Box<Blueprint<'a>> {
+  fn add_leading(mut self, leading: Box<Blueprint<'a>>) -> Self {
+    self.leadings.push(leading);
+    self
+  }
+
+  fn add_trailing(mut self, leading: Box<Blueprint<'a>>) -> Self {
+    self.trailings.push(leading);
+    self
+  }
 }
 
 impl<'arena, 'a> BlueprintBuildable<'arena> for Blueprint<'a> {
   type Result = Node<'arena>;
 
   fn build(&self, arena: &'arena Bump) -> Self::Result {
-    match &self.wrapper {
+    let mut node = match &self.wrapper {
       BlueprintWrapper::AnonymousClass(bp) => bp.build(arena),
       BlueprintWrapper::AnonymousFunction(bp) => bp.build(arena),
       BlueprintWrapper::CallArgument(bp) => bp.build(arena),
@@ -148,7 +183,14 @@ impl<'arena, 'a> BlueprintBuildable<'arena> for Blueprint<'a> {
       BlueprintWrapper::While(bp) => bp.build(arena),
       BlueprintWrapper::Yield(bp) => bp.build(arena),
       BlueprintWrapper::YieldFrom(bp) => bp.build(arena),
+    };
+    for leading in self.leadings.iter() {
+      node.leadings_push(arena, leading.deref().build(arena));
     }
+    for trailing in self.trailings.iter() {
+      node.leadings_push(arena, trailing.deref().build(arena));
+    }
+    node
   }
 }
 
@@ -328,7 +370,7 @@ impl_build!(
 
 #[cfg(test)]
 mod tests {
-  use crate::{ builder::{ BlueprintBuildable, Builder }, AssignmentType };
+  use crate::{ builder::{ BlueprintBuildable, BoxBlueprint, Builder }, AssignmentType };
 
   #[test]
   fn builder() {
@@ -336,7 +378,11 @@ mod tests {
     let b = Builder::new();
     let node = b
       .Program(
-        &[b.Assignment(b.Variable(b.Identifier("a")), AssignmentType::Default, b.Number("21"))]
+        &[
+          b
+            .Assignment(b.Variable(b.Identifier("a")), AssignmentType::Default, b.Number("21"))
+            .add_leading(b.CommentLine("Test leading")),
+        ]
       )
       .build(&arena);
     insta::assert_yaml_snapshot!(node);
