@@ -43,11 +43,11 @@ impl PrintBuilder {
     self.lines.push(String::new());
   }
 
-  // pub fn push(&mut self, line: &str) {
-  //   if let Some(last) = self.lines.last_mut() {
-  //     last.push_str(line);
-  //   }
-  // }
+  pub fn push(&mut self, line: &str) {
+    if let Some(last) = self.lines.last_mut() {
+      last.push_str(line);
+    }
+  }
 
   pub fn shift(&mut self, text: &str) {
     if let Some(last) = self.lines.last_mut() {
@@ -237,8 +237,8 @@ impl<'arena> Printable for Node<'arena> {
 
 impl Printable for RangeLocation {
   fn print(&self) -> PrintBuilder {
-    let mut builder = PrintBuilder::new(PrintType::Inline);
-    builder.shift(
+    let mut builder = PrintBuilder::new(PrintType::Object);
+    builder.shift_new_line(
       format!(
         "end: line {:?}, column {:?}, offset {:?}",
         self.end.line,
@@ -246,7 +246,7 @@ impl Printable for RangeLocation {
         self.end.offset
       ).as_str()
     );
-    builder.shift(
+    builder.shift_new_line(
       format!(
         "start: line {:?}, column {:?}, offset {:?}",
         self.start.line,
@@ -281,7 +281,7 @@ impl<'arena> Printable for bumpalo::collections::Vec<'arena, Node<'arena>> {
   }
 }
 
-impl<T> Printable for Option<T> where T: Printable + Debug {
+impl<T> Printable for Option<T> where T: Printable {
   fn print(&self) -> PrintBuilder {
     match self {
       Some(x) => x.print(),
@@ -300,6 +300,20 @@ impl<'arena> Printable for bumpalo::boxed::Box<'arena, Node<'arena>> {
   }
 }
 
+impl<T> Printable for Vec<T> where T: Printable {
+  fn print(&self) -> PrintBuilder {
+    let mut childs = Vec::new();
+    for x in self {
+      if let Some(last) = x.print().lines.last_mut() {
+        childs.push(last.to_owned());
+      }
+    }
+    let mut builder = PrintBuilder::new(PrintType::Inline);
+    builder.shift_new_line(childs.join(" | ").as_str());
+    return builder;
+  }
+}
+
 macro_rules! impl_build_printableable {
   ($($t:ty),*) => {
       $(
@@ -314,11 +328,24 @@ macro_rules! impl_build_printableable {
   };
 }
 
-impl_build_printableable!(
-  bool,
-  BString,
+macro_rules! impl_build_printableable_enum {
+  ($($t:ty),*) => {
+      $(
+          impl Printable for $t {
+            fn print(&self) -> PrintBuilder {
+              let mut builder = PrintBuilder::new(PrintType::Inline);
+              builder.shift_new_line(format!("{}::{:?}", stringify!($t), self).as_str());
+              builder
+            }
+          }
+      )*
+  };
+}
+
+impl_build_printableable!(bool, BString);
+
+impl_build_printableable_enum!(
   BodyType,
-  std::vec::Vec<Visibility>,
   AssignmentType,
   BinaryType,
   CastType,
@@ -335,17 +362,34 @@ impl_build_printableable!(
 
 #[cfg(test)]
 mod tests {
-  use crate::{ builder::{ BlueprintBuildable, Builder }, printer::Printable, AssignmentType };
+  use bstr::BString;
+
+  use crate::{
+    builder::{ BlueprintBuildable, Builder },
+    printer::Printable,
+    AssignmentType,
+    CommentLineNode,
+    Location,
+    RangeLocation,
+  };
 
   #[test]
   fn printer() {
     let arena = bumpalo::Bump::new();
     let b = Builder::new();
-    let node = b
+    let mut node = b
       .Program(
         &[b.Assignment(b.Variable(b.Identifier("a")), AssignmentType::Default, b.Number("21"))]
       )
       .build(&arena);
+    let comment = CommentLineNode::loc(
+      BString::new(b"Test comment".to_vec()),
+      Some(RangeLocation {
+        start: Location { line: 1, column: 0, offset: 0 },
+        end: Location { line: 1, column: 0, offset: 0 },
+      })
+    );
+    node.leadings = Some(bumpalo::vec![in &arena; comment]);
     println!("{:?}", node.print());
   }
 }
