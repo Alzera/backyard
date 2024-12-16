@@ -14,9 +14,9 @@ use crate::internal::{
 
 #[derive(Debug, Clone)]
 pub(crate) struct ControlSnapshot {
-  pub(crate) line: usize,
-  pub(crate) column: usize,
-  pub(crate) offset: usize,
+  pub(crate) line: u32,
+  pub(crate) column: u32,
+  pub(crate) offset: u32,
 }
 
 #[derive(Debug)]
@@ -58,7 +58,11 @@ impl Control {
 
   #[inline]
   pub(crate) fn get_snapshot(&self) -> ControlSnapshot {
-    ControlSnapshot { line: self.line, column: self.column, offset: self.position }
+    ControlSnapshot {
+      line: self.line as u32,
+      column: self.column as u32,
+      offset: self.position as u32,
+    }
   }
 
   pub(crate) fn peek_char(&mut self, pos: Option<usize>) -> Option<&u8> {
@@ -101,7 +105,11 @@ impl Control {
       if until(self, ch, &end_position) {
         break;
       }
-      last_snapshot = ControlSnapshot { line, column, offset: end_position };
+      last_snapshot = ControlSnapshot {
+        line: line as u32,
+        column: column as u32,
+        offset: end_position as u32,
+      };
       end_position += 1;
       if ch == b'\n' {
         line += 1;

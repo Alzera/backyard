@@ -42,9 +42,9 @@ pub struct RangeLocation {
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct Location {
-  pub line: usize,
-  pub column: usize,
-  pub offset: usize,
+  pub line: u32,
+  pub column: u32,
+  pub offset: u32,
 }
 
 #[derive(Debug, PartialEq, Serialize)]

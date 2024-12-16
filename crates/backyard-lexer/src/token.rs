@@ -209,9 +209,9 @@ pub enum TokenType {
 pub struct Token {
   pub token_type: TokenType,
   pub value: BString,
-  pub line: usize,
-  pub column: usize,
-  pub offset: usize,
+  pub line: u32,
+  pub column: u32,
+  pub offset: u32,
 }
 
 impl Token {

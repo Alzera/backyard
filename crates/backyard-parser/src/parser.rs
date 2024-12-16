@@ -378,7 +378,7 @@ impl LocationHelper for &Token {
 
   fn get_range_location(&self) -> Option<RangeLocation> {
     if let Some(start_loc) = self.get_location() {
-      let len = self.value.len();
+      let len = self.value.len() as u32;
       let end_loc = Location {
         line: start_loc.line,
         column: start_loc.column + len,
