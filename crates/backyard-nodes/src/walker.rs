@@ -32,7 +32,13 @@ impl<'arena, 'a> Walker<'arena, 'a> {
   }
 }
 
-pub trait Walkable<'arena> {
+impl<'arena> Node<'arena> {
+  pub fn walk(&self) -> Walker<'arena, '_> {
+    Walker::new(self).into_iter()
+  }
+}
+
+pub(crate) trait Walkable<'arena> {
   fn populate_walks<'a>(&'a self) -> VecDeque<&'a Node<'arena>>;
 }
 
@@ -153,7 +159,7 @@ impl<'arena, 'a> Iterator for Walker<'arena, 'a> {
   }
 }
 
-pub trait MapIntoWalkerStack<'arena> {
+pub(crate) trait MapIntoWalkerStack<'arena> {
   fn map_into_walker_stack<'a>(&'a self, stack: &mut std::collections::VecDeque<&'a Node<'arena>>);
 }
 
@@ -211,7 +217,7 @@ impl_map_into_walker_stack!(
 
 #[cfg(test)]
 mod tests {
-  use crate::{ builder::{ BlueprintBuildable, Builder }, walker::Walker, AssignmentType, NodeType };
+  use crate::{ builder::{ BlueprintBuildable, Builder }, AssignmentType, NodeType };
 
   #[test]
   fn walker() {
@@ -222,7 +228,7 @@ mod tests {
         &[b.Assignment(b.Variable(b.Identifier("a")), AssignmentType::Default, b.Number("21"))]
       )
       .build(&arena);
-    let mut walker = Walker::new(&*node).into_iter();
+    let mut walker = node.walk();
 
     assert_eq!(NodeType::Program, walker.next().unwrap().node_type);
     assert_eq!(NodeType::Assignment, walker.next().unwrap().node_type);
