@@ -25,7 +25,7 @@ use crate::builder::{ Blueprint, BlueprintBuildable, BlueprintWrapper, Builder }
 use crate::walker::{ MapIntoWalkerStack, Walkable };
 
 #[cfg(feature = "printer")]
-use crate::printer::{ PrintBuilder, Printable, PrintType };
+use crate::printer::{ PrintBuilder, Printable, PrintType, PrintConfig };
 
 #[derive(Debug, PartialEq, Clone, Serialize)]
 pub enum BodyType {
@@ -389,10 +389,10 @@ macro_rules! new_node {
 
     #[cfg(feature = "printer")]
     impl<$lt> Printable for $struct_name<$lt> {
-      fn print(&self) -> PrintBuilder {
+      fn print(&self, config: &PrintConfig) -> PrintBuilder {
         let mut builder = PrintBuilder::new(PrintType::Object);
         builder.push_props(false, &mut [
-          $((stringify!($field_name), self.$field_name.print()),)*
+          $((stringify!($field_name), self.$field_name.print(config)),)*
         ]);
         builder.shift_new_line(stringify!($struct_name));
         builder
@@ -481,10 +481,10 @@ macro_rules! new_node {
 
     #[cfg(feature = "printer")]
     impl Printable for $struct_name {
-      fn print(&self) -> PrintBuilder {
+      fn print(&self, config: &PrintConfig) -> PrintBuilder {
         let mut builder = PrintBuilder::new(PrintType::Object);
         builder.push_props(false, &mut [
-          $((stringify!($field_name), self.$field_name.print()),)*
+          $((stringify!($field_name), self.$field_name.print(config)),)*
         ]);
         builder.shift_new_line(stringify!($struct_name));
         builder
@@ -572,10 +572,12 @@ macro_rules! new_node {
 
     #[cfg(feature = "printer")]
     impl Printable for $struct_name {
-      fn print(&self) -> PrintBuilder {
+
+      #[allow(unused_variables)]
+      fn print(&self, config: &PrintConfig) -> PrintBuilder {
         let mut builder = PrintBuilder::new(PrintType::Object);
         builder.push_props(false, &mut [
-          $((stringify!($field_name), self.$field_name.print()),)*
+          $((stringify!($field_name), self.$field_name.print(config)),)*
         ]);
         builder.shift_new_line(stringify!($struct_name));
         builder
