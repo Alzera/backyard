@@ -389,10 +389,10 @@ macro_rules! new_node {
 
     #[cfg(feature = "printer")]
     impl<$lt> Printable for $struct_name<$lt> {
-      fn print(&self, config: &PrintConfig) -> PrintBuilder {
+      fn build_print(&self, config: &PrintConfig) -> PrintBuilder {
         let mut builder = PrintBuilder::new(PrintType::Object);
         builder.push_props(!(config.with_leading_trailing || config.with_location), &mut [
-          $((stringify!($field_name), self.$field_name.print(config)),)*
+          $((stringify!($field_name), self.$field_name.build_print(config)),)*
         ]);
         builder.shift_new_line(stringify!($struct_name));
         builder
@@ -481,10 +481,10 @@ macro_rules! new_node {
 
     #[cfg(feature = "printer")]
     impl Printable for $struct_name {
-      fn print(&self, config: &PrintConfig) -> PrintBuilder {
+      fn build_print(&self, config: &PrintConfig) -> PrintBuilder {
         let mut builder = PrintBuilder::new(PrintType::Object);
         builder.push_props(!(config.with_leading_trailing || config.with_location), &mut [
-          $((stringify!($field_name), self.$field_name.print(config)),)*
+          $((stringify!($field_name), self.$field_name.build_print(config)),)*
         ]);
         builder.shift_new_line(stringify!($struct_name));
         builder
@@ -574,10 +574,10 @@ macro_rules! new_node {
     impl Printable for $struct_name {
 
       #[allow(unused_variables)]
-      fn print(&self, config: &PrintConfig) -> PrintBuilder {
+      fn build_print(&self, config: &PrintConfig) -> PrintBuilder {
         let mut builder = PrintBuilder::new(PrintType::Object);
         builder.push_props(!(config.with_leading_trailing || config.with_location), &mut [
-          $((stringify!($field_name), self.$field_name.print(config)),)*
+          $((stringify!($field_name), self.$field_name.build_print(config)),)*
         ]);
         builder.shift_new_line(stringify!($struct_name));
         builder

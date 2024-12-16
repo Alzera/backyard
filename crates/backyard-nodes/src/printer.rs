@@ -131,127 +131,134 @@ impl PrintConfig {
   }
 }
 
+impl<'arena> Node<'arena> {
+  pub fn print(&self, with_leading_trailing: bool, with_location: bool) -> PrintBuilder {
+    let config = PrintConfig::new(with_leading_trailing, with_location);
+    self.build_print(&config)
+  }
+}
+
 // ┴ ┬ ┤ - ┼ ├ └ │
-pub trait Printable {
-  fn print(&self, config: &PrintConfig) -> PrintBuilder;
+pub(crate) trait Printable {
+  fn build_print(&self, config: &PrintConfig) -> PrintBuilder;
 }
 
 impl<'arena> Printable for Node<'arena> {
-  fn print(&self, config: &PrintConfig) -> PrintBuilder {
+  fn build_print(&self, config: &PrintConfig) -> PrintBuilder {
     let mut builder = match &self.wrapper {
-      NodeWrapper::AnonymousClass(v) => v.print(config),
-      NodeWrapper::AnonymousFunction(v) => v.print(config),
-      NodeWrapper::CallArgument(v) => v.print(config),
-      NodeWrapper::Array(v) => v.print(config),
-      NodeWrapper::ArrayItem(v) => v.print(config),
-      NodeWrapper::ArrayLookup(v) => v.print(config),
-      NodeWrapper::ArrowFunction(v) => v.print(config),
-      NodeWrapper::Assignment(v) => v.print(config),
-      NodeWrapper::Attribute(v) => v.print(config),
-      NodeWrapper::AttributeItem(v) => v.print(config),
-      NodeWrapper::Bin(v) => v.print(config),
-      NodeWrapper::Block(v) => v.print(config),
-      NodeWrapper::Boolean(v) => v.print(config),
-      NodeWrapper::Break(v) => v.print(config),
-      NodeWrapper::Call(v) => v.print(config),
-      NodeWrapper::Case(v) => v.print(config),
-      NodeWrapper::Cast(v) => v.print(config),
-      NodeWrapper::Catch(v) => v.print(config),
-      NodeWrapper::Class(v) => v.print(config),
-      NodeWrapper::ClassKeyword(v) => v.print(config),
-      NodeWrapper::Clone(v) => v.print(config),
-      NodeWrapper::CommentBlock(v) => v.print(config),
-      NodeWrapper::CommentDoc(v) => v.print(config),
-      NodeWrapper::CommentLine(v) => v.print(config),
-      NodeWrapper::Const(v) => v.print(config),
-      NodeWrapper::ConstProperty(v) => v.print(config),
-      NodeWrapper::ConstructorParameter(v) => v.print(config),
-      NodeWrapper::Continue(v) => v.print(config),
-      NodeWrapper::Declare(v) => v.print(config),
-      NodeWrapper::DeclareArgument(v) => v.print(config),
-      NodeWrapper::DoWhile(v) => v.print(config),
-      NodeWrapper::DoWhileCondition(v) => v.print(config),
-      NodeWrapper::Echo(v) => v.print(config),
-      NodeWrapper::Else(v) => v.print(config),
-      NodeWrapper::Encapsed(v) => v.print(config),
-      NodeWrapper::EncapsedPart(v) => v.print(config),
-      NodeWrapper::Enum(v) => v.print(config),
-      NodeWrapper::EnumItem(v) => v.print(config),
-      NodeWrapper::Eval(v) => v.print(config),
-      NodeWrapper::Exit(v) => v.print(config),
-      NodeWrapper::Finally(v) => v.print(config),
-      NodeWrapper::For(v) => v.print(config),
-      NodeWrapper::Foreach(v) => v.print(config),
-      NodeWrapper::Function(v) => v.print(config),
-      NodeWrapper::Global(v) => v.print(config),
-      NodeWrapper::Goto(v) => v.print(config),
-      NodeWrapper::HereDoc(v) => v.print(config),
-      NodeWrapper::Identifier(v) => v.print(config),
-      NodeWrapper::If(v) => v.print(config),
-      NodeWrapper::Include(v) => v.print(config),
-      NodeWrapper::Inline(v) => v.print(config),
-      NodeWrapper::Interface(v) => v.print(config),
-      NodeWrapper::IntersectionType(v) => v.print(config),
-      NodeWrapper::Label(v) => v.print(config),
-      NodeWrapper::List(v) => v.print(config),
-      NodeWrapper::Magic(v) => v.print(config),
-      NodeWrapper::MagicMethod(v) => v.print(config),
-      NodeWrapper::Match(v) => v.print(config),
-      NodeWrapper::MatchArm(v) => v.print(config),
-      NodeWrapper::Method(v) => v.print(config),
-      NodeWrapper::Namespace(v) => v.print(config),
-      NodeWrapper::Negate(v) => v.print(config),
-      NodeWrapper::New(v) => v.print(config),
-      NodeWrapper::NowDoc(v) => v.print(config),
-      NodeWrapper::Null(v) => v.print(config),
-      NodeWrapper::Number(v) => v.print(config),
-      NodeWrapper::ObjectAccess(v) => v.print(config),
-      NodeWrapper::Parameter(v) => v.print(config),
-      NodeWrapper::Parent(v) => v.print(config),
-      NodeWrapper::Parenthesis(v) => v.print(config),
-      NodeWrapper::Post(v) => v.print(config),
-      NodeWrapper::Pre(v) => v.print(config),
-      NodeWrapper::Print(v) => v.print(config),
-      NodeWrapper::Program(v) => v.print(config),
-      NodeWrapper::Property(v) => v.print(config),
-      NodeWrapper::PropertyHook(v) => v.print(config),
-      NodeWrapper::PropertyItem(v) => v.print(config),
-      NodeWrapper::Reference(v) => v.print(config),
-      NodeWrapper::Return(v) => v.print(config),
-      NodeWrapper::SelfKeyword(v) => v.print(config),
-      NodeWrapper::Silent(v) => v.print(config),
-      NodeWrapper::Static(v) => v.print(config),
-      NodeWrapper::StaticKeyword(v) => v.print(config),
-      NodeWrapper::StaticLookup(v) => v.print(config),
-      NodeWrapper::String(v) => v.print(config),
-      NodeWrapper::Switch(v) => v.print(config),
-      NodeWrapper::Ternary(v) => v.print(config),
-      NodeWrapper::This(v) => v.print(config),
-      NodeWrapper::Trait(v) => v.print(config),
-      NodeWrapper::TraitUse(v) => v.print(config),
-      NodeWrapper::TraitUseAlias(v) => v.print(config),
-      NodeWrapper::TraitUsePrecedence(v) => v.print(config),
-      NodeWrapper::Throw(v) => v.print(config),
-      NodeWrapper::Try(v) => v.print(config),
-      NodeWrapper::Type(v) => v.print(config),
-      NodeWrapper::UnionType(v) => v.print(config),
-      NodeWrapper::Use(v) => v.print(config),
-      NodeWrapper::UseItem(v) => v.print(config),
-      NodeWrapper::Variable(v) => v.print(config),
-      NodeWrapper::Variadic(v) => v.print(config),
-      NodeWrapper::While(v) => v.print(config),
-      NodeWrapper::Yield(v) => v.print(config),
-      NodeWrapper::YieldFrom(v) => v.print(config),
+      NodeWrapper::AnonymousClass(v) => v.build_print(config),
+      NodeWrapper::AnonymousFunction(v) => v.build_print(config),
+      NodeWrapper::CallArgument(v) => v.build_print(config),
+      NodeWrapper::Array(v) => v.build_print(config),
+      NodeWrapper::ArrayItem(v) => v.build_print(config),
+      NodeWrapper::ArrayLookup(v) => v.build_print(config),
+      NodeWrapper::ArrowFunction(v) => v.build_print(config),
+      NodeWrapper::Assignment(v) => v.build_print(config),
+      NodeWrapper::Attribute(v) => v.build_print(config),
+      NodeWrapper::AttributeItem(v) => v.build_print(config),
+      NodeWrapper::Bin(v) => v.build_print(config),
+      NodeWrapper::Block(v) => v.build_print(config),
+      NodeWrapper::Boolean(v) => v.build_print(config),
+      NodeWrapper::Break(v) => v.build_print(config),
+      NodeWrapper::Call(v) => v.build_print(config),
+      NodeWrapper::Case(v) => v.build_print(config),
+      NodeWrapper::Cast(v) => v.build_print(config),
+      NodeWrapper::Catch(v) => v.build_print(config),
+      NodeWrapper::Class(v) => v.build_print(config),
+      NodeWrapper::ClassKeyword(v) => v.build_print(config),
+      NodeWrapper::Clone(v) => v.build_print(config),
+      NodeWrapper::CommentBlock(v) => v.build_print(config),
+      NodeWrapper::CommentDoc(v) => v.build_print(config),
+      NodeWrapper::CommentLine(v) => v.build_print(config),
+      NodeWrapper::Const(v) => v.build_print(config),
+      NodeWrapper::ConstProperty(v) => v.build_print(config),
+      NodeWrapper::ConstructorParameter(v) => v.build_print(config),
+      NodeWrapper::Continue(v) => v.build_print(config),
+      NodeWrapper::Declare(v) => v.build_print(config),
+      NodeWrapper::DeclareArgument(v) => v.build_print(config),
+      NodeWrapper::DoWhile(v) => v.build_print(config),
+      NodeWrapper::DoWhileCondition(v) => v.build_print(config),
+      NodeWrapper::Echo(v) => v.build_print(config),
+      NodeWrapper::Else(v) => v.build_print(config),
+      NodeWrapper::Encapsed(v) => v.build_print(config),
+      NodeWrapper::EncapsedPart(v) => v.build_print(config),
+      NodeWrapper::Enum(v) => v.build_print(config),
+      NodeWrapper::EnumItem(v) => v.build_print(config),
+      NodeWrapper::Eval(v) => v.build_print(config),
+      NodeWrapper::Exit(v) => v.build_print(config),
+      NodeWrapper::Finally(v) => v.build_print(config),
+      NodeWrapper::For(v) => v.build_print(config),
+      NodeWrapper::Foreach(v) => v.build_print(config),
+      NodeWrapper::Function(v) => v.build_print(config),
+      NodeWrapper::Global(v) => v.build_print(config),
+      NodeWrapper::Goto(v) => v.build_print(config),
+      NodeWrapper::HereDoc(v) => v.build_print(config),
+      NodeWrapper::Identifier(v) => v.build_print(config),
+      NodeWrapper::If(v) => v.build_print(config),
+      NodeWrapper::Include(v) => v.build_print(config),
+      NodeWrapper::Inline(v) => v.build_print(config),
+      NodeWrapper::Interface(v) => v.build_print(config),
+      NodeWrapper::IntersectionType(v) => v.build_print(config),
+      NodeWrapper::Label(v) => v.build_print(config),
+      NodeWrapper::List(v) => v.build_print(config),
+      NodeWrapper::Magic(v) => v.build_print(config),
+      NodeWrapper::MagicMethod(v) => v.build_print(config),
+      NodeWrapper::Match(v) => v.build_print(config),
+      NodeWrapper::MatchArm(v) => v.build_print(config),
+      NodeWrapper::Method(v) => v.build_print(config),
+      NodeWrapper::Namespace(v) => v.build_print(config),
+      NodeWrapper::Negate(v) => v.build_print(config),
+      NodeWrapper::New(v) => v.build_print(config),
+      NodeWrapper::NowDoc(v) => v.build_print(config),
+      NodeWrapper::Null(v) => v.build_print(config),
+      NodeWrapper::Number(v) => v.build_print(config),
+      NodeWrapper::ObjectAccess(v) => v.build_print(config),
+      NodeWrapper::Parameter(v) => v.build_print(config),
+      NodeWrapper::Parent(v) => v.build_print(config),
+      NodeWrapper::Parenthesis(v) => v.build_print(config),
+      NodeWrapper::Post(v) => v.build_print(config),
+      NodeWrapper::Pre(v) => v.build_print(config),
+      NodeWrapper::Print(v) => v.build_print(config),
+      NodeWrapper::Program(v) => v.build_print(config),
+      NodeWrapper::Property(v) => v.build_print(config),
+      NodeWrapper::PropertyHook(v) => v.build_print(config),
+      NodeWrapper::PropertyItem(v) => v.build_print(config),
+      NodeWrapper::Reference(v) => v.build_print(config),
+      NodeWrapper::Return(v) => v.build_print(config),
+      NodeWrapper::SelfKeyword(v) => v.build_print(config),
+      NodeWrapper::Silent(v) => v.build_print(config),
+      NodeWrapper::Static(v) => v.build_print(config),
+      NodeWrapper::StaticKeyword(v) => v.build_print(config),
+      NodeWrapper::StaticLookup(v) => v.build_print(config),
+      NodeWrapper::String(v) => v.build_print(config),
+      NodeWrapper::Switch(v) => v.build_print(config),
+      NodeWrapper::Ternary(v) => v.build_print(config),
+      NodeWrapper::This(v) => v.build_print(config),
+      NodeWrapper::Trait(v) => v.build_print(config),
+      NodeWrapper::TraitUse(v) => v.build_print(config),
+      NodeWrapper::TraitUseAlias(v) => v.build_print(config),
+      NodeWrapper::TraitUsePrecedence(v) => v.build_print(config),
+      NodeWrapper::Throw(v) => v.build_print(config),
+      NodeWrapper::Try(v) => v.build_print(config),
+      NodeWrapper::Type(v) => v.build_print(config),
+      NodeWrapper::UnionType(v) => v.build_print(config),
+      NodeWrapper::Use(v) => v.build_print(config),
+      NodeWrapper::UseItem(v) => v.build_print(config),
+      NodeWrapper::Variable(v) => v.build_print(config),
+      NodeWrapper::Variadic(v) => v.build_print(config),
+      NodeWrapper::While(v) => v.build_print(config),
+      NodeWrapper::Yield(v) => v.build_print(config),
+      NodeWrapper::YieldFrom(v) => v.build_print(config),
     };
     if config.with_leading_trailing || config.with_location {
       let mut node_builder = PrintBuilder::new(PrintType::Object);
       let mut props = vec![];
       if config.with_leading_trailing {
-        props.push(("leadings", self.leadings.print(config)));
-        props.push(("trailings", self.trailings.print(config)));
+        props.push(("leadings", self.leadings.build_print(config)));
+        props.push(("trailings", self.trailings.build_print(config)));
       }
       if config.with_location {
-        props.push(("location", self.loc.print(config)));
+        props.push(("location", self.loc.build_print(config)));
       }
       node_builder.push_props(true, props.as_mut_slice());
       builder.extend(node_builder);
@@ -261,7 +268,7 @@ impl<'arena> Printable for Node<'arena> {
 }
 
 impl Printable for RangeLocation {
-  fn print(&self, _: &PrintConfig) -> PrintBuilder {
+  fn build_print(&self, _: &PrintConfig) -> PrintBuilder {
     let mut builder = PrintBuilder::new(PrintType::Object);
     builder.shift_new_line(
       format!(
@@ -284,7 +291,7 @@ impl Printable for RangeLocation {
 }
 
 impl<'arena> Printable for bumpalo::collections::Vec<'arena, Node<'arena>> {
-  fn print(&self, config: &PrintConfig) -> PrintBuilder {
+  fn build_print(&self, config: &PrintConfig) -> PrintBuilder {
     let len = self.len();
     if len == 0 {
       return PrintBuilder::new(PrintType::Vec);
@@ -292,7 +299,7 @@ impl<'arena> Printable for bumpalo::collections::Vec<'arena, Node<'arena>> {
     let mut builder = PrintBuilder::new(PrintType::Vec);
     let last_index = len.saturating_sub(1);
     for (i, node) in self.iter().enumerate() {
-      let mut scoped_builder = node.print(config);
+      let mut scoped_builder = node.build_print(config);
       if i == last_index {
         scoped_builder.indent(true, false);
       } else {
@@ -305,9 +312,9 @@ impl<'arena> Printable for bumpalo::collections::Vec<'arena, Node<'arena>> {
 }
 
 impl<T> Printable for Option<T> where T: Printable {
-  fn print(&self, config: &PrintConfig) -> PrintBuilder {
+  fn build_print(&self, config: &PrintConfig) -> PrintBuilder {
     match self {
-      Some(x) => x.print(config),
+      Some(x) => x.build_print(config),
       None => {
         let mut builder = PrintBuilder::new(PrintType::Inline);
         builder.shift_new_line("-");
@@ -318,16 +325,16 @@ impl<T> Printable for Option<T> where T: Printable {
 }
 
 impl<'arena> Printable for bumpalo::boxed::Box<'arena, Node<'arena>> {
-  fn print(&self, config: &PrintConfig) -> PrintBuilder {
-    self.as_ref().print(config)
+  fn build_print(&self, config: &PrintConfig) -> PrintBuilder {
+    self.as_ref().build_print(config)
   }
 }
 
 impl<T> Printable for Vec<T> where T: Printable {
-  fn print(&self, config: &PrintConfig) -> PrintBuilder {
+  fn build_print(&self, config: &PrintConfig) -> PrintBuilder {
     let mut childs = Vec::new();
     for x in self {
-      if let Some(last) = x.print(config).lines.last_mut() {
+      if let Some(last) = x.build_print(config).lines.last_mut() {
         childs.push(last.to_owned());
       }
     }
@@ -341,7 +348,7 @@ macro_rules! impl_build_printableable {
   ($($t:ty),*) => {
       $(
           impl Printable for $t {
-            fn print(&self, _: &PrintConfig) -> PrintBuilder {
+            fn build_print(&self, _: &PrintConfig) -> PrintBuilder {
               let mut builder = PrintBuilder::new(PrintType::Inline);
               builder.shift_new_line(format!("{:?}", self).as_str());
               builder
@@ -355,7 +362,7 @@ macro_rules! impl_build_printableable_enum {
   ($($t:ty),*) => {
       $(
           impl Printable for $t {
-            fn print(&self, _: &PrintConfig) -> PrintBuilder {
+            fn build_print(&self, _: &PrintConfig) -> PrintBuilder {
               let mut builder = PrintBuilder::new(PrintType::Inline);
               builder.shift_new_line(format!("{}::{:?}", stringify!($t), self).as_str());
               builder
@@ -413,6 +420,6 @@ mod tests {
       })
     );
     node.leadings = Some(bumpalo::vec![in &arena; comment]);
-    println!("{:?}", node.print(&PrintConfig::new(false, true)));
+    println!("{:?}", node.build_print(&PrintConfig::new(false, true)));
   }
 }
