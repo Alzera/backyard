@@ -1,5 +1,0 @@
-{
-  "scripts": {
-    "build": "wasm-pack build --target nodejs --release && wasm-opt -Oz -o ./pkg/backyard_bg.wasm ./pkg/backyard_bg.wasm"
-  }
-}

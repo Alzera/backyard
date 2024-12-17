@@ -40,7 +40,3 @@ fn main() {
     }
   }
 }
-
-// // globalize argument and parameter
-
-// unwrap, clone, to_string, Arc?
