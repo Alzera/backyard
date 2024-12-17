@@ -92,7 +92,7 @@ impl<'a> Node<'a> {
 pub enum NodeWrapper<'a> {
   AnonymousClass(AnonymousClassNode<'a>),
   AnonymousFunction(AnonymousFunctionNode<'a>),
-  CallArgument(CallArgumentNode<'a>),
+  Argument(ArgumentNode<'a>),
   Array(ArrayNode<'a>),
   ArrayItem(ArrayItemNode<'a>),
   ArrayLookup(ArrayLookupNode<'a>),
@@ -200,7 +200,7 @@ pub enum NodeWrapper<'a> {
 pub enum NodeType {
   AnonymousClass,
   AnonymousFunction,
-  CallArgument,
+  Argument,
   Array,
   ArrayItem,
   ArrayLookup,
@@ -597,7 +597,7 @@ macro_rules! new_node {
 
 new_node!(AnonymousClass, AnonymousClassNode<'a> { parameters: bumpalo::collections::Vec<'a, Node<'a>>, extends: Option<bumpalo::boxed::Box<'a, Node<'a>>>, implements: bumpalo::collections::Vec<'a, Node<'a>>, body: bumpalo::boxed::Box<'a, Node<'a>>, }, AnonymousClassBlueprint<'b> { parameters: &'b [Box<Blueprint<'b>>], extends: Option<Box<Blueprint<'b>>>, implements: &'b [Box<Blueprint<'b>>], body: Box<Blueprint<'b>>, });
 new_node!(AnonymousFunction, AnonymousFunctionNode<'a> { is_ref: bool, parameters: bumpalo::collections::Vec<'a, Node<'a>>, uses: bumpalo::collections::Vec<'a, Node<'a>>, return_type: Option<bumpalo::boxed::Box<'a, Node<'a>>>, body: bumpalo::boxed::Box<'a, Node<'a>>, }, AnonymousFunctionBlueprint<'b> { is_ref: bool, parameters: &'b [Box<Blueprint<'b>>], uses: &'b [Box<Blueprint<'b>>], return_type: Option<Box<Blueprint<'b>>>, body: Box<Blueprint<'b>>, });
-new_node!(CallArgument, CallArgumentNode<'a> { name: Option<bumpalo::boxed::Box<'a, Node<'a>>>, value: bumpalo::boxed::Box<'a, Node<'a>>, }, CallArgumentBlueprint<'b> { name: Option<Box<Blueprint<'b>>>, value: Box<Blueprint<'b>>, });
+new_node!(Argument, ArgumentNode<'a> { name: Option<bumpalo::boxed::Box<'a, Node<'a>>>, value: bumpalo::boxed::Box<'a, Node<'a>>, }, ArgumentBlueprint<'b> { name: Option<Box<Blueprint<'b>>>, value: Box<Blueprint<'b>>, });
 new_node!(Array, ArrayNode<'a> { is_short: bool, items: bumpalo::collections::Vec<'a, Node<'a>>, }, ArrayBlueprint<'b> { is_short: bool, items: &'b [Box<Blueprint<'b>>], });
 new_node!(ArrayItem, ArrayItemNode<'a> { key: Option<bumpalo::boxed::Box<'a, Node<'a>>>, value: bumpalo::boxed::Box<'a, Node<'a>>, }, ArrayItemBlueprint<'b> { key: Option<Box<Blueprint<'b>>>, value: Box<Blueprint<'b>>, });
 new_node!(ArrayLookup, ArrayLookupNode<'a> { left: bumpalo::boxed::Box<'a, Node<'a>>, right: Option<bumpalo::boxed::Box<'a, Node<'a>>>, }, ArrayLookupBlueprint<'b> { left: Box<Blueprint<'b>>, right: Option<Box<Blueprint<'b>>>, });

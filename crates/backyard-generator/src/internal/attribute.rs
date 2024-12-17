@@ -33,7 +33,7 @@ impl AttributeGenerator {
       let arguments = generator.generate_nodes_new(
         &node.arguments,
         &mut GeneratorArgument::for_parameter(
-          &[(NodeType::CallArgument, CallGenerator::generate_argument)]
+          &[(NodeType::Argument, CallGenerator::generate_argument)]
         )
       );
       builder.push(&arguments.print(" "));

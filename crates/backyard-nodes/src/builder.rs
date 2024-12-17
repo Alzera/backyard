@@ -24,9 +24,9 @@ use crate::{
 pub struct Builder {}
 
 impl Default for Builder {
-    fn default() -> Self {
-        Self::new()
-    }
+  fn default() -> Self {
+    Self::new()
+  }
 }
 
 impl Builder {
@@ -88,7 +88,7 @@ impl<'arena, 'a> BlueprintBuildable<'arena> for Blueprint<'a> {
     let mut node = match &self.wrapper {
       BlueprintWrapper::AnonymousClass(bp) => bp.build(arena),
       BlueprintWrapper::AnonymousFunction(bp) => bp.build(arena),
-      BlueprintWrapper::CallArgument(bp) => bp.build(arena),
+      BlueprintWrapper::Argument(bp) => bp.build(arena),
       BlueprintWrapper::Array(bp) => bp.build(arena),
       BlueprintWrapper::ArrayItem(bp) => bp.build(arena),
       BlueprintWrapper::ArrayLookup(bp) => bp.build(arena),
@@ -204,7 +204,7 @@ impl<'arena, 'a> BlueprintBuildable<'arena> for Blueprint<'a> {
 pub enum BlueprintWrapper<'a> {
   AnonymousClass(crate::AnonymousClassBlueprint<'a>),
   AnonymousFunction(crate::AnonymousFunctionBlueprint<'a>),
-  CallArgument(crate::CallArgumentBlueprint<'a>),
+  Argument(crate::ArgumentBlueprint<'a>),
   Array(crate::ArrayBlueprint<'a>),
   ArrayItem(crate::ArrayItemBlueprint<'a>),
   ArrayLookup(crate::ArrayLookupBlueprint<'a>),

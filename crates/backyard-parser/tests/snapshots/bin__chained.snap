@@ -52,7 +52,7 @@ children:
         leadings: ~
         trailings: ~
       arguments:
-        - node_type: call_argument
+        - node_type: argument
           name: ~
           value:
             node_type: variable
@@ -153,7 +153,7 @@ children:
           leadings: ~
           trailings: ~
         arguments:
-          - node_type: call_argument
+          - node_type: argument
             name: ~
             value:
               node_type: variable
@@ -254,7 +254,7 @@ children:
             leadings: ~
             trailings: ~
           arguments:
-            - node_type: call_argument
+            - node_type: argument
               name: ~
               value:
                 node_type: variable
@@ -355,7 +355,7 @@ children:
               leadings: ~
               trailings: ~
             arguments:
-              - node_type: call_argument
+              - node_type: argument
                 name: ~
                 value:
                   node_type: variable
@@ -454,7 +454,7 @@ children:
               leadings: ~
               trailings: ~
             arguments:
-              - node_type: call_argument
+              - node_type: argument
                 name: ~
                 value:
                   node_type: variable

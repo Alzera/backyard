@@ -20,7 +20,7 @@ children:
       leadings: ~
       trailings: ~
     arguments:
-      - node_type: call_argument
+      - node_type: argument
         name:
           node_type: identifier
           name:
@@ -62,7 +62,7 @@ children:
             offset: 9
         leadings: ~
         trailings: ~
-      - node_type: call_argument
+      - node_type: argument
         name:
           node_type: identifier
           name:

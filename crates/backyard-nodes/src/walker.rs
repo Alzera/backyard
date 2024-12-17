@@ -113,7 +113,7 @@ impl<'arena, 'a> Iterator for Walker<'arena, 'a> {
       match &item.node.wrapper {
         NodeWrapper::AnonymousClass(v) => v.populate_walks(&mut self.stack, item.level),
         NodeWrapper::AnonymousFunction(v) => v.populate_walks(&mut self.stack, item.level),
-        NodeWrapper::CallArgument(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::Argument(v) => v.populate_walks(&mut self.stack, item.level),
         NodeWrapper::Array(v) => v.populate_walks(&mut self.stack, item.level),
         NodeWrapper::ArrayItem(v) => v.populate_walks(&mut self.stack, item.level),
         NodeWrapper::ArrayLookup(v) => v.populate_walks(&mut self.stack, item.level),

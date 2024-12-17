@@ -90,7 +90,11 @@ impl PrintBuilder {
   pub fn indent(&mut self, is_vec: bool, is_middle: bool) {
     let first_char = if is_vec {
       if is_middle { "╟-" } else { "╙-" }
-    } else if is_middle { "├-" } else { "└-" };
+    } else if is_middle {
+      "├-"
+    } else {
+      "└-"
+    };
     let middle_char = if is_middle {
       if is_vec { "║ " } else { "│ " }
     } else {
@@ -146,7 +150,7 @@ impl<'arena> Printable for Node<'arena> {
     let mut builder = match &self.wrapper {
       NodeWrapper::AnonymousClass(v) => v.build_print(config),
       NodeWrapper::AnonymousFunction(v) => v.build_print(config),
-      NodeWrapper::CallArgument(v) => v.build_print(config),
+      NodeWrapper::Argument(v) => v.build_print(config),
       NodeWrapper::Array(v) => v.build_print(config),
       NodeWrapper::ArrayItem(v) => v.build_print(config),
       NodeWrapper::ArrayLookup(v) => v.build_print(config),

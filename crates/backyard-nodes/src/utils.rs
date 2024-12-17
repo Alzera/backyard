@@ -71,7 +71,7 @@ impl<'arena> CloneIn<'arena> for NodeWrapper<'_> {
     match self {
       NodeWrapper::AnonymousClass(v) => NodeWrapper::AnonymousClass(v.clone_in(arena)),
       NodeWrapper::AnonymousFunction(v) => NodeWrapper::AnonymousFunction(v.clone_in(arena)),
-      NodeWrapper::CallArgument(v) => NodeWrapper::CallArgument(v.clone_in(arena)),
+      NodeWrapper::Argument(v) => NodeWrapper::Argument(v.clone_in(arena)),
       NodeWrapper::Array(v) => NodeWrapper::Array(v.clone_in(arena)),
       NodeWrapper::ArrayItem(v) => NodeWrapper::ArrayItem(v.clone_in(arena)),
       NodeWrapper::ArrayLookup(v) => NodeWrapper::ArrayLookup(v.clone_in(arena)),

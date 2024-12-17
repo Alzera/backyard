@@ -1,7 +1,7 @@
 use bumpalo::collections::Vec;
 use backyard_lexer::token::TokenType;
 use backyard_nodes::{
-  CallArgumentNode,
+  ArgumentNode,
   CallNode,
   Location,
   Node,
@@ -126,7 +126,7 @@ impl ArgumentParser {
         )?
         .ok_internal()?;
       return Ok(
-        CallArgumentNode::loc(
+        ArgumentNode::loc(
           name.into_boxed(parser.arena),
           value.into_boxed(parser.arena),
           parser.gen_loc(start_loc)

@@ -90,7 +90,7 @@ children:
               - 116
               - 114
             arguments:
-              - node_type: call_argument
+              - node_type: argument
                 name: ~
                 value:
                   node_type: number
@@ -139,7 +139,7 @@ children:
               - 116
               - 114
             arguments:
-              - node_type: call_argument
+              - node_type: argument
                 name: ~
                 value:
                   node_type: number
