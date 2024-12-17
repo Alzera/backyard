@@ -1,7 +1,5 @@
 {
   "name": "@alzera/backyard",
-  "version": "0.1.9",
-  "main": "dist/index.js",
   "scripts": {
     "test": "cargo test --all-features",
     "test:update-snap": "INSTA_UPDATE=always cargo test --all-features",
@@ -13,8 +11,5 @@
     "publish:rust": "cargo publish -p backyard-lexer && cargo publish -p backyard-nodes && cargo publish -p backyard-parser && cargo publish -p backyard-generator",
     "clippy": "cargo clippy",
     "clippy:fix": "cargo clippy --fix --allow-dirty"
-  },
-  "devDependencies": {
-    "fs-extra": "^11.2.0"
   }
 }

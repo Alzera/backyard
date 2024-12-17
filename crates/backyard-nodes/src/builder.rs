@@ -23,6 +23,12 @@ use crate::{
 
 pub struct Builder {}
 
+impl Default for Builder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Builder {
   pub fn new() -> Self {
     Self {}
@@ -313,7 +319,7 @@ impl<'arena, T> BlueprintBuildable<'arena> for Option<T> where T: BlueprintBuild
   type Result = Option<T::Result>;
 
   fn build(&self, arena: &'arena Bump) -> Self::Result {
-    if let Some(i) = self { Some(i.build(arena)) } else { None }
+    self.as_ref().map(|i| i.build(arena))
   }
 }
 

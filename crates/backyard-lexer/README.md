@@ -15,30 +15,30 @@ Generating tokens representation of PHP code.
         var_dump($foo);
       }"#;
 
-      let parsed = backyard_lexer::lex(&arena, code);
-      println!("{:?}", parsed);
+      let tokens = backyard_lexer::lex(&arena, code);
+      println!("{:?}", tokens);
     }
 
 Resulting this:
 
     Ok([
-      Token { token_type: Function, value: "function", line: 2, column: 4, offset: 10 },
-      Token { token_type: Identifier, value: "hello_world", line: 2, column: 13, offset: 19 },
-      Token { token_type: LeftParenthesis, value: "(", line: 2, column: 24, offset: 30 },
-      Token { token_type: Variable, value: "foo", line: 2, column: 25, offset: 31 },
-      Token { token_type: RightParenthesis, value: ")", line: 2, column: 29, offset: 35 },
-      Token { token_type: LeftCurlyBracket, value: "{", line: 2, column: 31, offset: 37 },
-      Token { token_type: Identifier, value: "var_dump", line: 3, column: 6, offset: 45 },
-      Token { token_type: LeftParenthesis, value: "(", line: 3, column: 14, offset: 53 },
-      Token { token_type: Variable, value: "foo", line: 3, column: 15, offset: 54 },
-      Token { token_type: RightParenthesis, value: ")", line: 3, column: 19, offset: 58 },
-      Token { token_type: Semicolon, value: ";", line: 3, column: 20, offset: 59 },
-      Token { token_type: RightCurlyBracket, value: "}", line: 4, column: 4, offset: 65 }
+      Token { token_type: Function, value: "function", line: 2, column: 2, offset: 8 },
+      Token { token_type: UnqualifiedName, value: "hello_world", line: 2, column: 11, offset: 17 },
+      Token { token_type: LeftParenthesis, value: "(", line: 2, column: 22, offset: 28 },
+      Token { token_type: Variable, value: "foo", line: 2, column: 23, offset: 29 },
+      Token { token_type: RightParenthesis, value: ")", line: 2, column: 27, offset: 33 },
+      Token { token_type: LeftCurlyBracket, value: "{", line: 2, column: 29, offset: 35 },
+      Token { token_type: UnqualifiedName, value: "var_dump", line: 3, column: 4, offset: 41 },
+      Token { token_type: LeftParenthesis, value: "(", line: 3, column: 12, offset: 49 },
+      Token { token_type: Variable, value: "foo", line: 3, column: 13, offset: 50 },
+      Token { token_type: RightParenthesis, value: ")", line: 3, column: 17, offset: 54 },
+      Token { token_type: Semicolon, value: ";", line: 3, column: 18, offset: 55 },
+      Token { token_type: RightCurlyBracket, value: "}", line: 4, column: 2, offset: 59 }
     ])
 
 ## ecosystem
 
-- [backyard-nodes (Node / AST, with builder and walker)](https://crates.io/crates/backyard-nodes)
+- [backyard-nodes (Node / AST, builder, walker and printer)](https://crates.io/crates/backyard-nodes)
 - [backyard-parser](https://crates.io/crates/backyard-parser)
 - [backyard-generator](https://crates.io/crates/backyard-generator)
 

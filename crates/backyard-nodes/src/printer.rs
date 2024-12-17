@@ -90,9 +90,7 @@ impl PrintBuilder {
   pub fn indent(&mut self, is_vec: bool, is_middle: bool) {
     let first_char = if is_vec {
       if is_middle { "╟-" } else { "╙-" }
-    } else {
-      if is_middle { "├-" } else { "└-" }
-    };
+    } else if is_middle { "├-" } else { "└-" };
     let middle_char = if is_middle {
       if is_vec { "║ " } else { "│ " }
     } else {
@@ -340,7 +338,7 @@ impl<T> Printable for Vec<T> where T: Printable {
     }
     let mut builder = PrintBuilder::new(PrintType::Inline);
     builder.shift_new_line(childs.join(" | ").as_str());
-    return builder;
+    builder
   }
 }
 

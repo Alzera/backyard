@@ -4,30 +4,31 @@ Convert AST node back to PHP code.
 
 ## features
 
-- Convert AST back to string _(generator())_
+- Convert AST back to string _(generate())_
 
 ## usage
 
-    fn main() {
-      let code = r#"<?php
-        function hello_world($foo) {
-          var_dump($foo);
-        }"#;
+    let arena = bumpalo::Bump::new();
+    let code = r#"<?php
+    // leading comment
+    function hello_world($foo) {
+      var_dump($foo);
+    }"#;
 
-      let parsed = backyard_parser::parse(code).unwrap();
-      let code = backyard_generator::generate(parsed);
-      println!("{:?}", code);
-    }
+    let parsed = backyard_parser::parse(&arena, code).unwrap();
+    let generated = backyard_generator::generate(&parsed).unwrap();
+    println!("{:?}", generated);
 
 Resulting this code:
 
+    // leading comment
     function hello_world($foo) {
       var_dump($foo);
     }
 
 ## ecosystem
 
-- [backyard-nodes (Node / AST, with builder and walker)](https://crates.io/crates/backyard-nodes)
+- [backyard-nodes (Node / AST, with builder, walker and printer)](https://crates.io/crates/backyard-nodes)
 - [backyard-lexer (Tokenizer)](https://crates.io/crates/backyard-lexer)
 - [backyard-parser](https://crates.io/crates/backyard-parser)
 

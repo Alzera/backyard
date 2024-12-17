@@ -5,79 +5,203 @@ Nodes representing PHP code AST, with simple builder and walker.
 ## features
 
 - Ast Nodes
-- _"builder"_ simplify building AST nodes
-- _"walker"_ simple walker through AST nodes
+- _"builder"_ simplify building AST nodes (behind the `builder` feature)
+- _"walker"_ walker through AST nodes, support explorer to ancestors and siblings (behind the `walker` feature)
+- _"printer"_ print AST nodes as treeline (behind the `printer` feature)
 
 ## usage
 
 ### builder
 
-This builder is behind the `builder` feature.
+    use backyard_nodes::{ builder::{ BlueprintBuildable, BoxBlueprint, Builder }, AssignmentType };
 
-    use backyard_nodes::builder::{ Builder, BlueprintBuildable };
     fn main() {
       let arena = bumpalo::Bump::new();
       let b = Builder::new();
       let node = b
-        .Program(&[b.Assignment(b.Variable(b.Identifier("a")), "=", b.Number("21"))])
+        .Program(
+          &[
+            b
+              .Assignment(b.Variable(b.Identifier("a")), AssignmentType::Default, b.Number("21"))
+              .add_leading(b.CommentLine("Test leading")),
+          ]
+        )
         .build(&arena);
-      println!("{node:?}");
+
+      println!("{:?}", node.print(true, false));
     }
 
 Resulting this:
 
-    Node {
-      node_type: Program,
-      wrapper: Program(ProgramNode {
-        children: [
-          Node {
-            node_type: Assignment,
-            wrapper: Assignment(AssignmentNode {
-              left: Node {
-                node_type: Variable,
-                wrapper: Variable(VariableNode {
-                  name: Node {
-                    node_type: Identifier,
-                    wrapper: Identifier(IdentifierNode { name: "a" }),
-                    loc: None, leadings: None, trailings: None
-                  }
-                }),
-                loc: None, leadings: None, trailings: None
-              },
-              operator: "=",
-              right: Node {
-                node_type: Number,
-                wrapper: Number(NumberNode { value: "21" }),
-                loc: None, leadings: None, trailings: None
-              }
-            }),
-            loc: None, leadings: None, trailings: None
-          }]
-        }),
-      loc: None, leadings: None, trailings: None
-    }
+    ProgramNode
+    ├-children[]
+    │ ╙-AssignmentNode
+    │   ├-left
+    │   │ └-VariableNode
+    │   │   ├-name
+    │   │   │ └-IdentifierNode
+    │   │   │   ├-name: "a"
+    │   │   │   ├-leadings: -
+    │   │   │   └-trailings: -
+    │   │   ├-leadings: -
+    │   │   └-trailings: -
+    │   ├-operator: AssignmentType::Default
+    │   ├-right
+    │   │ └-NumberNode
+    │   │   ├-value: "21"
+    │   │   ├-leadings: -
+    │   │   └-trailings: -
+    │   ├-leadings[]
+    │   │ ╙-CommentLineNode
+    │   │   ├-comment: "Test leading"
+    │   │   ├-leadings: -
+    │   │   └-trailings: -
+    │   └-trailings: -
+    ├-leadings: -
+    └-trailings: -
 
 ### walker
 
-This builder is behind the `walker` feature.
-
-    use backyard_nodes::{ builder::{ BlueprintBuildable, Builder }, walker::Walker, NodeType };
+    use backyard_nodes::{
+      builder::{ BlueprintBuildable, BoxBlueprint, Builder },
+      AssignmentType,
+      NodeType,
+    };
 
     fn main() {
       let arena = bumpalo::Bump::new();
       let b = Builder::new();
       let node = b
-        .Program(&[b.Assignment(b.Variable(b.Identifier("a")), "=", b.Number("21"))])
+        .Program(
+          &[
+            b
+              .Assignment(b.Variable(b.Identifier("a")), AssignmentType::Default, b.Number("21"))
+              .add_leading(b.CommentLine("Test leading")),
+          ]
+        )
         .build(&arena);
-      let mut walker = Walker::new(&*node).into_iter();
+      let mut walker = node.walk();
 
-      assert_eq!(NodeType::Program, walker.next().unwrap().node_type);
-      assert_eq!(NodeType::Assignment, walker.next().unwrap().node_type);
-      assert_eq!(NodeType::Variable, walker.next().unwrap().node_type);
-      assert_eq!(NodeType::Identifier, walker.next().unwrap().node_type);
-      assert_eq!(NodeType::Number, walker.next().unwrap().node_type);
+      assert_eq!(NodeType::Program, walker.next().unwrap().1.node_type);
+      assert_eq!(NodeType::Assignment, walker.next().unwrap().1.node_type);
+      assert_eq!(NodeType::Variable, walker.next().unwrap().1.node_type);
+      assert_eq!(NodeType::Identifier, walker.next().unwrap().1.node_type);
+      assert_eq!(NodeType::Number, walker.next().unwrap().1.node_type);
       assert!(walker.next().is_none());
     }
+
+### printer
+
+Printer has 2 parameters, first is to print leadings and trailings, second is to print location. We use parser for this example, more on [backyard-parser](https://crates.io/crates/backyard-parser).
+
+    fn main() {
+      let arena = bumpalo::Bump::new();
+      let code = r#"<?php
+      // leading comment
+      function hello_world($foo) {
+        var_dump($foo);
+      }"#;
+
+      let parsed = backyard_parser::parse(&arena, code).unwrap();
+      println!("{:?}", parsed.print(true, true));
+    }
+
+Resulting this:
+
+    ProgramNode
+    ├-children[]
+    │ ╙-FunctionNode
+    │   ├-is_ref: false
+    │   ├-name
+    │   │ └-IdentifierNode
+    │   │   ├-name: "hello_world"
+    │   │   ├-leadings: -
+    │   │   ├-trailings: -
+    │   │   └-location
+    │   │     └-start: line 3, column 11, offset 38
+    │   │       end: line 3, column 22, offset 49
+    │   ├-parameters[]
+    │   │ ╙-ParameterNode
+    │   │   ├-variable_type: -
+    │   │   ├-is_ref: false
+    │   │   ├-is_ellipsis: false
+    │   │   ├-name
+    │   │   │ └-IdentifierNode
+    │   │   │   ├-name: "foo"
+    │   │   │   ├-leadings: -
+    │   │   │   ├-trailings: -
+    │   │   │   └-location
+    │   │   │     └-start: line 3, column 23, offset 50
+    │   │   │       end: line 3, column 26, offset 53
+    │   │   ├-value: -
+    │   │   ├-leadings: -
+    │   │   ├-trailings: -
+    │   │   └-location
+    │   │     └-start: line 3, column 23, offset 50
+    │   │       end: line 3, column 23, offset 50
+    │   ├-return_type: -
+    │   ├-body
+    │   │ └-BlockNode
+    │   │   ├-statements[]
+    │   │   │ ╙-CallNode
+    │   │   │   ├-name
+    │   │   │   │ └-IdentifierNode
+    │   │   │   │   ├-name: "var_dump"
+    │   │   │   │   ├-leadings: -
+    │   │   │   │   ├-trailings: -
+    │   │   │   │   └-location
+    │   │   │   │     └-start: line 4, column 4, offset 62
+    │   │   │   │       end: line 4, column 12, offset 70
+    │   │   │   ├-arguments[]
+    │   │   │   │ ╙-CallArgumentNode
+    │   │   │   │   ├-name: -
+    │   │   │   │   ├-value
+    │   │   │   │   │ └-VariableNode
+    │   │   │   │   │   ├-name
+    │   │   │   │   │   │ └-IdentifierNode
+    │   │   │   │   │   │   ├-name: "foo"
+    │   │   │   │   │   │   ├-leadings: -
+    │   │   │   │   │   │   ├-trailings: -
+    │   │   │   │   │   │   └-location
+    │   │   │   │   │   │     └-start: line 4, column 13, offset 71
+    │   │   │   │   │   │       end: line 4, column 16, offset 74
+    │   │   │   │   │   ├-leadings: -
+    │   │   │   │   │   ├-trailings: -
+    │   │   │   │   │   └-location
+    │   │   │   │   │     └-start: line 4, column 13, offset 71
+    │   │   │   │   │       end: line 4, column 16, offset 74
+    │   │   │   │   ├-leadings: -
+    │   │   │   │   ├-trailings: -
+    │   │   │   │   └-location
+    │   │   │   │     └-start: line 4, column 13, offset 71
+    │   │   │   │       end: line 4, column 13, offset 71
+    │   │   │   ├-leadings: -
+    │   │   │   ├-trailings: -
+    │   │   │   └-location
+    │   │   │     └-start: line 4, column 12, offset 70
+    │   │   │       end: line 4, column 17, offset 75
+    │   │   ├-leadings: -
+    │   │   ├-trailings: -
+    │   │   └-location
+    │   │     └-start: line 3, column 29, offset 56
+    │   │       end: line 5, column 2, offset 80
+    │   ├-leadings[]
+    │   │ ╙-CommentLineNode
+    │   │   ├-comment: " leading comment"
+    │   │   ├-leadings: -
+    │   │   ├-trailings: -
+    │   │   └-location
+    │   │     └-start: line 2, column 2, offset 8
+    │   │       end: line 2, column 2, offset 8
+    │   ├-trailings: -
+    │   └-location
+    │     └-start: line 3, column 2, offset 29
+    │       end: line 5, column 2, offset 80
+    ├-leadings: -
+    ├-trailings: -
+    └-location
+      └-start: line 1, column 0, offset 0
+        end: line 5, column 2, offset 80
 
 ## ecosystem
 

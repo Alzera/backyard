@@ -106,8 +106,8 @@ impl Control {
         break;
       }
       last_snapshot = ControlSnapshot {
-        line: line,
-        column: column,
+        line,
+        column,
         offset: end_position,
       };
       end_position += 1;

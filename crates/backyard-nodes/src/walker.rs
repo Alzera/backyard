@@ -97,7 +97,7 @@ impl<'arena, 'a> Walker<'arena, 'a> {
 
 impl<'arena> Node<'arena> {
   pub fn walk(&self) -> Walker<'arena, '_> {
-    Walker::new(self).into_iter()
+    Walker::new(self)
   }
 }
 

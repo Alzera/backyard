@@ -4,15 +4,12 @@ PHP parser written in rust.
 
 ## features
 
-- Parse string to tokens _(lex() & lex_eval())_
-- Parse string to AST _(parse() & parse_eval())_
-- Convert AST back to string _(generator())_
-- Simplify building AST nodes _(Builder)_
-- Simple walker through AST nodes _(Walker)_
-
-## todo
-
-- [ ] Standarize Tokens and Nodes
+- Parse string to tokens _(lex() & lex_eval())_ (`backyard-lexer`)
+- Parse string to AST _(parse() & parse_eval())_ (`backyard-parser`)
+- Convert AST back to string _(generate())_ (`backyard-generator`)
+- Simplify building AST nodes (`backyard-nodes`, behind the `builder` feature)
+- Walker through AST nodes, support explorer to ancestors and siblings (`backyard-nodes`, behind the `walker` feature)
+- Print AST nodes as treeline (`backyard-nodes`, behind the `printer` feature)
 
 ## usage
 
