@@ -194,6 +194,7 @@ impl<'arena> Printable for Node<'arena> {
       NodeWrapper::Function(v) => v.build_print(config),
       NodeWrapper::Global(v) => v.build_print(config),
       NodeWrapper::Goto(v) => v.build_print(config),
+      NodeWrapper::HaltCompiler(v) => v.build_print(config),
       NodeWrapper::HereDoc(v) => v.build_print(config),
       NodeWrapper::Identifier(v) => v.build_print(config),
       NodeWrapper::If(v) => v.build_print(config),

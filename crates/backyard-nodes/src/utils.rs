@@ -115,6 +115,7 @@ impl<'arena> CloneIn<'arena> for NodeWrapper<'_> {
       NodeWrapper::Function(v) => NodeWrapper::Function(v.clone_in(arena)),
       NodeWrapper::Global(v) => NodeWrapper::Global(v.clone_in(arena)),
       NodeWrapper::Goto(v) => NodeWrapper::Goto(v.clone_in(arena)),
+      NodeWrapper::HaltCompiler(v) => NodeWrapper::HaltCompiler(v.clone_in(arena)),
       NodeWrapper::HereDoc(v) => NodeWrapper::HereDoc(v.clone_in(arena)),
       NodeWrapper::Identifier(v) => NodeWrapper::Identifier(v.clone_in(arena)),
       NodeWrapper::If(v) => NodeWrapper::If(v.clone_in(arena)),

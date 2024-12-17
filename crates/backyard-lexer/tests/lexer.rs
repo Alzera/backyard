@@ -195,3 +195,10 @@ fn unrecognized() {
   let tokens = lex_eval(&arena, "class � {\n}");
   assert_eq!(tokens, Err(LexError::Unrecognized { token: "�".to_string(), line: 1, column: 7 }));
 }
+
+#[test]
+fn test_halt() {
+  let arena = bumpalo::Bump::new();
+  let tokens = lex_eval(&arena, "$a = false;\n__halt_compiler();\nThis text is invalid").unwrap();
+  insta::assert_yaml_snapshot!(tokens);
+}

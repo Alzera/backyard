@@ -3,4 +3,4 @@ source: crates/backyard-generator/tests/functions.rs
 expression: generate(asts).unwrap()
 snapshot_kind: text
 ---
-"function &a(?int ...$b = 0, String &$c = [0.01, 0x12], bool $d): ?int {\n}"
+"function &a(?int ...$b = 0, string &$c = [0.01, 0x12], bool $d): ?int {\n}"

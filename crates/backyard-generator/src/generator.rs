@@ -8,7 +8,7 @@ pub type InternalGenerator = for<'arena, 'a> fn(
   &Node<'arena>
 );
 
-pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 79] = [
+pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 80] = [
   (NodeType::AnonymousClass, super::internal::class::ClassGenerator::generate_anonymous),
   (NodeType::AnonymousFunction, super::internal::function::FunctionGenerator::generate_anonymous),
   // (NodeType::Argument, super::internal::call::CallGenerator::generate_argument),
@@ -51,6 +51,7 @@ pub const DEFAULT_GENERATORS: [(NodeType, InternalGenerator); 79] = [
   (NodeType::Function, super::internal::function::FunctionGenerator::generate),
   (NodeType::Global, super::internal::globals::GlobalGenerator::generate),
   (NodeType::Goto, super::internal::singles::SinglesGenerator::generate),
+  (NodeType::HaltCompiler, super::internal::halt::HaltGenerator::generate),
   (NodeType::HereDoc, super::internal::string::StringGenerator::generate_heredoc),
   (NodeType::Identifier, super::internal::identifier::IdentifierGenerator::generate),
   (NodeType::If, super::internal::ifs::IfGenerator::generate),

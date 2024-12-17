@@ -16,6 +16,7 @@ use crate::{
 };
 
 use super::internal::{
+  halt::HaltParser,
   array::ArrayParser,
   arraylookup::ArrayLookupParser,
   assignment::AssignmentParser,
@@ -70,7 +71,8 @@ type InternalParserParse = for<'arena, 'a, 'b> fn(
   _: &mut LoopArgument<'arena, 'b>
 ) -> Result<Node<'arena>, ParserError>;
 type InternalParser = (InternalParserTest, InternalParserParse);
-pub static DEFAULT_PARSERS: [InternalParser; 46] = [
+pub static DEFAULT_PARSERS: [InternalParser; 47] = [
+  (HaltParser::test, HaltParser::parse),
   (CommentParser::test, CommentParser::parse),
   (ListParser::test, ListParser::parse),
   (ArrayLookupParser::test, ArrayLookupParser::parse),

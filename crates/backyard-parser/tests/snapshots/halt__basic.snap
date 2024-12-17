@@ -1,0 +1,86 @@
+---
+source: crates/backyard-parser/tests/halt.rs
+assertion_line: 7
+expression: asts
+snapshot_kind: text
+---
+node_type: program
+children:
+  - node_type: assignment
+    left:
+      node_type: variable
+      name:
+        node_type: identifier
+        name:
+          - 97
+        loc:
+          start:
+            line: 1
+            column: 0
+            offset: 0
+          end:
+            line: 1
+            column: 1
+            offset: 1
+        leadings: ~
+        trailings: ~
+      loc:
+        start:
+          line: 1
+          column: 0
+          offset: 0
+        end:
+          line: 1
+          column: 1
+          offset: 1
+      leadings: ~
+      trailings: ~
+    operator: Default
+    right:
+      node_type: boolean
+      is_true: false
+      loc:
+        start:
+          line: 1
+          column: 5
+          offset: 5
+        end:
+          line: 1
+          column: 5
+          offset: 5
+      leadings: ~
+      trailings: ~
+    loc:
+      start:
+        line: 1
+        column: 3
+        offset: 3
+      end:
+        line: 1
+        column: 5
+        offset: 5
+    leadings: ~
+    trailings: ~
+  - node_type: halt_compiler
+    loc:
+      start:
+        line: 2
+        column: 0
+        offset: 12
+      end:
+        line: 2
+        column: 0
+        offset: 12
+    leadings: ~
+    trailings: ~
+loc:
+  start:
+    line: 1
+    column: 0
+    offset: 0
+  end:
+    line: 2
+    column: 0
+    offset: 12
+leadings: ~
+trailings: ~

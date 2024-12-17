@@ -10,7 +10,7 @@ pub mod builder;
 #[cfg(feature = "printer")]
 pub mod printer;
 
-use std::{ collections::VecDeque, fmt::{ self, Display, Formatter } };
+use std::fmt::{ self, Display, Formatter };
 
 use bstr::BString;
 use bumpalo::Bump;
@@ -136,6 +136,7 @@ pub enum NodeWrapper<'a> {
   Function(FunctionNode<'a>),
   Global(GlobalNode<'a>),
   Goto(GotoNode<'a>),
+  HaltCompiler(HaltCompilerNode),
   HereDoc(HereDocNode<'a>),
   Identifier(IdentifierNode),
   If(IfNode<'a>),
@@ -244,6 +245,7 @@ pub enum NodeType {
   Function,
   Global,
   Goto,
+  HaltCompiler,
   HereDoc,
   Identifier,
   If,
@@ -343,9 +345,9 @@ macro_rules! new_node {
 
     #[cfg(feature = "walker")]
     impl<'arena> Walkable<'arena> for $struct_name<'arena> {
-      fn populate_walks<'a>(&'a self, stack: &mut VecDeque<WalkerItem<'arena, 'a>>, level: u16) {
+      fn populate_walks<'a>(&'a self, stack: &mut std::collections::VecDeque<WalkerItem<'arena, 'a>>, level: u16) {
         let next_level = level + 1;
-        let mut scoped_stack = VecDeque::new();
+        let mut scoped_stack = std::collections::VecDeque::new();
         $(self.$field_name.populate_walks(&mut scoped_stack, next_level);)*
         scoped_stack.into_iter().rev().for_each(|x| stack.push_back(x))
       }
@@ -438,9 +440,9 @@ macro_rules! new_node {
 
     #[cfg(feature = "walker")]
     impl<'arena> Walkable<'arena> for $struct_name {
-      fn populate_walks<'a>(&'a self, stack: &mut VecDeque<WalkerItem<'arena, 'a>>, level: u16) {
+      fn populate_walks<'a>(&'a self, stack: &mut std::collections::VecDeque<WalkerItem<'arena, 'a>>, level: u16) {
         let next_level = level + 1;
-        let mut scoped_stack = VecDeque::new();
+        let mut scoped_stack = std::collections::VecDeque::new();
         $(self.$field_name.populate_walks(&mut scoped_stack, next_level);)*
         scoped_stack.into_iter().rev().for_each(|x| stack.push_back(x))
       }
@@ -533,9 +535,9 @@ macro_rules! new_node {
     impl<'arena> Walkable<'arena> for $struct_name {
 
       #[allow(unused_variables, unused_mut)]
-      fn populate_walks<'a>(&'a self, stack: &mut VecDeque<WalkerItem<'arena, 'a>>, level: u16) {
+      fn populate_walks<'a>(&'a self, stack: &mut std::collections::VecDeque<WalkerItem<'arena, 'a>>, level: u16) {
         let next_level = level + 1;
-        let mut scoped_stack = VecDeque::new();
+        let mut scoped_stack = std::collections::VecDeque::new();
         $(self.$field_name.populate_walks(&mut scoped_stack, next_level);)*
         scoped_stack.into_iter().rev().for_each(|x| stack.push_back(x))
       }
@@ -641,6 +643,7 @@ new_node!(Foreach, ForeachNode<'a> { source: bumpalo::boxed::Box<'a, Node<'a>>, 
 new_node!(Function, FunctionNode<'a> { is_ref: bool, name: bumpalo::boxed::Box<'a, Node<'a>>, parameters: bumpalo::collections::Vec<'a, Node<'a>>, return_type: Option<bumpalo::boxed::Box<'a, Node<'a>>>, body: Option<bumpalo::boxed::Box<'a, Node<'a>>>, }, FunctionBlueprint<'b> { is_ref: bool, name: Box<Blueprint<'b>>, parameters: &'b [Box<Blueprint<'b>>], return_type: Option<Box<Blueprint<'b>>>, body: Option<Box<Blueprint<'b>>>, });
 new_node!(Global, GlobalNode<'a> { items: bumpalo::collections::Vec<'a, Node<'a>>, }, GlobalBlueprint<'b> { items: &'b [Box<Blueprint<'b>>], });
 new_node!(Goto, GotoNode<'a> { label: bumpalo::boxed::Box<'a, Node<'a>>, }, GotoBlueprint<'b> { label: Box<Blueprint<'b>>, });
+new_node!(HaltCompiler, HaltCompilerNode {}, HaltCompilerBlueprint {});
 new_node!(HereDoc, HereDocNode<'a> { label: BString, values: bumpalo::collections::Vec<'a, Node<'a>>, }, HereDocBlueprint<'b> { label: &'b str, values: &'b [Box<Blueprint<'b>>], });
 new_node!(Identifier, IdentifierNode { name: BString, }, IdentifierBlueprint<'b> { name: &'b str, });
 new_node!(If, IfNode<'a> { condition: bumpalo::boxed::Box<'a, Node<'a>>, valid: bumpalo::boxed::Box<'a, Node<'a>>, invalid: Option<bumpalo::boxed::Box<'a, Node<'a>>>, is_short: bool, }, IfBlueprint<'b> { condition: Box<Blueprint<'b>>, valid: Box<Blueprint<'b>>, invalid: Option<Box<Blueprint<'b>>>, is_short: bool, });

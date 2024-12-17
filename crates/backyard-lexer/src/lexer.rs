@@ -274,7 +274,6 @@ const TYPE_KEYWORDS: &[&[u8]] = &[
   b"int",
   b"integer",
   b"object",
-  b"String",
   b"string",
   b"mixed",
   b"void",
@@ -285,6 +284,7 @@ const TYPE_KEYWORDS: &[&[u8]] = &[
 pub struct Lexer<'a> {
   pub(crate) tokens: bumpalo::collections::Vec<'a, Token>,
   pub(crate) control: Control,
+  pub(crate) halt: bool,
 }
 
 impl<'a> Lexer<'a> {
@@ -292,6 +292,7 @@ impl<'a> Lexer<'a> {
     Lexer {
       tokens: bumpalo::collections::Vec::new_in(arena),
       control: Control::new(input),
+      halt: false,
     }
   }
 
@@ -335,6 +336,9 @@ impl<'a> Lexer<'a> {
         }
         return Err(err);
       }
+      if self.halt {
+        break;
+      }
     }
     Ok(())
   }
@@ -363,14 +367,27 @@ impl<'a> Lexer<'a> {
           } else {
             self.tokens.push(Token::new(TokenType::QualifiedName, t, snapshot));
           }
+          return Ok(());
         } else if MAGIC_KEYWORDS.contains(&t_sliced) {
           self.tokens.push(Token::new(TokenType::Magic, t, snapshot));
-        } else if MAGIC_METHOD_KEYWORDS.contains(&t_sliced) {
-          self.tokens.push(Token::new(TokenType::MagicMethod, t, snapshot));
-        } else if TYPE_KEYWORDS.contains(&t_sliced) {
-          self.tokens.push(Token::new(TokenType::Type, t, snapshot));
-        } else if let Some(token) = KeywordToken::try_lex(self, &t, snapshot) {
+          return Ok(());
+        }
+        let t_lowercase: BString = t.to_ascii_lowercase().into();
+        let t_lowercase_sliced = t_lowercase.as_slice();
+        if MAGIC_METHOD_KEYWORDS.contains(&t_lowercase_sliced) {
+          self.tokens.push(Token::new(TokenType::MagicMethod, t_lowercase, snapshot));
+        } else if TYPE_KEYWORDS.contains(&t_lowercase_sliced) {
+          self.tokens.push(Token::new(TokenType::Type, t_lowercase, snapshot));
+        } else if
+          let Some(token) = KeywordToken::try_lex(self, &t_lowercase, t_lowercase_sliced, snapshot)
+        {
           self.tokens.push(token);
+        } else if
+          t_lowercase_sliced == b"__halt_compiler" &&
+          self.control.peek_char_n(None, 2).is_some_and(|x| x.as_slice() == b"()")
+        {
+          self.tokens.push(Token::new(TokenType::HaltCompiler, t_lowercase, snapshot));
+          self.halt = true;
         } else {
           self.tokens.push(Token::new(TokenType::UnqualifiedName, t, snapshot));
         }

@@ -12,6 +12,8 @@ pub enum TokenType {
   Magic,
   MagicMethod,
 
+  HaltCompiler,
+
   UnqualifiedName,
   QualifiedName,
   FullyQualifiedName,

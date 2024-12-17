@@ -157,6 +157,7 @@ impl<'arena, 'a> Iterator for Walker<'arena, 'a> {
         NodeWrapper::Function(v) => v.populate_walks(&mut self.stack, item.level),
         NodeWrapper::Global(v) => v.populate_walks(&mut self.stack, item.level),
         NodeWrapper::Goto(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::HaltCompiler(v) => v.populate_walks(&mut self.stack, item.level),
         NodeWrapper::HereDoc(v) => v.populate_walks(&mut self.stack, item.level),
         NodeWrapper::Identifier(v) => v.populate_walks(&mut self.stack, item.level),
         NodeWrapper::If(v) => v.populate_walks(&mut self.stack, item.level),
