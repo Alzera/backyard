@@ -4,12 +4,12 @@ use backyard_parser::parse_eval;
 fn basic() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "{\n}").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
 fn nested() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "{\n\t{\n\t}\n}").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }

@@ -9,7 +9,7 @@ fn union() {
   private array|\\Closure $suggestedValues = [];
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -18,7 +18,7 @@ fn intersection() {
   let asts = parse_eval(&arena, "class A {
     protected \\A&\\B $currentHandler;
 }").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -30,7 +30,7 @@ fn parenthesis() {
   protected ((\\A|\\C)&\\B)|null $currentHandler2;
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -43,7 +43,7 @@ fn break_on_var() {
   }
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -52,5 +52,5 @@ fn single_parenthesis() {
   let asts = parse_eval(&arena, "class A {
   protected (int) $a;
 }").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }

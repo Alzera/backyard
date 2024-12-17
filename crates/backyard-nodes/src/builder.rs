@@ -52,16 +52,6 @@ impl<'a> Blueprint<'a> {
   pub fn get_type(&self) -> NodeType {
     self.node_type.clone()
   }
-
-  // pub fn add_leading(&mut self, leading: Box<Blueprint<'a>>) -> &mut Self {
-  //   self.leadings.push(leading);
-  //   self
-  // }
-
-  // pub fn add_trailing(&mut self, leading: Box<Blueprint<'a>>) -> &mut Self {
-  //   self.trailings.push(leading);
-  //   self
-  // }
 }
 
 pub trait BoxBlueprint<'a> {
@@ -393,6 +383,6 @@ mod tests {
         ]
       )
       .build(&arena);
-    insta::assert_yaml_snapshot!(node);
+    insta::assert_yaml_snapshot!(node.serializable());
   }
 }

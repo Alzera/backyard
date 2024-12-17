@@ -4,26 +4,26 @@ use backyard_parser::parse_eval;
 fn basic() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "yield;").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
 fn with_argument() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "yield $a;").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
 fn with_key() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "yield $a => $b;").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
 fn from() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "yield from $a;").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }

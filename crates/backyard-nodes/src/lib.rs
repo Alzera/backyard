@@ -1,6 +1,9 @@
 pub mod macros;
 pub mod utils;
 
+#[cfg(feature = "serde")]
+pub mod serde;
+
 #[cfg(feature = "walker")]
 pub mod walker;
 
@@ -14,7 +17,9 @@ use std::fmt::{ self, Display, Formatter };
 
 use bstr::BString;
 use bumpalo::Bump;
-use serde::Serialize;
+
+#[cfg(feature = "serde")]
+use ::serde::{ Serialize, Deserialize };
 
 use crate::utils::CloneIn;
 
@@ -27,30 +32,33 @@ use crate::walker::{ Walkable, WalkerItem };
 #[cfg(feature = "printer")]
 use crate::printer::{ PrintBuilder, Printable, PrintType, PrintConfig };
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, PartialEq, Clone)]
 pub enum BodyType {
   Basic,
   Short,
   Empty,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, PartialEq)]
 pub struct RangeLocation {
   pub start: Location,
   pub end: Location,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Location {
   pub line: u32,
   pub column: u32,
   pub offset: u32,
 }
 
-#[derive(Debug, PartialEq, Serialize)]
+#[cfg_attr(test, derive(Serialize))]
+#[derive(Debug, PartialEq)]
 pub struct Node<'a> {
   pub node_type: NodeType,
-  #[serde(flatten)]
   pub wrapper: NodeWrapper<'a>,
   pub loc: Option<RangeLocation>,
   pub leadings: Option<bumpalo::collections::Vec<'a, Node<'a>>>,
@@ -87,8 +95,8 @@ impl<'a> Node<'a> {
   }
 }
 
-#[derive(Debug, PartialEq, Serialize)]
-#[serde(untagged)]
+#[cfg_attr(test, derive(Serialize))]
+#[derive(Debug, PartialEq)]
 pub enum NodeWrapper<'a> {
   AnonymousClass(AnonymousClassNode<'a>),
   AnonymousFunction(AnonymousFunctionNode<'a>),
@@ -196,7 +204,8 @@ pub enum NodeWrapper<'a> {
   YieldFrom(YieldFromNode<'a>),
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum NodeType {
   AnonymousClass,
@@ -313,7 +322,8 @@ macro_rules! new_node {
       $($blueprint_field_name:ident: $blueprint_field_type:ty),* $(,)?
     }
   ) => {
-    #[derive(Debug, PartialEq, Serialize)]
+    #[cfg_attr(test, derive(Serialize))]
+    #[derive(Debug, PartialEq)]
     pub struct $struct_name<$lt> {
       $(pub $field_name: $field_type),*
     }
@@ -410,7 +420,8 @@ macro_rules! new_node {
       $($blueprint_field_name:ident: $blueprint_field_type:ty),* $(,)?
     }
   ) => {
-    #[derive(Debug, PartialEq, Serialize)]
+    #[cfg_attr(test, derive(Serialize))]
+    #[derive(Debug, PartialEq)]
     pub struct $struct_name {
       $(pub $field_name: $field_type),*
     }
@@ -503,7 +514,8 @@ macro_rules! new_node {
     $struct_name:ident { $($field_name:ident: $field_type:ty),* $(,)? },
     $blueprint_name:ident { $($blueprint_field_name:ident: $blueprint_field_type:ty),* $(,)? }
   ) => {
-    #[derive(Debug, PartialEq, Serialize)]
+    #[cfg_attr(test, derive(Serialize))]
+    #[derive(Debug, PartialEq)]
     pub struct $struct_name {
       $(pub $field_name: $field_type),*
     }
@@ -706,7 +718,8 @@ new_node!(While, WhileNode<'a> { condition: bumpalo::boxed::Box<'a, Node<'a>>, b
 new_node!(Yield, YieldNode<'a> { key: Option<bumpalo::boxed::Box<'a, Node<'a>>>, value: Option<bumpalo::boxed::Box<'a, Node<'a>>>, }, YieldBlueprint<'b> { key: Option<Box<Blueprint<'b>>>, value: Option<Box<Blueprint<'b>>>, });
 new_node!(YieldFrom, YieldFromNode<'a> { statement: bumpalo::boxed::Box<'a, Node<'a>>, }, YieldFromBlueprint<'b> { statement: Box<Blueprint<'b>>, });
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, PartialEq, Clone)]
 pub enum MagicMethodName {
   Construct,
   Destruct,
@@ -778,7 +791,8 @@ impl Display for MagicMethodName {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, PartialEq, Clone)]
 pub enum MagicName {
   Class,
   Dir,
@@ -825,7 +839,9 @@ impl Display for MagicName {
     })
   }
 }
-#[derive(Debug, PartialEq, Clone, Serialize)]
+
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, PartialEq, Clone)]
 pub enum PreType {
   Increment,
   Decrement,
@@ -858,7 +874,8 @@ impl Display for PreType {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, PartialEq, Clone)]
 pub enum PostType {
   Increment,
   Decrement,
@@ -885,7 +902,8 @@ impl Display for PostType {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, PartialEq, Clone)]
 pub enum CastType {
   Int,
   Integer,
@@ -942,7 +960,8 @@ impl Display for CastType {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, PartialEq, Clone)]
 pub enum BinaryType {
   Addition,
   Subtraction,
@@ -1044,7 +1063,8 @@ impl Display for BinaryType {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, PartialEq, Clone)]
 pub enum AssignmentType {
   Default,
   Reference,
@@ -1110,7 +1130,8 @@ impl Display for AssignmentType {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, PartialEq, Clone)]
 pub enum UseItemModifier {
   Function,
   Const,
@@ -1137,7 +1158,8 @@ impl Display for UseItemModifier {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Modifier {
   Static,
   Readonly,
@@ -1164,7 +1186,8 @@ impl Display for Modifier {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Quote {
   Single,
   Double,
@@ -1194,7 +1217,8 @@ impl Display for Quote {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Inheritance {
   Abstract,
   Final,
@@ -1221,7 +1245,8 @@ impl Display for Inheritance {
   }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Visibility {
   Public,
   PublicGet,

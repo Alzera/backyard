@@ -4,7 +4,7 @@ use backyard_parser::parse_eval;
 fn basic() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "interface A {}").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -17,5 +17,5 @@ fn without_parenthesis() {
   public function a(int $x, int $y = 0): int;
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }

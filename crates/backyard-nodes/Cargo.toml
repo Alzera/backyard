@@ -12,6 +12,7 @@ license.workspace = true
 builder = []
 walker = []
 printer = []
+serde = []
 
 [lints]
 workspace = true

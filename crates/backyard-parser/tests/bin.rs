@@ -4,7 +4,7 @@ use backyard_parser::parse_eval;
 fn basic() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "$a = 5 + 5;").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -16,5 +16,5 @@ fn chained() {
   ?? $this->b($b) ?? $this->c($c)
     ?? $this->d($d) ?? $this->e($e);"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }

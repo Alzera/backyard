@@ -11,7 +11,7 @@ fn basic() {
   public final static function b();
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -20,5 +20,5 @@ fn shuffle_modifier() {
   let asts = parse_eval(&arena, "abstract class A {
   final static public function b();
 }").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }

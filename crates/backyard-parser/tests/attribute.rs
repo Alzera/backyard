@@ -6,7 +6,7 @@ fn basic() {
   let asts = parse_eval(&arena, "#[Attr]
 class A {
 }").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -15,7 +15,7 @@ fn with_argument() {
   let asts = parse_eval(&arena, "#[Attr(123)]
 class A {
 }").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -24,7 +24,7 @@ fn with_named_argument() {
   let asts = parse_eval(&arena, "#[Attr(a: 123)]
 class A {
 }").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -33,7 +33,7 @@ fn multiple_items() {
   let asts = parse_eval(&arena, "#[Attr(123), \\Attr(123)]
 class A {
 }").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -43,5 +43,5 @@ fn multiple() {
 #[Attr(123), \\Attr(123)]
 class A {
 }").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }

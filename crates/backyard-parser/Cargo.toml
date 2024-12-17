@@ -21,6 +21,7 @@ bumpalo = { workspace = true, features = ["boxed"] }
 [dev-dependencies]
 insta = { workspace = true }
 criterion = { workspace = true }
+backyard-nodes = { workspace = true, features = ["serde"] }
 
 [[bench]]
 name = "parser"

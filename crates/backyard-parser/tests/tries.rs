@@ -6,7 +6,7 @@ fn basic() {
   let asts = parse_eval(&arena, "try {
 } catch (Exception $e) {
 }").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -18,7 +18,7 @@ fn multiple_types() {
 } catch (UnknownGetterException | ReflectionException) {
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -33,5 +33,5 @@ fn finally() {
 } finally {
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }

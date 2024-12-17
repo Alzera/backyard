@@ -4,19 +4,19 @@ use backyard_parser::parse_eval;
 fn basic() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "$;").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
 fn bracket() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "${$a} = 4;").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
 fn multiple() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "$$a = 4;").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }

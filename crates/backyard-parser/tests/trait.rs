@@ -16,5 +16,5 @@ fn basic() {
   public static ?A $instance = 4;
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }

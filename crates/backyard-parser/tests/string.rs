@@ -7,7 +7,7 @@ fn basic() {
     &arena,
     "$a = \" ini string $ \\\" \\$var $b {${\"ale\" . 5}} {$a}\";"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -17,7 +17,7 @@ fn single_quote() {
     &arena,
     "$a = ' ini string $ \\\" \\$var $b {${\"ale\" . 5}} {$a}';"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -26,7 +26,7 @@ fn nowdoc() {
   let asts = parse_eval(&arena, "echo <<<'START'
 a {$a}
 START;").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -35,5 +35,5 @@ fn heredoc() {
   let asts = parse_eval(&arena, "echo <<<START
 a {$a}
 START;;").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }

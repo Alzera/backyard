@@ -7,7 +7,7 @@ fn basic() {
     &arena,
     "function &a(?int ...$b = 0, String &$c = [0.01, 0x12], bool $d): ?int {\n}"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -20,14 +20,14 @@ fn construct() {
   }
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
 fn arrow() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "$a = fn &(int $x): ?int => null;").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -37,5 +37,5 @@ fn anonymous() {
     &arena,
     "$a = function &(int $x, ?int $y) use ($arg2): static {\n};"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }

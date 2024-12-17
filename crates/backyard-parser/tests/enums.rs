@@ -7,7 +7,7 @@ fn basic() {
   case Hearts;
   case Spades;
 }").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -17,7 +17,7 @@ fn typed() {
   case Hearts = 5;
   case Spades = 6;
 }").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -39,5 +39,5 @@ fn content() {
   }
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }

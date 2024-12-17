@@ -4,21 +4,21 @@ use backyard_parser::parse_eval;
 fn basic() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "use const A\\B;").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
 fn alias() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "use const A\\B as A;").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
 fn multiple() {
   let arena = bumpalo::Bump::new();
   let asts = parse_eval(&arena, "use A\\B as A, B\\C as B;").unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
 
 #[test]
@@ -32,5 +32,5 @@ fn items() {
   function UserTestingC
 };"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }

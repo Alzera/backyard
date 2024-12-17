@@ -11,5 +11,5 @@ fn basic() {
   public string $d { &get { return $e; } set(int &...$i) => $f; };
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts);
+  insta::assert_yaml_snapshot!(asts.serializable());
 }
