@@ -12,7 +12,7 @@ license.workspace = true
 builder = []
 walker = []
 printer = []
-serde = []
+serde = ["dep:serde"]
 
 [lints]
 workspace = true
@@ -20,7 +20,7 @@ workspace = true
 [dependencies]
 bstr = { workspace = true }
 bumpalo = { workspace = true, features = ["boxed", "collections", "serde"] }
-serde = { workspace = true }
+serde = { workspace = true, default-features = false, features = ["derive"], optional = true }
 
 [dev-dependencies]
 insta = { workspace = true }
