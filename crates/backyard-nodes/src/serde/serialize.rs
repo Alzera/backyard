@@ -18,7 +18,7 @@ use crate::{
   Visibility,
 };
 
-use super::{ SerializableNode, SerializableNodeWrapper };
+use super::{ node::SerializableNodeWrapper, SerializableNode };
 
 pub(crate) trait Serializable {
   type Return: ?Sized;

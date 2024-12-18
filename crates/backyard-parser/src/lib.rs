@@ -4,7 +4,7 @@ mod utils;
 pub mod error;
 
 use backyard_lexer::{ arena_lex, error::LexError, token::Token };
-use backyard_nodes::{ serde::SerializableNode, Location, Node, ProgramNode, RangeLocation };
+use backyard_nodes::{ serde::node::SerializableNode, Location, Node, ProgramNode, RangeLocation };
 use bumpalo::Bump;
 use error::ParserError;
 use parser::{ LocationHelper, LoopArgument, Parser };
