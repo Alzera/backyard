@@ -1,18 +1,19 @@
 use backyard_generator::generate;
-use backyard_parser::parse_eval;
+use backyard_parser::arena_parse;
 
 #[test]
 fn basic() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "class A { use Ale; }").unwrap();
+  let asts = arena_parse(&arena, true, "class A { use Ale; }").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn items() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
+  let asts = arena_parse(
     &arena,
+    true,
     "class A {
   use Loggable, Usable {
     log as public;

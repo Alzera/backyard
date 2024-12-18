@@ -1,24 +1,22 @@
-use backyard_parser::parse_eval;
+use backyard_parser::parse;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
-    &arena,
+  let asts = parse(
+    true,
     "abstract class A {
   public function a() {
   }
   public final static function b();
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn shuffle_modifier() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "abstract class A {
+  let asts = parse(true, "abstract class A {
   final static public function b();
 }").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  insta::assert_yaml_snapshot!(asts);
 }

@@ -1,17 +1,15 @@
-use backyard_parser::parse_eval;
+use backyard_parser::parse;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "class A { use Ale; }").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "class A { use Ale; }").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn items() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
-    &arena,
+  let asts = parse(
+    true,
     "class A {
   use Loggable, Usable {
     log as public;
@@ -22,5 +20,5 @@ fn items() {
   }
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  insta::assert_yaml_snapshot!(asts);
 }

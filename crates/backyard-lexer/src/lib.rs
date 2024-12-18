@@ -9,34 +9,18 @@ use error::LexError;
 use lexer::Lexer;
 use token::Token;
 
-pub fn lex_bytes<'a>(
-  arena: &'a Bump,
-  input: Vec<u8>
-) -> Result<bumpalo::collections::Vec<'a, Token>, LexError> {
-  let mut lexer = Lexer::new(arena, BString::new(input));
-  lexer.start(true)?;
-  Ok(lexer.tokens)
+pub fn lex<'a>(is_eval: bool, input: &str) -> Result<Vec<Token>, LexError> {
+  let arena = Bump::new();
+  let result = arena_lex(&arena, is_eval, input)?;
+  Ok(Vec::from_iter(result.into_iter()))
 }
 
-pub fn lex_eval_bytes<'a>(
+pub fn arena_lex<'a>(
   arena: &'a Bump,
-  input: Vec<u8>
-) -> Result<bumpalo::collections::Vec<'a, Token>, LexError> {
-  let mut lexer = Lexer::new(arena, BString::new(input));
-  lexer.start(false)?;
-  Ok(lexer.tokens)
-}
-
-pub fn lex<'a>(
-  arena: &'a Bump,
+  is_eval: bool,
   input: &str
 ) -> Result<bumpalo::collections::Vec<'a, Token>, LexError> {
-  lex_bytes(arena, input.as_bytes().to_vec())
-}
-
-pub fn lex_eval<'a>(
-  arena: &'a Bump,
-  input: &str
-) -> Result<bumpalo::collections::Vec<'a, Token>, LexError> {
-  lex_eval_bytes(arena, input.as_bytes().to_vec())
+  let mut lexer = Lexer::new(arena, BString::new(input.as_bytes().to_vec()));
+  lexer.start(is_eval)?;
+  Ok(lexer.tokens)
 }

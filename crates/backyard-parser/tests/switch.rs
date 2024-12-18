@@ -1,10 +1,9 @@
-use backyard_parser::parse_eval;
+use backyard_parser::parse;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
-    &arena,
+  let asts = parse(
+    true,
     "switch ($a) {
   case 1:
     break;
@@ -14,14 +13,13 @@ fn basic() {
     continue;
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn short() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
-    &arena,
+  let asts = parse(
+    true,
     "switch ($a):
   case 1:
     break;
@@ -31,21 +29,17 @@ fn short() {
     continue;
 endswitch;"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn case_bracket() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
-    &arena,
-    "switch ($a) {
+  let asts = parse(true, "switch ($a) {
   case 1: {
     break;
   }
   default:
     continue;
-}"
-  ).unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+}").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }

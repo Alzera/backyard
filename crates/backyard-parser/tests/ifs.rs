@@ -1,53 +1,43 @@
-use backyard_parser::parse_eval;
+use backyard_parser::parse;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "if (false) {}").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "if (false) {}").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn with_else() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "if (false) {} else {}").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "if (false) {} else {}").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn with_elseif() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "if (false) {} elseif (true) {}").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "if (false) {} elseif (true) {}").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn with_else_if() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "if (false) {} else if (true) {}").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "if (false) {} else if (true) {}").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn nested() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
-    &arena,
-    "if (false) {if (false) {} else (true) {}} else if (true) {}"
-  ).unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "if (false) {if (false) {} else (true) {}} else if (true) {}").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn no_block() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "if (false) $e = 5; else if (true) $e = 6;").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "if (false) $e = 5; else if (true) $e = 6;").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn short() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "if (true): elseif (false): else: endif;").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "if (true): elseif (false): else: endif;").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }

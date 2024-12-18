@@ -1,10 +1,9 @@
-use backyard_parser::parse_eval;
+use backyard_parser::parse;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
-    &arena,
+  let asts = parse(
+    true,
     "trait B {
   use Ale;
   use Loggable, Usable {
@@ -16,5 +15,5 @@ fn basic() {
   public static ?A $instance = 4;
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  insta::assert_yaml_snapshot!(asts);
 }

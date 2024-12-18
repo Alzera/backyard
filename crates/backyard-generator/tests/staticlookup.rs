@@ -1,30 +1,30 @@
 use backyard_generator::generate;
-use backyard_parser::parse_eval;
+use backyard_parser::arena_parse;
 
 #[test]
 fn basic() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "self::a;").unwrap();
+  let asts = arena_parse(&arena, true, "self::a;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn bracket() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "self::{$a};").unwrap();
+  let asts = arena_parse(&arena, true, "self::{$a};").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn test_class() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "self::class;").unwrap();
+  let asts = arena_parse(&arena, true, "self::class;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn variable() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "self::$a;").unwrap();
+  let asts = arena_parse(&arena, true, "self::$a;").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }

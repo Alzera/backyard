@@ -1,29 +1,25 @@
-use backyard_lexer::lex_eval;
+use backyard_lexer::lex;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let tokens = lex_eval(&arena, "$a").unwrap();
+  let tokens = lex(true, "$a").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }
 
 #[test]
 fn this() {
-  let arena = bumpalo::Bump::new();
-  let tokens = lex_eval(&arena, "$this").unwrap();
+  let tokens = lex(true, "$this").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }
 
 #[test]
 fn bracket() {
-  let arena = bumpalo::Bump::new();
-  let tokens = lex_eval(&arena, "${$a}").unwrap();
+  let tokens = lex(true, "${$a}").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }
 
 #[test]
 fn multiple() {
-  let arena = bumpalo::Bump::new();
-  let tokens = lex_eval(&arena, "$$$a").unwrap();
+  let tokens = lex(true, "$$$a").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }

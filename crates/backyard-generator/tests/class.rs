@@ -1,44 +1,48 @@
 use backyard_generator::generate;
-use backyard_parser::parse_eval;
+use backyard_parser::arena_parse;
 
 #[test]
 fn basic() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "class A {\n}").unwrap();
+  let asts = arena_parse(&arena, true, "class A {\n}").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn modifiers() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "readonly final class A {\n}").unwrap();
+  let asts = arena_parse(&arena, true, "readonly final class A {\n}").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn extended() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "class A extends B implements C, D {\n}").unwrap();
+  let asts = arena_parse(&arena, true, "class A extends B implements C, D {\n}").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn anonymous() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "$a = new class {\n};").unwrap();
+  let asts = arena_parse(&arena, true, "$a = new class {\n};").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn parameter() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "$a = new class($b) {\n};").unwrap();
+  let asts = arena_parse(&arena, true, "$a = new class($b) {\n};").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn anonymous_extended() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "$a = new class($b) extends B implements C, D {\n}").unwrap();
+  let asts = arena_parse(
+    &arena,
+    true,
+    "$a = new class($b) extends B implements C, D {\n}"
+  ).unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }

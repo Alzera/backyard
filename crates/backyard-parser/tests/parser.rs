@@ -1,8 +1,7 @@
-use backyard_parser::parse_eval;
+use backyard_parser::parse;
 
 #[test]
 fn test_fail() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "function a a() {}");
+  let asts = parse(true, "function a a() {}");
   assert!(asts.is_err());
 }

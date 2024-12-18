@@ -1,5 +1,5 @@
 use std::hint::black_box;
-use backyard_lexer::lex;
+use backyard_lexer::arena_lex;
 use criterion::{ criterion_group, criterion_main, Criterion };
 
 const CONTENT: &str =
@@ -95,7 +95,7 @@ fn criterion_benchmark(c: &mut Criterion) {
   c.bench_function("lexer_basic", |b| {
     b.iter(|| {
       let arena = bumpalo::Bump::new();
-      let _ = lex(&arena, black_box(CONTENT));
+      let _ = arena_lex(&arena, false, black_box(CONTENT));
     });
   });
 }

@@ -1,10 +1,10 @@
 use backyard_generator::generate;
-use backyard_parser::parse_eval;
+use backyard_parser::arena_parse;
 
 #[test]
 fn basic() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "enum Suit {
+  let asts = arena_parse(&arena, true, "enum Suit {
   case Hearts;
   case Spades;
 }").unwrap();
@@ -14,18 +14,23 @@ fn basic() {
 #[test]
 fn typed() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "enum Suit: int {
+  let asts = arena_parse(
+    &arena,
+    true,
+    "enum Suit: int {
   case Hearts = 5;
   case Spades = 6;
-}").unwrap();
+}"
+  ).unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn content() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
+  let asts = arena_parse(
     &arena,
+    true,
     "enum Suit implements SuitInterface {
   case Hearts;
   case Spades;

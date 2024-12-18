@@ -3,19 +3,24 @@ mod parser;
 mod utils;
 pub mod error;
 
-use backyard_lexer::{ lex, lex_eval, error::LexError, token::Token };
-use backyard_nodes::{ Location, Node, ProgramNode, RangeLocation };
+use backyard_lexer::{ arena_lex, error::LexError, token::Token };
+use backyard_nodes::{ serde::SerializableNode, Location, Node, ProgramNode, RangeLocation };
 use bumpalo::Bump;
 use error::ParserError;
 use parser::{ LocationHelper, LoopArgument, Parser };
 
-pub fn parse<'arena>(arena: &'arena Bump, input: &str) -> Result<Node<'arena>, ParserError> {
-  let tokens = lex(arena, input);
-  parse_base(arena, &tokens)
+pub fn parse<'arena>(is_eval: bool, input: &str) -> Result<SerializableNode, ParserError> {
+  let arena = Bump::new();
+  let result = arena_parse(&arena, is_eval, input)?;
+  Ok(result.serializable())
 }
 
-pub fn parse_eval<'arena>(arena: &'arena Bump, input: &str) -> Result<Node<'arena>, ParserError> {
-  let tokens = lex_eval(arena, input);
+pub fn arena_parse<'arena>(
+  arena: &'arena Bump,
+  is_eval: bool,
+  input: &str
+) -> Result<Node<'arena>, ParserError> {
+  let tokens = arena_lex(arena, is_eval, input);
   parse_base(arena, &tokens)
 }
 

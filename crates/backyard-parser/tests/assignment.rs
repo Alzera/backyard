@@ -1,8 +1,7 @@
-use backyard_parser::parse_eval;
+use backyard_parser::parse;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "$a = 5;").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "$a = 5;").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }

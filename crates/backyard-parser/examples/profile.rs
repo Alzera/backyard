@@ -1,4 +1,4 @@
-use backyard_lexer::lex;
+use backyard_lexer::arena_lex;
 use backyard_parser::parse_base;
 use bumpalo::Bump;
 
@@ -93,7 +93,7 @@ BAR;
 
 fn main() {
   let lexer_arena = Bump::new();
-  let tokens = lex(&lexer_arena, CONTENT);
+  let tokens = arena_lex(&lexer_arena, false, CONTENT);
   for _ in 0..100 {
     let arena = Bump::new();
     let _ = parse_base(&arena, &tokens);

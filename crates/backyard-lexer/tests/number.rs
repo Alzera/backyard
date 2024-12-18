@@ -1,36 +1,31 @@
-use backyard_lexer::lex_eval;
+use backyard_lexer::lex;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let tokens = lex_eval(&arena, "67").unwrap();
+  let tokens = lex(true, "67").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }
 
 #[test]
 fn decimal() {
-  let arena = bumpalo::Bump::new();
-  let tokens = lex_eval(&arena, "6.7").unwrap();
+  let tokens = lex(true, "6.7").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }
 
 #[test]
 fn only_decimal() {
-  let arena = bumpalo::Bump::new();
-  let tokens = lex_eval(&arena, ".67").unwrap();
+  let tokens = lex(true, ".67").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }
 
 #[test]
 fn hex() {
-  let arena = bumpalo::Bump::new();
-  let tokens = lex_eval(&arena, "0xff9abc").unwrap();
+  let tokens = lex(true, "0xff9abc").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }
 
 #[test]
 fn binary() {
-  let arena = bumpalo::Bump::new();
-  let tokens = lex_eval(&arena, "0b1010_1010").unwrap();
+  let tokens = lex(true, "0b1010_1010").unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }

@@ -1,11 +1,12 @@
 use backyard_generator::generate;
-use backyard_parser::parse_eval;
+use backyard_parser::arena_parse;
 
 #[test]
 fn union() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
+  let asts = arena_parse(
     &arena,
+    true,
     "class A {
   private array|\\Closure $suggestedValues = [];
 }"
@@ -16,7 +17,7 @@ fn union() {
 #[test]
 fn intersection() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "class A {
+  let asts = arena_parse(&arena, true, "class A {
     protected \\A&\\B $currentHandler;
 }").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
@@ -25,8 +26,9 @@ fn intersection() {
 #[test]
 fn parenthesis() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
+  let asts = arena_parse(
     &arena,
+    true,
     "class A {
   protected ((\\A|\\C)&\\B)|null $currentHandler2;
 }"
@@ -37,8 +39,9 @@ fn parenthesis() {
 #[test]
 fn break_on_var() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
+  let asts = arena_parse(
     &arena,
+    true,
     "class A {
   function __construct(protected A&null &$a){
   }
@@ -50,7 +53,7 @@ fn break_on_var() {
 #[test]
 fn single_parenthesis() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "class A {
+  let asts = arena_parse(&arena, true, "class A {
   protected (int) $a;
 }").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());

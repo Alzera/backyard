@@ -1,11 +1,12 @@
 use backyard_generator::generate;
-use backyard_parser::parse_eval;
+use backyard_parser::arena_parse;
 
 #[test]
 fn basic() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
+  let asts = arena_parse(
     &arena,
+    true,
     "abstract class A {
   public function a() {
   }
@@ -18,8 +19,12 @@ fn basic() {
 #[test]
 fn shuffle_modifier() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "abstract class A {
+  let asts = arena_parse(
+    &arena,
+    true,
+    "abstract class A {
   final static public function b();
-}").unwrap();
+}"
+  ).unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }

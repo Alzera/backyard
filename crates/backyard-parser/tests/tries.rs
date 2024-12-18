@@ -1,31 +1,25 @@
-use backyard_parser::parse_eval;
+use backyard_parser::parse;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "try {
+  let asts = parse(true, "try {
 } catch (Exception $e) {
 }").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn multiple_types() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
-    &arena,
-    "try {
+  let asts = parse(true, "try {
 } catch (UnknownGetterException | ReflectionException) {
-}"
-  ).unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+}").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn finally() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
-    &arena,
+  let asts = parse(
+    true,
     "try {
   throw new Error(\"Custom error occurred\");
 } catch (FooError $err) {
@@ -33,5 +27,5 @@ fn finally() {
 } finally {
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  insta::assert_yaml_snapshot!(asts);
 }

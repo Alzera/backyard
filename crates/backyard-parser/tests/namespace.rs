@@ -1,15 +1,13 @@
-use backyard_parser::parse_eval;
+use backyard_parser::parse;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "namespace MyApp\\A;").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "namespace MyApp\\A;").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn with_body() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "namespace MyApp\\B {}").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "namespace MyApp\\B {}").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }

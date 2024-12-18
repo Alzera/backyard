@@ -1,64 +1,56 @@
-use backyard_parser::parse_eval;
+use backyard_parser::parse;
 
 #[test]
 fn line_basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "// test").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "// test").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn line_long() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "///////////// TEST /////////////").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "///////////// TEST /////////////").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn block() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "/*\ntest\n*/").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "/*\ntest\n*/").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn doc() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "/**\n * test\n */").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "/**\n * test\n */").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn before_block() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "if (false) // test
+  let asts = parse(true, "if (false) // test
 {
 }").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn after_block() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "do {
+  let asts = parse(true, "do {
 }
 // test
 while(false);").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn at_block_end() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "if (false) {
+  let asts = parse(true, "if (false) {
 }
 // test").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  insta::assert_yaml_snapshot!(asts);
 }
 
 #[test]
 fn at_statement_end() {
-  let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "$a = 5 /* test */;").unwrap();
-  insta::assert_yaml_snapshot!(asts.serializable());
+  let asts = parse(true, "$a = 5 /* test */;").unwrap();
+  insta::assert_yaml_snapshot!(asts);
 }

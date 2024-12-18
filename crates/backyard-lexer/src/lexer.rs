@@ -325,7 +325,7 @@ impl<'a> Lexer<'a> {
   }
 
   pub fn start(&mut self, is_eval: bool) -> LexResult {
-    if is_eval {
+    if !is_eval {
       InlineToken::lex(self, &(ControlSnapshot { line: 1, column: 0, offset: 0 }))?;
     }
     loop {

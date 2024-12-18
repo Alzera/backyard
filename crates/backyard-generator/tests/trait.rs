@@ -1,11 +1,12 @@
 use backyard_generator::generate;
-use backyard_parser::parse_eval;
+use backyard_parser::arena_parse;
 
 #[test]
 fn basic() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(
+  let asts = arena_parse(
     &arena,
+    true,
     "trait B {
   use Ale;
   use Loggable, Usable {

@@ -1,16 +1,16 @@
 use backyard_generator::generate;
-use backyard_parser::parse_eval;
+use backyard_parser::arena_parse;
 
 #[test]
 fn basic() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "{\n}").unwrap();
+  let asts = arena_parse(&arena, true, "{\n}").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
 
 #[test]
 fn nested() {
   let arena = bumpalo::Bump::new();
-  let asts = parse_eval(&arena, "{\n\t{\n\t}\n}").unwrap();
+  let asts = arena_parse(&arena, true, "{\n\t{\n\t}\n}").unwrap();
   insta::assert_yaml_snapshot!(generate(&asts).unwrap());
 }
