@@ -1,33 +1,25 @@
-use backyard_generator::generate;
-use backyard_parser::arena_parse;
+use backyard_generator::generate_serializable_node;
+use backyard_parser::parse;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(&arena, true, "try {
+  let asts = parse(true, "try {
 } catch (Exception $e) {
 }").unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }
 
 #[test]
 fn multiple_types() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(
-    &arena,
-    true,
-    "try {
+  let asts = parse(true, "try {
 } catch (UnknownGetterException | ReflectionException) {
-}"
-  ).unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+}").unwrap();
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }
 
 #[test]
 fn finally() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(
-    &arena,
+  let asts = parse(
     true,
     "try {
   throw new Error(\"Custom error occurred\");
@@ -36,5 +28,5 @@ fn finally() {
 } finally {
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }

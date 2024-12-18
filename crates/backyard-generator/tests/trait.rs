@@ -1,11 +1,9 @@
-use backyard_generator::generate;
-use backyard_parser::arena_parse;
+use backyard_generator::generate_serializable_node;
+use backyard_parser::parse;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(
-    &arena,
+  let asts = parse(
     true,
     "trait B {
   use Ale;
@@ -18,5 +16,5 @@ fn basic() {
   public static ?A $instance = 4;
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }

@@ -1,5 +1,5 @@
-use backyard_lexer::arena_lex;
-use backyard_parser::parse_base;
+use backyard_lexer::lex_in;
+use backyard_parser::parse_tokens_in;
 use bumpalo::Bump;
 
 const CONTENT: &str =
@@ -93,9 +93,9 @@ BAR;
 
 fn main() {
   let lexer_arena = Bump::new();
-  let tokens = arena_lex(&lexer_arena, false, CONTENT);
+  let tokens = lex_in(&lexer_arena, false, CONTENT).unwrap();
   for _ in 0..100 {
     let arena = Bump::new();
-    let _ = parse_base(&arena, &tokens);
+    let _ = parse_tokens_in(&arena, &tokens);
   }
 }

@@ -1,7 +1,7 @@
 ---
 source: crates/backyard-generator/tests/halt.rs
 assertion_line: 8
-expression: generate(&asts).unwrap()
+expression: generate_serializable_node(&asts).unwrap()
 snapshot_kind: text
 ---
 "$a = false;\n__halt_compiler();;"

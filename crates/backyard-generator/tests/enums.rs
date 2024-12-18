@@ -1,35 +1,27 @@
-use backyard_generator::generate;
-use backyard_parser::arena_parse;
+use backyard_generator::generate_serializable_node;
+use backyard_parser::parse;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(&arena, true, "enum Suit {
+  let asts = parse(true, "enum Suit {
   case Hearts;
   case Spades;
 }").unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }
 
 #[test]
 fn typed() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(
-    &arena,
-    true,
-    "enum Suit: int {
+  let asts = parse(true, "enum Suit: int {
   case Hearts = 5;
   case Spades = 6;
-}"
-  ).unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+}").unwrap();
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }
 
 #[test]
 fn content() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(
-    &arena,
+  let asts = parse(
     true,
     "enum Suit implements SuitInterface {
   case Hearts;
@@ -45,5 +37,5 @@ fn content() {
   }
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }

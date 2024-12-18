@@ -1,16 +1,14 @@
-use backyard_generator::generate;
-use backyard_parser::arena_parse;
+use backyard_generator::generate_serializable_node;
+use backyard_parser::parse;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(&arena, true, "namespace MyApp\\A;").unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+  let asts = parse(true, "namespace MyApp\\A;").unwrap();
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }
 
 #[test]
 fn with_body() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(&arena, true, "namespace MyApp\\B {}").unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+  let asts = parse(true, "namespace MyApp\\B {}").unwrap();
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }

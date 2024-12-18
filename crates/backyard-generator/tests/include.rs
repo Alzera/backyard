@@ -1,37 +1,32 @@
-use backyard_generator::generate;
-use backyard_parser::arena_parse;
+use backyard_generator::generate_serializable_node;
+use backyard_parser::parse;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(&arena, true, "include(\"a\");").unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+  let asts = parse(true, "include(\"a\");").unwrap();
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }
 
 #[test]
 fn without_parenthesis() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(&arena, true, "include \"a\";").unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+  let asts = parse(true, "include \"a\";").unwrap();
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }
 
 #[test]
 fn once() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(&arena, true, "include_once(\"a\");").unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+  let asts = parse(true, "include_once(\"a\");").unwrap();
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }
 
 #[test]
 fn require() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(&arena, true, "require(\"a\");").unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+  let asts = parse(true, "require(\"a\");").unwrap();
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }
 
 #[test]
 fn require_once() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(&arena, true, "require_once(\"a\");").unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+  let asts = parse(true, "require_once(\"a\");").unwrap();
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }

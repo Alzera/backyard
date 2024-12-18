@@ -1,4 +1,4 @@
-use backyard_lexer::arena_lex;
+use backyard_lexer::lex;
 
 const CONTENT: &str =
   "<?php
@@ -91,7 +91,6 @@ BAR;
 
 fn main() {
   for _ in 0..100 {
-    let arena = bumpalo::Bump::new();
-    let _ = arena_lex(&arena, false, CONTENT);
+    let _ = lex(false, CONTENT);
   }
 }

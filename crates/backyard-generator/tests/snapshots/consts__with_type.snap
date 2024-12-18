@@ -1,7 +1,7 @@
 ---
 source: crates/backyard-generator/tests/consts.rs
 assertion_line: 13
-expression: generate(&asts).unwrap()
+expression: generate_serializable_node(&asts).unwrap()
 snapshot_kind: text
 ---
 "class A {\n  const int A = 1;\n}"

@@ -1,18 +1,15 @@
-use backyard_generator::generate;
-use backyard_parser::arena_parse;
+use backyard_generator::generate_serializable_node;
+use backyard_parser::parse;
 
 #[test]
 fn basic() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(&arena, true, "class A { use Ale; }").unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+  let asts = parse(true, "class A { use Ale; }").unwrap();
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }
 
 #[test]
 fn items() {
-  let arena = bumpalo::Bump::new();
-  let asts = arena_parse(
-    &arena,
+  let asts = parse(
     true,
     "class A {
   use Loggable, Usable {
@@ -24,5 +21,5 @@ fn items() {
   }
 }"
   ).unwrap();
-  insta::assert_yaml_snapshot!(generate(&asts).unwrap());
+  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }

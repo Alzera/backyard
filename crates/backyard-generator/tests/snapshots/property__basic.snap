@@ -1,7 +1,7 @@
 ---
 source: crates/backyard-generator/tests/property.rs
 assertion_line: 13
-expression: generate(&asts).unwrap()
+expression: generate_serializable_node(&asts).unwrap()
 snapshot_kind: text
 ---
 "class A {\n  protected public(get) static ?A $a = 4;\n  public readonly A|callable|null $b = 4, $c = 6;\n  public string $d {\n    &get  {\n      return $e;\n    }\n    set(int &...$i) => $f\n  };\n}"
