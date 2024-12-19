@@ -206,7 +206,7 @@ pub enum NodeWrapper<'a> {
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
-#[serde(rename_all = "snake_case")]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 pub enum NodeType {
   AnonymousClass,
   AnonymousFunction,
