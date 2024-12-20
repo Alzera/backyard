@@ -1,0 +1,50 @@
+---
+source: crates/backyard-lexer/tests/comment.rs
+expression: tokens
+snapshot_kind: text
+---
+- token_type: CommentDocOpen
+  value:
+    - 47
+    - 42
+    - 42
+  line: 1
+  column: 0
+  offset: 0
+- token_type: DocTagParam
+  value:
+    - 64
+    - 112
+    - 97
+    - 114
+    - 97
+    - 109
+  line: 1
+  column: 4
+  offset: 4
+- token_type: This
+  value:
+    - 36
+    - 116
+    - 104
+    - 105
+    - 115
+  line: 1
+  column: 11
+  offset: 11
+- token_type: Variable
+  value:
+    - 36
+    - 102
+    - 111
+    - 111
+  line: 1
+  column: 17
+  offset: 17
+- token_type: CommentDocClose
+  value:
+    - 42
+    - 47
+  line: 1
+  column: 22
+  offset: 22

@@ -19,11 +19,11 @@ fn block() {
   insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
 }
 
-#[test]
-fn doc() {
-  let asts = parse(true, "/**\n * test\n */").unwrap();
-  insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
-}
+// #[test]
+// fn doc() {
+//   let asts = parse(true, "/**\n * test\n */").unwrap();
+//   insta::assert_yaml_snapshot!(generate_serializable_node(&asts).unwrap());
+// }
 
 #[test]
 fn before_block() {

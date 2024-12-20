@@ -1,0 +1,213 @@
+---
+source: crates/backyard-lexer/tests/comment.rs
+expression: tokens
+snapshot_kind: text
+---
+- token_type: CommentDocOpen
+  value:
+    - 47
+    - 42
+    - 42
+  line: 1
+  column: 0
+  offset: 0
+- token_type: DocTagParam
+  value:
+    - 64
+    - 112
+    - 97
+    - 114
+    - 97
+    - 109
+  line: 1
+  column: 4
+  offset: 4
+- token_type: Type
+  value:
+    - 97
+    - 114
+    - 114
+    - 97
+    - 121
+  line: 1
+  column: 11
+  offset: 11
+- token_type: LeftCurlyBracket
+  value:
+    - 123
+  line: 1
+  column: 16
+  offset: 16
+- token_type: UnqualifiedName
+  value:
+    - 97
+  line: 1
+  column: 17
+  offset: 17
+- token_type: QuestionMark
+  value:
+    - 63
+  line: 1
+  column: 18
+  offset: 18
+- token_type: Colon
+  value:
+    - 58
+  line: 1
+  column: 19
+  offset: 19
+- token_type: Type
+  value:
+    - 105
+    - 110
+    - 116
+  line: 1
+  column: 21
+  offset: 21
+- token_type: Comma
+  value:
+    - 44
+  line: 1
+  column: 24
+  offset: 24
+- token_type: UnqualifiedName
+  value:
+    - 98
+  line: 1
+  column: 26
+  offset: 26
+- token_type: Colon
+  value:
+    - 58
+  line: 1
+  column: 27
+  offset: 27
+- token_type: Type
+  value:
+    - 115
+    - 116
+    - 114
+    - 105
+    - 110
+    - 103
+  line: 1
+  column: 29
+  offset: 29
+- token_type: Comma
+  value:
+    - 44
+  line: 1
+  column: 35
+  offset: 35
+- token_type: Number
+  value:
+    - 48
+  line: 1
+  column: 37
+  offset: 37
+- token_type: Colon
+  value:
+    - 58
+  line: 1
+  column: 38
+  offset: 38
+- token_type: Type
+  value:
+    - 105
+    - 110
+    - 116
+  line: 1
+  column: 40
+  offset: 40
+- token_type: Comma
+  value:
+    - 44
+  line: 1
+  column: 43
+  offset: 43
+- token_type: Number
+  value:
+    - 49
+  line: 1
+  column: 45
+  offset: 45
+- token_type: QuestionMark
+  value:
+    - 63
+  line: 1
+  column: 46
+  offset: 46
+- token_type: Colon
+  value:
+    - 58
+  line: 1
+  column: 47
+  offset: 47
+- token_type: UnqualifiedName
+  value:
+    - 68
+    - 97
+    - 116
+    - 101
+    - 84
+    - 105
+    - 109
+    - 101
+  line: 1
+  column: 49
+  offset: 49
+- token_type: Comma
+  value:
+    - 44
+  line: 1
+  column: 57
+  offset: 57
+- token_type: UnqualifiedName
+  value:
+    - 104
+    - 101
+    - 108
+    - 108
+    - 111
+  line: 1
+  column: 59
+  offset: 59
+- token_type: Colon
+  value:
+    - 58
+  line: 1
+  column: 64
+  offset: 64
+- token_type: Type
+  value:
+    - 115
+    - 116
+    - 114
+    - 105
+    - 110
+    - 103
+  line: 1
+  column: 66
+  offset: 66
+- token_type: RightCurlyBracket
+  value:
+    - 125
+  line: 1
+  column: 72
+  offset: 72
+- token_type: Variable
+  value:
+    - 36
+    - 102
+    - 111
+    - 111
+  line: 1
+  column: 74
+  offset: 74
+- token_type: CommentDocClose
+  value:
+    - 42
+    - 47
+  line: 1
+  column: 79
+  offset: 79

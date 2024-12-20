@@ -320,7 +320,7 @@ impl<'a> Lexer<'a> {
   }
 
   #[inline]
-  fn until<F>(&mut self, mut callback: F) -> BString where F: FnMut(u8) -> bool {
+  pub(crate) fn until<F>(&mut self, mut callback: F) -> BString where F: FnMut(u8) -> bool {
     self.control.next_char_until(1, |_, ch, _| callback(ch))
   }
 
