@@ -363,7 +363,12 @@ impl CommentToken {
       b'\n' => {
         lexer.control.next_char_until(0, |_, ch, _| !matches!(ch, b'\t' | b'\x0C' | b' '));
         if lexer.control.peek_char(None) == Some(&b'*') {
-          lexer.control.next_char();
+          if lexer.control.peek_char(Some(lexer.control.get_position() + 1)) == Some(&b'/') {
+            lexer.control.consume(2);
+            lexer.tokens.push(Token::new(TokenType::CommentDocClose, "*/".into(), snapshot));
+          } else {
+            lexer.control.next_char();
+          }
         }
       }
       b'\t' | b'\x0C' | b' ' => {
@@ -495,6 +500,11 @@ impl CommentToken {
         b'\n' => {
           lexer.control.next_char_until(0, |_, ch, _| !matches!(ch, b'\t' | b'\x0C' | b' '));
           if lexer.control.peek_char(None) == Some(&b'*') {
+            if lexer.control.peek_char(Some(lexer.control.get_position() + 1)) == Some(&b'/') {
+              lexer.control.consume(2);
+              lexer.tokens.push(Token::new(TokenType::CommentDocClose, "*/".into(), snapshot));
+              break;
+            }
             lexer.control.next_char();
           }
         }

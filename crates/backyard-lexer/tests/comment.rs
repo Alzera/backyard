@@ -294,3 +294,129 @@ fn doc_param_description() {
   ).unwrap();
   insta::assert_yaml_snapshot!(tokens);
 }
+
+#[test]
+fn doc_tags() {
+  let tokens = lex(
+    true,
+    "/**
+ * Example of a comprehensive PHPDoc with all tags.
+ * 
+ * @param string $name User name.
+ * @phpstan-param non-empty-string $name
+ * @psalm-param non-empty-string $name
+ * @phan-param string $name
+ * 
+ * @param-immediately-invoked-callable callable $callback
+ * @phpstan-param-immediately-invoked-callable callable():void $callback
+ * 
+ * @param-later-invoked-callable callable $lazyCallback
+ * @phpstan-param-later-invoked-callable callable(int):string $lazyCallback
+ * 
+ * @param-closure-this object $thisObject
+ * @phpstan-param-closure-this self $thisObject
+ * 
+ * @pure-unless-callable-is-impure
+ * @phpstan-pure-unless-callable-is-impure
+ * 
+ * @var int
+ * @phpstan-var positive-int
+ * @psalm-var positive-int
+ * @phan-var int
+ * 
+ * @return bool
+ * @phpstan-return true
+ * @psalm-return true
+ * @phan-return bool
+ * @phan-real-return bool
+ * 
+ * @throws \\Exception
+ * @phpstan-throws \\InvalidArgumentException
+ * 
+ * @mixin \\MyClass
+ * @phan-mixin \\MyTrait
+ * 
+ * @psalm-require-extends \\BaseClass
+ * @phpstan-require-extends \\BaseClass
+ * 
+ * @psalm-require-implements \\MyInterface
+ * @phpstan-require-implements \\MyInterface
+ * 
+ * @deprecated Use `newMethod()` instead.
+ * 
+ * @property string $firstName
+ * @property-read string $lastName
+ * @property-write string $password
+ * @phpstan-property non-empty-string $firstName
+ * @phpstan-property-read string $lastName
+ * @phpstan-property-write string $password
+ * @psalm-property string $middleName
+ * @psalm-property-read string $nickName
+ * @psalm-property-write string $email
+ * @phan-property string $address
+ * @phan-property-read string $city
+ * @phan-property-write string $postalCode
+ * 
+ * @method void setName(string $name)
+ * @phpstan-method void setName(non-empty-string $name)
+ * @psalm-method void setName(non-empty-string $name)
+ * @phan-method void setName(string $name)
+ * 
+ * @template T
+ * @phpstan-template T
+ * @psalm-template T
+ * @phan-template T
+ * 
+ * @template-covariant T
+ * @phpstan-template-covariant T
+ * @psalm-template-covariant T
+ * 
+ * @template-contravariant T
+ * @phpstan-template-contravariant T
+ * @psalm-template-contravariant T
+ * 
+ * @extends \\BaseCollection<int>
+ * @phpstan-extends \\BaseCollection<int>
+ * @phan-extends \\BaseCollection<int>
+ * @phan-inherits \\BaseCollection
+ * 
+ * @template-extends \\MyList<string>
+ * 
+ * @implements \\MyInterface<string>
+ * @phpstan-implements \\MyInterface<string>
+ * @template-implements \\MyInterface<string>
+ * 
+ * @use \\HelperTrait
+ * @phpstan-use \\HelperTrait<string>
+ * @template-use \\HelperTrait<T>
+ * 
+ * @phpstan-type MyType array<string, mixed>
+ * @psalm-type MyType array<string, mixed>
+ * @phan-type MyType array<string, mixed>
+ * 
+ * @phpstan-import-type ImportedType from \\AnotherClass
+ * @psalm-import-type ImportedType from \\AnotherClass
+ * 
+ * @phpstan-assert array $data
+ * @phpstan-assert-if-true non-empty-array $data
+ * @phpstan-assert-if-false empty-array $data
+ * @psalm-assert string $name
+ * @psalm-assert-if-true non-empty-string $name
+ * @psalm-assert-if-false empty-string $name
+ * @phan-assert string $address
+ * @phan-assert-if-true non-empty-string $address
+ * @phan-assert-if-false empty-string $address
+ * 
+ * @phpstan-this-out self
+ * @phpstan-self-out \\MyClass
+ * @psalm-this-out self
+ * @psalm-self-out \\MyClass
+ * 
+ * @param-out string $result
+ * @phpstan-param-out non-empty-string $result
+ * @psalm-param-out non-empty-string $result
+ */
+function example(): void {}"
+  ).unwrap();
+  insta::assert_yaml_snapshot!(tokens);
+}
