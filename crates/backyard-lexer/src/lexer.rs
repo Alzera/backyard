@@ -160,6 +160,7 @@ mod tests {
 
 #[derive(Debug, PartialEq)]
 pub enum SeriesCheckerMode {
+  Comment,
   String,
   Inline,
   Heredoc,
@@ -182,6 +183,14 @@ impl<'a> SeriesChecker<'a> {
     self.last_result = None;
     if self.mode == SeriesCheckerMode::Heredoc {
       if ch == b'\n' {
+        self.list.clear();
+      } else {
+        self.list.push(ch);
+      }
+      return;
+    }
+    if self.mode == SeriesCheckerMode::Comment {
+      if ch == b' ' {
         self.list.clear();
       } else {
         self.list.push(ch);

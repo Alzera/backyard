@@ -31,6 +31,8 @@ impl CommentParser {
           CommentLineNode::loc(comment.value.to_owned(), parser.gen_loc(start_loc)),
         TokenType::CommentBlock =>
           CommentBlockNode::loc(comment.value.to_owned(), parser.gen_loc(start_loc)),
+        // TokenType::CommentDoc =>
+        //   CommentDocNode::loc(comment.value.to_owned(), parser.gen_loc(start_loc)),
         _ => {
           return Err(ParserError::Internal);
         }

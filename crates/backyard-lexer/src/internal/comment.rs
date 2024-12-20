@@ -1,7 +1,7 @@
 use bstr::{ BString, ByteSlice };
 
 use crate::error::{ LexError, LexResult };
-use crate::lexer::{ ControlSnapshot, Lexer };
+use crate::lexer::{ ControlSnapshot, Lexer, SeriesChecker, SeriesCheckerMode };
 use crate::token::{ Token, TokenType };
 
 use super::number::NumberToken;
@@ -15,13 +15,11 @@ impl CommentToken {
     take_prev_len: usize,
     snapshot: &ControlSnapshot
   ) -> LexResult {
-    let mut close: Vec<u8> = Vec::new();
+    let againsts = [b"*/".into()];
+    let mut checker = SeriesChecker::new(&againsts, SeriesCheckerMode::Comment);
     let mut comment = lexer.control.next_char_until(take_prev_len, |_, ch, _| {
-      close.push(ch);
-      if close.len() > 2 {
-        close.remove(0);
-      }
-      close.first() == Some(&b'*') && close.get(1) == Some(&b'/')
+      checker.push(ch);
+      checker.check().is_some()
     });
     lexer.control.next_char();
     comment.pop();
@@ -34,19 +32,18 @@ impl CommentToken {
     take_prev_len: usize,
     snapshot: &ControlSnapshot
   ) -> LexResult {
-    let comment = {
-      lexer.control.next_char_until(take_prev_len, |control, ch, i| {
-        if ch == b'\n' {
-          return true;
-        }
-        if let Some(next_char) = control.peek_char(Some(*i + 1)) {
-          if ch == b'?' && *next_char == b'>' {
-            return true;
-          }
-        }
-        false
-      })
-    };
+    let againsts = [b"\n".into(), b"?>".into()];
+    let mut checker = SeriesChecker::new(&againsts, SeriesCheckerMode::Comment);
+    let mut comment = lexer.control.next_char_until(take_prev_len, |_, ch, _| {
+      checker.push(ch);
+      checker.check().is_some()
+    });
+    if let Some(breaker) = checker.check() {
+      if breaker == "?>" {
+        lexer.control.next_char();
+        comment.pop();
+      }
+    }
     lexer.tokens.push(Token::new(TokenType::CommentLine, comment, snapshot));
     Ok(())
   }

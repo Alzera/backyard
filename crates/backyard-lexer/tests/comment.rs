@@ -21,10 +21,6 @@ fn line_tag_close() {
 #[test]
 fn block() {
   let tokens = lex(true, "/* test */").unwrap();
-  for token in tokens.iter() {
-    println!("{token:?}");
-  }
-  println!("");
   insta::assert_yaml_snapshot!(tokens);
 }
 
