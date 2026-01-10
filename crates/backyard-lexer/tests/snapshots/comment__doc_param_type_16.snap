@@ -22,13 +22,13 @@ snapshot_kind: text
   line: 1
   column: 4
   offset: 4
-- token_type: LeftParenthesis
+- token_type: DocLeftParenthesis
   value:
     - 40
   line: 1
   column: 11
   offset: 11
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -39,13 +39,13 @@ snapshot_kind: text
   line: 2
   column: 2
   offset: 15
-- token_type: BitwiseAnd
+- token_type: DocBitwiseAnd
   value:
     - 38
   line: 3
   column: 2
   offset: 24
-- token_type: Type
+- token_type: DocType
   value:
     - 105
     - 110
@@ -53,13 +53,13 @@ snapshot_kind: text
   line: 4
   column: 2
   offset: 28
-- token_type: RightParenthesis
+- token_type: DocRightParenthesis
   value:
     - 41
   line: 5
   column: 0
   offset: 32
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 102

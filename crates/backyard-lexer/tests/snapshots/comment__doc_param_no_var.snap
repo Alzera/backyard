@@ -1,6 +1,5 @@
 ---
 source: crates/backyard-lexer/tests/comment.rs
-assertion_line: 289
 expression: tokens
 snapshot_kind: text
 ---
@@ -23,7 +22,7 @@ snapshot_kind: text
   line: 1
   column: 4
   offset: 4
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116

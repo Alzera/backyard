@@ -252,6 +252,19 @@ impl<'arena> Printable for Node<'arena> {
       NodeWrapper::While(v) => v.build_print(config),
       NodeWrapper::Yield(v) => v.build_print(config),
       NodeWrapper::YieldFrom(v) => v.build_print(config),
+
+      // PHP Doc
+      NodeWrapper::DocText(v) => v.build_print(config),
+      NodeWrapper::DocParam(v) => v.build_print(config),
+      NodeWrapper::DocUnionType(v) => v.build_print(config),
+      NodeWrapper::DocIntersectionType(v) => v.build_print(config),
+      NodeWrapper::DocArrayType(v) => v.build_print(config),
+      NodeWrapper::DocStructuredArrayType(v) => v.build_print(config),
+      NodeWrapper::DocStructuredArrayItemType(v) => v.build_print(config),
+      NodeWrapper::DocListType(v) => v.build_print(config),
+      NodeWrapper::DocCallableType(v) => v.build_print(config),
+      NodeWrapper::DocType(v) => v.build_print(config),
+      NodeWrapper::DocVariable(v) => v.build_print(config),
     };
     if config.with_leading_trailing || config.with_location {
       let mut node_builder = PrintBuilder::new(PrintType::Object);

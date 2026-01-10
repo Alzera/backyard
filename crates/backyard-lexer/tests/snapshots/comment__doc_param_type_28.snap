@@ -22,7 +22,7 @@ snapshot_kind: text
   line: 1
   column: 4
   offset: 4
-- token_type: This
+- token_type: DocThis
   value:
     - 36
     - 116
@@ -32,7 +32,7 @@ snapshot_kind: text
   line: 1
   column: 11
   offset: 11
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 102

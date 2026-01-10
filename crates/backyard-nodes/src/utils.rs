@@ -173,6 +173,21 @@ impl<'arena> CloneIn<'arena> for NodeWrapper<'_> {
       NodeWrapper::While(v) => NodeWrapper::While(v.clone_in(arena)),
       NodeWrapper::Yield(v) => NodeWrapper::Yield(v.clone_in(arena)),
       NodeWrapper::YieldFrom(v) => NodeWrapper::YieldFrom(v.clone_in(arena)),
+
+      // PHP Doc
+      NodeWrapper::DocText(v) => NodeWrapper::DocText(v.clone_in(arena)),
+      NodeWrapper::DocParam(v) => NodeWrapper::DocParam(v.clone_in(arena)),
+      NodeWrapper::DocUnionType(v) => NodeWrapper::DocUnionType(v.clone_in(arena)),
+      NodeWrapper::DocIntersectionType(v) => NodeWrapper::DocIntersectionType(v.clone_in(arena)),
+      NodeWrapper::DocArrayType(v) => NodeWrapper::DocArrayType(v.clone_in(arena)),
+      NodeWrapper::DocStructuredArrayType(v) =>
+        NodeWrapper::DocStructuredArrayType(v.clone_in(arena)),
+      NodeWrapper::DocStructuredArrayItemType(v) =>
+        NodeWrapper::DocStructuredArrayItemType(v.clone_in(arena)),
+      NodeWrapper::DocListType(v) => NodeWrapper::DocListType(v.clone_in(arena)),
+      NodeWrapper::DocCallableType(v) => NodeWrapper::DocCallableType(v.clone_in(arena)),
+      NodeWrapper::DocType(v) => NodeWrapper::DocType(v.clone_in(arena)),
+      NodeWrapper::DocVariable(v) => NodeWrapper::DocVariable(v.clone_in(arena)),
     }
   }
 }

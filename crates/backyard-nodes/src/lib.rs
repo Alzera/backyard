@@ -120,7 +120,7 @@ pub enum NodeWrapper<'a> {
   ClassKeyword(ClassKeywordNode),
   Clone(CloneNode<'a>),
   CommentBlock(CommentBlockNode),
-  CommentDoc(CommentDocNode),
+  // CommentDoc(CommentDocNode),
   CommentLine(CommentLineNode),
   Const(ConstNode<'a>),
   ConstProperty(ConstPropertyNode<'a>),
@@ -202,6 +202,20 @@ pub enum NodeWrapper<'a> {
   While(WhileNode<'a>),
   Yield(YieldNode<'a>),
   YieldFrom(YieldFromNode<'a>),
+
+  // PHP Doc
+  CommentDoc(CommentDocNode<'a>),
+  DocText(DocTextNode),
+  DocParam(DocParamNode<'a>),
+  DocUnionType(DocUnionTypeNode<'a>),
+  DocIntersectionType(DocIntersectionTypeNode<'a>),
+  DocArrayType(DocArrayTypeNode<'a>),
+  DocStructuredArrayType(DocStructuredArrayTypeNode<'a>),
+  DocStructuredArrayItemType(DocStructuredArrayItemTypeNode<'a>),
+  DocListType(DocListTypeNode<'a>),
+  DocCallableType(DocCallableTypeNode<'a>),
+  DocType(DocTypeNode),
+  DocVariable(DocVariableNode),
 }
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -230,7 +244,7 @@ pub enum NodeType {
   ClassKeyword,
   Clone,
   CommentBlock,
-  CommentDoc,
+  // CommentDoc,
   CommentLine,
   Const,
   ConstProperty,
@@ -312,6 +326,20 @@ pub enum NodeType {
   While,
   Yield,
   YieldFrom,
+
+  // PHP Doc
+  CommentDoc,
+  DocText,
+  DocParam,
+  DocUnionType,
+  DocIntersectionType,
+  DocArrayType,
+  DocStructuredArrayType,
+  DocStructuredArrayItemType,
+  DocListType,
+  DocCallableType,
+  DocType,
+  DocVariable,
 }
 
 macro_rules! new_node {
@@ -631,7 +659,7 @@ new_node!(Class, ClassNode<'a> { inheritance: Option<Inheritance>, name: Option<
 new_node!(ClassKeyword, ClassKeywordNode {}, ClassKeywordBlueprint {});
 new_node!(Clone, CloneNode<'a> { statement: bumpalo::boxed::Box<'a, Node<'a>>, }, CloneBlueprint<'b> { statement: Box<Blueprint<'b>>, });
 new_node!(CommentBlock, CommentBlockNode { comment: BString, }, CommentBlockBlueprint<'b> { comment: &'b str, });
-new_node!(CommentDoc, CommentDocNode { comment: BString, }, CommentDocBlueprint<'b> { comment: &'b str, });
+// new_node!(CommentDoc, CommentDocNode { comment: BString, }, CommentDocBlueprint<'b> { comment: &'b str, });
 new_node!(CommentLine, CommentLineNode { comment: BString, }, CommentLineBlueprint<'b> { comment: &'b str, });
 new_node!(Const, ConstNode<'a> { items: bumpalo::collections::Vec<'a, Node<'a>>, }, ConstBlueprint<'b> { items: &'b [Box<Blueprint<'b>>], });
 new_node!(ConstProperty, ConstPropertyNode<'a> { const_type: Option<bumpalo::boxed::Box<'a, Node<'a>>>, visibilities: Vec<Visibility>, items: bumpalo::collections::Vec<'a, Node<'a>>, }, ConstPropertyBlueprint<'b> { const_type: Option<Box<Blueprint<'b>>>, visibilities: Vec<Visibility>, items: &'b [Box<Blueprint<'b>>], });
@@ -717,6 +745,20 @@ new_node!(Variadic, VariadicNode<'a> { statement: Option<bumpalo::boxed::Box<'a,
 new_node!(While, WhileNode<'a> { condition: bumpalo::boxed::Box<'a, Node<'a>>, body: bumpalo::boxed::Box<'a, Node<'a>>, is_short: bool, }, WhileBlueprint<'b> { condition: Box<Blueprint<'b>>, body: Box<Blueprint<'b>>, is_short: bool, });
 new_node!(Yield, YieldNode<'a> { key: Option<bumpalo::boxed::Box<'a, Node<'a>>>, value: Option<bumpalo::boxed::Box<'a, Node<'a>>>, }, YieldBlueprint<'b> { key: Option<Box<Blueprint<'b>>>, value: Option<Box<Blueprint<'b>>>, });
 new_node!(YieldFrom, YieldFromNode<'a> { statement: bumpalo::boxed::Box<'a, Node<'a>>, }, YieldFromBlueprint<'b> { statement: Box<Blueprint<'b>>, });
+
+// PHP Doc
+new_node!(CommentDoc, CommentDocNode<'a> { contents: bumpalo::collections::Vec<'a, Node<'a>>, }, CommentDocBlueprint<'b> { contents: &'b [Box<Blueprint<'b>>], });
+new_node!(DocText, DocTextNode { value: BString, }, DocTextBlueprint<'b> { value: &'b str, });
+new_node!(DocParam, DocParamNode<'a> { param_type: Option<bumpalo::boxed::Box<'a, Node<'a>>>, name: Option<bumpalo::boxed::Box<'a, Node<'a>>>, description: Option<bumpalo::boxed::Box<'a, Node<'a>>>, }, DocParamBlueprint<'b> { param_type: Option<Box<Blueprint<'b>>>, name: Option<Box<Blueprint<'b>>>, description: Option<Box<Blueprint<'b>>>, });
+new_node!(DocUnionType, DocUnionTypeNode<'a> { types: bumpalo::collections::Vec<'a, Node<'a>>, }, DocUnionTypeBlueprint<'b> { types: &'b [Box<Blueprint<'b>>], });
+new_node!(DocIntersectionType, DocIntersectionTypeNode<'a> { types: bumpalo::collections::Vec<'a, Node<'a>>, }, DocIntersectionTypeBlueprint<'b> { types: &'b [Box<Blueprint<'b>>], });
+new_node!(DocArrayType, DocArrayTypeNode<'a> { key: Option<bumpalo::boxed::Box<'a, Node<'a>>>, value: bumpalo::boxed::Box<'a, Node<'a>>, }, DocArrayTypeBlueprint<'b> { key: Option<Box<Blueprint<'b>>>, value: Box<Blueprint<'b>>, });
+new_node!(DocStructuredArrayType, DocStructuredArrayTypeNode<'a> { structures: bumpalo::collections::Vec<'a, Node<'a>>, }, DocStructuredArrayTypeBlueprint<'b> { structures: &'b [Box<Blueprint<'b>>], });
+new_node!(DocStructuredArrayItemType, DocStructuredArrayItemTypeNode<'a> { is_nullable: bool, label: BString, value: bumpalo::boxed::Box<'a, Node<'a>>, }, DocStructuredArrayItemTypeBlueprint<'b> { is_nullable: bool, label: &'b str, value: Box<Blueprint<'b>>, });
+new_node!(DocListType, DocListTypeNode<'a> { value: Option<bumpalo::boxed::Box<'a, Node<'a>>>, }, DocListTypeBlueprint<'b> { value: Option<Box<Blueprint<'b>>>, });
+new_node!(DocCallableType, DocCallableTypeNode<'a> { parameters: bumpalo::collections::Vec<'a, Node<'a>>, return_type: Option<bumpalo::boxed::Box<'a, Node<'a>>>, }, DocCallableTypeBlueprint<'b> { parameters: &'b [Box<Blueprint<'b>>], return_type: Option<Box<Blueprint<'b>>>, });
+new_node!(DocType, DocTypeNode { is_nullable: bool, name: BString, }, DocTypeBlueprint<'b> { is_nullable: bool, name: &'b str, });
+new_node!(DocVariable, DocVariableNode { name: BString, }, DocVariableBlueprint<'b> { name: &'b str, });
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, PartialEq, Clone)]

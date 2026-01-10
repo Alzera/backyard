@@ -22,7 +22,7 @@ snapshot_kind: text
   line: 1
   column: 4
   offset: 4
-- token_type: Type
+- token_type: DocType
   value:
     - 97
     - 114
@@ -32,13 +32,13 @@ snapshot_kind: text
   line: 1
   column: 11
   offset: 11
-- token_type: LeftCurlyBracket
+- token_type: DocLeftCurlyBracket
   value:
     - 123
   line: 1
   column: 16
   offset: 16
-- token_type: Type
+- token_type: DocType
   value:
     - 105
     - 110
@@ -46,13 +46,13 @@ snapshot_kind: text
   line: 1
   column: 17
   offset: 17
-- token_type: Comma
+- token_type: DocComma
   value:
     - 44
   line: 1
   column: 20
   offset: 20
-- token_type: Type
+- token_type: DocType
   value:
     - 105
     - 110
@@ -60,13 +60,13 @@ snapshot_kind: text
   line: 1
   column: 22
   offset: 22
-- token_type: RightCurlyBracket
+- token_type: DocRightCurlyBracket
   value:
     - 125
   line: 1
   column: 25
   offset: 25
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 102

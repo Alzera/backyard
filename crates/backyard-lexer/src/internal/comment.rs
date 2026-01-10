@@ -86,11 +86,11 @@ impl CommentToken {
       b'$' => {
         let t: BString = lexer.until(|ch| !(ch.is_ascii_alphanumeric() || ch == b'_'));
         if t == b"$this" {
-          lexer.tokens.push(Token::new(TokenType::This, t, snapshot));
+          lexer.tokens.push(Token::new(TokenType::DocThis, t, snapshot));
           return Ok(());
         } else if let Some(f) = t.get(1) {
           if f.is_ascii_alphabetic() || *f == b'_' {
-            lexer.tokens.push(Token::new(TokenType::Variable, t, snapshot));
+            lexer.tokens.push(Token::new(TokenType::DocVariable, t, snapshot));
             return Ok(());
           }
         }
@@ -413,6 +413,7 @@ impl CommentToken {
   fn try_parse_type(lexer: &mut Lexer) -> LexResult {
     let mut expect_non_type = false;
     loop {
+      // possibly to remove this whitespace skipping
       lexer.control.next_char_until(0, |_, ch, _| !matches!(ch, b'\t' | b'\x0C' | b' '));
 
       if let Some(next_char) = lexer.control.peek_char(None) {
@@ -443,41 +444,45 @@ impl CommentToken {
           let t = lexer.until(|ch| !(ch.is_ascii_alphanumeric() || ch == b'_' || ch == b'\\'));
           if t.contains(&b'\\') {
             if t.starts_with(b"namespace") {
-              lexer.tokens.push(Token::new(TokenType::RelativeName, t, snapshot));
+              lexer.tokens.push(Token::new(TokenType::DocRelativeName, t, snapshot));
             } else {
-              lexer.tokens.push(Token::new(TokenType::QualifiedName, t, snapshot));
+              lexer.tokens.push(Token::new(TokenType::DocQualifiedName, t, snapshot));
             }
           } else {
             let t_lowercase: BString = t.to_ascii_lowercase().into();
             let t_lowercase_sliced = t_lowercase.as_slice();
             if TYPE_KEYWORDS.contains(&t_lowercase_sliced) {
-              lexer.tokens.push(Token::new(TokenType::Type, t_lowercase, snapshot));
+              lexer.tokens.push(Token::new(TokenType::DocType, t_lowercase, snapshot));
             } else {
-              lexer.tokens.push(Token::new(TokenType::UnqualifiedName, t, snapshot));
+              lexer.tokens.push(Token::new(TokenType::DocUnqualifiedName, t, snapshot));
             }
           }
           expect_non_type = true;
         }
-        b'(' => lexer.tokens.push(Token::new(TokenType::LeftParenthesis, "(".into(), snapshot)),
-        b')' => lexer.tokens.push(Token::new(TokenType::RightParenthesis, ")".into(), snapshot)),
-        b'<' => lexer.tokens.push(Token::new(TokenType::LeftAngleBracket, "<".into(), snapshot)),
-        b'>' => lexer.tokens.push(Token::new(TokenType::RightAngleBracket, ">".into(), snapshot)),
-        b'{' => lexer.tokens.push(Token::new(TokenType::LeftCurlyBracket, "{".into(), snapshot)),
-        b'}' => lexer.tokens.push(Token::new(TokenType::RightCurlyBracket, "}".into(), snapshot)),
-        b'[' => lexer.tokens.push(Token::new(TokenType::LeftSquareBracket, "[".into(), snapshot)),
-        b']' => lexer.tokens.push(Token::new(TokenType::RightSquareBracket, "]".into(), snapshot)),
-        b':' => lexer.tokens.push(Token::new(TokenType::Colon, ":".into(), snapshot)),
-        b',' => lexer.tokens.push(Token::new(TokenType::Comma, ",".into(), snapshot)),
-        b'|' => lexer.tokens.push(Token::new(TokenType::BitwiseOr, "|".into(), snapshot)),
+        b'(' => lexer.tokens.push(Token::new(TokenType::DocLeftParenthesis, "(".into(), snapshot)),
+        b')' => lexer.tokens.push(Token::new(TokenType::DocRightParenthesis, ")".into(), snapshot)),
+        b'<' => lexer.tokens.push(Token::new(TokenType::DocLeftAngleBracket, "<".into(), snapshot)),
+        b'>' =>
+          lexer.tokens.push(Token::new(TokenType::DocRightAngleBracket, ">".into(), snapshot)),
+        b'{' => lexer.tokens.push(Token::new(TokenType::DocLeftCurlyBracket, "{".into(), snapshot)),
+        b'}' =>
+          lexer.tokens.push(Token::new(TokenType::DocRightCurlyBracket, "}".into(), snapshot)),
+        b'[' =>
+          lexer.tokens.push(Token::new(TokenType::DocLeftSquareBracket, "[".into(), snapshot)),
+        b']' =>
+          lexer.tokens.push(Token::new(TokenType::DocRightSquareBracket, "]".into(), snapshot)),
+        b':' => lexer.tokens.push(Token::new(TokenType::DocColon, ":".into(), snapshot)),
+        b',' => lexer.tokens.push(Token::new(TokenType::DocComma, ",".into(), snapshot)),
+        b'|' => lexer.tokens.push(Token::new(TokenType::DocBitwiseOr, "|".into(), snapshot)),
         b'\'' => StringToken::lex_basic(lexer, snapshot)?,
-        b'?' => lexer.tokens.push(Token::new(TokenType::QuestionMark, "?".into(), snapshot)),
+        b'?' => lexer.tokens.push(Token::new(TokenType::DocQuestionMark, "?".into(), snapshot)),
         b'&' => {
-          lexer.tokens.push(Token::new(TokenType::BitwiseAnd, "&".into(), snapshot));
+          lexer.tokens.push(Token::new(TokenType::DocBitwiseAnd, "&".into(), snapshot));
         }
         b'.' => {
           let t = lexer.until(|ch| ![b'.', b'='].contains(&ch));
           if t == b"..." {
-            lexer.tokens.push(Token::new(TokenType::Ellipsis, "...".into(), snapshot));
+            lexer.tokens.push(Token::new(TokenType::DocEllipsis, "...".into(), snapshot));
           } else {
             lexer.tokens.push(Token::new(TokenType::DocUnknown, t, snapshot));
             break;
@@ -485,7 +490,7 @@ impl CommentToken {
         }
         b'\\' => {
           let t = lexer.until(|ch| !(ch.is_ascii_alphanumeric() || ch == b'_' || ch == b'\\'));
-          lexer.tokens.push(Token::new(TokenType::FullyQualifiedName, t, snapshot));
+          lexer.tokens.push(Token::new(TokenType::DocFullyQualifiedName, t, snapshot));
           expect_non_type = true;
         }
         b'*' => {
@@ -494,7 +499,7 @@ impl CommentToken {
             lexer.tokens.push(Token::new(TokenType::CommentDocClose, "*/".into(), snapshot));
             break;
           } else {
-            lexer.tokens.push(Token::new(TokenType::Multiplication, "*".into(), snapshot));
+            lexer.tokens.push(Token::new(TokenType::DocMultiplication, "*".into(), snapshot));
           }
         }
         b'\n' => {

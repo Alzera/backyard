@@ -22,19 +22,19 @@ snapshot_kind: text
   line: 1
   column: 4
   offset: 4
-- token_type: LeftParenthesis
+- token_type: DocLeftParenthesis
   value:
     - 40
   line: 1
   column: 11
   offset: 11
-- token_type: LeftParenthesis
+- token_type: DocLeftParenthesis
   value:
     - 40
   line: 1
   column: 13
   offset: 13
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -45,19 +45,19 @@ snapshot_kind: text
   line: 1
   column: 15
   offset: 15
-- token_type: RightParenthesis
+- token_type: DocRightParenthesis
   value:
     - 41
   line: 1
   column: 22
   offset: 22
-- token_type: RightParenthesis
+- token_type: DocRightParenthesis
   value:
     - 41
   line: 1
   column: 24
   offset: 24
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 102

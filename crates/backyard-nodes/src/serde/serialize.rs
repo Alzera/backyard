@@ -140,6 +140,23 @@ impl<'arena> Serializable for Node<'arena> {
       NodeWrapper::While(v) => SerializableNodeWrapper::While(v.to_serializable()),
       NodeWrapper::Yield(v) => SerializableNodeWrapper::Yield(v.to_serializable()),
       NodeWrapper::YieldFrom(v) => SerializableNodeWrapper::YieldFrom(v.to_serializable()),
+
+      // PHP Doc
+      NodeWrapper::DocText(v) => SerializableNodeWrapper::DocText(v.to_serializable()),
+      NodeWrapper::DocParam(v) => SerializableNodeWrapper::DocParam(v.to_serializable()),
+      NodeWrapper::DocUnionType(v) => SerializableNodeWrapper::DocUnionType(v.to_serializable()),
+      NodeWrapper::DocIntersectionType(v) =>
+        SerializableNodeWrapper::DocIntersectionType(v.to_serializable()),
+      NodeWrapper::DocArrayType(v) => SerializableNodeWrapper::DocArrayType(v.to_serializable()),
+      NodeWrapper::DocStructuredArrayType(v) =>
+        SerializableNodeWrapper::DocStructuredArrayType(v.to_serializable()),
+      NodeWrapper::DocStructuredArrayItemType(v) =>
+        SerializableNodeWrapper::DocStructuredArrayItemType(v.to_serializable()),
+      NodeWrapper::DocListType(v) => SerializableNodeWrapper::DocListType(v.to_serializable()),
+      NodeWrapper::DocCallableType(v) =>
+        SerializableNodeWrapper::DocCallableType(v.to_serializable()),
+      NodeWrapper::DocType(v) => SerializableNodeWrapper::DocType(v.to_serializable()),
+      NodeWrapper::DocVariable(v) => SerializableNodeWrapper::DocVariable(v.to_serializable()),
     };
     SerializableNode {
       node_type: self.node_type.clone(),

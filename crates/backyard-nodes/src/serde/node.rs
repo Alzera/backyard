@@ -139,6 +139,19 @@ pub enum SerializableNodeWrapper {
   While(WhileSNode),
   Yield(YieldSNode),
   YieldFrom(YieldFromSNode),
+
+  // PHP Doc
+  DocText(DocTextSNode),
+  DocParam(DocParamSNode),
+  DocUnionType(DocUnionTypeSNode),
+  DocIntersectionType(DocIntersectionTypeSNode),
+  DocArrayType(DocArrayTypeSNode),
+  DocStructuredArrayType(DocStructuredArrayTypeSNode),
+  DocStructuredArrayItemType(DocStructuredArrayItemTypeSNode),
+  DocListType(DocListTypeSNode),
+  DocCallableType(DocCallableTypeSNode),
+  DocType(DocTypeSNode),
+  DocVariable(DocVariableSNode),
 }
 
 macro_rules! new_serializable_node {
@@ -224,7 +237,7 @@ new_serializable_node!(Class, ClassNode<'a>, ClassSNode { inheritance: Option<In
 new_serializable_node!(ClassKeyword, ClassKeywordNode, ClassKeywordSNode {});
 new_serializable_node!(Clone, CloneNode<'a>, CloneSNode { statement: Box<SerializableNode>, });
 new_serializable_node!(CommentBlock, CommentBlockNode, CommentBlockSNode { comment: BString });
-new_serializable_node!(CommentDoc, CommentDocNode, CommentDocSNode { comment: BString });
+// new_serializable_node!(CommentDoc, CommentDocNode, CommentDocSNode { comment: BString });
 new_serializable_node!(CommentLine, CommentLineNode, CommentLineSNode { comment: BString });
 new_serializable_node!(Const, ConstNode<'a>, ConstSNode { items: Vec<SerializableNode>, });
 new_serializable_node!(ConstProperty, ConstPropertyNode<'a>, ConstPropertySNode { const_type: Option<Box<SerializableNode>>, visibilities: Vec<Visibility>, items: Vec<SerializableNode>, });
@@ -306,6 +319,20 @@ new_serializable_node!(Variadic, VariadicNode<'a>, VariadicSNode { statement: Op
 new_serializable_node!(While, WhileNode<'a>, WhileSNode { condition: Box<SerializableNode>, body: Box<SerializableNode>, is_short: bool, });
 new_serializable_node!(Yield, YieldNode<'a>, YieldSNode { key: Option<Box<SerializableNode>>, value: Option<Box<SerializableNode>>, });
 new_serializable_node!(YieldFrom, YieldFromNode<'a>, YieldFromSNode { statement: Box<SerializableNode>, });
+
+// PHP Doc
+new_serializable_node!(CommentDoc, CommentDocNode<'a>, CommentDocSNode { contents: Vec<SerializableNode>, });
+new_serializable_node!(DocText, DocTextNode, DocTextSNode { value: BString });
+new_serializable_node!(DocParam, DocParamNode<'a>, DocParamSNode { param_type: Option<Box<SerializableNode>>, name: Option<Box<SerializableNode>>, description: Option<Box<SerializableNode>>, });
+new_serializable_node!(DocUnionType, DocUnionTypeNode<'a>, DocUnionTypeSNode { types: Vec<SerializableNode>, });
+new_serializable_node!(DocIntersectionType, DocIntersectionTypeNode<'a>, DocIntersectionTypeSNode { types: Vec<SerializableNode>, });
+new_serializable_node!(DocArrayType, DocArrayTypeNode<'a>, DocArrayTypeSNode { key: Option<Box<SerializableNode>>, value: Box<SerializableNode>, });
+new_serializable_node!(DocStructuredArrayType, DocStructuredArrayTypeNode<'a>, DocStructuredArrayTypeSNode { structures: Vec<SerializableNode>, });
+new_serializable_node!(DocStructuredArrayItemType, DocStructuredArrayItemTypeNode<'a>, DocStructuredArrayItemTypeSNode { is_nullable: bool, label: BString, value: Box<SerializableNode>, });
+new_serializable_node!(DocListType, DocListTypeNode<'a>, DocListTypeSNode { value: Option<Box<SerializableNode>>, });
+new_serializable_node!(DocCallableType, DocCallableTypeNode<'a>, DocCallableTypeSNode { parameters: Vec<SerializableNode>, return_type: Option<Box<SerializableNode>>, });
+new_serializable_node!(DocType, DocTypeNode, DocTypeSNode { is_nullable: bool, name: BString });
+new_serializable_node!(DocVariable, DocVariableNode, DocVariableSNode { name: BString });
 
 #[cfg(test)]
 mod tests {

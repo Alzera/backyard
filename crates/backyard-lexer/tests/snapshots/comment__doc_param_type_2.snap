@@ -22,7 +22,7 @@ snapshot_kind: text
   line: 1
   column: 4
   offset: 4
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -33,7 +33,7 @@ snapshot_kind: text
   line: 1
   column: 13
   offset: 13
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 102

@@ -25,8 +25,7 @@ fn main() {
   for file in php_files {
     match read_to_string(&file) {
       Ok(content) => {
-        let arena = bumpalo::Bump::new();
-        let parsed = parse(&arena, &content);
+        let parsed = parse(false, &content);
         if let Err(err) = parsed {
           if let ParserError::Eof = err {
           } else {
@@ -40,3 +39,12 @@ fn main() {
     }
   }
 }
+
+// better support for PHPDoc
+// use rc on lexer
+// keep empty line break
+
+// make lexer and parser work together
+// make parser grouped so can be multithread-ed
+// unifying internal parser
+// use visitor in generator

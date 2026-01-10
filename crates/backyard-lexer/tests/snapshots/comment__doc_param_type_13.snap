@@ -22,7 +22,7 @@ snapshot_kind: text
   line: 1
   column: 4
   offset: 4
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -33,13 +33,13 @@ snapshot_kind: text
   line: 1
   column: 11
   offset: 11
-- token_type: BitwiseAnd
+- token_type: DocBitwiseAnd
   value:
     - 38
   line: 1
   column: 17
   offset: 17
-- token_type: Type
+- token_type: DocType
   value:
     - 105
     - 110
@@ -47,7 +47,7 @@ snapshot_kind: text
   line: 1
   column: 18
   offset: 18
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 102

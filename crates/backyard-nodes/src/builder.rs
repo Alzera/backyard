@@ -180,6 +180,19 @@ impl<'arena, 'a> BlueprintBuildable<'arena> for Blueprint<'a> {
       BlueprintWrapper::While(bp) => bp.build(arena),
       BlueprintWrapper::Yield(bp) => bp.build(arena),
       BlueprintWrapper::YieldFrom(bp) => bp.build(arena),
+
+      // PHP Doc
+      BlueprintWrapper::DocText(bp) => bp.build(arena),
+      BlueprintWrapper::DocParam(bp) => bp.build(arena),
+      BlueprintWrapper::DocUnionType(bp) => bp.build(arena),
+      BlueprintWrapper::DocIntersectionType(bp) => bp.build(arena),
+      BlueprintWrapper::DocArrayType(bp) => bp.build(arena),
+      BlueprintWrapper::DocStructuredArrayType(bp) => bp.build(arena),
+      BlueprintWrapper::DocStructuredArrayItemType(bp) => bp.build(arena),
+      BlueprintWrapper::DocListType(bp) => bp.build(arena),
+      BlueprintWrapper::DocCallableType(bp) => bp.build(arena),
+      BlueprintWrapper::DocType(bp) => bp.build(arena),
+      BlueprintWrapper::DocVariable(bp) => bp.build(arena),
     };
     for leading in self.leadings.iter() {
       node.leadings_push(arena, leading.deref().build(arena));
@@ -297,6 +310,19 @@ pub enum BlueprintWrapper<'a> {
   While(crate::WhileBlueprint<'a>),
   Yield(crate::YieldBlueprint<'a>),
   YieldFrom(crate::YieldFromBlueprint<'a>),
+
+  // PHP Doc
+  DocText(crate::DocTextBlueprint<'a>),
+  DocParam(crate::DocParamBlueprint<'a>),
+  DocUnionType(crate::DocUnionTypeBlueprint<'a>),
+  DocIntersectionType(crate::DocIntersectionTypeBlueprint<'a>),
+  DocArrayType(crate::DocArrayTypeBlueprint<'a>),
+  DocStructuredArrayType(crate::DocStructuredArrayTypeBlueprint<'a>),
+  DocStructuredArrayItemType(crate::DocStructuredArrayItemTypeBlueprint<'a>),
+  DocListType(crate::DocListTypeBlueprint<'a>),
+  DocCallableType(crate::DocCallableTypeBlueprint<'a>),
+  DocType(crate::DocTypeBlueprint<'a>),
+  DocVariable(crate::DocVariableBlueprint<'a>),
 }
 
 impl<'arena, 'a> BlueprintBuildable<'arena> for std::boxed::Box<Blueprint<'a>> {

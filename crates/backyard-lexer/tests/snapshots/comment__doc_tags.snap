@@ -1,6 +1,5 @@
 ---
 source: crates/backyard-lexer/tests/comment.rs
-assertion_line: 421
 expression: tokens
 snapshot_kind: text
 ---
@@ -104,7 +103,7 @@ snapshot_kind: text
   line: 4
   column: 3
   offset: 63
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -115,7 +114,7 @@ snapshot_kind: text
   line: 4
   column: 10
   offset: 70
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 110
@@ -163,7 +162,7 @@ snapshot_kind: text
   line: 5
   column: 3
   offset: 97
-- token_type: UnqualifiedName
+- token_type: DocUnqualifiedName
   value:
     - 110
     - 111
@@ -188,7 +187,7 @@ snapshot_kind: text
   line: 5
   column: 22
   offset: 116
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 110
@@ -215,7 +214,7 @@ snapshot_kind: text
   line: 6
   column: 3
   offset: 138
-- token_type: UnqualifiedName
+- token_type: DocUnqualifiedName
   value:
     - 110
     - 111
@@ -240,7 +239,7 @@ snapshot_kind: text
   line: 6
   column: 20
   offset: 155
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 110
@@ -266,7 +265,7 @@ snapshot_kind: text
   line: 7
   column: 3
   offset: 177
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -277,7 +276,7 @@ snapshot_kind: text
   line: 7
   column: 15
   offset: 189
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 110
@@ -340,7 +339,7 @@ snapshot_kind: text
   line: 9
   column: 39
   offset: 245
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 99
@@ -422,7 +421,7 @@ snapshot_kind: text
   line: 10
   column: 47
   offset: 311
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 99
@@ -483,7 +482,7 @@ snapshot_kind: text
   line: 12
   column: 33
   offset: 374
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 108
@@ -568,7 +567,7 @@ snapshot_kind: text
   line: 13
   column: 41
   offset: 438
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 108
@@ -610,7 +609,7 @@ snapshot_kind: text
   line: 15
   column: 3
   offset: 480
-- token_type: Type
+- token_type: DocType
   value:
     - 111
     - 98
@@ -621,7 +620,7 @@ snapshot_kind: text
   line: 15
   column: 23
   offset: 500
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 116
@@ -669,7 +668,7 @@ snapshot_kind: text
   line: 16
   column: 3
   offset: 522
-- token_type: UnqualifiedName
+- token_type: DocUnqualifiedName
   value:
     - 115
     - 101
@@ -678,7 +677,7 @@ snapshot_kind: text
   line: 16
   column: 31
   offset: 550
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 116
@@ -783,7 +782,7 @@ snapshot_kind: text
   line: 21
   column: 3
   offset: 656
-- token_type: Type
+- token_type: DocType
   value:
     - 105
     - 110
@@ -839,7 +838,7 @@ snapshot_kind: text
   line: 23
   column: 3
   offset: 697
-- token_type: UnqualifiedName
+- token_type: DocUnqualifiedName
   value:
     - 112
     - 111
@@ -874,7 +873,7 @@ snapshot_kind: text
   line: 24
   column: 3
   offset: 724
-- token_type: Type
+- token_type: DocType
   value:
     - 105
     - 110
@@ -922,7 +921,7 @@ snapshot_kind: text
   line: 27
   column: 3
   offset: 761
-- token_type: UnqualifiedName
+- token_type: DocUnqualifiedName
   value:
     - 116
     - 114
@@ -974,7 +973,7 @@ snapshot_kind: text
   line: 29
   column: 3
   offset: 807
-- token_type: Type
+- token_type: DocType
   value:
     - 98
     - 111
@@ -1025,7 +1024,7 @@ snapshot_kind: text
   line: 32
   column: 3
   offset: 858
-- token_type: FullyQualifiedName
+- token_type: DocFullyQualifiedName
   value:
     - 92
     - 69
@@ -1100,7 +1099,7 @@ snapshot_kind: text
   line: 35
   column: 3
   offset: 929
-- token_type: FullyQualifiedName
+- token_type: DocFullyQualifiedName
   value:
     - 92
     - 77
@@ -1168,7 +1167,7 @@ snapshot_kind: text
   line: 38
   column: 3
   offset: 976
-- token_type: FullyQualifiedName
+- token_type: DocFullyQualifiedName
   value:
     - 92
     - 66
@@ -1256,7 +1255,7 @@ snapshot_kind: text
   line: 41
   column: 3
   offset: 1056
-- token_type: FullyQualifiedName
+- token_type: DocFullyQualifiedName
   value:
     - 92
     - 77
@@ -1390,7 +1389,7 @@ snapshot_kind: text
   line: 46
   column: 3
   offset: 1192
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -1401,7 +1400,7 @@ snapshot_kind: text
   line: 46
   column: 13
   offset: 1202
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 102
@@ -1435,7 +1434,7 @@ snapshot_kind: text
   line: 47
   column: 3
   offset: 1223
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -1446,7 +1445,7 @@ snapshot_kind: text
   line: 47
   column: 18
   offset: 1238
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 108
@@ -1480,7 +1479,7 @@ snapshot_kind: text
   line: 48
   column: 3
   offset: 1258
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -1491,7 +1490,7 @@ snapshot_kind: text
   line: 48
   column: 19
   offset: 1274
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 112
@@ -1527,7 +1526,7 @@ snapshot_kind: text
   line: 49
   column: 3
   offset: 1294
-- token_type: UnqualifiedName
+- token_type: DocUnqualifiedName
   value:
     - 110
     - 111
@@ -1552,7 +1551,7 @@ snapshot_kind: text
   line: 49
   column: 25
   offset: 1316
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 102
@@ -1594,7 +1593,7 @@ snapshot_kind: text
   line: 50
   column: 3
   offset: 1343
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -1605,7 +1604,7 @@ snapshot_kind: text
   line: 50
   column: 26
   offset: 1366
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 108
@@ -1647,7 +1646,7 @@ snapshot_kind: text
   line: 51
   column: 3
   offset: 1386
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -1658,7 +1657,7 @@ snapshot_kind: text
   line: 51
   column: 27
   offset: 1410
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 112
@@ -1692,7 +1691,7 @@ snapshot_kind: text
   line: 52
   column: 3
   offset: 1430
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -1703,7 +1702,7 @@ snapshot_kind: text
   line: 52
   column: 19
   offset: 1446
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 109
@@ -1744,7 +1743,7 @@ snapshot_kind: text
   line: 53
   column: 3
   offset: 1468
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -1755,7 +1754,7 @@ snapshot_kind: text
   line: 53
   column: 24
   offset: 1489
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 110
@@ -1795,7 +1794,7 @@ snapshot_kind: text
   line: 54
   column: 3
   offset: 1509
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -1806,7 +1805,7 @@ snapshot_kind: text
   line: 54
   column: 25
   offset: 1531
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 101
@@ -1836,7 +1835,7 @@ snapshot_kind: text
   line: 55
   column: 3
   offset: 1548
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -1847,7 +1846,7 @@ snapshot_kind: text
   line: 55
   column: 18
   offset: 1563
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 97
@@ -1884,7 +1883,7 @@ snapshot_kind: text
   line: 56
   column: 3
   offset: 1582
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -1895,7 +1894,7 @@ snapshot_kind: text
   line: 56
   column: 23
   offset: 1602
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 99
@@ -1930,7 +1929,7 @@ snapshot_kind: text
   line: 57
   column: 3
   offset: 1618
-- token_type: Type
+- token_type: DocType
   value:
     - 115
     - 116
@@ -1941,7 +1940,7 @@ snapshot_kind: text
   line: 57
   column: 24
   offset: 1639
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 112
@@ -1997,7 +1996,7 @@ snapshot_kind: text
   line: 59
   column: 16
   offset: 1678
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 110
@@ -2071,7 +2070,7 @@ snapshot_kind: text
   line: 60
   column: 24
   offset: 1724
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 110
@@ -2143,7 +2142,7 @@ snapshot_kind: text
   line: 61
   column: 22
   offset: 1778
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 110
@@ -2204,7 +2203,7 @@ snapshot_kind: text
   line: 62
   column: 21
   offset: 1831
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 110
@@ -3328,7 +3327,7 @@ snapshot_kind: text
   line: 99
   column: 19
   offset: 2820
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 100
@@ -3386,7 +3385,7 @@ snapshot_kind: text
   line: 100
   column: 27
   offset: 2859
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 100
@@ -3441,7 +3440,7 @@ snapshot_kind: text
   line: 101
   column: 28
   offset: 2909
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 100
@@ -3480,7 +3479,7 @@ snapshot_kind: text
   line: 102
   column: 17
   offset: 2944
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 110
@@ -3537,7 +3536,7 @@ snapshot_kind: text
   line: 103
   column: 25
   offset: 2982
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 110
@@ -3591,7 +3590,7 @@ snapshot_kind: text
   line: 104
   column: 26
   offset: 3031
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 110
@@ -3629,7 +3628,7 @@ snapshot_kind: text
   line: 105
   column: 16
   offset: 3066
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 97
@@ -3688,7 +3687,7 @@ snapshot_kind: text
   line: 106
   column: 24
   offset: 3106
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 97
@@ -3744,7 +3743,7 @@ snapshot_kind: text
   line: 107
   column: 25
   offset: 3157
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 97
@@ -3911,7 +3910,7 @@ snapshot_kind: text
   line: 114
   column: 14
   offset: 3309
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 114
@@ -3967,7 +3966,7 @@ snapshot_kind: text
   line: 115
   column: 22
   offset: 3346
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 114
@@ -4021,7 +4020,7 @@ snapshot_kind: text
   line: 116
   column: 20
   offset: 3391
-- token_type: Variable
+- token_type: DocVariable
   value:
     - 36
     - 114

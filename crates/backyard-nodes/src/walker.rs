@@ -215,6 +215,19 @@ impl<'arena, 'a> Iterator for Walker<'arena, 'a> {
         NodeWrapper::While(v) => v.populate_walks(&mut self.stack, item.level),
         NodeWrapper::Yield(v) => v.populate_walks(&mut self.stack, item.level),
         NodeWrapper::YieldFrom(v) => v.populate_walks(&mut self.stack, item.level),
+
+        // PHP Doc
+        NodeWrapper::DocText(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::DocParam(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::DocUnionType(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::DocIntersectionType(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::DocArrayType(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::DocStructuredArrayType(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::DocStructuredArrayItemType(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::DocListType(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::DocCallableType(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::DocType(v) => v.populate_walks(&mut self.stack, item.level),
+        NodeWrapper::DocVariable(v) => v.populate_walks(&mut self.stack, item.level),
       }
       let node = item.node;
       let level = item.level;
